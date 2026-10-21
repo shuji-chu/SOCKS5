@@ -18,20 +18,48 @@
                 <h2 class="text-2xl font-bold mb-2">一站式服务</h2>
                 <p class="text-blue-100 text-sm">高质量 TG 账号、稳定代理节点，即买即用。</p>
             </div>
-            <h3 class="font-bold text-slate-800 mb-3 text-lg">热门商品</h3>
-            <div class="space-y-4">
+            
+            <!-- 商品分类 Tab -->
+            <div class="flex bg-slate-200/50 p-1 rounded-xl mb-4">
+                <button id="btn-shop-tg" onclick="switchShopTab('tg')" class="flex-1 py-1.5 text-sm font-bold bg-white text-slate-800 rounded-lg shadow-sm transition-all">TG 账号</button>
+                <button id="btn-shop-node" onclick="switchShopTab('node')" class="flex-1 py-1.5 text-sm font-medium text-slate-500 hover:text-slate-800 rounded-lg transition-all">代理节点</button>
+            </div>
+
+            <!-- TG 账号列表 -->
+            <div id="list-tg" class="space-y-4">
                 <div class="bg-white rounded-xl p-4 card-shadow flex flex-col">
-                    <div class="flex justify-between items-start mb-2"><h4 class="font-bold text-slate-800">TG 高质量老号</h4><span class="text-blue-600 font-bold">¥9.90</span></div>
+                    <div class="flex justify-between items-start mb-2"><h4 class="font-bold text-slate-800">TG 高质量老号 (美国)</h4><span class="text-blue-600 font-bold">¥9.90</span></div>
                     <p class="text-xs text-slate-500 mb-3">已稳定养号30天，带2FA密码，防封性强。</p>
                     <button class="btn-primary w-full py-2 rounded-lg text-sm" onclick="requireLogin()">立即购买</button>
                 </div>
+                <div class="bg-white rounded-xl p-4 card-shadow flex flex-col">
+                    <div class="flex justify-between items-start mb-2"><h4 class="font-bold text-slate-800">TG 白号 (印尼)</h4><span class="text-blue-600 font-bold">¥4.50</span></div>
+                    <p class="text-xs text-slate-500 mb-3">全新无密码直登号，用于注册或登录。</p>
+                    <button class="btn-primary w-full py-2 rounded-lg text-sm" onclick="requireLogin()">立即购买</button>
+                </div>
+                <div class="bg-white rounded-xl p-4 card-shadow flex flex-col">
+                    <div class="flex justify-between items-start mb-2"><h4 class="font-bold text-slate-800">TG 双绑号 (带邮箱)</h4><span class="text-blue-600 font-bold">¥15.00</span></div>
+                    <p class="text-xs text-slate-500 mb-3">高权重防封号，附带原始邮箱，可改密。</p>
+                    <button class="btn-primary w-full py-2 rounded-lg text-sm" onclick="requireLogin()">立即购买</button>
+                </div>
+            </div>
+
+            <!-- 代理节点列表 (默认隐藏) -->
+            <div id="list-node" class="space-y-4 hidden">
                 <div class="bg-white rounded-xl p-4 card-shadow flex flex-col">
                     <div class="flex justify-between items-start mb-2"><h4 class="font-bold text-slate-800">专属高速节点 (月付)</h4><span class="text-blue-600 font-bold">¥19.90</span></div>
                     <p class="text-xs text-slate-500 mb-3">Socks5/VMess 协议，专为 TG 打造。</p>
                     <button class="btn-primary w-full py-2 rounded-lg text-sm" onclick="requireLogin()">立即购买</button>
                 </div>
+                <div class="bg-white rounded-xl p-4 card-shadow flex flex-col">
+                    <div class="flex justify-between items-start mb-2"><h4 class="font-bold text-slate-800">独享 IP 节点 (季付)</h4><span class="text-blue-600 font-bold">¥49.90</span></div>
+                    <p class="text-xs text-slate-500 mb-3">纯净独享IP，极高防封率，适合重度用户。</p>
+                    <button class="btn-primary w-full py-2 rounded-lg text-sm" onclick="requireLogin()">立即购买</button>
+                </div>
             </div>
         </div>
+
+        <!-- 订单视图 -->
         <div id="view-orders" class="hidden">
             <h3 class="font-bold text-slate-800 mb-4 text-xl">我的资产</h3>
             <div id="empty-orders" class="text-center py-10">
@@ -46,6 +74,8 @@
                 </div>
             </div>
         </div>
+
+        <!-- 我的视图 -->
         <div id="view-profile" class="hidden">
             <div id="profile-login-prompt" class="text-center py-10">
                 <h3 class="text-xl font-bold text-slate-800 mb-2">未登录</h3>
@@ -66,11 +96,14 @@
             </div>
         </div>
     </main>
+    
     <nav class="app-tab-bar">
         <div class="tab-item active" id="tab-home" onclick="switchTab('home')"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span>首页</span></div>
         <div class="tab-item" id="tab-orders" onclick="switchTab('orders')"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg><span>订单</span></div>
         <div class="tab-item" id="tab-profile" onclick="switchTab('profile')"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg><span>我的</span></div>
     </nav>
+
+    <!-- 登录弹窗 -->
     <div id="auth-modal" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-end justify-center" style="backdrop-filter: blur(4px);">
         <div class="bg-white w-full rounded-t-3xl p-6 pb-10 relative" style="animation: slideUp 0.3s ease-out;">
             <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 p-2">✕</button>

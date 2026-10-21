@@ -1,5 +1,6 @@
 const API_BASE = '/api/v1/passport/auth';
 let currentUser = localStorage.getItem('socks5_email') || null;
+
 function switchTab(tabName) {
     document.getElementById('view-home').classList.add('hidden');
     document.getElementById('view-orders').classList.add('hidden');
@@ -11,6 +12,22 @@ function switchTab(tabName) {
     document.getElementById('tab-' + tabName).classList.add('active');
     if (tabName === 'profile') updateProfileView();
 }
+
+// 商品分类切换
+function switchShopTab(type) {
+    if (type === 'tg') {
+        document.getElementById('list-tg').classList.remove('hidden');
+        document.getElementById('list-node').classList.add('hidden');
+        document.getElementById('btn-shop-tg').className = 'flex-1 py-1.5 text-sm font-bold bg-white text-slate-800 rounded-lg shadow-sm transition-all';
+        document.getElementById('btn-shop-node').className = 'flex-1 py-1.5 text-sm font-medium text-slate-500 rounded-lg transition-all';
+    } else {
+        document.getElementById('list-tg').classList.add('hidden');
+        document.getElementById('list-node').classList.remove('hidden');
+        document.getElementById('btn-shop-node').className = 'flex-1 py-1.5 text-sm font-bold bg-white text-slate-800 rounded-lg shadow-sm transition-all';
+        document.getElementById('btn-shop-tg').className = 'flex-1 py-1.5 text-sm font-medium text-slate-500 rounded-lg transition-all';
+    }
+}
+
 function updateProfileView() {
     if (currentUser) {
         document.getElementById('profile-login-prompt').classList.add('hidden');
@@ -39,6 +56,7 @@ function switchAuthTab(tab) {
     }
 }
 function requireLogin() { if (!currentUser) { showAuthModal(); } else { alert('正在调起支付接口...'); } }
+
 async function sendCode() {
     const email = document.getElementById('reg-email').value;
     if(!email || !email.includes('@')) { alert('请输入正确邮箱'); return; }
@@ -54,6 +72,7 @@ async function sendCode() {
         } else { alert(data.message || '发送失败'); btn.disabled = false; btn.innerText = '获取验证码'; }
     } catch (e) { alert('网络错误'); btn.disabled = false; btn.innerText = '获取验证码'; }
 }
+
 async function handleRegister(e) {
     e.preventDefault();
     const email = document.getElementById('reg-email').value;
@@ -65,7 +84,9 @@ async function handleRegister(e) {
         if (res.ok) { alert('注册成功，正在自动登录...'); setTimeout(() => loginUser(email, password), 1000); } else { alert(data.message || '注册失败'); }
     } catch (e) { alert('网络错误'); }
 }
+
 async function handleLogin(e) { e.preventDefault(); loginUser(document.getElementById('login-email').value, document.getElementById('login-pwd').value); }
+
 async function loginUser(email, password) {
     try {
         const res = await fetch(`${API_BASE}/login`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ email, password }) });
@@ -76,14 +97,17 @@ async function loginUser(email, password) {
         } else { alert(data.message || '邮箱或密码错误'); }
     } catch (e) { alert('网络错误'); }
 }
+
 function logout() {
     localStorage.removeItem('socks5_email'); currentUser = null; updateProfileView(); switchTab('home');
     document.getElementById('empty-orders').classList.remove('hidden'); document.getElementById('order-list').classList.add('hidden');
 }
+
 function handleSignIn() {
     const btn = document.getElementById('sign-btn'); btn.disabled = true; btn.innerText = '获取中...';
     setTimeout(() => { btn.innerText = '已签到 (点击复制节点)'; btn.classList.replace('text-orange-500', 'text-green-600'); alert('签到成功！Socks5 节点已复制到剪贴板。'); }, 800);
 }
+
 document.addEventListener('DOMContentLoaded', () => {
     if(currentUser) { document.getElementById('empty-orders').classList.add('hidden'); document.getElementById('order-list').classList.remove('hidden'); }
 });

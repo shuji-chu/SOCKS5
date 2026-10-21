@@ -4,18 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>登录 - SOCKS5</title>
-    <!-- 使用更稳定的国内镜像 CDN 替代原版 Tailwind，防止加载抽风导致页面跳动 -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="/style.css?v=31">
+    <link rel="stylesheet" href="/style.css?v=32">
     <style>
-        /* 强制禁用滚动，防止页面整体抖动 */
         html, body { overflow: hidden; height: 100%; height: 100dvh; }
         #login-container { height: 100%; height: 100dvh; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        /* 自定义 Toast 动画 */
+        @keyframes toastIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .toast-anim { animation: toastIn 0.3s ease-out forwards; }
     </style>
 </head>
 <body>
-    <div id="login-container" class="bg-slate-50 flex flex-col justify-between p-6 pb-4">
+    <!-- 自定义全局 Toast 提示 -->
+    <div id="custom-toast" class="fixed top-10 left-1/2 transform -translate-x-1/2 z-[100] hidden">
+        <div class="bg-slate-800/95 backdrop-blur-md text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3 border border-slate-700">
+            <img src="/logo.jpg" class="w-6 h-6 rounded-md object-cover">
+            <div>
+                <p class="text-xs text-slate-400 font-medium">SOCKS5 提醒</p>
+                <p id="toast-text" class="text-sm font-medium mt-0.5">提示内容</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="login-container" class="bg-slate-50 flex flex-col justify-between p-6 pb-4 relative">
         <div class="text-center mt-6 mb-8">
             <img src="/logo.jpg" class="w-16 h-16 rounded-[1.25rem] mx-auto mb-4 object-cover shadow-sm border border-slate-200">
             <h2 class="text-[22px] font-bold text-slate-900 tracking-tight">欢迎回来</h2>
@@ -39,13 +51,13 @@
             </div>
 
             <div class="flex items-center justify-center gap-5">
-                <button onclick="handlePlatformLogin('tg')" class="w-11 h-11 rounded-xl bg-white border border-slate-200 shadow-sm flex items-center justify-center hover:bg-slate-50 overflow-hidden">
+                <button onclick="handlePlatformLogin('Telegram')" class="w-11 h-11 rounded-xl bg-white border border-slate-200 shadow-sm flex items-center justify-center hover:bg-slate-50 overflow-hidden">
                     <img src="/tg.jpg" class="w-full h-full object-cover">
                 </button>
-                <button onclick="handlePlatformLogin('safew')" class="w-11 h-11 rounded-xl bg-white border border-slate-200 shadow-sm flex items-center justify-center hover:bg-slate-50 overflow-hidden">
+                <button onclick="handlePlatformLogin('SafeW')" class="w-11 h-11 rounded-xl bg-white border border-slate-200 shadow-sm flex items-center justify-center hover:bg-slate-50 overflow-hidden">
                     <img src="/safew.jpg" class="w-full h-full object-cover">
                 </button>
-                <button onclick="handlePlatformLogin('mivra')" class="w-11 h-11 rounded-xl bg-white border border-slate-200 shadow-sm flex items-center justify-center hover:bg-slate-50 overflow-hidden">
+                <button onclick="handlePlatformLogin('Mivra')" class="w-11 h-11 rounded-xl bg-white border border-slate-200 shadow-sm flex items-center justify-center hover:bg-slate-50 overflow-hidden">
                     <img src="/mivra.jpg" class="w-full h-full object-cover">
                 </button>
             </div>
@@ -64,6 +76,7 @@
         </div>
     </div>
 
+    <!-- 协议弹窗 -->
     <div id="info-modal" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-end justify-center" style="backdrop-filter: blur(4px);">
         <div class="bg-white w-full max-w-md rounded-t-3xl p-6 pb-10 relative max-h-[80vh] flex flex-col" style="animation: slideUp 0.3s ease-out;">
             <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
@@ -75,8 +88,23 @@
     </div>
 
     <style>@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }</style>
-    <script src="/app.js?v=31"></script>
+    <script src="/app.js?v=32"></script>
     <script>
+        // 自定义 Toast 提示函数
+        function showToast(msg) {
+            const toast = document.getElementById('custom-toast');
+            document.getElementById('toast-text').innerText = msg;
+            toast.classList.remove('hidden');
+            toast.classList.add('toast-anim');
+            
+            // 2.5秒后自动消失
+            clearTimeout(window.toastTimer);
+            window.toastTimer = setTimeout(() => {
+                toast.classList.add('hidden');
+                toast.classList.remove('toast-anim');
+            }, 2500);
+        }
+
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value;
@@ -90,14 +118,16 @@
                     localStorage.setItem('socks5_email', email);
                     localStorage.setItem('socks5_token', data.data?.token || data.token || '');
                     window.location.href = '/index.html';
-                } else { alert(data.message || '登录失败'); }
-            } catch (err) { alert('网络错误'); }
+                } else { 
+                    showToast(data.message || '登录失败'); 
+                }
+            } catch (err) { showToast('网络错误，请稍后再试'); }
         });
 
-        function handlePlatformLogin(platform) {
-            if (platform === 'mivra') { window.location.href = 'https://m.mivra.im/'; } 
-            else if (platform === 'safew') { window.location.href = 'https://sfw.bar/'; } 
-            else { alert('请前往 Telegram 机器人内点击专属按钮打开，或使用邮箱登录。'); }
+        // 统一平台按钮拦截逻辑
+        function handlePlatformLogin(platformName) {
+            // 不再乱跳转导致 404 或拒绝连接，统一提示去机器人内打开
+            showToast(`请前往 ${platformName} 机器人内点击专属按钮授权`);
         }
 
         const modalContent = {

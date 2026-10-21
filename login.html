@@ -4,58 +4,63 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>登录 - SOCKS5</title>
+    <!-- 使用更稳定的国内镜像 CDN 替代原版 Tailwind，防止加载抽风导致页面跳动 -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="/style.css?v=30">
+    <link rel="stylesheet" href="/style.css?v=31">
+    <style>
+        /* 强制禁用滚动，防止页面整体抖动 */
+        html, body { overflow: hidden; height: 100%; height: 100dvh; }
+        #login-container { height: 100%; height: 100dvh; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+    </style>
 </head>
-<body class="bg-slate-50 flex flex-col justify-between min-h-screen p-6 pb-4 relative overflow-hidden">
-    
-    <div class="text-center mt-10 mb-8">
-        <img src="/logo.jpg" class="w-16 h-16 rounded-[1.25rem] mx-auto mb-4 object-cover shadow-sm border border-slate-200">
-        <h2 class="text-[22px] font-bold text-slate-900 tracking-tight">欢迎回来</h2>
-        <p class="text-[13px] text-slate-500 mt-1.5">登录以继续使用 SOCKS5 服务</p>
-    </div>
-
-    <div class="max-w-sm w-full mx-auto bg-white p-6 md:p-8 rounded-[2rem] card-shadow border border-slate-100 z-10 relative">
-        <form id="login-form" class="space-y-3.5">
-            <input type="email" id="email" required placeholder="工作邮箱" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none text-[15px]">
-            <input type="password" id="password" required placeholder="密码" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none text-[15px]">
-            <button type="submit" class="btn-primary w-full py-3.5 rounded-2xl font-bold text-[15px] mt-2">安全登录</button>
-        </form>
-        
-        <div class="text-center mt-5 mb-8">
-            <a href="/register.html" class="text-[13px] font-medium text-blue-600">没有账号？立即注册</a>
+<body>
+    <div id="login-container" class="bg-slate-50 flex flex-col justify-between p-6 pb-4">
+        <div class="text-center mt-6 mb-8">
+            <img src="/logo.jpg" class="w-16 h-16 rounded-[1.25rem] mx-auto mb-4 object-cover shadow-sm border border-slate-200">
+            <h2 class="text-[22px] font-bold text-slate-900 tracking-tight">欢迎回来</h2>
+            <p class="text-[13px] text-slate-500 mt-1.5">登录以继续使用 SOCKS5 服务</p>
         </div>
 
-        <div class="relative mb-6">
-            <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-100"></div></div>
-            <div class="relative flex justify-center text-[11px]"><span class="px-3 bg-white text-slate-400 tracking-wider">快捷授权登录</span></div>
+        <div class="max-w-sm w-full mx-auto bg-white p-6 md:p-8 rounded-[2rem] card-shadow border border-slate-100 z-10 relative">
+            <form id="login-form" class="space-y-3.5">
+                <input type="email" id="email" required placeholder="工作邮箱" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none text-[15px]">
+                <input type="password" id="password" required placeholder="密码" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none text-[15px]">
+                <button type="submit" class="btn-primary w-full py-3.5 rounded-2xl font-bold text-[15px] mt-2">安全登录</button>
+            </form>
+            
+            <div class="text-center mt-5 mb-8">
+                <a href="/register.html" class="text-[13px] font-medium text-blue-600">没有账号？立即注册</a>
+            </div>
+
+            <div class="relative mb-6">
+                <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-100"></div></div>
+                <div class="relative flex justify-center text-[11px]"><span class="px-3 bg-white text-slate-400 tracking-wider">快捷授权登录</span></div>
+            </div>
+
+            <div class="flex items-center justify-center gap-5">
+                <button onclick="handlePlatformLogin('tg')" class="w-11 h-11 rounded-xl bg-white border border-slate-200 shadow-sm flex items-center justify-center hover:bg-slate-50 overflow-hidden">
+                    <img src="/tg.jpg" class="w-full h-full object-cover">
+                </button>
+                <button onclick="handlePlatformLogin('safew')" class="w-11 h-11 rounded-xl bg-white border border-slate-200 shadow-sm flex items-center justify-center hover:bg-slate-50 overflow-hidden">
+                    <img src="/safew.jpg" class="w-full h-full object-cover">
+                </button>
+                <button onclick="handlePlatformLogin('mivra')" class="w-11 h-11 rounded-xl bg-white border border-slate-200 shadow-sm flex items-center justify-center hover:bg-slate-50 overflow-hidden">
+                    <img src="/mivra.jpg" class="w-full h-full object-cover">
+                </button>
+            </div>
         </div>
 
-        <div class="flex items-center justify-center gap-5">
-            <button onclick="handlePlatformLogin('tg')" class="w-11 h-11 rounded-xl bg-white border border-slate-200 shadow-sm flex items-center justify-center hover:bg-slate-50 overflow-hidden">
-                <img src="/tg.jpg" class="w-full h-full object-cover">
-            </button>
-
-            <button onclick="handlePlatformLogin('safew')" class="w-11 h-11 rounded-xl bg-white border border-slate-200 shadow-sm flex items-center justify-center hover:bg-slate-50 overflow-hidden">
-                <img src="/safew.jpg" class="w-full h-full object-cover">
-            </button>
-
-            <button onclick="handlePlatformLogin('mivra')" class="w-11 h-11 rounded-xl bg-white border border-slate-200 shadow-sm flex items-center justify-center hover:bg-slate-50 overflow-hidden">
-                <img src="/mivra.jpg" class="w-full h-full object-cover">
-            </button>
-        </div>
-    </div>
-
-    <div class="text-center mt-8 mb-4 flex flex-col items-center justify-center z-10 relative">
-        <img src="/logo.jpg" class="w-7 h-7 rounded-lg mb-3 grayscale opacity-40 object-cover">
-        <p class="text-[10px] font-semibold text-slate-400 tracking-widest uppercase mb-4">Powered by SOCKS5 Secure</p>
-        <div class="flex items-center justify-center gap-3 text-[11px] text-slate-400">
-            <button onclick="openModal('privacy')" class="hover:text-slate-600">隐私政策</button>
-            <span>|</span>
-            <button onclick="openModal('terms')" class="hover:text-slate-600">用户协议</button>
-            <span>|</span>
-            <button onclick="openModal('about')" class="hover:text-slate-600">关于我们</button>
+        <div class="text-center mt-8 mb-4 flex flex-col items-center justify-center z-10 relative">
+            <img src="/logo.jpg" class="w-7 h-7 rounded-lg mb-3 grayscale opacity-40 object-cover">
+            <p class="text-[10px] font-semibold text-slate-400 tracking-widest uppercase mb-4">Powered by SOCKS5 Secure</p>
+            <div class="flex items-center justify-center gap-3 text-[11px] text-slate-400">
+                <button onclick="openModal('privacy')" class="hover:text-slate-600">隐私政策</button>
+                <span>|</span>
+                <button onclick="openModal('terms')" class="hover:text-slate-600">用户协议</button>
+                <span>|</span>
+                <button onclick="openModal('about')" class="hover:text-slate-600">关于我们</button>
+            </div>
         </div>
     </div>
 
@@ -70,14 +75,14 @@
     </div>
 
     <style>@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }</style>
-    <script src="/app.js?v=30"></script>
+    <script src="/app.js?v=31"></script>
     <script>
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             try {
-                const res = await fetch('/api/v1/passport/auth/login', {
+                const res = await fetch('https://api.shuji.cc.cd/s5api/api/v1/passport/auth/login', {
                     method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ email, password })
                 });
                 const data = await res.json();
@@ -96,9 +101,9 @@
         }
 
         const modalContent = {
-            'privacy': { title: '隐私政策', text: '我们深知个人信息对您的重要性，并会尽全力保护您的个人信息安全可靠...' },
-            'terms': { title: '用户协议', text: '欢迎使用 SOCKS5 服务。本协议是您与 SOCKS5 之间关于您使用本服务所订立的协议...' },
-            'about': { title: '关于我们', text: 'SOCKS5 致力于为您提供全球领先的虚拟资产与安全网络服务...' }
+            'privacy': { title: '隐私政策', text: '我们深知个人信息对您的重要性...' },
+            'terms': { title: '用户协议', text: '欢迎使用 SOCKS5 服务...' },
+            'about': { title: '关于我们', text: 'SOCKS5 致力于为您提供...' }
         };
         function openModal(type) {
             const data = modalContent[type]; if(!data) return;

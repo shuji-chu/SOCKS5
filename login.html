@@ -6,7 +6,7 @@
     <title>登录 - SOCKS5</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="/style.css?v=24">
+    <link rel="stylesheet" href="/style.css?v=25">
 </head>
 <body class="bg-slate-50 flex flex-col justify-between min-h-screen p-6 pb-4 relative overflow-hidden">
     
@@ -30,26 +30,27 @@
             <a href="/register.html" class="text-[13px] font-medium text-blue-600 hover:text-blue-700">没有账号？立即注册</a>
         </div>
 
-        <!-- 底部：精致的第三方 APP 图标快捷登录 -->
+        <!-- 底部：官方原版图标快捷登录 -->
         <div class="relative mb-6">
             <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-100"></div></div>
             <div class="relative flex justify-center text-[11px]"><span class="px-3 bg-white text-slate-400 tracking-wider">快捷授权登录</span></div>
         </div>
 
-        <div class="flex items-center justify-center gap-7">
-            <!-- Telegram -->
-            <button onclick="handlePlatformLogin('tg')" class="w-14 h-14 rounded-full bg-white border border-slate-200 shadow-sm flex items-center justify-center hover:bg-slate-50 transition-all active:scale-90">
-                <svg class="w-8 h-8 text-[#229ED9]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>
+        <div class="flex items-center justify-center gap-6">
+            <!-- Telegram 官方图标 -->
+            <button onclick="handlePlatformLogin('tg')" class="w-14 h-14 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center justify-center hover:bg-slate-50 transition-all active:scale-90 overflow-hidden">
+                <!-- 如果你还没准备 tg.png，会显示裂图。请务必放入图片 -->
+                <img src="/tg.png" class="w-9 h-9 object-contain">
             </button>
 
-            <!-- SafeW (安全聊天图标) -->
-            <button onclick="handlePlatformLogin('safew')" class="w-14 h-14 rounded-full bg-white border border-slate-200 shadow-sm flex items-center justify-center hover:bg-slate-50 transition-all active:scale-90">
-                <svg class="w-7 h-7 text-[#0F172A]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+            <!-- SafeW 官方图标 (你发的第二张图) -->
+            <button onclick="handlePlatformLogin('safew')" class="w-14 h-14 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center justify-center hover:bg-slate-50 transition-all active:scale-90 overflow-hidden">
+                <img src="/safew.png" class="w-9 h-9 object-contain">
             </button>
 
-            <!-- Mivra (紫色纸飞机) -->
-            <button onclick="handlePlatformLogin('mivra')" class="w-14 h-14 rounded-full bg-white border border-slate-200 shadow-sm flex items-center justify-center hover:bg-slate-50 transition-all active:scale-90">
-                <svg class="w-8 h-8 text-[#8B5CF6]" fill="currentColor" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            <!-- Mivra 官方图标 (你发的第一张图) -->
+            <button onclick="handlePlatformLogin('mivra')" class="w-14 h-14 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center justify-center hover:bg-slate-50 transition-all active:scale-90 overflow-hidden">
+                <img src="/mivra.png" class="w-9 h-9 object-contain">
             </button>
         </div>
     </div>
@@ -59,7 +60,6 @@
         <img src="/logo.jpg" class="w-7 h-7 rounded-lg mb-3 grayscale opacity-40 object-cover">
         <p class="text-[10px] font-semibold text-slate-400 tracking-widest uppercase mb-4">Powered by SOCKS5 Secure</p>
         
-        <!-- 协议与关于我们 -->
         <div class="flex items-center justify-center gap-3 text-[11px] text-slate-400">
             <button onclick="openModal('privacy')" class="hover:text-slate-600 transition-colors">隐私政策</button>
             <span class="text-slate-300">|</span>
@@ -76,17 +76,12 @@
                 <h3 class="text-lg font-bold text-slate-800" id="modal-title">标题</h3>
                 <button onclick="closeModal()" class="text-slate-400 p-2 hover:text-slate-700">✕</button>
             </div>
-            <div class="overflow-y-auto text-[13px] text-slate-600 leading-relaxed space-y-3 pr-2" id="modal-content">
-                <!-- 内容动态填充 -->
-            </div>
+            <div class="overflow-y-auto text-[13px] text-slate-600 leading-relaxed space-y-3 pr-2" id="modal-content"></div>
         </div>
     </div>
 
-    <style>
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-    </style>
-
-    <script src="/app.js?v=24"></script>
+    <style>@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }</style>
+    <script src="/app.js?v=25"></script>
     <script>
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -106,42 +101,24 @@
         });
 
         function handlePlatformLogin(platform) {
-            if (platform === 'mivra') {
-                window.location.href = 'https://m.mivra.im/';
-            } else if (platform === 'safew') {
-                window.location.href = 'https://sfw.bar/';
-            } else {
-                alert('请前往 Telegram 机器人内点击专属按钮打开，或使用邮箱登录。');
-            }
+            if (platform === 'mivra') { window.location.href = 'https://m.mivra.im/'; } 
+            else if (platform === 'safew') { window.location.href = 'https://sfw.bar/'; } 
+            else { alert('请前往 Telegram 机器人内点击专属按钮打开，或使用邮箱登录。'); }
         }
 
-        // --- 弹窗逻辑 ---
         const modalContent = {
-            'privacy': {
-                title: '隐私政策',
-                text: '我们深知个人信息对您的重要性，并会尽全力保护您的个人信息安全可靠。我们致力于维持您对我们的信任，恪守以下原则保护您的个人信息：权责一致原则、目的明确原则、选择同意原则、最少够用原则、确保安全原则、主体参与原则、公开透明原则等。同时，我们承诺，我们将按业界成熟的安全标准，采取相应的安全保护措施来保护您的个人信息。'
-            },
-            'terms': {
-                title: '用户协议',
-                text: '欢迎使用 SOCKS5 服务。本协议是您与 SOCKS5 之间关于您使用本服务所订立的协议。您应当具备完全民事行为能力。若您不具备前述资格，则您及您的监护人应承担因此而导致的一切后果。您在使用本服务时，必须遵守中华人民共和国的相关法律法规，不得利用本服务从事任何违法违规活动。对于任何违反规定的账号，我们有权进行封禁处理。'
-            },
-            'about': {
-                title: '关于我们',
-                text: 'SOCKS5 致力于为您提供全球领先的虚拟资产与安全网络服务。我们拥有专业的技术团队，采用银行级加密技术保障您的每一次交易和数据传输。我们的使命是让全球互联网访问变得无界、安全、极速。如遇任何问题，请通过系统内客服渠道或官方机器人联系我们。'
-            }
+            'privacy': { title: '隐私政策', text: '我们深知个人信息对您的重要性，并会尽全力保护您的个人信息安全可靠。我们致力于维持您对我们的信任，恪守以下原则保护您的个人信息：权责一致原则、目的明确原则、选择同意原则、最少够用原则、确保安全原则等。' },
+            'terms': { title: '用户协议', text: '欢迎使用 SOCKS5 服务。本协议是您与 SOCKS5 之间关于您使用本服务所订立的协议。您在使用本服务时，必须遵守相关法律法规，不得利用本服务从事任何违法违规活动。对于任何违反规定的账号，我们有权进行封禁处理。' },
+            'about': { title: '关于我们', text: 'SOCKS5 致力于为您提供全球领先的虚拟资产与安全网络服务。我们拥有专业的技术团队，采用银行级加密技术保障您的每一次交易和数据传输。如遇问题，请通过系统内客服渠道联系我们。' }
         };
 
         function openModal(type) {
-            const data = modalContent[type];
-            if(!data) return;
+            const data = modalContent[type]; if(!data) return;
             document.getElementById('modal-title').innerText = data.title;
             document.getElementById('modal-content').innerText = data.text;
             document.getElementById('info-modal').classList.remove('hidden');
         }
-
-        function closeModal() {
-            document.getElementById('info-modal').classList.add('hidden');
-        }
+        function closeModal() { document.getElementById('info-modal').classList.add('hidden'); }
     </script>
 </body>
 </html>

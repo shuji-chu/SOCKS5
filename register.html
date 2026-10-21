@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>注册 - SOCKS5</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/style.css?v=6">
+</head>
+<body class="bg-slate-50 flex flex-col justify-center min-h-screen p-6">
+    <div class="text-center mb-8">
+        <img src="/logo.jpg" class="w-16 h-16 rounded-2xl mx-auto mb-4 object-cover shadow-sm">
+        <h2 class="text-2xl font-bold text-slate-800">创建新账号</h2>
+        <p class="text-sm text-slate-500 mt-1">请使用真实邮箱完成验证</p>
+    </div>
+    <form id="reg-form" class="bg-white p-6 rounded-2xl card-shadow border border-slate-100 space-y-4">
+        <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">工作邮箱</label>
+            <input type="email" id="email" required placeholder="name@company.com" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">邮箱验证码</label>
+            <div class="flex gap-2">
+                <input type="text" id="code" required placeholder="6位数字" class="flex-1 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+                <button type="button" id="send-code-btn" class="px-4 py-3 bg-slate-800 text-white rounded-xl text-xs font-medium whitespace-nowrap">获取验证码</button>
+            </div>
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">设置密码</label>
+            <input type="password" id="password" required placeholder="设置至少8位密码" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+        <button type="submit" class="btn-primary w-full py-3 rounded-xl font-bold mt-2">立即注册</button>
+    </form>
+    <div class="text-center mt-6">
+        <a href="/login.html" class="text-sm text-blue-600 font-medium">已有账号？返回登录</a>
+    </div>
+
+    <script>
+        // 发送验证码逻辑
+        document.getElementById('send-code-btn').addEventListener('click', async function() {
+            const email = document.getElementById('email').value;
+            if(!email || !email.includes('@')) { alert('请输入正确邮箱'); return; }
+            this.disabled = true; this.innerText = '发送中...';
+            try {
+                const res = await fetch('/api/v1/passport/auth/send-code', {
+                    method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ email })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    alert('验证码已发送，请查收邮箱');
+                    let cd = 60; const btn = this;
+                    const timer = setInterval(() => { cd--; btn.innerText = `${cd}s`; if(cd <= 0) { clearInterval(timer); btn.disabled = false; btn.innerText = '获取验证码'; } }, 1000);
+                } else { alert(data.message || '发送失败'); this.disabled = false; this.innerText = '获取验证码'; }
+            } catch (e) { alert('网络错误'); this.disabled = false; this.innerText = '获取验证码'; }
+        });
+
+        // 提交注册逻辑
+        document.getElementById('reg-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const code = document.getElementById('code').value;
+            const password = document.getElementById('password').value;
+            try {
+                const res = await fetch('/api/v1/passport/auth/register', {
+                    method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ email, password, code })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    alert('注册成功，请登录');
+                    window.location.href = '/login.html';
+                } else { alert(data.message || '注册失败'); }
+            } catch (err) { alert('网络错误'); }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>个人中心 - SOCKS5</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/style.css?v=6">
+</head>
+<body>
+    <header class="app-header">
+        <img src="/logo.jpg" class="app-logo">
+        <h1 class="app-title">个人中心</h1>
+    </header>
+    <main class="content-wrap">
+        <div class="bg-white rounded-2xl p-6 card-shadow text-center mb-6">
+            <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl font-bold">U</div>
+            <h3 class="font-bold text-slate-800" id="user-email">加载中...</h3>
+            <button onclick="logout()" class="mt-4 text-xs font-medium text-red-500 bg-red-50 px-4 py-1.5 rounded-full">退出登录</button>
+        </div>
+
+        <div class="bg-gradient-to-r from-orange-400 to-orange-500 rounded-2xl p-6 text-white card-shadow">
+            <h4 class="font-bold text-lg mb-1">专属会员福利</h4>
+            <p class="text-orange-100 text-xs mb-4">每日签到免费获取高速 Socks5 节点体验</p>
+            <button onclick="document.getElementById('sign-btn').innerText='已签到 (点击复制节点)';alert('签到成功！节点已复制。')" id="sign-btn" class="w-full py-2.5 bg-white text-orange-500 font-bold rounded-xl text-sm transition-all active:scale-95">立即签到</button>
+        </div>
+    </main>
+
+    <nav class="app-tab-bar">
+        <a href="/index.html" class="tab-item"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span>首页</span></a>
+        <a href="/orders.html" class="tab-item"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg><span>订单</span></a>
+        <a href="/profile.html" class="tab-item active"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg><span>我的</span></a>
+    </nav>
+    <script src="/app.js?v=6"></script>
+    <script>
+        if(!localStorage.getItem('socks5_email')) {
+            window.location.href = '/login.html';
+        } else {
+            document.getElementById('user-email').innerText = localStorage.getItem('socks5_email');
+        }
+    </script>
+</body>
+</html>

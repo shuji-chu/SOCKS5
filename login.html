@@ -6,55 +6,44 @@
     <title>登录 - SOCKS5</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="/style.css?v=20">
+    <link rel="stylesheet" href="/style.css?v=21">
 </head>
-<body class="bg-slate-50 flex flex-col justify-center min-h-screen p-6">
+<body class="bg-slate-50 flex flex-col justify-between min-h-screen p-6 pb-4">
     
-    <div class="text-center mb-6">
+    <div class="text-center mt-8 mb-6">
         <img src="/logo.jpg" class="w-16 h-16 rounded-2xl mx-auto mb-4 object-cover shadow-sm border border-slate-100">
         <h2 class="text-2xl font-bold text-slate-800">欢迎回来</h2>
         <p class="text-sm text-slate-500 mt-2">登录以继续使用 SOCKS5 服务</p>
     </div>
 
+    <!-- 核心登录面板 -->
     <div class="max-w-sm w-full mx-auto bg-white p-6 md:p-8 rounded-3xl card-shadow border border-slate-100">
         
-        <!-- 三大平台入口 -->
+        <!-- 三大平台入口 (纯净版，无官方组件报错) -->
         <div class="space-y-3 mb-6">
-            <!-- 1. Telegram 官方授权组件 (gsdlvpnbot) -->
-            <div class="flex justify-center w-full overflow-hidden">
-                <script async src="https://telegram.org/js/telegram-widget.js?22" 
-                        data-telegram-login="gsdlvpnbot" 
-                        data-size="large" 
-                        data-onauth="onTelegramAuth(user)" 
-                        data-request-access="write"></script>
-            </div>
-
-            <!-- 2. SafeW 官方授权组件 (lsmcrbot) -->
-            <div class="flex justify-center w-full overflow-hidden">
-                <script async src="https://oauth.safew.bot/js/safew-widget.js" 
-                        data-safew-login="lsmcrbot" 
-                        data-size="large" 
-                        data-onauth="onSafeWAuth(user)" 
-                        data-request-access="write"></script>
-            </div>
-
-            <!-- 3. SafeW 备用入口 (sfw.bar) -->
-            <a href="https://sfw.bar/" target="_blank" class="w-full flex items-center justify-center gap-2 py-3 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-medium transition-all">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                前往 SafeW 官方入口
-            </a>
-
-            <!-- 4. Mivra 专属入口 (m.mivra.im) -->
-            <a href="https://m.mivra.im/" target="_blank" class="w-full flex items-center justify-center gap-2 py-3 px-4 bg-[#2AABEE] hover:bg-[#229ED9] text-white rounded-xl font-medium transition-all">
+            <!-- 1. Telegram 按钮 -->
+            <button onclick="handlePlatformLogin('tg')" class="w-full flex items-center justify-center gap-2 py-3 px-4 bg-[#229ED9] hover:bg-[#1E8CC2] text-white rounded-xl font-medium transition-all">
                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>
-                前往 Mivra 官方入口
-            </a>
+                使用 Telegram 账号登录
+            </button>
+
+            <!-- 2. SafeW 按钮 -->
+            <button onclick="handlePlatformLogin('safew')" class="w-full flex items-center justify-center gap-2 py-3 px-4 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-medium transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                使用 SafeW 账号登录
+            </button>
+
+            <!-- 3. Mivra 按钮 -->
+            <button onclick="handlePlatformLogin('mivra')" class="w-full flex items-center justify-center gap-2 py-3 px-4 bg-[#2AABEE] hover:bg-[#229ED9] text-white rounded-xl font-medium transition-all">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>
+                使用 Mivra 账号登录
+            </button>
         </div>
 
         <!-- 分割线 -->
         <div class="relative mb-5">
             <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200"></div></div>
-            <div class="relative flex justify-center text-xs"><span class="px-2 bg-white text-slate-400">或使用邮箱登录</span></div>
+            <div class="relative flex justify-center text-xs"><span class="px-2 bg-white text-slate-400">或使用邮箱账号</span></div>
         </div>
 
         <!-- 邮箱密码登录 -->
@@ -69,7 +58,13 @@
         </div>
     </div>
 
-    <script src="/app.js?v=20"></script>
+    <!-- 底部 Logo 标识挂载 -->
+    <div class="text-center mt-8 mb-4 flex flex-col items-center justify-center opacity-60">
+        <img src="/logo.jpg" class="w-6 h-6 rounded-md mb-2 grayscale object-cover">
+        <p class="text-[11px] font-medium text-slate-500 tracking-wider">Powered by SOCKS5 Secure</p>
+    </div>
+
+    <script src="/app.js?v=21"></script>
     <script>
         // 邮箱登录
         document.getElementById('login-form').addEventListener('submit', async (e) => {
@@ -89,35 +84,17 @@
             } catch (err) { alert('网络错误'); }
         });
 
-        // TG 授权回调
-        async function onTelegramAuth(user) {
-            try {
-                const res = await fetch('/s5api/api/v1/auth/sso-login', {
-                    method: 'POST', headers: {'Content-Type': 'application/json'}, 
-                    body: JSON.stringify({ platform: 'tg', open_id: user.id, nickname: user.first_name })
-                });
-                const data = await res.json();
-                if (res.ok && data.data) {
-                    localStorage.setItem('socks5_email', data.data.email);
-                    localStorage.setItem('socks5_token', data.data.token);
-                    window.location.href = '/index.html';
-                }
-            } catch (err) { alert('网络错误'); }
-        }
-
-        // SafeW 授权回调
-        async function onSafeWAuth(user) {
-            try {
-                const res = await fetch('/s5api/api/v1/auth/safew-login', {
-                    method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(user)
-                });
-                const data = await res.json();
-                if (res.ok && data.data) {
-                    localStorage.setItem('socks5_email', data.data.email);
-                    localStorage.setItem('socks5_token', data.data.token);
-                    window.location.href = '/index.html';
-                }
-            } catch (err) { alert('网络错误'); }
+        // 统一平台按钮拦截逻辑
+        function handlePlatformLogin(platform) {
+            // 如果是 Mivra，直接跳转到你发我的官方入口
+            if (platform === 'mivra') {
+                window.location.href = 'https://m.mivra.im/';
+            } else if (platform === 'safew') {
+                window.location.href = 'https://sfw.bar/';
+            } else {
+                // 对于 TG，提示去机器人内授权
+                alert('请前往 Telegram 机器人内点击专属按钮打开，或使用邮箱登录。');
+            }
         }
     </script>
 </body>

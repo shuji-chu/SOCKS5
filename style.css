@@ -1,0 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body { font-family: 'Inter', -apple-system, sans-serif; background-color: #f1f5f9; color: #1e293b; margin: 0; padding: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+.app-header { background: #ffffff; padding: 16px 20px; display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); z-index: 10; }
+.app-logo { width: 28px; height: 28px; border-radius: 8px; object-fit: cover; }
+.app-title { font-size: 18px; font-weight: 700; margin: 0; }
+.app-content { flex: 1; overflow-y: auto; padding: 16px 20px; padding-bottom: 80px; }
+.app-tab-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #ffffff; display: flex; justify-content: space-around; padding: 10px 0 20px 0; box-shadow: 0 -1px 3px rgba(0,0,0,0.05); border-top-left-radius: 20px; border-top-right-radius: 20px; z-index: 20; }
+.tab-item { display: flex; flex-direction: column; align-items: center; font-size: 10px; color: #94a3b8; cursor: pointer; transition: all 0.2s; }
+.tab-item svg { width: 24px; height: 24px; margin-bottom: 4px; fill: currentColor; }
+.tab-item.active { color: #2563eb; }
+.card-shadow { box-shadow: 0 2px 8px -1px rgba(0,0,0,0.05); }
+.btn-primary { background-color: #2563eb; color: white; border: none; cursor: pointer; transition: all 0.2s ease; }
+.btn-primary:active { transform: scale(0.97); background-color: #1d4ed8; }
+.hidden { display: none !important; }
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }

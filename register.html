@@ -6,38 +6,42 @@
     <title>注册 - SOCKS5</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="/style.css?v=6">
+    <link rel="stylesheet" href="/style.css?v=13">
 </head>
 <body class="bg-slate-50 flex flex-col justify-center min-h-screen p-6">
     <div class="text-center mb-8">
-        <img src="/logo.jpg" class="w-16 h-16 rounded-2xl mx-auto mb-4 object-cover shadow-sm">
+        <img src="/logo.jpg" class="w-16 h-16 rounded-2xl mx-auto mb-4 object-cover shadow-sm border border-slate-100">
         <h2 class="text-2xl font-bold text-slate-800">创建新账号</h2>
-        <p class="text-sm text-slate-500 mt-1">请使用真实邮箱完成验证</p>
+        <p class="text-sm text-slate-500 mt-2">请使用真实邮箱完成验证</p>
     </div>
-    <form id="reg-form" class="bg-white p-6 rounded-2xl card-shadow border border-slate-100 space-y-4">
+
+    <form id="reg-form" class="bg-white p-6 md:p-8 rounded-3xl card-shadow border border-slate-100 space-y-5 max-w-sm w-full mx-auto">
         <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1">工作邮箱</label>
-            <input type="email" id="email" required placeholder="name@company.com" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+            <label class="block text-sm font-medium text-slate-700 mb-1.5">工作邮箱</label>
+            <input type="email" id="email" required placeholder="name@company.com" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
         </div>
         <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1">邮箱验证码</label>
-            <div class="flex gap-2">
-                <input type="text" id="code" required placeholder="6位数字" class="flex-1 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
-                <button type="button" id="send-code-btn" class="px-4 py-3 bg-slate-800 text-white rounded-xl text-xs font-medium whitespace-nowrap">获取验证码</button>
+            <label class="block text-sm font-medium text-slate-700 mb-1.5">邮箱验证码</label>
+            <div class="flex gap-2 w-full">
+                <!-- 加上了 min-w-0，防止被挤出去 -->
+                <input type="text" id="code" required placeholder="6位数字" class="flex-1 min-w-0 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
+                <!-- 加上了 shrink-0，强制固定宽度 -->
+                <button type="button" id="send-code-btn" class="w-28 shrink-0 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-sm font-medium transition-all">获取验证码</button>
             </div>
         </div>
         <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1">设置密码</label>
-            <input type="password" id="password" required placeholder="设置至少8位密码" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+            <label class="block text-sm font-medium text-slate-700 mb-1.5">设置密码</label>
+            <input type="password" id="password" required placeholder="设置至少8位密码" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
         </div>
-        <button type="submit" class="btn-primary w-full py-3 rounded-xl font-bold mt-2">立即注册</button>
+        <button type="submit" class="btn-primary w-full py-3.5 rounded-xl font-bold mt-2">立即注册</button>
     </form>
-    <div class="text-center mt-6">
-        <a href="/login.html" class="text-sm text-blue-600 font-medium">已有账号？返回登录</a>
+    
+    <div class="text-center mt-8">
+        <a href="/login.html" class="text-sm font-medium text-blue-600 hover:text-blue-700">已有账号？返回登录</a>
     </div>
 
+    <script src="/app.js?v=13"></script>
     <script>
-        // 发送验证码逻辑
         document.getElementById('send-code-btn').addEventListener('click', async function() {
             const email = document.getElementById('email').value;
             if(!email || !email.includes('@')) { alert('请输入正确邮箱'); return; }
@@ -55,7 +59,6 @@
             } catch (e) { alert('网络错误'); this.disabled = false; this.innerText = '获取验证码'; }
         });
 
-        // 提交注册逻辑
         document.getElementById('reg-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value;

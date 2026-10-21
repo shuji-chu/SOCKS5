@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>SOCKS5</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- 升级版本号 v=3，防止缓存 -->
-    <link rel="stylesheet" href="/style.css?v=3">
+    <link rel="stylesheet" href="/style.css?v=5">
 </head>
 <body>
     <div class="app-container">
@@ -17,71 +16,85 @@
         
         <main class="app-content">
             <div id="view-home">
-                <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 text-white mb-6 card-shadow">
-                    <h2 class="text-2xl font-bold mb-2">一站式服务</h2>
-                    <p class="text-blue-100 text-sm">高质量 TG/苹果ID/邮箱/节点，即买即用。</p>
+                <div class="bg-gradient-to-r from-slate-800 to-slate-900 rounded-2xl p-6 text-white mb-6 card-shadow relative overflow-hidden">
+                    <div class="absolute -right-4 -top-4 w-24 h-24 bg-blue-500 rounded-full blur-2xl opacity-40"></div>
+                    <h2 class="text-2xl font-bold mb-2">企业级安全资产</h2>
+                    <p class="text-slate-300 text-sm">原生纯净环境 / 全自动极速发货 / 售后无忧</p>
                 </div>
                 
-                <!-- 四大分类 Tab -->
                 <div class="flex bg-slate-200/60 p-1 rounded-xl mb-4 gap-1">
-                    <button id="btn-shop-tg" onclick="switchShopTab('tg')" class="flex-1 py-1.5 text-[13px] font-bold bg-white text-slate-800 rounded-lg shadow-sm transition-all">TG账号</button>
-                    <button id="btn-shop-node" onclick="switchShopTab('node')" class="flex-1 py-1.5 text-[13px] font-medium text-slate-500 rounded-lg transition-all">代理节点</button>
-                    <button id="btn-shop-email" onclick="switchShopTab('email')" class="flex-1 py-1.5 text-[13px] font-medium text-slate-500 rounded-lg transition-all">谷歌邮箱</button>
-                    <button id="btn-shop-apple" onclick="switchShopTab('apple')" class="flex-1 py-1.5 text-[13px] font-medium text-slate-500 rounded-lg transition-all">苹果ID</button>
+                    <button id="btn-shop-tg" onclick="switchShopTab('tg')" class="flex-1 py-1.5 text-[13px] font-bold bg-white text-slate-800 rounded-lg shadow-sm transition-all">TG 账号</button>
+                    <button id="btn-shop-node" onclick="switchShopTab('node')" class="flex-1 py-1.5 text-[13px] font-medium text-slate-500 rounded-lg transition-all">专线节点</button>
+                    <button id="btn-shop-email" onclick="switchShopTab('email')" class="flex-1 py-1.5 text-[13px] font-medium text-slate-500 rounded-lg transition-all">企业邮箱</button>
+                    <button id="btn-shop-apple" onclick="switchShopTab('apple')" class="flex-1 py-1.5 text-[13px] font-medium text-slate-500 rounded-lg transition-all">苹果 ID</button>
                 </div>
 
-                <!-- 1. TG 账号列表 -->
+                <!-- 1. TG 账号 -->
                 <div id="list-tg" class="space-y-4">
-                    <div class="bg-white rounded-xl p-4 card-shadow flex flex-col">
-                        <div class="flex justify-between items-start mb-2"><h4 class="font-bold text-slate-800">TG 高质量老号 (美国)</h4><span class="text-blue-600 font-bold">¥9.90</span></div>
-                        <p class="text-xs text-slate-500 mb-3">已稳定养号30天，带2FA密码，防封性强。</p>
-                        <button class="btn-primary w-full py-2 rounded-lg text-sm" onclick="requireLogin()">立即购买</button>
+                    <div class="bg-white rounded-xl p-5 card-shadow flex flex-col border border-slate-100">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-slate-800 text-[15px]">TG 旗舰防封号 (美国)</h4>
+                            <span class="text-blue-600 font-bold text-lg">¥ 68.00</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mb-4 leading-relaxed">已稳定养号 90 天以上，附带原始邮箱与 2FA 密保。纯净住宅 IP 注册。</p>
+                        <!-- 真实商品ID -->
+                        <button class="btn-primary w-full py-2.5 rounded-lg text-sm font-medium" onclick="buyProduct(1, 'TG 旗舰防封号', 68.00)">立即获取</button>
                     </div>
                 </div>
 
-                <!-- 2. 代理节点列表 -->
+                <!-- 2. 代理节点 -->
                 <div id="list-node" class="space-y-4 hidden">
-                    <div class="bg-white rounded-xl p-4 card-shadow flex flex-col">
-                        <div class="flex justify-between items-start mb-2"><h4 class="font-bold text-slate-800">专属高速节点 (月付)</h4><span class="text-blue-600 font-bold">¥19.90</span></div>
-                        <p class="text-xs text-slate-500 mb-3">Socks5/VMess 协议，专为 TG 打造。</p>
-                        <button class="btn-primary w-full py-2 rounded-lg text-sm" onclick="requireLogin()">立即购买</button>
+                    <div class="bg-white rounded-xl p-5 card-shadow flex flex-col border border-slate-100">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-slate-800 text-[15px]">SVIP 独享住宅 IP (月付)</h4>
+                            <span class="text-blue-600 font-bold text-lg">¥ 88.00</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mb-4 leading-relaxed">原生纯净家宽 IP，全网独享。完美解锁各类流媒体与风控严格的业务。</p>
+                        <button class="btn-primary w-full py-2.5 rounded-lg text-sm font-medium" onclick="buyProduct(2, 'SVIP 独享住宅 IP', 88.00)">立即获取</button>
                     </div>
                 </div>
 
-                <!-- 3. 谷歌邮箱列表 -->
+                <!-- 3. 企业邮箱 -->
                 <div id="list-email" class="space-y-4 hidden">
-                    <div class="bg-white rounded-xl p-4 card-shadow flex flex-col">
-                        <div class="flex justify-between items-start mb-2"><h4 class="font-bold text-slate-800">谷歌老邮箱 (纯白号)</h4><span class="text-blue-600 font-bold">¥5.00</span></div>
-                        <p class="text-xs text-slate-500 mb-3">注册半年以上，无绑定手机，适合注册各类海外服务。</p>
-                        <button class="btn-primary w-full py-2 rounded-lg text-sm" onclick="requireLogin()">立即购买</button>
-                    </div>
-                    <div class="bg-white rounded-xl p-4 card-shadow flex flex-col">
-                        <div class="flex justify-between items-start mb-2"><h4 class="font-bold text-slate-800">谷歌带密保邮箱</h4><span class="text-blue-600 font-bold">¥8.00</span></div>
-                        <p class="text-xs text-slate-500 mb-3">附带辅助邮箱和密保，防封防找回。</p>
-                        <button class="btn-primary w-full py-2 rounded-lg text-sm" onclick="requireLogin()">立即购买</button>
+                    <div class="bg-white rounded-xl p-5 card-shadow flex flex-col border border-slate-100">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-slate-800 text-[15px]">Gmail 纯净老邮箱</h4>
+                            <span class="text-blue-600 font-bold text-lg">¥ 18.00</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mb-4 leading-relaxed">注册于 1 年前，无手机绑定，无任何异地登录记录。附带备用验证邮箱。</p>
+                        <button class="btn-primary w-full py-2.5 rounded-lg text-sm font-medium" onclick="buyProduct(3, 'Gmail 纯净老邮箱', 18.00)">立即获取</button>
                     </div>
                 </div>
 
-                <!-- 4. 苹果ID列表 -->
+                <!-- 4. 苹果ID -->
                 <div id="list-apple" class="space-y-4 hidden">
-                    <div class="bg-white rounded-xl p-4 card-shadow flex flex-col">
-                        <div class="flex justify-between items-start mb-2"><h4 class="font-bold text-slate-800">美区 Apple ID (独享)</h4><span class="text-blue-600 font-bold">¥25.00</span></div>
-                        <p class="text-xs text-slate-500 mb-3">美国区纯净号，未绑手机，可改密，用于下载 App。</p>
-                        <button class="btn-primary w-full py-2 rounded-lg text-sm" onclick="requireLogin()">立即购买</button>
+                    <div class="bg-white rounded-xl p-5 card-shadow flex flex-col border border-slate-100">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-slate-800 text-[15px]">美区 Apple ID (高权重)</h4>
+                            <span class="text-blue-600 font-bold text-lg">¥ 55.00</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mb-4 leading-relaxed">美国本土原生环境注册，消费记录良好。可用于下载 App 与内购。</p>
+                        <button class="btn-primary w-full py-2.5 rounded-lg text-sm font-medium" onclick="buyProduct(4, '美区 Apple ID', 55.00)">立即获取</button>
                     </div>
                 </div>
             </div>
 
-            <!-- 订单视图等... (保持原样) -->
+            <!-- 订单视图 -->
             <div id="view-orders" class="hidden">
-                <h3 class="font-bold text-slate-800 mb-4 text-xl">我的资产</h3>
-                <div id="empty-orders" class="text-center py-10"><p class="text-slate-400 text-sm mb-4">暂无已购资产</p><button onclick="switchTab('home')" class="text-blue-600 font-medium text-sm">去逛逛</button></div>
-                <div id="order-list" class="space-y-3 hidden"><div class="bg-white p-4 rounded-xl card-shadow border border-slate-100"><div class="flex justify-between items-center border-b pb-2 mb-2"><span class="text-xs text-slate-400">订单号: #10024</span><span class="text-xs text-green-500 font-medium">已发货</span></div><h4 class="font-bold text-slate-800">TG 账号 (美国区)</h4><button class="mt-3 w-full py-2 bg-slate-100 text-slate-600 rounded-lg text-sm font-medium" onclick="alert('跳转至接码面板...')">查看账号</button></div></div>
+                <h3 class="font-bold text-slate-800 mb-4 text-xl">我的订单</h3>
+                <div id="empty-orders" class="text-center py-10">
+                    <p class="text-slate-400 text-sm mb-4">暂无订单</p>
+                    <button onclick="switchTab('home')" class="text-blue-600 font-medium text-sm">去逛逛</button>
+                </div>
+                <div id="order-list" class="space-y-3 hidden">
+                    <!-- JS 动态渲染真实订单 -->
+                </div>
             </div>
 
+            <!-- 我的视图 -->
             <div id="view-profile" class="hidden">
                 <div id="profile-login-prompt" class="text-center py-10"><h3 class="text-xl font-bold text-slate-800 mb-2">未登录</h3><p class="text-slate-500 text-sm mb-6">登录后即可查看订单、每日签到领节点</p><button onclick="showAuthModal()" class="btn-primary px-8 py-2.5 rounded-full font-medium">立即登录 / 注册</button></div>
-                <div id="profile-logged-in" class="hidden"><div class="bg-white rounded-2xl p-6 card-shadow text-center mb-6"><div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl font-bold">U</div><h3 class="font-bold text-slate-800" id="profile-email">user@email.com</h3><button onclick="logout()" class="mt-4 text-xs font-medium text-red-500 bg-red-50 px-4 py-1.5 rounded-full">退出登录</button></div><div class="bg-gradient-to-r from-orange-400 to-orange-500 rounded-2xl p-6 text-white card-shadow"><h4 class="font-bold text-lg mb-1">每日签到领节点</h4><p class="text-orange-100 text-xs mb-4">每天签到免费获取高速 Socks5 节点</p><button onclick="handleSignIn()" id="sign-btn" class="w-full py-2.5 bg-white text-orange-500 font-bold rounded-xl text-sm transition-all active:scale-95">立即签到</button></div></div>
+                <div id="profile-logged-in" class="hidden"><div class="bg-white rounded-2xl p-6 card-shadow text-center mb-6"><div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl font-bold">U</div><h3 class="font-bold text-slate-800" id="profile-email">user@email.com</h3><button onclick="logout()" class="mt-4 text-xs font-medium text-red-500 bg-red-50 px-4 py-1.5 rounded-full">退出登录</button></div><div class="bg-gradient-to-r from-orange-400 to-orange-500 rounded-2xl p-6 text-white card-shadow"><h4 class="font-bold text-lg mb-1">专属会员福利</h4><p class="text-orange-100 text-xs mb-4">每日签到免费获取高速 Socks5 节点体验</p><button onclick="handleSignIn()" id="sign-btn" class="w-full py-2.5 bg-white text-orange-500 font-bold rounded-xl text-sm transition-all active:scale-95">立即签到</button></div></div>
             </div>
         </main>
         
@@ -104,7 +117,6 @@
             <form id="form-register" class="space-y-4 hidden" onsubmit="handleRegister(event)"><input type="email" id="reg-email" required placeholder="工作邮箱" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none"><div class="flex gap-2"><input type="text" id="reg-code" required placeholder="验证码" class="flex-1 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none"><button type="button" id="send-code-btn" onclick="sendCode()" class="px-4 py-3 bg-slate-800 text-white rounded-xl text-xs font-medium whitespace-nowrap">获取验证码</button></div><input type="password" id="reg-pwd" required placeholder="设置密码" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none"><button type="submit" class="btn-primary w-full py-3 rounded-xl font-bold mt-2">立即注册</button></form>
         </div>
     </div>
-    <!-- 升级版本号 v=3 -->
-    <script src="/app.js?v=3"></script>
+    <script src="/app.js?v=5"></script>
 </body>
 </html>

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud TG - 企业级接码服务平台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body { font-family: 'Inter', -apple-system, sans-serif; background-color: #f8fafc; color: #1e293b; }
+        .card-shadow { box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05), 0 10px 15px -3px rgb(0 0 0 / 0.05); }
+        .btn-primary { background-color: #2563eb; transition: all 0.2s ease; }
+        .btn-primary:hover { background-color: #1d4ed8; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- 顶部导航栏 (全局 Logo) -->
+    <nav class="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <!-- 你的 Logo -->
+            <img src="/assets/logo.jpg" alt="Logo" class="w-8 h-8 rounded-lg object-cover">
+            <span class="text-xl font-bold text-slate-800 tracking-tight">Cloud TG</span>
+        </div>
+        <div class="text-sm font-medium text-slate-500">企业级 TG 账号托管与接码</div>
+    </nav>
+
+    <!-- 主体内容 -->
+    <main class="flex-1 flex items-center justify-center p-4">
+        
+        <!-- 登录注册面板 -->
+        <div id="auth-container" class="w-full max-w-md bg-white rounded-2xl p-8 card-shadow border border-slate-100 relative overflow-hidden">
+            <div class="text-center mb-8">
+                <!-- 大 Logo 展示 -->
+                <img src="/assets/logo.jpg" alt="Logo" class="w-16 h-16 rounded-2xl mx-auto mb-4 object-cover shadow-sm border border-slate-100">
+                <h2 class="text-2xl font-bold text-slate-800">欢迎使用 Cloud TG</h2>
+                <p class="text-sm text-slate-500 mt-2">请使用真实邮箱注册以保障账号安全</p>
+            </div>
+
+            <!-- Tab 切换 -->
+            <div class="flex bg-slate-100 p-1 rounded-xl mb-6">
+                <button id="tab-login" onclick="switchTab('login')" class="flex-1 py-2 text-sm font-semibold bg-white text-slate-800 rounded-lg shadow-sm transition-all">登录</button>
+                <button id="tab-register" onclick="switchTab('register')" class="flex-1 py-2 text-sm font-medium text-slate-500 hover:text-slate-800 transition-all">注册</button>
+            </div>
+
+            <!-- 登录表单 -->
+            <form id="form-login" class="space-y-4" onsubmit="handleLogin(event)">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">工作邮箱</label>
+                    <input type="email" id="login-email" required placeholder="name@company.com" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">密码</label>
+                    <input type="password" id="login-pwd" required placeholder="••••••••" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
+                </div>
+                <button type="submit" class="btn-primary w-full py-2.5 rounded-lg text-white font-medium mt-2">安全登录</button>
+            </form>
+
+            <!-- 注册表单 -->
+            <form id="form-register" class="space-y-4 hidden" onsubmit="handleRegister(event)">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">工作邮箱</label>
+                    <input type="email" id="reg-email" required placeholder="name@company.com" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">邮箱验证码</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="reg-code" required placeholder="6位数字" class="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
+                        <button type="button" id="send-code-btn" onclick="sendCode()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg whitespace-nowrap text-sm font-medium transition-all">获取验证码</button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">设置密码</label>
+                    <input type="password" id="reg-pwd" required placeholder="设置至少8位密码" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
+                </div>
+                <button type="submit" class="btn-primary w-full py-2.5 rounded-lg text-white font-medium mt-2">立即注册</button>
+            </form>
+
+            <!-- 提示信息 -->
+            <div id="message" class="mt-4 text-center text-sm font-medium hidden p-3 rounded-lg"></div>
+        </div>
+
+        <!-- 登录后的控制台 -->
+        <div id="dashboard-container" class="hidden w-full max-w-3xl bg-white rounded-2xl p-8 card-shadow border border-slate-100">
+            <div class="flex justify-between items-center mb-8 border-b border-slate-100 pb-6">
+                <div class="flex items-center gap-4">
+                    <img src="/assets/logo.jpg" alt="Logo" class="w-12 h-12 rounded-xl object-cover shadow-sm">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800">控制台概览</h2>
+                        <p class="text-sm text-slate-500" id="user-email-display">加载中...</p>
+                    </div>
+                </div>
+                <button onclick="logout()" class="px-4 py-2 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-all">退出登录</button>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="p-6 border border-slate-100 rounded-xl bg-slate-50/50">
+                    <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-slate-800">TG 接码服务</h3>
+                    <p class="text-sm text-slate-500 mt-1 mb-4">进入后台管理您的 TG 账号，处理接码请求。</p>
+                    <a href="/admin" target="_blank" class="inline-block btn-primary px-6 py-2 rounded-lg text-white text-sm font-medium">进入 TGAPI 面板</a>
+                </div>
+                <div class="p-6 border border-slate-100 rounded-xl bg-slate-50/50">
+                    <div class="w-10 h-10 bg-green-100 text-green-600 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-slate-800">账户状态</h3>
+                    <p class="text-sm text-slate-500 mt-1 mb-4">当前账户已通过真实邮箱认证。</p>
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-700">已认证</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const API_BASE = '/api/v1/passport/auth';
+        
+        function switchTab(tab) {
+            if (tab === 'login') {
+                document.getElementById('form-login').classList.remove('hidden');
+                document.getElementById('form-register').classList.add('hidden');
+                document.getElementById('tab-login').className = 'flex-1 py-2 text-sm font-semibold bg-white text-slate-800 rounded-lg shadow-sm transition-all';
+                document.getElementById('tab-register').className = 'flex-1 py-2 text-sm font-medium text-slate-500 hover:text-slate-800 transition-all';
+            } else {
+                document.getElementById('form-login').classList.add('hidden');
+                document.getElementById('form-register').classList.remove('hidden');
+                document.getElementById('tab-register').className = 'flex-1 py-2 text-sm font-semibold bg-white text-slate-800 rounded-lg shadow-sm transition-all';
+                document.getElementById('tab-login').className = 'flex-1 py-2 text-sm font-medium text-slate-500 hover:text-slate-800 transition-all';
+            }
+            document.getElementById('message').classList.add('hidden');
+        }
+
+        async function sendCode() {
+            const email = document.getElementById('reg-email').value;
+            if(!email || !email.includes('@')) { showMsg('请输入正确邮箱', 'error'); return; }
+            const btn = document.getElementById('send-code-btn');
+            btn.disabled = true; btn.innerText = '发送中...';
+
+            try {
+                const res = await fetch(`${API_BASE}/send-code`, {
+                    method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ email })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    showMsg('验证码已发送，请查收邮箱', 'success');
+                    let cd = 60;
+                    const timer = setInterval(() => {
+                        cd--; btn.innerText = `${cd}s 后重发`;
+                        if(cd <= 0) { clearInterval(timer); btn.disabled = false; btn.innerText = '获取验证码'; }
+                    }, 1000);
+                } else { showMsg(data.message || '发送失败', 'error'); btn.disabled = false; btn.innerText = '获取验证码'; }
+            } catch (e) { showMsg('网络错误，请稍后重试', 'error'); btn.disabled = false; btn.innerText = '获取验证码'; }
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            const email = document.getElementById('reg-email').value;
+            const code = document.getElementById('reg-code').value;
+            const password = document.getElementById('reg-pwd').value;
+            try {
+                const res = await fetch(`${API_BASE}/register`, {
+                    method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ email, password, code })
+                });
+                const data = await res.json();
+                if (res.ok) { showMsg('注册成功，正在自动登录...', 'success'); setTimeout(() => loginUser(email, password), 1000); } else { showMsg(data.message || '注册失败', 'error'); }
+            } catch (e) { showMsg('网络错误', 'error'); }
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            loginUser(document.getElementById('login-email').value, document.getElementById('login-pwd').value);
+        }
+
+        async function loginUser(email, password) {
+            try {
+                const res = await fetch(`${API_BASE}/login`, {
+                    method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    localStorage.setItem('token', data.data?.token || data.token || 'success');
+                    localStorage.setItem('email', email);
+                    showDashboard(email);
+                } else { showMsg(data.message || '邮箱或密码错误', 'error'); }
+            } catch (e) { showMsg('网络错误', 'error'); }
+        }
+
+        function showDashboard(email) {
+            document.getElementById('auth-container').classList.add('hidden');
+            document.getElementById('dashboard-container').classList.remove('hidden');
+            document.getElementById('user-email-display').innerText = `当前登录：${email}`;
+        }
+
+        function logout() { localStorage.clear(); location.reload(); }
+
+        function showMsg(text, type) {
+            const msg = document.getElementById('message');
+            msg.innerText = text;
+            if(type === 'error') {
+                msg.className = 'mt-4 text-center text-sm font-medium p-3 rounded-lg bg-red-50 text-red-600 border border-red-100';
+            } else {
+                msg.className = 'mt-4 text-center text-sm font-medium p-3 rounded-lg bg-green-50 text-green-600 border border-green-100';
+            }
+            msg.classList.remove('hidden');
+        }
+
+        if(localStorage.getItem('email')) { showDashboard(localStorage.getItem('email')); }
+    </script>
+</body>
+</html>

@@ -6,35 +6,74 @@
     <title>登录 - SOCKS5</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <!-- 暴力升版本号 -->
-    <link rel="stylesheet" href="/style.css?v=14">
+    <link rel="stylesheet" href="/style.css?v=17">
 </head>
 <body class="bg-slate-50 flex flex-col justify-center min-h-screen p-6">
+    
+    <!-- 头部 Logo -->
     <div class="text-center mb-8">
         <img src="/logo.jpg" class="w-16 h-16 rounded-2xl mx-auto mb-4 object-cover shadow-sm border border-slate-100">
         <h2 class="text-2xl font-bold text-slate-800">欢迎回来</h2>
         <p class="text-sm text-slate-500 mt-2">登录以继续使用 SOCKS5 服务</p>
     </div>
 
-    <form id="login-form" class="bg-white p-6 md:p-8 rounded-3xl card-shadow border border-slate-100 space-y-5 max-w-sm w-full mx-auto">
-        <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1.5">工作邮箱</label>
-            <input type="email" id="email" required placeholder="name@company.com" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
+    <div class="max-w-sm w-full mx-auto bg-white p-6 md:p-8 rounded-3xl card-shadow border border-slate-100">
+
+        <!-- 第三方一键授权区 -->
+        <div class="space-y-4 mb-6">
+            <!-- 1. Telegram 登录组件 -->
+            <!-- 注意：把 YOUR_TG_BOT 换成你真实的 TG 机器人用户名(不带@) -->
+            <div class="flex justify-center w-full overflow-hidden">
+                <script async src="https://telegram.org/js/telegram-widget.js?22" 
+                        data-telegram-login="YOUR_TG_BOT" 
+                        data-size="large" 
+                        data-onauth="onTelegramAuth(user)" 
+                        data-request-access="write"></script>
+            </div>
+
+            <!-- 2. SafeW 登录组件 -->
+            <!-- 注意：把 YOUR_SAFEW_BOT 换成你真实的 SafeW 机器人用户名 -->
+            <div class="flex justify-center w-full overflow-hidden">
+                <script async src="https://oauth.safew.bot/js/safew-widget.js" 
+                        data-safew-login="YOUR_SAFEW_BOT" 
+                        data-size="large" 
+                        data-onauth="onSafeWAuth(user)" 
+                        data-request-access="write"></script>
+            </div>
+
+            <!-- 3. Mivra 登录按钮 (如果 Mivra 也有官方 JS，可替换) -->
+            <button onclick="handleMivraLogin()" class="w-full flex items-center justify-center gap-2 py-3 px-4 bg-[#2AABEE] hover:bg-[#229ED9] text-white rounded-xl font-medium transition-all">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>
+                使用 Mivra 账号一键授权
+            </button>
         </div>
-        <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1.5">密码</label>
-            <input type="password" id="password" required placeholder="••••••••" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
+
+        <!-- 分割线 -->
+        <div class="relative mb-6">
+            <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200"></div></div>
+            <div class="relative flex justify-center text-xs"><span class="px-2 bg-white text-slate-400">或使用邮箱账号</span></div>
         </div>
-        <button type="submit" class="btn-primary w-full py-3.5 rounded-xl font-bold mt-2">安全登录</button>
-    </form>
-    
-    <!-- 只有去注册的链接，没有任何返回商城 -->
-    <div class="text-center mt-8">
-        <a href="/register.html" class="text-sm font-medium text-blue-600 hover:text-blue-700">还没有账号？立即注册</a>
+
+        <!-- 邮箱密码登录区 -->
+        <form id="login-form" class="space-y-4">
+            <div>
+                <input type="email" id="email" required placeholder="工作邮箱" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+            </div>
+            <div>
+                <input type="password" id="password" required placeholder="密码" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+            </div>
+            <button type="submit" class="btn-primary w-full py-3.5 rounded-xl font-bold mt-2">安全登录</button>
+        </form>
+        
+        <!-- 底部去注册 -->
+        <div class="text-center mt-6">
+            <a href="/register.html" class="text-sm font-medium text-blue-600 hover:text-blue-700">还没有账号？立即注册</a>
+        </div>
     </div>
 
-    <script src="/app.js?v=14"></script>
+    <script src="/app.js?v=17"></script>
     <script>
+        // 1. 邮箱登录逻辑
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value;
@@ -48,11 +87,51 @@
                     localStorage.setItem('socks5_email', email);
                     localStorage.setItem('socks5_token', data.data?.token || data.token || '');
                     window.location.href = '/index.html';
-                } else {
-                    alert(data.message || '登录失败');
-                }
+                } else { alert(data.message || '登录失败'); }
             } catch (err) { alert('网络错误'); }
         });
+
+        // 2. TG 官方一键授权回调
+        async function onTelegramAuth(user) {
+            console.log("TG 授权成功，数据：", user);
+            // 这里需要后端再写一个校验 tg 签名的接口，这里暂且用统一的 sso-login
+            try {
+                const res = await fetch('/s5api/api/v1/auth/sso-login', {
+                    method: 'POST', headers: {'Content-Type': 'application/json'}, 
+                    body: JSON.stringify({ platform: 'tg', open_id: user.id, nickname: user.first_name })
+                });
+                const data = await res.json();
+                if (res.ok && data.data) {
+                    localStorage.setItem('socks5_email', data.data.email);
+                    localStorage.setItem('socks5_token', data.data.token);
+                    window.location.href = '/index.html';
+                } else { alert('TG 登录失败'); }
+            } catch (err) { alert('网络错误'); }
+        }
+
+        // 3. SafeW 官方一键授权回调
+        async function onSafeWAuth(user) {
+            console.log("SafeW 授权成功，数据：", user);
+            try {
+                const res = await fetch('/s5api/api/v1/auth/safew-login', {
+                    method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(user)
+                });
+                const data = await res.json();
+                if (res.ok && data.data) {
+                    localStorage.setItem('socks5_email', data.data.email);
+                    localStorage.setItem('socks5_token', data.data.token);
+                    window.location.href = '/index.html';
+                } else { alert(data.detail || 'SafeW 登录失败'); }
+            } catch (err) { alert('网络错误'); }
+        }
+
+        // 4. Mivra 一键授权回调 (由于没有官方 JS，这里做一个跳转拦截或提示)
+        function handleMivraLogin() {
+            // 如果是通过 Mivra WebApp 打开的，app.js 已经自动拦截登录了，根本不会走到这里。
+            // 这里是为了在普通浏览器里点 Mivra 按钮时，提示用户去机器人里点。
+            alert("请前往 Mivra 机器人内点击专属链接打开，或使用邮箱登录。");
+            // 如果你们 Mivra 后期有网页 OAuth 链接，可以改成 window.location.href = '...'
+        }
     </script>
 </body>
 </html>

@@ -1,52 +1,21 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-body { 
-    font-family: 'Inter', -apple-system, sans-serif; 
-    background-color: #f1f5f9; 
-    color: #1e293b; 
-    margin: 0; 
-    padding: 0; 
-    padding-bottom: 80px; /* 给底部导航留出空间 */
-    -webkit-overflow-scrolling: touch; /* 开启 iOS/WebView 原生顺滑滚动 */
-}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
 
-/* 顶部导航吸顶 */
-.app-header { 
-    position: sticky; 
-    top: 0; 
-    background: rgba(255, 255, 255, 0.95); 
-    backdrop-filter: blur(10px);
-    padding: 16px 20px; 
-    display: flex; 
-    align-items: center; 
-    gap: 12px; 
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05); 
-    z-index: 50; 
-}
+html, body { height: 100%; width: 100%; overflow: hidden; background-color: #f1f5f9; font-family: 'Inter', -apple-system, sans-serif; color: #1e293b; }
 
+/* 采用最稳的 Flex 布局，中间滑动 */
+.app-container { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
+
+/* 头部固定 */
+.app-header { flex-shrink: 0; background: #ffffff; padding: 16px 20px; display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); z-index: 50; }
 .app-logo { width: 28px; height: 28px; border-radius: 8px; object-fit: cover; }
 .app-title { font-size: 18px; font-weight: 700; margin: 0; }
 
-.app-content { 
-    padding: 16px 20px; 
-    animation: fadeIn 0.3s ease-out;
-}
+/* 核心滑动区 */
+.app-content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 16px 20px; padding-bottom: 100px; }
 
-/* 底部原生导航栏 (适配iPhone安全区) */
-.app-tab-bar { 
-    position: fixed; 
-    bottom: 0; 
-    left: 0; 
-    right: 0; 
-    background: #ffffff; 
-    display: flex; 
-    justify-content: space-around; 
-    padding: 10px 0 calc(10px + env(safe-area-inset-bottom)); 
-    box-shadow: 0 -1px 3px rgba(0,0,0,0.05); 
-    border-top-left-radius: 20px; 
-    border-top-right-radius: 20px; 
-    z-index: 50; 
-}
+/* 底部固定 */
+.app-tab-bar { flex-shrink: 0; background: #ffffff; display: flex; justify-content: space-around; padding: 10px 0 calc(10px + env(safe-area-inset-bottom)); box-shadow: 0 -1px 3px rgba(0,0,0,0.05); border-top-left-radius: 20px; border-top-right-radius: 20px; z-index: 50; }
 
 .tab-item { display: flex; flex-direction: column; align-items: center; font-size: 10px; color: #94a3b8; cursor: pointer; transition: all 0.2s; }
 .tab-item svg { width: 24px; height: 24px; margin-bottom: 4px; fill: currentColor; }
@@ -55,9 +24,6 @@ body {
 .card-shadow { box-shadow: 0 2px 8px -1px rgba(0,0,0,0.05); }
 .btn-primary { background-color: #2563eb; color: white; border: none; cursor: pointer; transition: all 0.2s ease; }
 .btn-primary:active { transform: scale(0.96); background-color: #1d4ed8; }
-
 .hidden { display: none !important; }
 
-/* 弹窗动画 */
 @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }

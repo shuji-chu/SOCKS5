@@ -13,18 +13,20 @@ function switchTab(tabName) {
     if (tabName === 'profile') updateProfileView();
 }
 
-function switchShopTab(type) {
-    if (type === 'tg') {
-        document.getElementById('list-tg').classList.remove('hidden');
-        document.getElementById('list-node').classList.add('hidden');
-        document.getElementById('btn-shop-tg').className = 'flex-1 py-1.5 text-sm font-bold bg-white text-slate-800 rounded-lg shadow-sm transition-all';
-        document.getElementById('btn-shop-node').className = 'flex-1 py-1.5 text-sm font-medium text-slate-500 hover:text-slate-800 rounded-lg transition-all';
-    } else {
-        document.getElementById('list-tg').classList.add('hidden');
-        document.getElementById('list-node').classList.remove('hidden');
-        document.getElementById('btn-shop-node').className = 'flex-1 py-1.5 text-sm font-bold bg-white text-slate-800 rounded-lg shadow-sm transition-all';
-        document.getElementById('btn-shop-tg').className = 'flex-1 py-1.5 text-sm font-medium text-slate-500 hover:text-slate-800 rounded-lg transition-all';
-    }
+// 四大分类切换逻辑 (优化版)
+function switchShopTab(activeType) {
+    const types = ['tg', 'node', 'email', 'apple'];
+    types.forEach(type => {
+        const list = document.getElementById('list-' + type);
+        const btn = document.getElementById('btn-shop-' + type);
+        if (type === activeType) {
+            list.classList.remove('hidden');
+            btn.className = 'flex-1 py-1.5 text-[13px] font-bold bg-white text-slate-800 rounded-lg shadow-sm transition-all';
+        } else {
+            list.classList.add('hidden');
+            btn.className = 'flex-1 py-1.5 text-[13px] font-medium text-slate-500 rounded-lg transition-all';
+        }
+    });
 }
 
 function updateProfileView() {

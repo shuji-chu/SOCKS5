@@ -1,70 +1,80 @@
-// 引入 TG WebApp 实例
+// 自动嗅探不同的平台环境
 const tg = window.Telegram?.WebApp;
+const safew = window.SafeW || window.SafeWApp; // 假设 SafeW 的注入名，如果有不同可以后续调整
 
 let currentUser = localStorage.getItem('socks5_email') || null;
 let currentToken = localStorage.getItem('socks5_token') || null;
 
-// 全局路由拦截器 (在每个页面加载前调用)
 async function checkAuthAndRedirect() {
-    // 1. 如果本地已经有 Token，说明已登录，放行
+    // 1. 已登录直接放行
     if (currentToken) return;
 
-    // 2. 检查是否在 Telegram 机器人内嵌环境
+    let platform = null;
+    let openId = null;
+    let nickname = "用户";
+
+    // 2. 嗅探 URL 参数 (适用于 Mivra 机器人，或者任何直接传参的链接)
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('platform') && urlParams.has('uid')) {
+        platform = urlParams.get('platform');
+        openId = urlParams.get('uid');
+    }
+
+    // 3. 嗅探 Telegram 环境
     if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
-        // 在机器人里，拿到 TG 用户信息，静默去你服务器换取 Token
-        const tgUser = tg.initDataUnsafe.user;
-        const tgId = tgUser.id;
-        const tgName = tgUser.username || tgUser.first_name || "TG_User";
+        platform = 'tg';
+        openId = tg.initDataUnsafe.user.id;
+        nickname = tg.initDataUnsafe.user.first_name;
+    }
+    // 4. 嗅探 SafeW 环境 (如果 SafeW 有注入对象)
+    else if (safew && safew.user) {
+        platform = 'safew';
+        openId = safew.user.id; // 或者 safew.user.uid
+        nickname = safew.user.name || 'SafeW用户';
+    }
 
-        console.log("检测到 Telegram 环境，正在自动授权...", tgId);
-
+    // 5. 如果成功抓到了平台和用户 ID，发起静默授权
+    if (platform && openId) {
+        console.log(`✅ 检测到 ${platform} 环境，正在静默授权... ID: ${openId}`);
         try {
-            // ⚠️ 这里需要你后端配合，我会在下面解释
-            // 调用你的 lynli-api 网关的 TG 专用登录接口
-            const res = await fetch('/api/v1/passport/auth/tg-login', {
+            // 请求你后端的统一授权接口
+            const res = await fetch('/api/v1/passport/auth/sso-login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ tg_id: tgId, username: tgName })
+                body: JSON.stringify({ platform, open_id: String(openId), nickname })
             });
             const data = await res.json();
             
             if (res.ok && data.data) {
-                // 授权成功，保存信息
-                localStorage.setItem('socks5_email', data.data.email || `${tgId}@tg.user`);
+                // 授权成功，保存 token 并跳转商城
+                localStorage.setItem('socks5_email', data.data.email);
                 localStorage.setItem('socks5_token', data.data.token);
-                window.location.reload(); // 刷新页面，进入商城
+                window.location.href = '/index.html'; 
                 return;
             }
         } catch (e) {
-            console.error("TG 自动授权失败，可能需要后端支持", e);
-            // 如果后端还没写好接口，这里做个妥协：先允许他用假身份体验
-            // localStorage.setItem('socks5_email', `${tgId}@tg.user`);
-            // localStorage.setItem('socks5_token', 'mock_tg_token');
-            // window.location.reload();
+            console.error("自动授权异常", e);
         }
     }
 
-    // 3. 如果既没 Token，也不在 TG 环境里，且当前不在登录页/注册页，强制跳转到登录页
+    // 6. 兜底：如果什么环境都没检测到，跳转登录页
     const currentPath = window.location.pathname;
     if (!currentPath.includes('login.html') && !currentPath.includes('register.html')) {
         window.location.href = '/login.html';
     }
 }
 
-// 退出登录
 function logout() {
     localStorage.removeItem('socks5_email'); 
     localStorage.removeItem('socks5_token');
     window.location.href = '/login.html';
 }
 
-// 购买逻辑
 function buyProduct(productId, productName, price) {
     if (!currentToken) { window.location.href = '/login.html'; return; }
     alert(`正在创建订单：${productName}\n金额：¥${price}`);
 }
 
-// 页面加载时自动执行拦截
 document.addEventListener('DOMContentLoaded', () => {
     checkAuthAndRedirect();
 });

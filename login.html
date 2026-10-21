@@ -6,105 +6,79 @@
     <title>登录 - SOCKS5</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="/style.css?v=32">
+    <!-- 升版本号到 v=33，清除一切历史缓存 -->
+    <link rel="stylesheet" href="/style.css?v=33">
     <style>
-        html, body { overflow: hidden; height: 100%; height: 100dvh; }
-        #login-container { height: 100%; height: 100dvh; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-        /* 自定义 Toast 动画 */
-        @keyframes toastIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .toast-anim { animation: toastIn 0.3s ease-out forwards; }
+        /* 恢复原生滚动，绝不禁用滚动条 */
+        body { min-height: 100vh; overflow-y: auto; -webkit-overflow-scrolling: touch; }
     </style>
 </head>
-<body>
-    <!-- 自定义全局 Toast 提示 -->
-    <div id="custom-toast" class="fixed top-10 left-1/2 transform -translate-x-1/2 z-[100] hidden">
-        <div class="bg-slate-800/95 backdrop-blur-md text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3 border border-slate-700">
-            <img src="/logo.jpg" class="w-6 h-6 rounded-md object-cover">
-            <div>
-                <p class="text-xs text-slate-400 font-medium">SOCKS5 提醒</p>
-                <p id="toast-text" class="text-sm font-medium mt-0.5">提示内容</p>
-            </div>
+<body class="bg-slate-50 flex flex-col p-6 pb-8 relative">
+    
+    <div class="text-center mt-6 mb-8">
+        <img src="/logo.jpg" class="w-16 h-16 rounded-[1.25rem] mx-auto mb-4 object-cover shadow-sm border border-slate-200">
+        <h2 class="text-[22px] font-bold text-slate-900 tracking-tight">欢迎回来</h2>
+        <p class="text-[13px] text-slate-500 mt-1.5">登录以继续使用 SOCKS5 服务</p>
+    </div>
+
+    <div class="max-w-sm w-full mx-auto bg-white p-6 md:p-8 rounded-[2rem] card-shadow border border-slate-100 z-10 relative">
+        <form id="login-form" class="space-y-3.5">
+            <input type="email" id="email" required placeholder="工作邮箱" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none text-[15px]">
+            <input type="password" id="password" required placeholder="密码" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none text-[15px]">
+            <button type="submit" class="btn-primary w-full py-3.5 rounded-2xl font-bold text-[15px] mt-2">安全登录</button>
+        </form>
+        
+        <div class="text-center mt-5 mb-8">
+            <a href="/register.html" class="text-[13px] font-medium text-blue-600">没有账号？立即注册</a>
+        </div>
+
+        <div class="relative mb-6">
+            <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-100"></div></div>
+            <div class="relative flex justify-center text-[11px]"><span class="px-3 bg-white text-slate-400 tracking-wider">快捷授权登录</span></div>
+        </div>
+
+        <div class="flex items-center justify-center gap-5">
+            <!-- 恢复三方跳转逻辑 -->
+            <button onclick="window.location.href='https://t.me/gsdlvpnbot'" class="w-11 h-11 rounded-xl bg-white border border-slate-200 shadow-sm flex items-center justify-center hover:bg-slate-50 overflow-hidden">
+                <img src="/tg.jpg" class="w-full h-full object-cover">
+            </button>
+            <button onclick="window.location.href='https://sfw.bar/'" class="w-11 h-11 rounded-xl bg-white border border-slate-200 shadow-sm flex items-center justify-center hover:bg-slate-50 overflow-hidden">
+                <img src="/safew.jpg" class="w-full h-full object-cover">
+            </button>
+            <button onclick="window.location.href='https://m.mivra.im/'" class="w-11 h-11 rounded-xl bg-white border border-slate-200 shadow-sm flex items-center justify-center hover:bg-slate-50 overflow-hidden">
+                <img src="/mivra.jpg" class="w-full h-full object-cover">
+            </button>
         </div>
     </div>
 
-    <div id="login-container" class="bg-slate-50 flex flex-col justify-between p-6 pb-4 relative">
-        <div class="text-center mt-6 mb-8">
-            <img src="/logo.jpg" class="w-16 h-16 rounded-[1.25rem] mx-auto mb-4 object-cover shadow-sm border border-slate-200">
-            <h2 class="text-[22px] font-bold text-slate-900 tracking-tight">欢迎回来</h2>
-            <p class="text-[13px] text-slate-500 mt-1.5">登录以继续使用 SOCKS5 服务</p>
-        </div>
-
-        <div class="max-w-sm w-full mx-auto bg-white p-6 md:p-8 rounded-[2rem] card-shadow border border-slate-100 z-10 relative">
-            <form id="login-form" class="space-y-3.5">
-                <input type="email" id="email" required placeholder="工作邮箱" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none text-[15px]">
-                <input type="password" id="password" required placeholder="密码" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none text-[15px]">
-                <button type="submit" class="btn-primary w-full py-3.5 rounded-2xl font-bold text-[15px] mt-2">安全登录</button>
-            </form>
-            
-            <div class="text-center mt-5 mb-8">
-                <a href="/register.html" class="text-[13px] font-medium text-blue-600">没有账号？立即注册</a>
-            </div>
-
-            <div class="relative mb-6">
-                <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-100"></div></div>
-                <div class="relative flex justify-center text-[11px]"><span class="px-3 bg-white text-slate-400 tracking-wider">快捷授权登录</span></div>
-            </div>
-
-            <div class="flex items-center justify-center gap-5">
-                <button onclick="handlePlatformLogin('Telegram')" class="w-11 h-11 rounded-xl bg-white border border-slate-200 shadow-sm flex items-center justify-center hover:bg-slate-50 overflow-hidden">
-                    <img src="/tg.jpg" class="w-full h-full object-cover">
-                </button>
-                <button onclick="handlePlatformLogin('SafeW')" class="w-11 h-11 rounded-xl bg-white border border-slate-200 shadow-sm flex items-center justify-center hover:bg-slate-50 overflow-hidden">
-                    <img src="/safew.jpg" class="w-full h-full object-cover">
-                </button>
-                <button onclick="handlePlatformLogin('Mivra')" class="w-11 h-11 rounded-xl bg-white border border-slate-200 shadow-sm flex items-center justify-center hover:bg-slate-50 overflow-hidden">
-                    <img src="/mivra.jpg" class="w-full h-full object-cover">
-                </button>
-            </div>
-        </div>
-
-        <div class="text-center mt-8 mb-4 flex flex-col items-center justify-center z-10 relative">
-            <img src="/logo.jpg" class="w-7 h-7 rounded-lg mb-3 grayscale opacity-40 object-cover">
-            <p class="text-[10px] font-semibold text-slate-400 tracking-widest uppercase mb-4">Powered by SOCKS5 Secure</p>
-            <div class="flex items-center justify-center gap-3 text-[11px] text-slate-400">
-                <button onclick="openModal('privacy')" class="hover:text-slate-600">隐私政策</button>
-                <span>|</span>
-                <button onclick="openModal('terms')" class="hover:text-slate-600">用户协议</button>
-                <span>|</span>
-                <button onclick="openModal('about')" class="hover:text-slate-600">关于我们</button>
-            </div>
+    <!-- 底部区域正常跟随滚动，不再卡死 -->
+    <div class="text-center mt-12 mb-4 flex flex-col items-center justify-center z-10 relative">
+        <img src="/logo.jpg" class="w-7 h-7 rounded-lg mb-3 grayscale opacity-40 object-cover">
+        <p class="text-[10px] font-semibold text-slate-400 tracking-widest uppercase mb-4">Powered by SOCKS5 Secure</p>
+        <div class="flex items-center justify-center gap-3 text-[11px] text-slate-400">
+            <!-- 加上了点击事件和更高层级防止被遮挡 -->
+            <button onclick="openModal('privacy')" class="hover:text-slate-600">隐私政策</button>
+            <span>|</span>
+            <button onclick="openModal('terms')" class="hover:text-slate-600">用户协议</button>
+            <span>|</span>
+            <button onclick="openModal('about')" class="hover:text-slate-600">关于我们</button>
         </div>
     </div>
 
-    <!-- 协议弹窗 -->
-    <div id="info-modal" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-end justify-center" style="backdrop-filter: blur(4px);">
+    <!-- 协议底部弹窗 (z-index 提升到 999 确保绝对在最上层) -->
+    <div id="info-modal" class="fixed inset-0 bg-slate-900/60 z-[999] hidden flex items-end justify-center" style="backdrop-filter: blur(4px);">
         <div class="bg-white w-full max-w-md rounded-t-3xl p-6 pb-10 relative max-h-[80vh] flex flex-col" style="animation: slideUp 0.3s ease-out;">
             <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
                 <h3 class="text-lg font-bold text-slate-800" id="modal-title">标题</h3>
-                <button onclick="closeModal()" class="text-slate-400 p-2">✕</button>
+                <button onclick="closeModal()" class="text-slate-400 p-2 text-xl">✕</button>
             </div>
             <div class="overflow-y-auto text-[13px] text-slate-600 leading-relaxed space-y-3 pr-2" id="modal-content"></div>
         </div>
     </div>
 
     <style>@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }</style>
-    <script src="/app.js?v=32"></script>
+    <script src="/app.js?v=33"></script>
     <script>
-        // 自定义 Toast 提示函数
-        function showToast(msg) {
-            const toast = document.getElementById('custom-toast');
-            document.getElementById('toast-text').innerText = msg;
-            toast.classList.remove('hidden');
-            toast.classList.add('toast-anim');
-            
-            // 2.5秒后自动消失
-            clearTimeout(window.toastTimer);
-            window.toastTimer = setTimeout(() => {
-                toast.classList.add('hidden');
-                toast.classList.remove('toast-anim');
-            }, 2500);
-        }
-
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value;
@@ -118,23 +92,17 @@
                     localStorage.setItem('socks5_email', email);
                     localStorage.setItem('socks5_token', data.data?.token || data.token || '');
                     window.location.href = '/index.html';
-                } else { 
-                    showToast(data.message || '登录失败'); 
-                }
-            } catch (err) { showToast('网络错误，请稍后再试'); }
+                } else { alert(data.message || '登录失败'); }
+            } catch (err) { alert('网络错误'); }
         });
 
-        // 统一平台按钮拦截逻辑
-        function handlePlatformLogin(platformName) {
-            // 不再乱跳转导致 404 或拒绝连接，统一提示去机器人内打开
-            showToast(`请前往 ${platformName} 机器人内点击专属按钮授权`);
-        }
-
+        // 弹窗内容
         const modalContent = {
-            'privacy': { title: '隐私政策', text: '我们深知个人信息对您的重要性...' },
-            'terms': { title: '用户协议', text: '欢迎使用 SOCKS5 服务...' },
-            'about': { title: '关于我们', text: 'SOCKS5 致力于为您提供...' }
+            'privacy': { title: '隐私政策', text: '我们深知个人信息对您的重要性，并会尽全力保护您的个人信息安全可靠。我们致力于维持您对我们的信任，恪守以下原则保护您的个人信息：权责一致原则、目的明确原则、选择同意原则等。' },
+            'terms': { title: '用户协议', text: '欢迎使用 SOCKS5 服务。本协议是您与 SOCKS5 之间关于您使用本服务所订立的协议。您在使用本服务时，必须遵守相关法律法规，不得利用本服务从事任何违法违规活动。' },
+            'about': { title: '关于我们', text: 'SOCKS5 致力于为您提供全球领先的虚拟资产与安全网络服务。我们拥有专业的技术团队，采用银行级加密技术保障您的每一次交易和数据传输。' }
         };
+
         function openModal(type) {
             const data = modalContent[type]; if(!data) return;
             document.getElementById('modal-title').innerText = data.title;

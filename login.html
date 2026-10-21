@@ -6,7 +6,7 @@
     <title>登录 - SOCKS5</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="/style.css?v=29">
+    <link rel="stylesheet" href="/style.css?v=30">
 </head>
 <body class="bg-slate-50 flex flex-col justify-between min-h-screen p-6 pb-4 relative overflow-hidden">
     
@@ -32,16 +32,16 @@
             <div class="relative flex justify-center text-[11px]"><span class="px-3 bg-white text-slate-400 tracking-wider">快捷授权登录</span></div>
         </div>
 
-        <div class="flex items-center justify-center gap-6">
-            <button onclick="handlePlatformLogin('tg')" class="w-14 h-14 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center justify-center hover:bg-slate-50 overflow-hidden">
+        <div class="flex items-center justify-center gap-5">
+            <button onclick="handlePlatformLogin('tg')" class="w-11 h-11 rounded-xl bg-white border border-slate-200 shadow-sm flex items-center justify-center hover:bg-slate-50 overflow-hidden">
                 <img src="/tg.jpg" class="w-full h-full object-cover">
             </button>
 
-            <button onclick="handlePlatformLogin('safew')" class="w-14 h-14 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center justify-center hover:bg-slate-50 overflow-hidden">
+            <button onclick="handlePlatformLogin('safew')" class="w-11 h-11 rounded-xl bg-white border border-slate-200 shadow-sm flex items-center justify-center hover:bg-slate-50 overflow-hidden">
                 <img src="/safew.jpg" class="w-full h-full object-cover">
             </button>
 
-            <button onclick="handlePlatformLogin('mivra')" class="w-14 h-14 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center justify-center hover:bg-slate-50 overflow-hidden">
+            <button onclick="handlePlatformLogin('mivra')" class="w-11 h-11 rounded-xl bg-white border border-slate-200 shadow-sm flex items-center justify-center hover:bg-slate-50 overflow-hidden">
                 <img src="/mivra.jpg" class="w-full h-full object-cover">
             </button>
         </div>
@@ -70,7 +70,7 @@
     </div>
 
     <style>@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }</style>
-    <script src="/app.js?v=29"></script>
+    <script src="/app.js?v=30"></script>
     <script>
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();

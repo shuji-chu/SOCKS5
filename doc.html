@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>开发者文档 - SOCKS5</title>
+    <link rel="icon" href="/logo.jpg" type="image/jpeg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #ffffff; color: #1e293b; font-family: -apple-system, sans-serif; }
+        .code-block { background: #1e293b; color: #e2e8f0; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 13px; overflow-x: auto; line-height: 1.6; }
+        .seamless-item { border-bottom: 1px solid #f1f5f9; }
+    </style>
+</head>
+<body>
+    <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center gap-3 sticky top-0 z-50">
+        <a href="/console.html" class="text-slate-600 text-xl font-bold px-2">←</a>
+        <h1 class="text-lg font-bold text-slate-800">开发者文档</h1>
+    </header>
+
+    <main class="px-4 py-4 pb-12 max-w-lg mx-auto">
+        <div class="mb-6">
+            <h2 class="text-2xl font-bold text-slate-800 mb-2">API 接入指南</h2>
+            <p class="text-[14px] text-slate-500">对接 SOCKS5 开放平台，获取卡密、节点、接码及支付能力。</p>
+        </div>
+
+        <div class="space-y-4">
+            <!-- 基础信息 -->
+            <div class="seamless-item py-4">
+                <h3 class="font-bold text-slate-800 mb-2">1. 基础信息</h3>
+                <p class="text-[14px] text-slate-600 mb-2"><b>接口网关：</b><code class="bg-slate-100 px-1 rounded text-blue-600">https://web.lynli.me/api/v1</code></p>
+                <p class="text-[14px] text-slate-600"><b>鉴权方式：</b>请求头携带 <code class="bg-slate-100 px-1 rounded text-blue-600">Authorization: Bearer YOUR_API_KEY</code></p>
+            </div>
+
+            <!-- 错误码 -->
+            <div class="seamless-item py-4">
+                <h3 class="font-bold text-slate-800 mb-2">2. 通用错误码</h3>
+                <ul class="text-[14px] text-slate-600 space-y-1">
+                    <li><b>200</b> - 请求成功</li>
+                    <li><b>401</b> - API Key 无效或过期</li>
+                    <li><b>402</b> - 余额不足 (请前往控制台充值)</li>
+                    <li><b>403</b> - 接口未开通或 IP 不在白名单</li>
+                    <li><b>429</b> - 请求过于频繁</li>
+                </ul>
+            </div>
+
+            <!-- 账号接口示例 -->
+            <div class="seamless-item py-4">
+                <h3 class="font-bold text-slate-800 mb-2">3. 账号接口 (卡密获取)</h3>
+                <p class="text-[14px] text-slate-500 mb-2">POST /order/account</p>
+                <div class="code-block">curl -X POST "https://web.lynli.me/api/v1/order/account" \\<br>  -H "Authorization: Bearer YOUR_API_KEY" \\<br>  -H "Content-Type: application/json" \\<br>  -d '{"product_id": 1, "quantity": 1}'</div>
+            </div>
+            
+            <!-- 占位，后续填入接码、节点、查询、支付的文档 -->
+            <div class="py-6 text-center text-slate-400 text-sm">
+                更多接口文档 (接码 / 节点 / 查询 / 支付) 正在整理中...
+            </div>
+        </div>
+    </main>
+</body>
+</html>

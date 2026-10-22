@@ -11,10 +11,19 @@
         body { background-color: #f8fafc; color: #1e293b; }
         .card { background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        /* 手风琴动画 */
         .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
-        .accordion-content.active { max-height: 800px; transition: max-height 0.4s ease-in; }
+        .accordion-content.active { max-height: 1200px; transition: max-height 0.4s ease-in; }
         .rotate-180 { transform: rotate(180deg); }
+        
+        .status-btn { display: inline-flex; align-items: center; justify-content: center; padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .status-pending { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+        .status-pending:active { background: #dbeafe; }
+        .status-review { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; cursor: default; }
+        .status-active { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; cursor: default; }
+        
+        /* 长文本弹窗滚动 */
+        .modal-body { max-height: 50vh; overflow-y: auto; text-align: left; }
+        .modal-body p { margin-bottom: 8px; line-height: 1.5; }
     </style>
 </head>
 <body>
@@ -24,7 +33,6 @@
     </header>
 
     <main class="px-4 py-4 pb-12 space-y-4 max-w-lg mx-auto">
-        
         <!-- 1. 顶部看板 -->
         <div class="card p-5">
             <div class="flex justify-between items-start mb-4">
@@ -36,7 +44,7 @@
                 </div>
                 <div class="text-right">
                     <p class="text-xs text-slate-400 mb-1">当前余额</p>
-                    <p class="text-2xl font-bold text-blue-600">¥ 0.00</p>
+                    <p class="text-2xl font-bold text-blue-600">¥ 120.00</p> <!-- 模拟余额，方便测试 -->
                 </div>
             </div>
             
@@ -51,7 +59,7 @@
                 </div>
             </div>
             
-            <button onclick="showCustomAlert('提示', '正在唤起在线充值...')" class="w-full py-2.5 bg-blue-600 text-white font-bold rounded-xl text-[14px] active:opacity-80 transition shadow-sm">
+            <button onclick="showCustomAlert('在线充值', '正在唤起在线充值...')" class="w-full py-2.5 bg-blue-600 text-white font-bold rounded-xl text-[14px] active:opacity-80 transition shadow-sm">
                 在线充值
             </button>
         </div>
@@ -60,52 +68,12 @@
         <div class="card overflow-hidden">
             <button onclick="toggleAccordion('accordion-1', 'icon-1')" class="w-full px-5 py-4 flex justify-between items-center bg-white active:bg-slate-50 transition">
                 <span class="font-bold text-slate-800 text-[15px]">账户详情与接口权限</span>
-                <svg id="icon-1" class="w-5 h-5 text-slate-400 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                <svg id="icon-1" class="w-5 h-5 text-slate-400 transition-transform duration-300 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
             </button>
-            <div id="accordion-1" class="accordion-content bg-white">
+            <div id="accordion-1" class="accordion-content active bg-white">
                 <div class="px-5 pb-5 pt-1 border-t border-slate-100">
-                    <!-- 5个接口权限列表 -->
-                    <div class="space-y-1">
-                        <!-- 1. 账号接口 -->
-                        <div class="flex justify-between items-center py-3 border-b border-slate-50">
-                            <div>
-                                <p class="text-[14px] font-medium text-slate-800">1. 账号接口</p>
-                                <p class="text-[12px] text-slate-400">TG / 邮箱等静态卡密提取</p>
-                            </div>
-                            <span class="text-[12px] font-medium px-2 py-1 bg-slate-100 text-slate-500 rounded border border-slate-200">未申请</span>
-                        </div>
-                        <!-- 2. 节点接口 -->
-                        <div class="flex justify-between items-center py-3 border-b border-slate-50">
-                            <div>
-                                <p class="text-[14px] font-medium text-slate-800">2. 节点接口</p>
-                                <p class="text-[12px] text-slate-400">代理节点 / IP 提取</p>
-                            </div>
-                            <button onclick="applyApi('节点接口', this)" class="text-[12px] font-medium px-3 py-1 bg-blue-50 text-blue-600 rounded border border-blue-100 active:bg-blue-100">申请调用</button>
-                        </div>
-                        <!-- 3. 接码接口 -->
-                        <div class="flex justify-between items-center py-3 border-b border-slate-50">
-                            <div>
-                                <p class="text-[14px] font-medium text-slate-800">3. 接码接口</p>
-                                <p class="text-[12px] text-slate-400">上游取号 / 动态收码</p>
-                            </div>
-                            <span class="text-[12px] font-medium px-2 py-1 bg-green-50 text-green-600 rounded border border-green-200">启用中</span>
-                        </div>
-                        <!-- 4. 查询接口 -->
-                        <div class="flex justify-between items-center py-3 border-b border-slate-50">
-                            <div>
-                                <p class="text-[14px] font-medium text-slate-800">4. 查询接口</p>
-                                <p class="text-[12px] text-slate-400">二要素 / 三要素数据核验</p>
-                            </div>
-                            <span class="text-[12px] font-medium px-2 py-1 bg-amber-50 text-amber-600 rounded border border-amber-200">审核中</span>
-                        </div>
-                        <!-- 5. 支付接口 -->
-                        <div class="flex justify-between items-center py-3">
-                            <div>
-                                <p class="text-[14px] font-medium text-slate-800">5. 支付接口</p>
-                                <p class="text-[12px] text-slate-400">易支付代收 / 回调下发</p>
-                            </div>
-                            <button onclick="applyApi('支付接口', this)" class="text-[12px] font-medium px-3 py-1 bg-blue-50 text-blue-600 rounded border border-blue-100 active:bg-blue-100">申请调用</button>
-                        </div>
+                    <div id="api-list" class="space-y-1">
+                        <!-- JS动态渲染 -->
                     </div>
                     
                     <button onclick="showCustomAlert('提示', '已退出登录')" class="mt-4 w-full py-2.5 bg-red-50 text-red-600 font-bold rounded-lg text-[14px] border border-red-100 active:bg-red-100 transition">
@@ -123,7 +91,6 @@
             </button>
             <div id="accordion-2" class="accordion-content bg-white">
                 <div class="px-5 pb-5 pt-2 border-t border-slate-100">
-                    <!-- 专属 Key -->
                     <div class="mb-4">
                         <label class="block text-[13px] font-bold text-slate-700 mb-2">专属 API Key</label>
                         <div class="flex items-center bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5">
@@ -134,11 +101,10 @@
                         </div>
                     </div>
 
-                    <!-- 全局 IP 白名单 -->
                     <div>
                         <label class="block text-[13px] font-bold text-slate-700 mb-1">全局 IP 白名单</label>
                         <p class="text-[11px] text-slate-400 mb-2">此处设置对所有已开通接口生效</p>
-                        <textarea rows="3" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-[13px] text-slate-700 focus:outline-none focus:border-blue-500 focus:bg-white transition resize-none" placeholder="一行一个 IP，例如：&#10;127.0.0.1&#10;192.168.1.1"></textarea>
+                        <textarea rows="3" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-[13px] text-slate-700 focus:outline-none focus:border-blue-500 focus:bg-white transition resize-none" placeholder="一行一个 IP，例如：&#10;127.0.0.1"></textarea>
                     </div>
                     <button onclick="showCustomAlert('保存成功', '全局 IP 白名单已更新，即刻生效。')" class="mt-3 w-full py-2.5 bg-blue-50 text-blue-600 font-bold rounded-lg text-[14px] border border-blue-100 active:bg-blue-100 transition">
                         保存白名单
@@ -147,32 +113,136 @@
             </div>
         </div>
 
-        <!-- 4. 底部说明 -->
-        <div class="card p-4 text-center">
-            <p class="text-[13px] text-slate-500 mb-2">需要查看接口参数和调用示例？</p>
-            <a href="/guide.html" class="inline-block text-[14px] font-bold text-blue-600">前往查看开发者文档 →</a>
-        </div>
+        <!-- 4. 开发者文档入口 -->
+        <a href="/doc.html" class="card p-4 flex justify-between items-center active:bg-slate-50 transition">
+            <div>
+                <p class="text-[15px] font-bold text-slate-800">开发者文档</p>
+                <p class="text-[12px] text-slate-500 mt-1">查看接口参数、错误码及调用示例</p>
+            </div>
+            <span class="text-slate-400 text-xl">→</span>
+        </a>
 
         <div class="text-center pb-6">
             <p class="text-[12px] text-slate-400">请妥善保管 API Key，切勿在公开页面暴露。</p>
         </div>
     </main>
 
-    <!-- 磨砂玻璃自定义弹窗 -->
-    <div id="custom-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[9999] hidden items-center justify-center px-6">
-        <div class="bg-white rounded-2xl w-full max-w-[300px] p-5 text-center shadow-xl transform scale-95 transition-transform duration-200">
-            <h3 class="text-[17px] font-bold text-slate-800 mb-2" id="modal-title">提示</h3>
-            <p class="text-[14px] text-slate-500 mb-5 leading-relaxed" id="modal-desc">内容</p>
-            <button onclick="closeCustomAlert()" class="w-full py-2.5 bg-blue-500 text-white font-bold rounded-xl text-[15px] active:opacity-80">我知道了</button>
+    <!-- 通用自定义弹窗 (支持长文本) -->
+    <div id="custom-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[9999] hidden items-center justify-center px-4">
+        <div class="bg-white rounded-2xl w-full max-w-[340px] p-5 text-center shadow-xl transform scale-95 transition-transform duration-200">
+            <h3 class="text-[17px] font-bold text-slate-800 mb-3" id="modal-title">提示</h3>
+            <div class="modal-body text-[14px] text-slate-600 mb-5" id="modal-desc"></div>
+            <div class="flex gap-3" id="modal-btns">
+                <button onclick="closeCustomAlert()" class="flex-1 py-2.5 bg-slate-100 text-slate-600 font-bold rounded-xl text-[15px] active:bg-slate-200">取消</button>
+                <button id="modal-confirm-btn" class="flex-1 py-2.5 bg-blue-600 text-white font-bold rounded-xl text-[15px] active:opacity-80">确认</button>
+            </div>
         </div>
     </div>
 
     <script>
-        // 手风琴逻辑
+        // 接口数据配置
+        const apis = [
+            { id: 'account', name: '账号接口', desc: 'TG / 邮箱等静态卡密提取' },
+            { id: 'node', name: '节点接口', desc: '代理节点 / IP 提取' },
+            { id: 'sms', name: '接码接口', desc: '上游取号 / 动态收码' },
+            { id: 'query', name: '查询接口', desc: '二要素 / 三要素数据核验' },
+            { id: 'pay', name: '支付接口', desc: '易支付代收 / 回调下发' }
+        ];
+
+        // 弹窗文案配置 (纯文本，无链接)
+        const modalConfigs = {
+            account: {
+                title: '申请开通【账号接口】',
+                content: `该接口专为做号商打造，支持 API 实时接码与静态卡密自动分发。<br><br>⚠️ <b>申请门槛</b>：申请前请确保账户余额 ≥ 100 RMB（不足请先充值），审核通过后即可调用。<br><br>注：提交即代表同意《开发者接入规范》，详情请查看底部开发者文档。`
+            },
+            node: {
+                title: '申请开通【节点接口】',
+                content: `本接口专为代理服务商及工作室打造，支持全自动创建节点。您可自由选择共用节点池或单人单用节点下发，精准控制每个节点的流量上限与时长限制。<br><br>🚀 <b>专属扶持</b>：支持为优质新人提供源码部署机器人定制指导。<br><br>⚠️ <b>申请门槛</b>：申请开通前账户余额需 ≥ 200 RMB。`
+            },
+            sms: {
+                title: '申请开通【接码接口】',
+                content: `本接口为注册验证、账号留存与长期号码场景提供一站式 API 接入方案。<br><br>✅ <b>验证码接收</b>：多国家、多供应商实时取号，成功回码后才计费。<br>🔎 <b>通用短信接收</b>：服务名不可检索时，支持按短信关键词精准监听。<br>☎️ <b>租借号码</b>：长期保留专属号码，适合持续收码与账号矩阵管理。<br><br>🚀 <b>新人扶持</b>：平台提供接码机器人自动化部署指导。<br><br>⚠️ <b>申请门槛</b>：在本平台有过任意成功下单记录即可申请。`
+            },
+            query: {
+                title: '申请开通【查询接口】',
+                content: `本接口直连底层聚合网关，提供一站式数据核验服务。目前已无缝集成超 <b>60+</b> 优质数据源，全面覆盖二要素、三要素、司法涉诉、企业工商及反欺诈等维度。<br><br>✅ <b>一站式调用</b>：统一 API 轻松调用所有数据源。<br>⚡️ <b>极速响应</b>：毫秒级核验反馈。<br>🔒 <b>安全合规</b>：严格链路加密防缓存。<br><br>⚠️ <b>申请门槛</b>：申请前账户余额需 ≥ 100 RMB。`
+            },
+            pay: {
+                title: '申请开通【支付接口】',
+                content: `本接口提供易支付/支付宝聚合代收通道。因涉及资金清算，风控审核极严，请一次性提供以下信息供人工审核：<br><br>1️⃣ <b>业务内容</b>：请简述您的业务模式。<br>2️⃣ <b>业务链接</b>：频道 / 网站 / 机器人链接。<br>3️⃣ <b>证明资料</b>：相关聊天截图或业务证明。<br><br>🛡️ <b>风控声明</b>：平台需严格核实业务真实性与资金来源，坚决杜绝黑灰产接入。<br><br>💰 <b>费率说明</b>：支付调用点位 <b>10%</b>。<br><br>⚠️ 审核通过后，方为您开通商户权限并下发支付网关。`
+            }
+        };
+
+        // 初始化状态 (0未申请, 1审核中, 2启用中)
+        let apiStatus = JSON.parse(localStorage.getItem('api_status')) || {
+            account: 0, node: 0, sms: 0, query: 0, pay: 0
+        };
+
+        function renderApis() {
+            const list = document.getElementById('api-list');
+            list.innerHTML = '';
+            
+            apis.forEach((api, index) => {
+                const status = apiStatus[api.id] !== undefined ? apiStatus[api.id] : 0;
+                let btnHtml = '';
+
+                if (status === 0) {
+                    btnHtml = `<button onclick="openApplyModal('${api.id}')" class="status-btn status-pending">申请调用</button>`;
+                } else if (status === 1) {
+                    btnHtml = `<span class="status-btn status-review">⏳ 审核中</span>`;
+                } else if (status === 2) {
+                    btnHtml = `<span class="status-btn status-active">🟢 启用中</span>`;
+                }
+
+                list.innerHTML += `
+                    <div class="flex justify-between items-center py-3 ${index !== apis.length -1 ? 'border-b border-slate-50' : ''}">
+                        <div>
+                            <p class="text-[14px] font-medium text-slate-800">${index + 1}. ${api.name}</p>
+                            <p class="text-[12px] text-slate-400">${api.desc}</p>
+                        </div>
+                        ${btnHtml}
+                    </div>
+                `;
+            });
+        }
+
+        let currentApplyId = null;
+
+        function openApplyModal(id) {
+            currentApplyId = id;
+            const config = modalConfigs[id];
+            
+            document.getElementById('modal-title').innerText = config.title;
+            document.getElementById('modal-desc').innerHTML = config.content;
+            
+            // 恢复双按钮布局
+            document.getElementById('modal-btns').innerHTML = `
+                <button onclick="closeCustomAlert()" class="flex-1 py-2.5 bg-slate-100 text-slate-600 font-bold rounded-xl text-[15px] active:bg-slate-200">取消</button>
+                <button onclick="confirmApply()" class="flex-1 py-2.5 bg-blue-600 text-white font-bold rounded-xl text-[15px] active:opacity-80">确认并提交</button>
+            `;
+            
+            showModal();
+        }
+
+        function confirmApply() {
+            if (currentApplyId) {
+                // 更新状态为审核中
+                apiStatus[currentApplyId] = 1;
+                localStorage.setItem('api_status', JSON.stringify(apiStatus));
+                renderApis();
+                
+                // 把弹窗变成单按钮提示
+                document.getElementById('modal-title').innerText = '提交成功';
+                document.getElementById('modal-desc').innerHTML = '申请已提交，请等待老板审核。审核通过后即可正式启用调用。';
+                document.getElementById('modal-btns').innerHTML = `
+                    <button onclick="closeCustomAlert()" class="w-full py-2.5 bg-blue-600 text-white font-bold rounded-xl text-[15px] active:opacity-80">我知道了</button>
+                `;
+            }
+        }
+
         function toggleAccordion(contentId, iconId) {
             const content = document.getElementById(contentId);
             const icon = document.getElementById(iconId);
-            
             if (content.classList.contains('active')) {
                 content.classList.remove('active');
                 content.style.maxHeight = null;
@@ -184,7 +254,6 @@
             }
         }
 
-        // 掩码逻辑
         const realKey = 'sk_live_7a8b9c0d1e2f3g4h5i6j7k8l9m0n';
         const maskedKey = 'sk_live_************************';
         let isMasked = false;
@@ -193,21 +262,7 @@
             document.getElementById('api-key-text').innerText = isMasked ? maskedKey : realKey;
         }
 
-        // 申请接口逻辑
-        function applyApi(apiName, btn) {
-            // 模拟点击后状态变为审核中
-            const originalText = btn.innerText;
-            btn.innerHTML = '审核中';
-            btn.className = 'text-[12px] font-medium px-2 py-1 bg-amber-50 text-amber-600 rounded border border-amber-200 cursor-default';
-            btn.onclick = null; // 移除点击事件
-            
-            showCustomAlert('申请已提交', apiName + ' 申请已提交，请等待老板审核。');
-        }
-
-        // 弹窗逻辑
-        function showCustomAlert(title, desc) {
-            document.getElementById('modal-title').innerText = title;
-            document.getElementById('modal-desc').innerText = desc;
+        function showModal() {
             const modal = document.getElementById('custom-modal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
@@ -216,6 +271,16 @@
                 modal.querySelector('div').classList.add('scale-100');
             }, 10);
         }
+
+        function showCustomAlert(title, desc) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-desc').innerText = desc;
+            document.getElementById('modal-btns').innerHTML = `
+                <button onclick="closeCustomAlert()" class="w-full py-2.5 bg-blue-600 text-white font-bold rounded-xl text-[15px] active:opacity-80">我知道了</button>
+            `;
+            showModal();
+        }
+
         function closeCustomAlert() {
             const modal = document.getElementById('custom-modal');
             const innerDiv = modal.querySelector('div');
@@ -226,6 +291,8 @@
                 modal.classList.remove('flex');
             }, 200);
         }
+
+        document.addEventListener('DOMContentLoaded', renderApis);
     </script>
 </body>
 </html>

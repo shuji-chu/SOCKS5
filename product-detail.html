@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>商品详情 - SOCKS5</title>
+    <link rel="icon" href="/logo.jpg" type="image/jpeg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #f8fafc; color: #1e293b; padding-bottom: 80px; }
+        .card { background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; }
+        .btn-press { transition: transform 0.1s; }
+        .btn-press:active { transform: scale(0.97); }
+        
+        .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 0 16px; }
+        .modal-overlay.active { display: flex; }
+        .modal-box { background: #fff; width: 100%; max-width: 360px; border-radius: 16px; padding: 20px; transform: scale(0.95); transition: transform 0.2s; opacity: 0; text-align: left; }
+        .modal-overlay.active .modal-box { transform: scale(1); opacity: 1; }
+        
+        /* 长文本教程滚动 */
+        .doc-content { max-height: 60vh; overflow-y: auto; font-size: 13px; color: #475569; line-height: 1.6; }
+        .doc-content p { margin-bottom: 8px; }
+        .doc-content b { color: #1e293b; }
+        .doc-content a { color: #2563eb; text-decoration: underline; }
+        
+        /* 底部购买栏 */
+        .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 1px solid #f1f5f9; padding: 12px 16px; padding-bottom: env(safe-area-inset-bottom); z-index: 50; display: flex; align-items: center; justify-content: space-between; }
+    </style>
+</head>
+<body>
+    <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center gap-3 sticky top-0 z-50">
+        <a href="/index.html" class="text-slate-600 text-xl font-bold px-2">←</a>
+        <h1 class="text-[17px] font-bold text-slate-800">商品详情</h1>
+    </header>
+
+    <main class="px-4 py-4 max-w-lg mx-auto">
+        <!-- 商品头部信息 -->
+        <div class="card p-5 mb-4">
+            <div class="flex gap-2 mb-2">
+                <span class="bg-blue-50 text-blue-600 text-[10px] px-2 py-0.5 rounded font-bold border border-blue-100">在售</span>
+                <span class="bg-orange-50 text-orange-600 text-[10px] px-2 py-0.5 rounded font-bold border border-orange-100">推荐</span>
+                <span class="bg-red-50 text-red-600 text-[10px] px-2 py-0.5 rounded font-bold border border-red-100">热门</span>
+            </div>
+            <h2 class="text-[16px] font-bold text-slate-800 leading-snug mb-3">[货号3965]🛰️Telegram飞机号/电报 | +1美国电话注册 | 成品号 | API接码登录 | 稳定推荐👍👍</h2>
+            <div class="flex items-baseline justify-between">
+                <span class="text-[24px] font-bold text-red-500">¥ 8.72</span>
+                <span class="text-[13px] text-slate-400">库存: <span class="text-green-500 font-bold">1934</span> 件</span>
+            </div>
+        </div>
+
+        <!-- 购买操作区 -->
+        <div class="card p-5 mb-4">
+            <div class="flex justify-between items-center mb-4">
+                <span class="text-[14px] text-slate-600 font-medium">购买数量</span>
+                <div class="flex items-center border border-slate-200 rounded-lg overflow-hidden">
+                    <button class="px-3 py-1.5 bg-slate-50 text-slate-500 active:bg-slate-200" onclick="changeQty(-1)">-</button>
+                    <input type="number" id="buy-qty" value="1" class="w-12 text-center text-[14px] outline-none" readonly>
+                    <button class="px-3 py-1.5 bg-slate-50 text-slate-500 active:bg-slate-200" onclick="changeQty(1)">+</button>
+                </div>
+            </div>
+            
+            <div class="flex justify-between items-center mb-4 pb-4 border-b border-slate-100">
+                <span class="text-[14px] text-slate-600 font-medium">订单金额</span>
+                <span class="text-[18px] font-bold text-red-500" id="total-amount">¥ 8.72</span>
+            </div>
+            
+            <div class="mb-2">
+                <span class="text-[14px] text-slate-600 font-medium mb-3 block">支付方式</span>
+                <div class="flex gap-3">
+                    <div class="flex-1 border-2 border-blue-500 bg-blue-50 text-blue-600 font-bold text-[14px] py-2 rounded-lg text-center cursor-pointer">支付宝</div>
+                    <div class="flex-1 border border-slate-200 text-slate-600 font-medium text-[14px] py-2 rounded-lg text-center cursor-pointer active:bg-slate-50">微信支付</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 商品图文详情 (简略版，详细点弹窗) -->
+        <div class="card p-5 mb-6">
+            <h3 class="text-[15px] font-bold text-slate-800 mb-3 border-l-4 border-blue-500 pl-2">商品描述</h3>
+            <div class="text-[13px] text-slate-600 space-y-2 leading-relaxed">
+                <p><b>卡密格式：</b><span class="bg-slate-100 px-1 py-0.5 rounded text-pink-600">号码|接码链接</span></p>
+                <p><b>描述：</b>Telegram飞机号/电报，+1美国，成品号。支持任何设备登录（网页/电脑/手机/苹果/Mac等）。</p>
+                <p><b>汉化包：</b><a href="https://t.me/setlanguage/classic-zh-cn" class="text-blue-500">点击安装汉化</a></p>
+                <p>本站代开 TG 会员，刷频道订阅者，全网最低价。</p>
+                <p>联系客服：<a href="https://t.me/qingtian_Boss" class="text-blue-500">@qingtian_Boss</a></p>
+            </div>
+        </div>
+
+        <!-- 底部信息栏区 (包含五个接口和协议链接) -->
+        <div class="text-center pb-8 space-y-4">
+            <!-- 教程与免责声明链接 -->
+            <div class="flex flex-wrap justify-center gap-x-4 gap-y-2 text-[12px] text-slate-500 px-4">
+                <span onclick="openDocModal('usage')" class="cursor-pointer text-blue-500 font-medium underline underline-offset-2">使用教程与接码说明</span>
+                <span onclick="openDocModal('warning')" class="cursor-pointer text-blue-500 font-medium underline underline-offset-2">重要防封提醒</span>
+                <span onclick="openDocModal('video')" class="cursor-pointer text-blue-500 font-medium underline underline-offset-2">视频教程与APP下载</span>
+            </div>
+
+            <!-- 开发者接口导航 (一排五个) -->
+            <div class="flex justify-center items-center gap-3 text-[12px] text-slate-400 mt-2">
+                <span class="text-slate-300">开发者接口:</span>
+                <a href="/doc.html#tg" class="active:text-blue-500">账号</a>
+                <a href="/doc.html#jd" class="active:text-blue-500">节点</a>
+                <a href="/doc.html#sms" class="active:text-blue-500">接码</a>
+                <a href="/doc.html#cx" class="active:text-blue-500">查询</a>
+                <a href="/doc.html#zf" class="active:text-blue-500">支付</a>
+            </div>
+
+            <p class="text-[11px] text-slate-300 mt-4 px-6">© 2026 SOCKS5 版权所有 | 本平台所有账号仅供合法合规用途，严禁用于任何违法违规行为。</p>
+        </div>
+    </main>
+
+    <!-- 底部固定购买栏 -->
+    <div class="bottom-bar">
+        <div class="flex flex-col">
+            <span class="text-[12px] text-slate-500">应付金额</span>
+            <span class="text-[20px] font-bold text-red-500" id="bottom-amount">¥ 8.72</span>
+        </div>
+        <button onclick="showToast('正在唤起支付...')" class="bg-blue-600 text-white font-bold px-8 py-2.5 rounded-xl text-[15px] active:opacity-80 shadow-sm">立即购买</button>
+    </div>
+
+    <!-- 通用弹窗 (用于展示长教程) -->
+    <div id="doc-modal" class="modal-overlay">
+        <div class="modal-box">
+            <h3 class="text-[17px] font-bold text-slate-800 mb-3 text-center border-b border-slate-100 pb-3" id="doc-title">标题</h3>
+            <div class="doc-content" id="doc-body"></div>
+            <button onclick="closeDocModal()" class="mt-5 w-full py-2.5 bg-slate-100 text-slate-600 font-bold rounded-xl text-[15px] active:bg-slate-200">我知道了</button>
+        </div>
+    </div>
+
+    <div id="toast" style="visibility: hidden; min-width: 200px; background-color: #334155; color: #fff; text-align: center; border-radius: 8px; padding: 10px 16px; position: fixed; z-index: 10000; left: 50%; bottom: 100px; transform: translateX(-50%); font-size: 13px; opacity: 0; transition: opacity 0.3s;">提示内容</div>
+
+    <!-- 引入全局 AI 客服 -->
+    <script src="/ai-widget.js"></script>
+
+    <script>
+        const price = 8.72;
+        
+        function changeQty(step) {
+            const input = document.getElementById('buy-qty');
+            let qty = parseInt(input.value) + step;
+            if (qty < 1) qty = 1;
+            input.value = qty;
+            
+            const total = (qty * price).toFixed(2);
+            document.getElementById('total-amount').innerText = `¥ ${total}`;
+            document.getElementById('bottom-amount').innerText = `¥ ${total}`;
+        }
+
+        // 文案配置数据
+        const docData = {
+            usage: {
+                title: '使用教程与接码说明',
+                content: `
+                    <p><b>【卡密格式】</b>号码|接码链接</p>
+                    <p><b>【第一步：输入号码】</b><br>在客户端中输入卡密中提供的手机号（+1为区号），点击下一步。千万别返回或关闭客户端。</p>
+                    <p><b>【第二步：获取验证码】</b><br>输入号码点击下一步后，不论验证码显示发送到某邮箱或某设备还是其他，均去打开卡密中的【接码链接】获取验证码。</p>
+                    <p><b>【第三步：填入验证码】</b><br>根据链接中的验证码输入客户端中。接码可能有延迟，千万不要退出Telegram程序，等待即可。</p>
+                    <p><b>【第四步：输入2FA密码】</b><br>接码成功后，立即输入验证码（存在有效期）。输入验证码后，再输入2FA密码（密码在接码网页中）。</p>
+                    <p class="text-red-500 font-bold">⚠️ 成功登录后请至少保持一个设备登录，不要退出，后面登录的验证码会发送到当前登录设备的，不提供二次接码服务。</p>
+                `
+            },
+            warning: {
+                title: '重要防封提醒',
+                content: `
+                    <p><b>【售后说明】</b><br>本店所售出账号均为未冻结状态，因此"账号冻结"不在售后范围之内！！！</p>
+                    <p><b>【风控提示】</b><br>由于Telegram官方风控极其严格，推荐使用注册地IP进行登录（实际测试任何IP均可登录，是否影响封号不保证）。</p>
+                    <p><b>【保护期】</b><br>由于账号注册时间均不相等，未满三天账号存在保护期（即：无法与非好友对话），满三天自行解除。</p>
+                    <p><b>【设备建议】</b><br>新设备登录，不要着急修改资料。</p>
+                    <p><b>【地区差异】</b><br>Telegram部分国家地区的账号功能有少许差异，有特殊需求的用户谨慎购买，售出不退。</p>
+                `
+            },
+            video: {
+                title: '视频教程与APP下载',
+                content: `
+                    <p><b>【视频教程】</b><br>Telegram - API接码号登录视频教程：<br><a href="https://youtu.be/rxxVhC-ul-w" target="_blank">https://youtu.be/rxxVhC-ul-w</a></p>
+                    <p><b>【手机收不到验证码的解决方法】</b><br>如果手机无法收到验证码，请下载“Nicegram app”测试该版本可用。<br>苹果或安卓机型：在应用商店搜索：Nicegram 下载。</p>
+                `
+            }
+        };
+
+        function openDocModal(type) {
+            const data = docData[type];
+            document.getElementById('doc-title').innerText = data.title;
+            document.getElementById('doc-body').innerHTML = data.content;
+            document.getElementById('doc-modal').classList.add('active');
+        }
+
+        function closeDocModal() {
+            document.getElementById('doc-modal').classList.remove('active');
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg; 
+            toast.style.visibility = 'visible'; toast.style.opacity = '1';
+            setTimeout(() => { 
+                toast.style.visibility = 'hidden'; toast.style.opacity = '0';
+            }, 2500);
+        }
+    </script>
+</body>
+</html>

@@ -7,68 +7,161 @@
     <link rel="icon" href="/logo.jpg" type="image/jpeg">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
-        body { background-color: #ffffff; color: #1e293b; }
-        .seamless-item { border-bottom: 1px solid #f1f5f9; }
-        .code-block { background: #1e293b; color: #e2e8f0; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 12px; overflow-x: auto; margin-top: 8px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #f8fafc; color: #1e293b; }
+        .card { background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; }
+        .code-block { background: #1e293b; color: #e2e8f0; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 13px; overflow-x: auto; line-height: 1.6; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body>
-    <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center gap-3 sticky top-0 z-50">
+    <header class="bg-white border-b border-slate-200 px-4 py-3 flex items-center gap-3 sticky top-0 z-50 shadow-sm">
         <a href="/profile.html" class="text-slate-600 text-xl font-bold px-2">←</a>
-        <h1 class="text-lg font-bold text-slate-800">开发者控制台</h1>
+        <h1 class="text-[17px] font-bold text-slate-800">开发者控制台</h1>
     </header>
 
-    <main class="px-4 py-4 pb-10">
-        <!-- 凭证展示 -->
-        <div class="bg-slate-50 rounded-xl p-4 mb-6 border border-slate-100">
-            <h2 class="text-sm font-bold text-slate-800 mb-3">接口凭证</h2>
-            <div class="mb-3">
-                <label class="text-xs text-slate-500 block mb-1">API Key</label>
-                <div class="flex justify-between items-center bg-white border border-slate-200 rounded-lg px-3 py-2">
-                    <span id="api-key" class="text-[13px] font-mono text-slate-700">sk_live_................</span>
-                    <button onclick="copyText('api-key')" class="text-blue-500 text-xs font-medium">复制</button>
+    <main class="px-4 py-4 pb-12 space-y-4 max-w-lg mx-auto">
+        
+        <!-- 数据看板 (Dashboard) -->
+        <div class="card p-5">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h2 class="text-sm text-slate-500 font-medium mb-1">当前账户</h2>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xl font-bold text-slate-800">boss</span>
+                        <span class="bg-blue-50 text-blue-600 text-[10px] px-2 py-0.5 rounded-full font-bold">已认证</span>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-xs text-slate-400 mb-1">当前余额</p>
+                    <p class="text-2xl font-bold text-blue-600">¥ 0.00</p>
                 </div>
             </div>
-            <div>
-                <label class="text-xs text-slate-500 block mb-1">API Secret</label>
-                <div class="flex justify-between items-center bg-white border border-slate-200 rounded-lg px-3 py-2">
-                    <span id="api-secret" class="text-[13px] font-mono text-slate-700">••••••••••••••••••••</span>
-                    <button onclick="copyText('api-secret')" class="text-blue-500 text-xs font-medium">复制</button>
+            
+            <div class="grid grid-cols-2 gap-3 mt-4">
+                <div class="bg-slate-50 rounded-lg p-3 border border-slate-100">
+                    <p class="text-xs text-slate-500 mb-1">今日消费</p>
+                    <p class="text-base font-bold text-slate-800">¥ 0.00</p>
+                </div>
+                <div class="bg-slate-50 rounded-lg p-3 border border-slate-100">
+                    <p class="text-xs text-slate-500 mb-1">调用资格</p>
+                    <p class="text-base font-bold text-green-500">可以调用</p>
                 </div>
             </div>
         </div>
 
-        <!-- 对接说明 -->
-        <h2 class="text-base font-bold text-slate-800 mb-3">对接说明</h2>
-        <div class="text-sm text-slate-600 leading-relaxed space-y-4">
-            <p>请将您的 API Key 放在 HTTP 请求头中：<code class="bg-slate-100 px-1 py-0.5 rounded text-pink-600">Authorization: Bearer YOUR_API_KEY</code></p>
+        <!-- 秘钥与白名单管理 -->
+        <div class="card p-5">
+            <h2 class="text-[16px] font-bold text-slate-800 mb-1">秘钥与白名单</h2>
+            <p class="text-[13px] text-slate-500 mb-4">专属 API Key，请妥善保管，切勿泄露。</p>
             
-            <div>
-                <h3 class="font-bold text-slate-800 text-[14px] mb-1">1. 获取账户余额</h3>
-                <p class="mb-1">接口：<span class="text-blue-500">GET /api/v1/user/balance</span></p>
-                <div class="code-block">curl -X GET "https://web.lynli.me/api/v1/user/balance" \\<br>  -H "Authorization: Bearer YOUR_API_KEY"</div>
+            <button onclick="showCustomAlert('提示', '重置秘钥请联系客服处理，此操作有风险。')" class="bg-blue-600 text-white text-[13px] font-medium px-4 py-2 rounded-lg active:opacity-80 transition shadow-sm">
+                更换 / 重置秘钥
+            </button>
+
+            <!-- Key 展示 -->
+            <div class="mt-4 relative">
+                <div class="flex items-center bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5">
+                    <span id="api-key-text" class="font-mono text-[14px] text-slate-700 flex-1 truncate">sk_live_7a8b9c0d1e2f3g4h5i6j7k8l9m0n</span>
+                    <button onclick="toggleKey()" id="eye-btn" class="text-slate-400 hover:text-slate-600 px-1 ml-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                    </button>
+                </div>
             </div>
 
-            <div>
-                <h3 class="font-bold text-slate-800 text-[14px] mb-1">2. 购买卡密 (静态)</h3>
-                <p class="mb-1">接口：<span class="text-blue-500">POST /api/v1/order/static</span></p>
-                <div class="code-block">curl -X POST "https://web.lynli.me/api/v1/order/static" \\<br>  -H "Authorization: Bearer YOUR_API_KEY" \\<br>  -H "Content-Type: application/json" \\<br>  -d '{"product_id": 1, "quantity": 1}'</div>
+            <!-- IP 白名单 -->
+            <div class="mt-5">
+                <label class="block text-[13px] font-bold text-slate-700 mb-2">IP 白名单</label>
+                <textarea id="ip-whitelist" rows="3" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-[13px] text-slate-700 focus:outline-none focus:border-blue-500 focus:bg-white transition resize-none" placeholder="一行一个 IP，例如：&#10;127.0.0.1&#10;192.168.1.1"></textarea>
             </div>
+            <button onclick="saveWhitelist()" class="mt-3 w-full py-2.5 bg-blue-50 text-blue-600 font-bold rounded-lg text-[14px] border border-blue-100 active:bg-blue-100 transition">
+                保存白名单
+            </button>
+        </div>
+
+        <!-- 接口文档区 -->
+        <div class="card p-5">
+            <h2 class="text-[16px] font-bold text-slate-800 mb-3 flex items-center gap-2">
+                <span class="w-1.5 h-4 bg-blue-500 rounded-full"></span> 接入指南
+            </h2>
+            <div class="text-[13px] text-slate-600 leading-relaxed space-y-4">
+                <p>请将您的 API Key 放在 HTTP 请求头中：<br>
+                <code class="bg-slate-100 px-1.5 py-0.5 rounded text-pink-600 font-mono mt-1 inline-block">Authorization: Bearer YOUR_API_KEY</code></p>
+                
+                <div>
+                    <h3 class="font-bold text-slate-800 mb-1">1. 获取账户余额</h3>
+                    <p class="mb-1 text-slate-500">GET /api/v1/user/balance</p>
+                    <div class="code-block">curl -X GET "https://web.lynli.me/api/v1/user/balance" \\<br>  -H "Authorization: Bearer YOUR_API_KEY"</div>
+                </div>
+
+                <div>
+                    <h3 class="font-bold text-slate-800 mb-1">2. 购买卡密 (静态)</h3>
+                    <p class="mb-1 text-slate-500">POST /api/v1/order/static</p>
+                    <div class="code-block">curl -X POST "https://web.lynli.me/api/v1/order/static" \\<br>  -H "Authorization: Bearer YOUR_API_KEY" \\<br>  -H "Content-Type: application/json" \\<br>  -d '{"product_id": 1, "quantity": 1}'</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部说明 -->
+        <div class="text-center pb-6">
+            <p class="text-[12px] text-slate-400">价格与服务状态以接口详情页为准。</p>
+            <p class="text-[12px] text-slate-400 mt-1">请妥善保管 API Key，切勿在公开页面暴露。</p>
         </div>
     </main>
 
+    <!-- 磨砂玻璃自定义弹窗 -->
+    <div id="custom-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[9999] hidden items-center justify-center px-6">
+        <div class="bg-white rounded-2xl w-full max-w-[300px] p-5 text-center shadow-xl transform scale-95 transition-transform duration-200">
+            <h3 class="text-[17px] font-bold text-slate-800 mb-2" id="modal-title">提示</h3>
+            <p class="text-[14px] text-slate-500 mb-5 leading-relaxed" id="modal-desc">内容</p>
+            <button onclick="closeCustomAlert()" class="w-full py-2.5 bg-blue-500 text-white font-bold rounded-xl text-[15px] active:opacity-80">我知道了</button>
+        </div>
+    </div>
+
     <script>
-        // 模拟数据，后续接入真实后端时替换
-        document.getElementById('api-key').innerText = 'sk_live_' + Math.random().toString(36).substr(2, 24);
-        
-        function copyText(id) {
-            const text = document.getElementById(id).innerText;
-            if(text.includes('•••')) { alert('请先点击显示明文(待开发)'); return; }
-            navigator.clipboard.writeText(text).then(() => {
-                // 这里可以调用你封装的自定义弹窗
-                window.showCustomAlert ? showCustomAlert('提示', '复制成功') : alert('复制成功');
-            });
+        const realKey = 'sk_live_7a8b9c0d1e2f3g4h5i6j7k8l9m0n';
+        const maskedKey = 'sk_live_************************';
+        let isMasked = false; // 默认显示明文，点击眼睛隐藏
+
+        function toggleKey() {
+            isMasked = !isMasked;
+            document.getElementById('api-key-text').innerText = isMasked ? maskedKey : realKey;
+            
+            // 切换图标 (简单处理，实际中可以换 SVG)
+            const eyeBtn = document.getElementById('eye-btn');
+            if (isMasked) {
+                eyeBtn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path></svg>';
+            } else {
+                eyeBtn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>';
+            }
+        }
+
+        function saveWhitelist() {
+            // 模拟保存动作
+            showCustomAlert('保存成功', '您的 IP 白名单已更新，即刻生效。');
+        }
+
+        function showCustomAlert(title, desc) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-desc').innerText = desc;
+            const modal = document.getElementById('custom-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => {
+                modal.querySelector('div').classList.remove('scale-95');
+                modal.querySelector('div').classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeCustomAlert() {
+            const modal = document.getElementById('custom-modal');
+            const innerDiv = modal.querySelector('div');
+            innerDiv.classList.remove('scale-100');
+            innerDiv.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }, 200);
         }
     </script>
 </body>

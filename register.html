@@ -10,27 +10,27 @@
         .header { text-align: center; margin-bottom: 32px; }
         .header img { width: 64px; height: 64px; border-radius: 20px; margin-bottom: 16px; object-fit: cover; }
         .header h2 { font-size: 22px; font-weight: 700; }
-        .header p { font-size: 13px; color: #64748b; margin-top: 6px; }
         .card { background: #ffffff; padding: 24px; border-radius: 24px; box-shadow: 0 4px 20px -2px rgba(0,0,0,0.05); width: 100%; max-width: 380px; margin: 0 auto; }
         .input-group { margin-bottom: 16px; }
         .input-group input { width: 100%; padding: 14px 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; font-size: 15px; outline: none; }
         .code-row { display: flex; gap: 10px; }
         .code-row input { flex: 1; min-width: 0; }
-        .btn-code { width: 110px; flex-shrink: 0; background: #f1f5f9; border: 1px solid #e2e8f0; color: #334155; border-radius: 12px; font-size: 13px; font-weight: 600; cursor: pointer; }
+        .btn-code { width: 110px; flex-shrink: 0; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 12px; font-size: 13px; font-weight: 600; cursor: pointer; }
         .btn-primary { width: 100%; padding: 14px; background: #2563eb; color: white; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 8px; }
         .link-text { text-align: center; margin-top: 24px; }
         .link-text a { font-size: 14px; color: #2563eb; text-decoration: none; font-weight: 500; }
         .agreement { display: flex; align-items: flex-start; gap: 8px; margin-top: 16px; font-size: 12px; color: #64748b; }
         .agreement input { margin-top: 2px; width: 14px; height: 14px; accent-color: #2563eb; }
         .agreement a { color: #2563eb; text-decoration: none; }
-        .footer { position: absolute; bottom: 24px; left: 0; right: 0; text-align: center; font-size: 12px; color: #94a3b8; }
+        .footer { position: absolute; bottom: 24px; text-align: center; font-size: 12px; color: #94a3b8; }
         .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 9999; display: none; align-items: flex-end; justify-content: center; }
         .modal-overlay.active { display: flex; }
-        .modal-content { background: white; width: 100%; max-width: 400px; border-radius: 24px 24px 0 0; padding: 24px; padding-bottom: 40px; max-height: 80vh; display: flex; flex-direction: column; }
+        .modal-content { background: white; width: 100%; max-width: 400px; border-radius: 24px 24px 0 0; padding: 24px; padding-bottom: 40px; max-height: 80vh; display: flex; flex-direction: column; animation: slideUp 0.3s ease-out; }
         .modal-header { display: flex; justify-content: space-between; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 16px; }
         .modal-body { font-size: 13px; color: #475569; line-height: 1.6; overflow-y: auto; }
         #toast { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); background: rgba(30,41,59,0.95); color: white; padding: 12px 24px; border-radius: 12px; font-size: 14px; transition: all 0.3s; z-index: 99999; }
         #toast.show { top: 30px; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -44,106 +44,72 @@
                 <button type="button" id="send-code-btn" class="btn-code">获取验证码</button>
             </div>
             <div class="input-group"><input type="password" id="password" required placeholder="设置密码"></div>
-            
             <label class="agreement">
                 <input type="checkbox" id="agree-check">
                 <span>我已阅读并同意 <a href="javascript:void(0)" onclick="openModal('terms')">《用户协议》</a> 和 <a href="javascript:void(0)" onclick="openModal('privacy')">《隐私政策》</a></span>
             </label>
-            
             <button type="submit" class="btn-primary" id="submit-btn">立即注册</button>
         </form>
         <div class="link-text"><a href="/login.html">已有账号？返回登录</a></div>
     </div>
-
     <div class="footer">客服邮箱：boss@lynli.me</div>
-
     <div id="info-modal" class="modal-overlay">
         <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="modal-title" style="font-size:18px;font-weight:700;">标题</h3>
-                <button onclick="closeModal()" style="border:none;background:none;font-size:20px;color:#94a3b8;">✕</button>
-            </div>
+            <div class="modal-header"><h3 id="modal-title" style="font-size:18px;font-weight:700;">标题</h3><button onclick="closeModal()" style="border:none;background:none;font-size:20px;color:#94a3b8;">✕</button></div>
             <div class="modal-body" id="modal-body-content"></div>
         </div>
     </div>
-
     <script>
         let toastTimer;
         function showToast(msg) {
             const t = document.getElementById('toast');
-            t.innerText = msg;
-            t.classList.add('show');
+            t.innerText = msg; t.classList.add('show');
             clearTimeout(toastTimer);
             toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
         }
-
+        const WORKER_URL = 'https://sendmail.lynli.me';
         document.getElementById('send-code-btn').addEventListener('click', async function() {
             const email = document.getElementById('email').value;
             if(!email || !email.includes('@')) { showToast('请输入正确邮箱'); return; }
-            
             this.disabled = true; this.innerText = '发送中...';
-            
             const myCode = Math.floor(100000 + Math.random() * 900000).toString();
             localStorage.setItem('my_verify_code', myCode);
-
             try {
-                const res = await fetch('https://sendmail.lynli.me', {
+                const res = await fetch(WORKER_URL, {
                     method: 'POST', headers: {'Content-Type': 'application/json'}, 
                     body: JSON.stringify({ email: email, code: myCode })
                 });
-                
                 if (res.ok) {
                     showToast('验证码已发送');
                     let cd = 60; const btn = this;
                     const timer = setInterval(() => { cd--; btn.innerText = `${cd}s`; if(cd <= 0) { clearInterval(timer); btn.disabled = false; btn.innerText = '获取验证码'; } }, 1000);
-                } else { 
-                    showToast('发送失败'); this.disabled = false; this.innerText = '获取验证码'; 
-                }
-            } catch (e) { 
-                showToast('网络错误'); this.disabled = false; this.innerText = '获取验证码'; 
-            }
+                } else { showToast('发送失败'); this.disabled = false; this.innerText = '获取验证码'; }
+            } catch (e) { showToast('网络错误'); this.disabled = false; this.innerText = '获取验证码'; }
         });
-
         document.getElementById('reg-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
-            if (!document.getElementById('agree-check').checked) {
-                showToast('请先同意协议'); return;
-            }
-
+            if (!document.getElementById('agree-check').checked) { showToast('请先同意协议'); return; }
             const btn = document.getElementById('submit-btn');
             const email = document.getElementById('email').value;
             const code = document.getElementById('code').value;
-
-            if(code !== localStorage.getItem('my_verify_code')) {
-                showToast('验证码错误'); return;
-            }
-
+            if(code !== localStorage.getItem('my_verify_code')) { showToast('验证码错误'); return; }
             btn.innerText = '正在进入...'; btn.disabled = true;
-            
             try {
-                // 真实请求你的 702 网关，拿到真 Token
-                const res = await fetch('https://api.lynli.me/api/v1/auth/direct-register', {
+                const res = await fetch(`${WORKER_URL}/register`, {
                     method: 'POST', headers: {'Content-Type': 'application/json'}, 
                     body: JSON.stringify({ email: email })
                 });
                 const data = await res.json();
-                
                 if (res.ok && data.data) {
-                    localStorage.setItem('socks5_email', email);
+                    localStorage.setItem('socks5_email', data.data.email);
                     localStorage.setItem('socks5_token', data.data.token);
+                    localStorage.setItem('socks5_nickname', data.data.nickname);
+                    localStorage.setItem('socks5_avatar', data.data.avatar);
                     showToast('注册成功');
                     setTimeout(() => window.location.href = '/index.html', 800);
-                } else { 
-                    showToast('系统异常'); btn.innerText = '立即注册'; btn.disabled = false;
-                }
-            } catch (err) { 
-                // 如果这里还报网络错误，就是 Nginx 跨域没配好或者被 CF 拦截了
-                showToast('服务器连接失败'); 
-                btn.innerText = '立即注册'; btn.disabled = false;
-            }
+                } else { showToast('注册异常'); btn.innerText = '立即注册'; btn.disabled = false; }
+            } catch (err) { showToast('网络错误'); btn.innerText = '立即注册'; btn.disabled = false; }
         });
-
         const modalContent = {
             'privacy': { title: '隐私政策', text: '我们深知个人信息对您的重要性...' },
             'terms': { title: '用户协议', text: '欢迎使用 SOCKS5 服务...' }
@@ -154,9 +120,7 @@
             document.getElementById('modal-body-content').innerText = data.text;
             document.getElementById('info-modal').classList.add('active');
         }
-        function closeModal() {
-            document.getElementById('info-modal').classList.remove('active');
-        }
+        function closeModal() { document.getElementById('info-modal').classList.remove('active'); }
     </script>
 </body>
 </html>

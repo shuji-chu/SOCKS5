@@ -156,7 +156,7 @@
             }
 
             list.innerHTML = filtered.map(p => `
-                <a href="/product-detail.html?id=${p.id}" class="block bg-white rounded-xl p-3 border border-slate-100 shadow-sm active:bg-slate-50 transition fade-in">
+                <a href="${p.category === '接码服务' ? '/sms.html' : (p.category === '数据查询' ? '/api-market.html' : '/product-detail.html?id=' + p.id)}" class="block bg-white rounded-xl p-3 border border-slate-100 shadow-sm active:bg-slate-50 transition fade-in">
                     <div class="flex gap-3">
                         <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${p.icon === 'tg' ? 'bg-blue-50 text-blue-500' : p.icon === 'gmail' ? 'bg-pink-50 text-pink-500' : p.icon === 'node' ? 'bg-indigo-50 text-indigo-500' : p.icon === 'sms' ? 'bg-green-50 text-green-500' : p.icon === 'domain' ? 'bg-orange-50 text-orange-500' : 'bg-purple-50 text-purple-500'}">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">${icons[p.icon] || icons.tg}</svg>
@@ -168,7 +168,7 @@
                             </div>
                             <div class="flex justify-between items-end">
                                 <span class="text-[18px] font-bold text-red-500 leading-none">¥${p.price}</span>
-                                <span class="text-[11px] text-slate-400">库存: <span class="text-green-500 font-medium">${p.stock}</span></span>
+                                <span class="text-[11px] text-slate-400">${p.category === '接码服务' || p.category === '数据查询' ? '点击进入控制台' : '库存: <span class="text-green-500 font-medium">' + p.stock + '</span>'}</span>
                             </div>
                         </div>
                     </div>

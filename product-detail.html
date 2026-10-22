@@ -82,6 +82,7 @@
             <div class="text-[13px] text-slate-600 space-y-2 leading-relaxed" id="p-desc">
                 加载中...
             </div>
+            <div id="action-area" class="mt-4"></div>
         </div>
 
         <!-- 底部教程与声明区 -->
@@ -206,7 +207,33 @@
                 document.getElementById('p-stock').innerText = currentProduct.stock;
                 document.getElementById('p-desc').innerHTML = currentProduct.desc;
                 
+                if (currentProduct.category === '接码服务') {
+                    document.getElementById('action-area').innerHTML = '<a href="/sms.html" class="block text-center w-full py-2.5 bg-blue-50 text-blue-600 font-bold rounded-xl border border-blue-100">立即前往接码控制台</a>';
+                } else if (currentProduct.category === '数据查询') {
+                    document.getElementById('action-area').innerHTML = '<a href="/api-market.html" class="block text-center w-full py-2.5 bg-blue-50 text-blue-600 font-bold rounded-xl border border-blue-100">立即前往数据查询中心</a>';
+                }
+                
                 updateTotal();
+
+                // 核心逻辑拦截：如果是接码或查询，隐藏常规购买操作
+                if (currentProduct.category === '接码服务' || currentProduct.category === '数据查询') {
+                    // 隐藏数量、金额、支付方式卡片
+                    document.querySelectorAll('.card.p-5')[1].style.display = 'none'; 
+                    
+                    // 修改底部购买栏
+                    const bottomBar = document.querySelector('.bottom-bar');
+                    const targetUrl = currentProduct.category === '接码服务' ? '/sms.html' : '/api-market.html';
+                    const btnText = currentProduct.category === '接码服务' ? '进入接码控制台' : '进入数据查询中心';
+                    
+                    bottomBar.innerHTML = `
+                        <div class="flex flex-col w-full">
+                            <p class="text-[12px] text-slate-500 mb-1">该项业务按次实时扣费，请确保账户余额充足</p>
+                            <button onclick="window.location.href='${targetUrl}'" class="w-full py-3 bg-blue-600 text-white font-bold rounded-xl text-[15px] active:opacity-80">${btnText}</button>
+                        </div>
+                    `;
+                    bottomBar.style.padding = '16px';
+                }
+
             } catch (e) {
                 console.error('商品加载失败', e);
                 document.getElementById('p-title').innerText = '商品数据加载失败';

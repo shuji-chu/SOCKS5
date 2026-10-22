@@ -51,10 +51,10 @@
 
         <div class="px-4 mb-2">
             <h3 class="text-[18px] font-bold text-slate-800 mb-1" id="current-title">全部接口</h3>
-            <p class="text-[12px] text-slate-500">当前展示 <span class="text-blue-600 font-bold" id="total-count">0</span> 个接口，点击卡片查看详情。</p>
+            <p class="text-[12px] text-slate-500">当前展示 <span class="text-blue-600 font-bold" id="total-count">65</span> 个接口。</p>
         </div>
 
-        <!-- 排序与付费筛选 (真实生效) -->
+        <!-- 排序与付费筛选 -->
         <div class="px-4 flex gap-3 mb-4">
             <select id="sort-select" onchange="renderApis()" class="filter-select flex-1">
                 <option value="default">排序：综合</option>
@@ -71,7 +71,7 @@
         <!-- 列表容器 -->
         <div id="api-list" class="px-4 pb-6 space-y-4"></div>
 
-        <!-- 分页 (静态展示) -->
+        <!-- 分页 (此时应该在底部) -->
         <div class="flex flex-wrap items-center justify-center gap-2 px-4 pb-12 mt-4">
             <button class="px-3 py-1.5 bg-white border border-slate-200 text-slate-500 text-[13px] rounded-lg">上一页</button>
             <button class="px-3 py-1.5 bg-blue-600 text-white text-[13px] rounded-lg">1</button>
@@ -82,6 +82,7 @@
         </div>
     </main>
 
+    <!-- 引入数据和组件 -->
     <script src="/api-data.js"></script>
     <script src="/notice.js"></script>
     <script src="/ai-widget.js"></script>
@@ -89,7 +90,7 @@
     <script>
         let currentCategory = '全部';
 
-        // 专属分类图标字典
+        // 专属图标库
         const categoryIcons = {
             '手机号码': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>',
             '实名认证': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>',
@@ -158,16 +159,51 @@
             }
 
             list.innerHTML = filtered.map(api => {
-                // 获取对应图标与颜色
                 const iconPath = categoryIcons[api.category] || categoryIcons['默认'];
                 const iconColor = categoryColors[api.category] || categoryColors['默认'];
 
-                return ;
+                return `
+                <a href="/api-detail.html?id=${api.id}" class="block card p-5 active:bg-slate-50 transition relative">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="w-12 h-12 rounded-xl relative overflow-hidden shrink-0 shadow-sm border border-slate-100">
+                            <img src="https://picsum.photos/seed/${api.id}/100/100" class="absolute inset-0 w-full h-full object-cover opacity-80">
+                            <div class="absolute inset-0 flex items-center justify-center bg-white/50 backdrop-blur-sm ${iconColor}">
+                                <svg class="w-6 h-6 drop-shadow-md" fill="none" stroke="currentColor" viewBox="0 0 24 24">${iconPath}</svg>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[12px] text-slate-500 font-bold">${api.category}</p>
+                            <p class="text-[11px] text-slate-400 font-mono mt-1">ID: ${api.id}</p>
+                        </div>
+                    </div>
+                    
+                    <h3 class="text-[16px] font-bold text-slate-800 mb-1 flex items-center gap-2">
+                        ${api.title}
+                        ${api.isHot ? '<span class="text-[10px] bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded border border-orange-200">热门</span>' : ''}
+                        ${api.status === '维护' ? '<span class="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded border border-slate-200">维护</span>' : ''}
+                    </h3>
+                    
+                    <p class="text-[13px] text-slate-500 leading-relaxed mb-4 line-clamp-2">${api.desc}</p>
+                    
+                    <div class="flex gap-2 mb-4">
+                        <span class="text-[11px] bg-slate-100 text-slate-500 px-2 py-1 rounded">${api.price === '免费' ? '免费' : '付费'}</span>
+                        <span class="text-[11px] ${api.price === '免费' ? 'bg-green-50 text-green-600' : 'bg-orange-50 text-orange-600'} font-bold px-2 py-1 rounded">${api.price === '免费' ? '免费' : '$' + api.price + '/次'}</span>
+                        <span class="text-[11px] bg-blue-50 text-blue-600 px-2 py-1 rounded">${api.method}</span>
+                    </div>
+                    
+                    <div class="flex justify-between items-center pt-3 border-t border-slate-50">
+                        <span class="text-[12px] text-slate-400">开发者 API</span>
+                        <span class="text-[13px] text-blue-600 font-bold flex items-center gap-1">查看文档并测试 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></span>
+                    </div>
+                </a>
+                `;
             }).join('');
         }
 
-        renderApis();
+        // 关键：在页面加载完成时立即渲染
+        document.addEventListener('DOMContentLoaded', () => {
+            renderApis();
+        });
     </script>
-
 </body>
 </html>

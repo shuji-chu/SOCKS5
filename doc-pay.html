@@ -52,6 +52,8 @@
             <a href="#step3" class="nav-item flex items-center whitespace-nowrap"><span class="nav-dot"></span>关闭订单</a>
             <a href="#step4" class="nav-item flex items-center whitespace-nowrap"><span class="nav-dot"></span>支付回调</a>
             <a href="#step5" class="nav-item flex items-center whitespace-nowrap"><span class="nav-dot"></span>签名规则</a>
+            <a href="#step6" class="nav-item flex items-center whitespace-nowrap"><span class="nav-dot"></span>商户接口</a>
+            <a href="#step7" class="nav-item flex items-center whitespace-nowrap"><span class="nav-dot"></span>SDK下载</a>
         </div>
 
         <!-- 01 统一下单 -->
@@ -232,6 +234,65 @@
                     <div class="code-wrapper">
                         <div class="copy-btn" onclick="copyCode(this)">复制</div>
                         <div class="code-block">money=1.00&name=支付测试&notify_url=https://merchant.example.com/notify_url.php&out_trade_no=202606130001&pid=1001&return_url=https://merchant.example.com/return_url.php&timestamp=1781270400&type=alipay</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="step6" class="mb-12 scroll-mt-20">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="num-box">06</div>
+                <h3 class="text-[18px] font-bold text-slate-800">商户相关接口 (补充)</h3>
+            </div>
+            
+            <div class="card p-5">
+                <div class="flex items-center mb-3">
+                    <span class="bg-blue-50 text-blue-600 px-2 py-1 rounded text-[11px] font-bold border border-blue-200 mr-2">GET</span>
+                    <span class="font-mono text-[14px] font-bold text-slate-800">/api/merchant/balance</span>
+                </div>
+                <p class="text-[13px] text-slate-500 mb-4">查询当前商户可提现余额与待结算资金。</p>
+                <p class="text-[13px] font-bold text-slate-700 mb-2">返回示例：</p>
+                <div class="code-wrapper">
+                    <div class="copy-btn" onclick="copyCode(this)">复制</div>
+                    <div class="code-block">{
+  "code": 0,
+  "data": {
+    "balance": "1000.00",
+    "pending": "50.00"
+  }
+}</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="step7" class="mb-10 scroll-mt-20">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="num-box">07</div>
+                <h3 class="text-[18px] font-bold text-slate-800">SDK 工具包下载</h3>
+            </div>
+            
+            <div class="card p-5">
+                <p class="text-[13px] text-slate-600 mb-4">为降低您的开发成本，我们提供了封装好 RSA 签名算法的官方 SDK。请下载后修改 <code>epay.config.php</code>，填入商户 ID 与私钥即可使用。</p>
+                
+                <div class="flex flex-col gap-3">
+                    <a href="/sdk.zip" class="flex items-center justify-between p-3 border border-slate-200 rounded-lg active:bg-slate-50">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">PHP</div>
+                            <div>
+                                <p class="text-[14px] font-bold text-slate-800">PHP-SDK.zip (V2.1)</p>
+                                <p class="text-[11px] text-slate-500">适配 ThinkPHP / Laravel 等主流框架</p>
+                            </div>
+                        </div>
+                        <span class="text-[12px] text-blue-500 font-bold">下载</span>
+                    </a>
+                    <div class="flex items-center justify-between p-3 border border-slate-100 rounded-lg bg-slate-50 opacity-60">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded bg-slate-200 text-slate-500 flex items-center justify-center font-bold">JAVA</div>
+                            <div>
+                                <p class="text-[14px] font-bold text-slate-500">Java-SDK.zip</p>
+                                <p class="text-[11px] text-slate-400">正在整理中...</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

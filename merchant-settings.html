@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>API 信息 - 商户中心</title>
+    <link rel="icon" href="/logo.jpg" type="image/jpeg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #f8fafc; color: #1e293b; }
+        .card { background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; }
+        .code-block { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; font-family: monospace; font-size: 13px; color: #1e293b; word-break: break-all; }
+    </style>
+</head>
+<body class="pb-12">
+    <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center gap-3 sticky top-0 z-50">
+        <a href="/merchant.html" class="text-slate-600 text-xl font-bold px-2">←</a>
+        <h1 class="text-[17px] font-bold text-slate-800">API 信息与密钥</h1>
+    </header>
+
+    <main class="px-4 py-6 space-y-4 max-w-lg mx-auto">
+        <div class="bg-red-50 border border-red-100 rounded-lg p-3 text-[13px] text-red-600 mb-4">
+            ⚠️ 请妥善保管您的私钥，切勿泄露给他人。如发现泄露，请立即点击重置！
+        </div>
+
+        <!-- 商户 ID -->
+        <div class="card p-5">
+            <div class="flex justify-between items-center mb-2">
+                <h3 class="text-[14px] font-bold text-slate-800">商户 ID (pid)</h3>
+                <button onclick="copyText('pid-val')" class="text-[12px] text-blue-600 font-bold">复制</button>
+            </div>
+            <div class="code-block" id="pid-val">1001</div>
+        </div>
+
+        <!-- 平台公钥 -->
+        <div class="card p-5">
+            <div class="flex justify-between items-center mb-2">
+                <h3 class="text-[14px] font-bold text-slate-800">平台公钥</h3>
+                <button onclick="copyText('pub-key')" class="text-[12px] text-blue-600 font-bold">复制</button>
+            </div>
+            <p class="text-[12px] text-slate-500 mb-3">用于验证平台发给您的异步通知</p>
+            <div class="code-block text-slate-500" id="pub-key">MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1x... (省略) ...IDAQAB</div>
+        </div>
+
+        <!-- 商户私钥 -->
+        <div class="card p-5 border-blue-200">
+            <div class="flex justify-between items-center mb-2">
+                <h3 class="text-[14px] font-bold text-blue-600">商户私钥 (Secret)</h3>
+                <button onclick="copyText('pri-key')" class="text-[12px] text-blue-600 font-bold">复制</button>
+            </div>
+            <p class="text-[12px] text-slate-500 mb-3">用于生成请求签名，请勿泄露</p>
+            <div class="code-block text-slate-500" id="pri-key">MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC... (省略) ...CgYEA</div>
+            <button onclick="resetKeys()" class="mt-4 w-full py-2 bg-red-50 text-red-600 font-bold rounded-lg text-[13px] active:bg-red-100">重置 RSA 密钥对</button>
+        </div>
+
+        <!-- SDK 下载 -->
+        <div class="card p-5 mt-6">
+            <h3 class="text-[14px] font-bold text-slate-800 mb-2">开发者 SDK 下载</h3>
+            <p class="text-[12px] text-slate-500 mb-4">提供 PHP 等语言的封装代码，填入密钥即可直接调用。</p>
+            <a href="/sdk.zip" class="flex items-center justify-center gap-2 w-full py-2.5 bg-slate-800 text-white text-[14px] font-bold rounded-lg active:opacity-80">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                下载 PHP-SDK.zip (V2.1)
+            </a>
+        </div>
+    </main>
+
+    <script>
+        function copyText(id) {
+            const text = document.getElementById(id).innerText;
+            if(navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(() => { showToast('已复制'); });
+            } else {
+                const t = document.createElement("textarea"); t.value = text;
+                document.body.appendChild(t); t.select();
+                try { document.execCommand('copy'); showToast('已复制'); } catch(e) {}
+                document.body.removeChild(t);
+            }
+        }
+        function resetKeys() {
+            if(confirm("警告：重置后原密钥将立即失效，需更新您服务器上的代码。确定重置吗？")) {
+                showToast("密钥已重置，请重新复制");
+            }
+        }
+        function showToast(msg) {
+            let toast = document.getElementById('toast');
+            if(!toast) {
+                toast = document.createElement('div'); toast.id = 'toast';
+                toast.style.cssText = 'visibility:hidden; min-width:200px; background-color:#334155; color:#fff; text-align:center; border-radius:8px; padding:10px 16px; position:fixed; z-index:10000; left:50%; bottom:30px; transform:translateX(-50%); font-size:13px; opacity:0; transition:opacity 0.3s;';
+                document.body.appendChild(toast);
+            }
+            toast.innerText = msg; toast.style.visibility = 'visible'; toast.style.opacity = '1';
+            setTimeout(() => { toast.style.visibility = 'hidden'; toast.style.opacity = '0'; }, 2500);
+        }
+    </script>
+</body>
+</html>

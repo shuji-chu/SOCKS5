@@ -50,7 +50,93 @@
             </div>
         </div>
 
-        <!-- ================= 1. 账号接口 ================= -->
+
+        <div class="mb-4 bg-white rounded-xl border border-slate-200 overflow-hidden">
+            <button onclick="toggleAccordion('acc-base', 'icon-base')" class="w-full px-5 py-4 flex justify-between items-center bg-white active:bg-slate-50 transition">
+                <div class="flex items-center gap-3">
+                    <span class="text-[18px] font-bold text-slate-800">0. 通用基础接口</span>
+                    <span class="bg-slate-100 text-slate-600 text-[10px] px-2 py-0.5 rounded font-bold border border-slate-200">必读 / 余额与商品</span>
+                </div>
+                <svg id="icon-base" class="w-5 h-5 text-slate-400 transition-transform duration-300 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </button>
+            <div id="acc-base" class="accordion-content active bg-white border-t border-slate-100">
+                <div class="p-5">
+                    <p class="text-[14px] text-slate-600 mb-5 leading-relaxed">对接业务前，请先通过以下接口获取您的账户余额以及商品信息。</p>
+
+                    <div class="mb-8">
+                        <div class="flex items-center mb-3">
+                            <span class="tag-get">GET</span>
+                            <span class="font-mono text-[15px] font-bold text-slate-800">/user/balance</span>
+                        </div>
+                        <p class="text-[13px] text-slate-500 mb-3">查询当前 API Key 所属账户的可用余额与冻结余额。</p>
+                        
+                        <p class="text-[13px] font-bold text-slate-700 mb-2">请求示例 (cURL)：</p>
+                        <div class="code-wrapper">
+                            <div class="copy-btn" onclick="copyCode(this)">复制</div>
+                            <div class="code-block">curl -X GET "https://web.lynli.me/api/v1/user/balance" -H "Authorization: Bearer sk_tg_xxxxxx"</div>
+                        </div>
+
+                        <p class="text-[13px] font-bold text-slate-700 mb-2">成功返回示例：</p>
+                        <div class="code-wrapper">
+                            <div class="copy-btn" onclick="copyCode(this)">复制</div>
+                            <div class="code-block">{
+  "code": 200,
+  "msg": "success",
+  "data": {
+    "balance": 120.50,
+    "frozen": 0.00,
+    "currency": "CNY"
+  }
+}</div>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-slate-100 pt-6">
+                        <div class="flex items-center mb-3">
+                            <span class="tag-get">GET</span>
+                            <span class="font-mono text-[15px] font-bold text-slate-800">/products</span>
+                        </div>
+                        <p class="text-[13px] text-slate-500 mb-3">获取平台所有商品的 ID、名称、分类及实时价格。下游系统可据此动态渲染商品展示。</p>
+                        
+                        <p class="text-[13px] font-bold text-slate-700 mb-2">请求参数 (Query)：</p>
+                        <table class="api-table">
+                            <tr><th>参数名</th><th>类型</th><th>必填</th><th>描述</th></tr>
+                            <tr><td>type</td><td>string</td><td>否</td><td>商品类型，如 account / sms / domain</td></tr>
+                            <tr><td>category</td><td>string</td><td>否</td><td>商品分类，如 Telegram / Gmail</td></tr>
+                        </table>
+
+                        <p class="text-[13px] font-bold text-slate-700 mb-2">成功返回示例：</p>
+                        <div class="code-wrapper">
+                            <div class="copy-btn" onclick="copyCode(this)">复制</div>
+                            <div class="code-block">{
+  "code": 200,
+  "msg": "success",
+  "data": [
+    {
+      "id": 3965,
+      "name": "[货号3965] Telegram飞机号/电报 | +1美国电话",
+      "type": "account",
+      "category": "Telegram",
+      "price": 8.72,
+      "stock": 1934
+    },
+    {
+      "id": 1907,
+      "name": "Google Gmail 账号 | 2006-2019年老号",
+      "type": "account",
+      "category": "Gmail",
+      "price": 12.35,
+      "stock": 0
+    }
+  ]
+}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
         <div class="mb-4 bg-white rounded-xl border border-slate-200 overflow-hidden">
             <button onclick="toggleAccordion('acc-tg', 'icon-tg')" class="w-full px-5 py-4 flex justify-between items-center bg-white active:bg-slate-50 transition">
                 <div class="flex items-center gap-3">

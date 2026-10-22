@@ -1,13 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // 动态注入悬浮球和聊天窗 HTML
     const widgetHtml = `
         <!-- AI 智能客服悬浮球 -->
-        <div id="ai-fab" onclick="openAiChat()" class="fixed right-4 bottom-24 w-14 h-14 bg-blue-600 rounded-full shadow-lg shadow-blue-500/30 flex items-center justify-center cursor-pointer active:scale-90 transition-transform z-[999]">
+        <div id="ai-fab" onclick="openAiChat()" class="fixed right-4 bottom-[80px] w-14 h-14 bg-blue-600 rounded-full shadow-lg shadow-blue-500/30 flex items-center justify-center cursor-pointer active:scale-90 transition-transform z-[9990]">
             <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
         </div>
 
         <!-- AI 聊天弹窗 -->
-        <div id="ai-chat-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[10000] hidden justify-end flex-col" onclick="closeAiChat(event)">
+        <div id="ai-chat-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[99999] hidden justify-end flex-col" onclick="closeAiChat(event)">
             <div class="bg-white w-full h-[85vh] rounded-t-3xl flex flex-col transform translate-y-full transition-transform duration-300" id="ai-chat-panel" onclick="event.stopPropagation()">
                 <div class="flex justify-between items-center p-4 border-b border-slate-100">
                     <div class="flex items-center gap-2">
@@ -30,7 +29,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="flex flex-col gap-2 mt-2">
                                 <button onclick="askQuestion('如何对接API？')" class="text-left text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100">如何对接API？</button>
                                 <button onclick="askQuestion('提现多久到账？')" class="text-left text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100">提现多久到账？</button>
-                                <button onclick="askQuestion('佣金比例是多少？')" class="text-left text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100">佣金比例是多少？</button>
                             </div>
                         </div>
                     </div>
@@ -47,7 +45,6 @@ document.addEventListener('DOMContentLoaded', () => {
     `;
     document.body.insertAdjacentHTML('beforeend', widgetHtml);
 
-    // 绑定到 window 上供全局调用
     window.openAiChat = function() {
         const modal = document.getElementById('ai-chat-modal');
         const panel = document.getElementById('ai-chat-panel');
@@ -71,30 +68,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 300);
     };
 
-    window.handleChatEnter = function(e) {
-        if (e.key === 'Enter') sendChatMessage();
-    };
-
-    window.askQuestion = function(q) {
-        document.getElementById('chat-input').value = q;
-        sendChatMessage();
-    };
+    window.handleChatEnter = function(e) { if (e.key === 'Enter') sendChatMessage(); };
+    window.askQuestion = function(q) { document.getElementById('chat-input').value = q; sendChatMessage(); };
 
     window.sendChatMessage = function() {
         const input = document.getElementById('chat-input');
         const msg = input.value.trim();
         if (!msg) return;
-
         appendChatMessage('user', msg);
         input.value = '';
         
         setTimeout(() => {
-            let reply = "您好，我是智能客服。关于您的问题，可以查阅对应页面的开发者文档，或直接联系老板 TG：@qingtian_Boss。";
-            if (msg.includes('API') || msg.includes('接口')) reply = "对接 API 请前往【开发者控制台】获取您的专属密钥（sk_live_xxx）。每个接口独立密钥，请求头加上 Authorization: Bearer YOUR_API_KEY 即可调用。";
-            if (msg.includes('提现')) reply = "提现需在【佣金管理】中申请，最低 15 USDT。请务必填写真实的 TRC20 地址，财务人工审核后会在 24 小时内打款。";
-            if (msg.includes('佣金') || msg.includes('返佣')) reply = "咱们目前的返佣政策是永久 15%！如果您申请成为代理，最高可以拿到 50% 的返佣特权。下级消费自动结算。";
-            if (msg.includes('域名') || msg.includes('解析')) reply = "域名中心支持免费赠送二级域名。解析记录每个域名最多限制 5 条，赠送有效期为 90 天，支持随时续期。";
-            
+            let reply = "您好，关于您的问题，可以查阅对应的开发者文档，或联系官方客服。";
+            if (msg.includes('API')) reply = "对接 API 请前往【开发者控制台】获取您的专属密钥（sk_live_xxx）。每个接口独立密钥，请求头加上 Authorization: Bearer YOUR_API_KEY 即可调用。";
+            if (msg.includes('提现')) reply = "提现需在【佣金管理】中申请，最低 15 USDT。请务必填写真实的 TRC20 地址或支付宝账号，财务人工审核后会在 24 小时内打款。";
             appendChatMessage('ai', reply);
         }, 800);
     };

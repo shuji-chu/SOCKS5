@@ -13,52 +13,41 @@
         .btn-press { transition: transform 0.1s; }
         .btn-press:active { transform: scale(0.98); }
         
-        /* Tab 样式 */
-        .api-tab { flex: 1; text-align: center; padding: 12px 0; font-size: 14px; font-weight: bold; color: #64748b; border-bottom: 2px solid transparent; cursor: pointer; transition: all 0.2s; }
-        .api-tab.active { color: #2563eb; border-bottom-color: #2563eb; }
-        
-        /* 表格样式 */
-        .api-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; }
-        .api-table th { text-align: left; padding: 10px 8px; background: #f8fafc; color: #475569; font-weight: bold; border-bottom: 1px solid #e2e8f0; }
-        .api-table td { padding: 10px 8px; border-bottom: 1px solid #f1f5f9; color: #1e293b; line-height: 1.5; }
-        .api-table td:first-child { font-family: monospace; color: #2563eb; }
-        
-        /* 代码块 */
-        .code-block { background: #1e293b; color: #e2e8f0; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 12px; overflow-x: auto; line-height: 1.6; white-space: pre-wrap; margin-top: 10px; }
-
         .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 0 16px; }
         .modal-overlay.active { display: flex; }
         .modal-box { background: #fff; width: 100%; max-width: 340px; border-radius: 20px; padding: 24px; text-align: center; }
     </style>
 </head>
 <body>
-    <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center gap-3 sticky top-0 z-50">
-        <a href="/api-market.html" class="text-slate-600 text-xl font-bold px-2">←</a>
-        <h1 class="text-[17px] font-bold text-slate-800">接口详情</h1>
+    <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
+        <div class="flex items-center gap-3">
+            <a href="/api-market.html" class="text-slate-600 text-xl font-bold px-2">←</a>
+            <h1 class="text-[17px] font-bold text-slate-800">接口详情</h1>
+        </div>
     </header>
 
-    <main class="px-4 py-4 space-y-4 max-w-lg mx-auto">
-        <!-- 顶部接口信息卡片 -->
+    <main class="px-4 py-4 max-w-lg mx-auto space-y-4">
+        <!-- 顶部接口信息 -->
         <div class="card p-5">
             <div class="bg-blue-50/50 rounded-xl p-4 border border-blue-100/50 mb-4">
-                <h2 class="text-[18px] font-bold text-slate-800 mb-1" id="api-name">手机号二要素认证</h2>
-                <p class="text-[13px] text-slate-500 mb-3">通过姓名与手机号核验身份信息是否一致，适用于注册风控、实名认证等场景。</p>
+                <h2 class="text-[18px] font-bold text-slate-800 mb-1" id="api-name">加载中...</h2>
+                <p class="text-[13px] text-slate-500 mb-3" id="api-desc">...</p>
                 
                 <div class="flex justify-between items-end">
                     <div>
                         <p class="text-[12px] text-slate-500 mb-0.5">调用单价</p>
-                        <p class="text-[24px] font-bold text-amber-600 font-mono leading-none" id="api-price">$0.045<span class="text-[12px] text-slate-400 font-sans font-normal">/次</span></p>
+                        <p class="text-[24px] font-bold text-amber-600 font-mono leading-none" id="api-price">$0.00<span class="text-[12px] text-slate-400 font-sans font-normal">/次</span></p>
                     </div>
                     <div class="text-right">
-                        <p class="text-[12px] text-slate-500 mb-0.5">预估可用次数</p>
-                        <p class="text-[16px] font-bold text-green-600">2,637 次</p>
+                        <p class="text-[12px] text-slate-500 mb-0.5">接口 ID</p>
+                        <p class="text-[16px] font-bold text-slate-800 font-mono" id="api-id">0</p>
                     </div>
                 </div>
             </div>
             
             <div class="flex justify-between py-2.5 border-b border-slate-100">
                 <span class="text-[13px] text-slate-500">请求方式</span>
-                <span class="text-[13px] font-bold text-slate-800">POST / GET</span>
+                <span class="text-[13px] font-bold text-slate-800" id="api-method">POST</span>
             </div>
             <div class="flex justify-between py-2.5 border-b border-slate-100">
                 <span class="text-[13px] text-slate-500">接口网关</span>
@@ -76,64 +65,14 @@
             </div>
         </div>
 
-        <!-- 详细内容区 (Tab 切换) -->
-        <div class="card overflow-hidden">
-            <div class="flex border-b border-slate-100 bg-slate-50/50">
-                <div class="api-tab active" onclick="switchTab('info')">接口说明</div>
-                <div class="api-tab" onclick="switchTab('params')">请求参数</div>
-                <div class="api-tab" onclick="switchTab('response')">返回示例</div>
-            </div>
-            
-            <div class="p-5">
-                <!-- 接口说明 -->
-                <div id="tab-info" class="block">
-                    <h4 class="text-[14px] font-bold text-slate-800 mb-2">功能简介</h4>
-                    <p class="text-[13px] text-slate-600 leading-relaxed mb-4">手机号二要素核验接口，直连三大运营商底层数据源，输入姓名和手机号，毫秒级返回校验结果。适用于绝大部分需要实名核验的互联网业务场景。</p>
-                    
-                    <h4 class="text-[14px] font-bold text-slate-800 mb-2">应用场景</h4>
-                    <ul class="text-[13px] text-slate-600 space-y-1.5 leading-relaxed list-disc list-inside">
-                        <li>APP/网站用户实名注册风控</li>
-                        <li>金融理财、借贷平台身份核验</li>
-                        <li>游戏防沉迷及账号安全保护</li>
-                        <li>电商平台收货人信息校验</li>
-                    </ul>
-                </div>
-
-                <!-- 请求参数 -->
-                <div id="tab-params" class="hidden">
-                    <p class="text-[13px] text-slate-500 mb-3">请在请求 Header 中携带 <code>Authorization: Bearer sk_cx_...</code></p>
-                    <table class="api-table">
-                        <tr><th>参数名</th><th>类型</th><th>必填</th><th>描述</th></tr>
-                        <tr><td>name</td><td>string</td><td>是</td><td>真实姓名</td></tr>
-                        <tr><td>phone</td><td>string</td><td>是</td><td>手机号码（11位）</td></tr>
-                        <tr><td>id_card</td><td>string</td><td>否</td><td>身份证号（部分高级接口需要）</td></tr>
-                    </table>
-                </div>
-
-                <!-- 返回示例 -->
-                <div id="tab-response" class="hidden">
-                    <p class="text-[13px] font-bold text-slate-700 mb-1">成功返回 (JSON)</p>
-                    <div class="code-block">{
-  "code": 200,
-  "msg": "success",
-  "data": {
-    "status": "1",      // 1为一致，0为不一致
-    "desc": "验证通过",
-    "cost": 0.045
-  }
-}</div>
-                </div>
-            </div>
-        </div>
-
         <!-- 在线测试区 -->
         <div class="card p-5">
-            <h3 class="text-[16px] font-bold text-slate-800 mb-2">在线测试</h3>
+            <h3 class="text-[16px] font-bold text-slate-800 mb-2">在线测试体验</h3>
             <p class="text-[13px] text-slate-500 mb-4">无需写代码，直接在此测试接口并查看返回结果。</p>
             
             <div class="space-y-3 mb-5">
-                <input type="text" id="test-name" placeholder="请输入姓名 (如: 张三)" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px] outline-none focus:border-blue-500 focus:bg-white transition">
-                <input type="text" id="test-phone" placeholder="请输入手机号 (如: 13800000000)" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px] outline-none focus:border-blue-500 focus:bg-white transition">
+                <input type="text" id="test-name" placeholder="请输入姓名" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px] outline-none focus:border-blue-500 focus:bg-white transition">
+                <input type="text" id="test-phone" placeholder="请输入手机号/身份证/企业名等" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px] outline-none focus:border-blue-500 focus:bg-white transition">
             </div>
             
             <button onclick="runTest()" id="btn-test" class="w-full py-3.5 bg-slate-800 text-white font-bold rounded-xl text-[15px] active:opacity-80 transition shadow-sm">立即在线测试</button>
@@ -151,30 +90,35 @@
         </div>
     </div>
 
+    <script src="/api-data.js"></script>
+    <script src="/notice.js"></script>
+    <script src="/ai-widget.js"></script>
     <script>
-        function switchTab(tab) {
-            // 切换 Tab 样式
-            document.querySelectorAll('.api-tab').forEach(el => el.classList.remove('active'));
-            event.target.classList.add('active');
+        let currentApi = null;
 
-            // 切换内容
-            document.getElementById('tab-info').classList.add('hidden');
-            document.getElementById('tab-params').classList.add('hidden');
-            document.getElementById('tab-response').classList.add('hidden');
+        document.addEventListener('DOMContentLoaded', () => {
+            // 获取 URL 中的 id
+            const urlParams = new URLSearchParams(window.location.search);
+            const apiId = parseInt(urlParams.get('id')) || 1;
 
-            if (tab === 'info') document.getElementById('tab-info').classList.remove('hidden');
-            if (tab === 'params') document.getElementById('tab-params').classList.remove('hidden');
-            if (tab === 'response') document.getElementById('tab-response').classList.remove('hidden');
-        }
+            // 从数据源中查找对应的接口
+            currentApi = apisData.find(a => a.id === apiId) || apisData[0];
+
+            // 渲染页面数据
+            document.getElementById('api-name').innerText = currentApi.title;
+            document.getElementById('api-desc').innerText = currentApi.desc;
+            document.getElementById('api-id').innerText = currentApi.id;
+            document.getElementById('api-method').innerText = currentApi.method;
+            document.getElementById('api-price').innerHTML = currentApi.price === '免费' 
+                ? '免费' 
+                : `$${currentApi.price}<span class="text-[12px] text-slate-400 font-sans font-normal">/次</span>`;
+        });
 
         function runTest() {
             const name = document.getElementById('test-name').value;
             const phone = document.getElementById('test-phone').value;
             
-            if (!name || !phone) {
-                alert('请填写姓名和手机号'); // 以后可以换成自定义弹窗
-                return;
-            }
+            if (!name || !phone) { alert('请填写输入参数'); return; }
             
             const btn = document.getElementById('btn-test');
             const originalText = btn.innerText;
@@ -182,48 +126,32 @@
             btn.disabled = true;
             btn.classList.add('opacity-70');
 
-            // 模拟请求延迟
             setTimeout(() => {
                 btn.innerText = originalText;
                 btn.disabled = false;
                 btn.classList.remove('opacity-70');
                 
-                // 组装假结果
+                // 模拟真实的接口返回 JSON
                 const mockResult = {
                     "code": 200,
                     "msg": "success",
+                    "api_name": currentApi.title,
+                    "api_id": currentApi.id,
                     "data": {
-                        "name": name,
-                        "phone": phone,
-                        "status": "1",
-                        "desc": "一致",
-                        "cost": 0.045
+                        "input_name": name,
+                        "input_query": phone,
+                        "result_status": "1",
+                        "result_desc": "查询成功/一致",
+                        "cost": currentApi.price === '免费' ? 0 : parseFloat(currentApi.price)
                     }
                 };
                 
-                // 渲染到黑框弹窗
                 document.getElementById('result-json').innerText = JSON.stringify(mockResult, null, 2);
                 document.getElementById('result-modal').classList.add('active');
-                
-                // 这里模拟扣费提醒
-                setTimeout(() => {
-                    if(confirm('本次调用扣除 0.045 USDT，是否继续测试？')) {
-                        closeModal();
-                    } else {
-                        closeModal();
-                    }
-                }, 1000); // 弹窗展示1秒后提示，防止体验太割裂
-                
             }, 800);
         }
         
-        function closeModal() {
-            document.getElementById('result-modal').classList.remove('active');
-        }
+        function closeModal() { document.getElementById('result-modal').classList.remove('active'); }
     </script>
-    <script src="/ai-widget.js"></script>
-    
-
-<script src="/notice.js"></script>
 </body>
 </html>

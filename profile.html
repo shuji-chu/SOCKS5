@@ -17,13 +17,11 @@
         .tab-item { flex: 1; text-align: center; padding: 16px 0; font-size: 15px; font-weight: 600; color: #64748b; border-bottom: 2px solid transparent; }
         .tab-item.active { color: #3b82f6; border-bottom-color: #3b82f6; }
         
-        /* 底部导航栏样式 */
         .nav-tab-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #ffffff; display: flex; justify-content: space-around; padding: 10px 0 calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid #e2e8f0; z-index: 50; }
         .nav-tab-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: #94a3b8; text-decoration: none; }
         .nav-tab-item.active { color: #2563eb; }
         .nav-tab-item svg { width: 24px; height: 24px; margin-bottom: 4px; fill: currentColor; }
 
-        /* 弹窗 */
         .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 9999; display: none; align-items: center; justify-content: center; }
         .modal-overlay.active { display: flex; }
         .modal-content { background: white; width: 90%; max-width: 360px; border-radius: 20px; padding: 24px; animation: slideUp 0.3s ease-out; }
@@ -37,7 +35,6 @@
         我的账户
     </div>
 
-    <!-- 个人资料卡片 -->
     <div class="app-card flex items-center gap-4 mt-4 cursor-pointer hover:bg-slate-50 transition-colors" onclick="openEditModal()">
         <img id="user-avatar" src="/logo.jpg" class="w-16 h-16 rounded-full object-cover border border-slate-200">
         <div>
@@ -45,12 +42,11 @@
                 <span id="user-nickname">加载中...</span>
                 <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
             </h2>
-            <p class="text-xs text-slate-400 mt-1">专属ID: <span id="user-id" class="font-mono text-blue-500 font-bold"></span></p>
+            <p class="text-xs text-slate-400 mt-1">专属ID: <span id="user-id" class="font-mono text-blue-500 font-bold">加载中...</span></p>
             <p class="text-xs text-slate-400 mt-0.5">邮箱：<span id="user-email-sub"></span></p>
         </div>
     </div>
 
-    <!-- 资产概览网格 -->
     <div class="grid grid-cols-2 gap-3 mx-3">
         <div class="asset-box">
             <div class="asset-icon bg-blue-500"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg></div>
@@ -71,11 +67,11 @@
         </div>
     </div>
 
-    <!-- API 配置 -->
+    <!-- 去掉了“支持外部对接”废话 -->
     <div class="app-card">
         <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
             <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
-            API 配置 (支持外部对接)
+            API 配置
         </h3>
         <div>
             <p class="text-xs text-slate-500 mb-1">APP Secret:</p>
@@ -87,7 +83,6 @@
         </div>
     </div>
 
-    <!-- Tab 切换卡片 -->
     <div class="app-card p-0 overflow-hidden">
         <div class="flex border-b border-slate-200">
             <div class="tab-item active" onclick="switchTab('orders', this)">订单查询</div>
@@ -121,7 +116,6 @@
         <button onclick="logout()" class="w-full py-3.5 bg-white text-red-500 text-sm font-bold rounded-xl shadow-sm border border-slate-200 active:bg-slate-50">退出登录</button>
     </div>
 
-    <!-- 底部导航栏 (已找回) -->
     <div class="nav-tab-bar">
         <a href="/index.html" class="nav-tab-item">
             <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
@@ -133,11 +127,9 @@
         </a>
     </div>
 
-    <!-- 修改资料弹窗 -->
     <div id="edit-modal" class="modal-overlay">
         <div class="modal-content">
             <h3 class="text-lg font-bold text-slate-800 mb-4">修改个人资料</h3>
-            
             <div class="mb-4 text-center">
                 <label class="block text-xs text-slate-500 mb-2">点击更换头像</label>
                 <div class="relative w-20 h-20 mx-auto cursor-pointer">
@@ -148,41 +140,58 @@
                     <input type="file" id="avatar-upload" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="previewImage(this)">
                 </div>
             </div>
-
             <div class="mb-6">
                 <label class="block text-xs text-slate-500 mb-1">修改昵称</label>
                 <input type="text" id="edit-nickname" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none">
             </div>
-            
             <div class="flex gap-3">
                 <button onclick="closeEditModal()" class="flex-1 py-2.5 bg-slate-100 text-slate-600 font-bold rounded-lg">取消</button>
-                <button onclick="saveProfile()" class="flex-1 py-2.5 bg-blue-500 text-white font-bold rounded-lg">保存</button>
+                <button id="save-btn" onclick="saveProfile()" class="flex-1 py-2.5 bg-blue-500 text-white font-bold rounded-lg">保存</button>
             </div>
         </div>
     </div>
 
     <script>
         const email = localStorage.getItem('socks5_email');
-        const uid = localStorage.getItem('socks5_user_id');
-        const appSecret = localStorage.getItem('socks5_app_secret');
-        const nickname = localStorage.getItem('socks5_nickname');
-        const avatar = localStorage.getItem('socks5_avatar');
         let newAvatarBase64 = "";
 
-        if (!email) {
-            window.location.href = '/login.html';
-        } else {
-            document.getElementById('user-email-sub').innerText = email;
-            document.getElementById('user-nickname').innerText = nickname || email.split('@')[0];
-            document.getElementById('user-id').innerText = uid || '暂无';
-            document.getElementById('user-avatar').src = avatar || '/logo.jpg';
-            document.getElementById('api-secret').value = appSecret || '暂无';
-            document.getElementById('invite-link').value = `https://web.lynli.me/?from=${uid}`;
+        // 自动同步用户信息 (解决老号无 ID 的问题)
+        async function syncUserInfo() {
+            if (!email) { window.location.href = '/login.html'; return; }
+            try {
+                const res = await fetch('https://sendmail.lynli.me/register', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ email: email })
+                });
+                const data = await res.json();
+                if(data.success && data.data) {
+                    const u = data.data;
+                    localStorage.setItem('socks5_user_id', u.user_id);
+                    localStorage.setItem('socks5_app_secret', u.app_secret);
+                    localStorage.setItem('socks5_nickname', u.nickname);
+                    localStorage.setItem('socks5_avatar', u.avatar);
+                    renderUI();
+                }
+            } catch(e) { console.error(e); }
         }
+
+        function renderUI() {
+            document.getElementById('user-email-sub').innerText = email;
+            document.getElementById('user-nickname').innerText = localStorage.getItem('socks5_nickname') || email.split('@')[0];
+            document.getElementById('user-id').innerText = localStorage.getItem('socks5_user_id') || '系统分配中...';
+            document.getElementById('user-avatar').src = localStorage.getItem('socks5_avatar') || '/logo.jpg';
+            document.getElementById('api-secret').value = localStorage.getItem('socks5_app_secret') || '系统生成中...';
+            document.getElementById('invite-link').value = `https://web.lynli.me/?from=${localStorage.getItem('socks5_user_id') || ''}`;
+        }
+
+        // 页面加载时先渲染本地缓存，然后偷偷去后台同步最新数据
+        renderUI();
+        syncUserInfo();
 
         function copyVal(id) {
             const val = document.getElementById(id).value;
-            if(!val || val === '暂无') return;
+            if(!val || val.includes('...')) return;
             navigator.clipboard.writeText(val).then(() => alert('已复制到剪贴板'));
         }
         function togglePwd(id) {
@@ -208,19 +217,42 @@
         function closeEditModal() {
             document.getElementById('edit-modal').classList.remove('active');
         }
+
+        // 核心：压缩图片并转 Base64
         function previewImage(input) {
             if (input.files && input.files[0]) {
+                const file = input.files[0];
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    document.getElementById('edit-avatar-preview').src = e.target.result;
-                    newAvatarBase64 = e.target.result;
+                    const img = new Image();
+                    img.onload = function() {
+                        // 用 Canvas 压缩图片
+                        const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 200;
+                        const scaleSize = MAX_WIDTH / img.width;
+                        canvas.width = MAX_WIDTH;
+                        canvas.height = img.height * scaleSize;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        
+                        // 将压缩后的图转回 Base64
+                        const base64 = canvas.toDataURL('image/jpeg', 0.8);
+                        document.getElementById('edit-avatar-preview').src = base64;
+                        newAvatarBase64 = base64;
+                    }
+                    img.src = e.target.result;
                 }
-                reader.readAsDataURL(input.files[0]);
+                reader.readAsDataURL(file);
             }
         }
+
         async function saveProfile() {
+            const btn = document.getElementById('save-btn');
+            btn.innerText = '保存中...'; btn.disabled = true;
+            
             const nNickname = document.getElementById('edit-nickname').value;
             const nAvatar = newAvatarBase64 || document.getElementById('user-avatar').src;
+            
             try {
                 const res = await fetch('https://sendmail.lynli.me/update-profile', {
                     method: 'POST',
@@ -231,8 +263,14 @@
                     localStorage.setItem('socks5_nickname', nNickname);
                     localStorage.setItem('socks5_avatar', nAvatar);
                     location.reload();
-                } else { alert('修改失败'); }
-            } catch(e) { alert('网络错误'); }
+                } else { 
+                    alert('修改失败'); 
+                    btn.innerText = '保存'; btn.disabled = false; 
+                }
+            } catch(e) { 
+                alert('网络错误'); 
+                btn.innerText = '保存'; btn.disabled = false; 
+            }
         }
     </script>
 </body>

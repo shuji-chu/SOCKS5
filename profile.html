@@ -13,9 +13,6 @@
         .app-card { background: white; border-radius: 12px; margin: 12px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .asset-box { display: flex; flex-direction: column; justify-content: center; background: #f8fafc; border-radius: 10px; padding: 16px; border: 1px solid #f1f5f9; cursor: pointer; transition: all 0.2s; }
         .asset-box:active { background: #f1f5f9; transform: scale(0.98); }
-        .tab-header { display: flex; border-bottom: 1px solid #e2e8f0; padding: 0 12px; margin-bottom: 16px; }
-        .tab-item { flex: 1; text-align: center; padding: 16px 0; font-size: 15px; font-weight: 600; color: #64748b; border-bottom: 2px solid transparent; cursor: pointer; }
-        .tab-item.active { color: #3b82f6; border-bottom-color: #3b82f6; }
         
         .nav-tab-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #ffffff; display: flex; justify-content: space-around; padding: 10px 0 calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid #e2e8f0; z-index: 50; }
         .nav-tab-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: #94a3b8; text-decoration: none; }
@@ -25,32 +22,36 @@
         /* 弹窗通用样式 */
         .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 9999; display: none; align-items: flex-end; justify-content: center; }
         .modal-overlay.active { display: flex; }
-        .modal-content { background: white; width: 100%; max-width: 400px; border-radius: 24px 24px 0 0; padding: 24px; padding-bottom: 40px; max-height: 80vh; display: flex; flex-direction: column; animation: slideUp 0.3s ease-out; }
+        .modal-content { background: white; width: 100%; max-width: 400px; border-radius: 24px 24px 0 0; padding: 24px; padding-bottom: 40px; max-height: 85vh; display: flex; flex-direction: column; animation: slideUp 0.3s ease-out; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 16px; }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     </style>
 </head>
 <body>
 
+    <!-- 顶部导航 (去掉了修改密码) -->
     <div class="top-nav">
         <div class="flex items-center gap-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
             我的账户
         </div>
-        <div class="text-sm font-normal bg-blue-600 px-3 py-1 rounded-full" onclick="openPasswordModal()">修改密码</div>
     </div>
 
     <!-- 个人资料卡片 -->
     <div class="app-card flex items-center gap-4 mt-4 cursor-pointer hover:bg-slate-50 transition-colors" onclick="openEditModal()">
         <img id="user-avatar" src="/logo.jpg" class="w-16 h-16 rounded-full object-cover border border-slate-200">
-        <div>
-            <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-                <span id="user-nickname">加载中...</span>
-                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+        <div class="flex-1">
+            <h2 class="text-lg font-bold text-slate-800 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span id="user-nickname">加载中...</span>
+                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                </div>
             </h2>
-            <p class="text-[13px] text-slate-500 mt-1">用户ID：<span id="user-id" class="text-slate-500">---</span></p>
+            <p class="text-[13px] text-slate-500 mt-1">用户ID：<span id="user-id" class="text-slate-500 font-mono"></span></p>
             <p class="text-[13px] text-slate-500 mt-0.5">邮箱：<span id="user-email-sub"></span></p>
         </div>
+        <!-- 右侧箭头提示点击进入 -->
+        <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
     </div>
 
     <!-- 四个资产/数据格子 -->
@@ -104,21 +105,21 @@
         </div>
     </div>
 
-    <!-- 底部退出 -->
-    <div class="mx-3 mt-4">
-        <button onclick="logout()" class="w-full py-3.5 bg-white text-red-500 text-sm font-bold rounded-xl shadow-sm border border-slate-200 active:bg-slate-50">退出登录</button>
-    </div>
-
     <!-- 底部导航 -->
     <div class="nav-tab-bar">
         <a href="/index.html" class="nav-tab-item"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span>首页</span></a>
         <a href="/profile.html" class="nav-tab-item active"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg><span>我的</span></a>
     </div>
 
-    <!-- 修改资料弹窗 -->
+    <!-- 🌟 个人中心操作弹窗 (包含资料修改、密码、退出) -->
     <div id="edit-modal" class="modal-overlay">
         <div class="modal-content">
-            <div class="modal-header"><h3 class="text-lg font-bold">修改个人资料</h3><button onclick="closeModal('edit-modal')" style="border:none;background:none;font-size:20px;color:#94a3b8;">✕</button></div>
+            <div class="modal-header">
+                <h3 class="text-lg font-bold">个人中心设置</h3>
+                <button onclick="closeModal('edit-modal')" style="border:none;background:none;font-size:20px;color:#94a3b8;">✕</button>
+            </div>
+            
+            <!-- 头像修改 -->
             <div class="mb-4 text-center">
                 <label class="block text-xs text-slate-500 mb-2">点击更换头像</label>
                 <div class="relative w-20 h-20 mx-auto cursor-pointer">
@@ -127,15 +128,31 @@
                     <input type="file" id="avatar-upload" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="previewImage(this)">
                 </div>
             </div>
-            <div class="mb-6"><label class="block text-xs text-slate-500 mb-1">修改昵称</label><input type="text" id="edit-nickname" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none"></div>
-            <div class="flex gap-3">
-                <button onclick="closeModal('edit-modal')" class="flex-1 py-2.5 bg-slate-100 text-slate-600 font-bold rounded-lg">取消</button>
-                <button id="save-btn" onclick="saveProfile()" class="flex-1 py-2.5 bg-blue-500 text-white font-bold rounded-lg">保存</button>
+            
+            <!-- 昵称修改 -->
+            <div class="mb-6">
+                <label class="block text-xs text-slate-500 mb-1">修改昵称</label>
+                <input type="text" id="edit-nickname" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none">
+            </div>
+            
+            <!-- 保存资料按钮 -->
+            <button id="save-btn" onclick="saveProfile()" class="w-full py-2.5 bg-blue-500 text-white font-bold rounded-lg mb-4">保存资料</button>
+
+            <!-- 🚨 账号操作区 (修改密码 & 退出登录) -->
+            <div class="border-t border-slate-100 pt-4 space-y-2">
+                <button onclick="openPasswordModal()" class="w-full py-3 bg-slate-100 text-slate-700 font-bold rounded-xl flex justify-between px-4 items-center">
+                    <span>修改密码</span>
+                    <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </button>
+                <button onclick="logout()" class="w-full py-3 bg-red-50 text-red-500 font-bold rounded-xl flex justify-between px-4 items-center">
+                    <span>退出登录</span>
+                    <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- 修改密码弹窗 -->
+    <!-- 修改密码二级弹窗 -->
     <div id="password-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header"><h3 class="text-lg font-bold">修改密码</h3><button onclick="closeModal('password-modal')" style="border:none;background:none;font-size:20px;color:#94a3b8;">✕</button></div>
@@ -161,7 +178,7 @@
         </div>
     </div>
 
-    <!-- 数据明细弹窗 (余额、佣金、消费、订单) -->
+    <!-- 数据明细弹窗 -->
     <div id="data-modal" class="modal-overlay">
         <div class="modal-content" style="height: 60vh;">
             <div class="modal-header"><h3 id="data-modal-title" class="text-lg font-bold">明细记录</h3><button onclick="closeModal('data-modal')" style="border:none;background:none;font-size:20px;color:#94a3b8;">✕</button></div>
@@ -176,7 +193,6 @@
         const email = localStorage.getItem('socks5_email');
         let newAvatarBase64 = "";
 
-        // 写死兜底：把老板号伪装成正常的 10001
         const isBoss = email === 'boss@lynli.me';
         const fallbackUid = isBoss ? '10001' : '---';
         const fallbackSecret = isBoss ? 'sec_8f9c2d1b4e6f7a9c0b1d2e3f4a5b6c7d' : '---';
@@ -184,8 +200,6 @@
         function renderUI() {
             document.getElementById('user-email-sub').innerText = email;
             document.getElementById('user-nickname').innerText = localStorage.getItem('socks5_nickname') || email.split('@')[0];
-            
-            // 用户ID 保持正常颜色
             document.getElementById('user-id').innerText = localStorage.getItem('socks5_user_id') || fallbackUid;
             document.getElementById('api-secret').value = localStorage.getItem('socks5_app_secret') || fallbackSecret;
             document.getElementById('user-avatar').src = localStorage.getItem('socks5_avatar') || '/logo.jpg';
@@ -211,13 +225,13 @@
             window.location.href = '/login.html';
         }
 
-        // 弹窗控制
         function openEditModal() {
             document.getElementById('edit-nickname').value = document.getElementById('user-nickname').innerText;
             document.getElementById('edit-avatar-preview').src = document.getElementById('user-avatar').src;
             document.getElementById('edit-modal').classList.add('active');
         }
         function openPasswordModal() {
+            closeModal('edit-modal');
             document.getElementById('password-modal').classList.add('active');
         }
         function openApiDocModal() {
@@ -237,7 +251,6 @@
             document.getElementById(id).classList.remove('active');
         }
 
-        // 图片压缩
         function previewImage(input) {
             if (input.files && input.files[0]) {
                 const file = input.files[0];
@@ -262,7 +275,6 @@
             }
         }
 
-        // 保存资料
         async function saveProfile() {
             const btn = document.getElementById('save-btn');
             btn.innerText = '保存中...'; btn.disabled = true;
@@ -278,11 +290,10 @@
                     localStorage.setItem('socks5_nickname', nNickname);
                     localStorage.setItem('socks5_avatar', nAvatar);
                     location.reload();
-                } else { alert('修改失败'); btn.innerText = '保存'; btn.disabled = false; }
-            } catch(e) { alert('网络错误'); btn.innerText = '保存'; btn.disabled = false; }
+                } else { alert('修改失败'); btn.innerText = '保存资料'; btn.disabled = false; }
+            } catch(e) { alert('网络错误'); btn.innerText = '保存资料'; btn.disabled = false; }
         }
 
-        // 保存密码 (前端预留接口)
         function savePassword() {
             const oldPwd = document.getElementById('old-pwd').value;
             const newPwd = document.getElementById('new-pwd').value;
@@ -292,8 +303,7 @@
             if(newPwd !== confirmPwd) return alert('两次输入的密码不一致');
             if(newPwd.length < 8) return alert('密码至少8位');
 
-            // 这里后续对接 Worker 的 /update-password 接口
-            alert('密码修改成功（前端演示）');
+            alert('密码修改成功（等待后端接入真实接口）');
             closeModal('password-modal');
         }
     </script>

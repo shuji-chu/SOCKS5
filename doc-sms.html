@@ -19,6 +19,10 @@
         .api-table th { text-align: left; padding: 8px 12px; background: #f8fafc; color: #64748b; font-weight: bold; border-bottom: 1px solid #e2e8f0; }
         .api-table td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; color: #1e293b; }
         .api-table td:first-child { font-family: monospace; color: #2563eb; }
+        
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-in-out; }
+        .accordion-content.active { max-height: 5000px; }
+        .rotate-180 { transform: rotate(180deg); }
     </style>
 </head>
 <body>
@@ -28,141 +32,193 @@
     </header>
 
     <main class="px-5 py-6 pb-24 max-w-2xl mx-auto">
-        <div class="mb-6">
-            <h2 class="text-[22px] font-extrabold text-slate-800 mb-2">实时验证码接码接口</h2>
-            <p class="text-[14px] text-slate-500 leading-relaxed mb-4">
-                全自动取号、监听短信、成功扣费。<b>请使用 <code class="text-blue-600">sk_sms_</code> 开头的 API Key 进行调用。</b>
-            </p>
-            <div class="bg-amber-50 border border-amber-100 rounded-lg p-3 text-[13px] text-amber-600 font-medium">
-                资金机制说明：调用取号接口时，系统将<b>冻结</b>对应金额。收到验证码后实际扣费；超时未收到（默认15分钟）或主动释放，则自动解冻退款。
-            </div>
-        </div>
-
-        <!-- 1. 获取服务项目及国家 -->
-        <div class="mb-8 border-t border-slate-100 pt-6">
-            <div class="flex items-center mb-3">
-                <span class="tag-get">GET</span>
-                <span class="font-mono text-[15px] font-bold text-slate-800">/sms/products</span>
-            </div>
-            <p class="text-[13px] text-slate-500 mb-3">获取支持接码的 APP 项目（如 Telegram、WhatsApp）及对应可用国家列表。</p>
-            <div class="code-wrapper">
-                <div class="copy-btn" onclick="copyCode(this)">复制</div>
-                <div class="code-block">curl -X GET "https://web.lynli.me/api/v1/sms/products" \
--H "Authorization: Bearer sk_sms_xxxxxx"</div>
-            </div>
-            <p class="text-[13px] font-bold text-slate-700 mb-2">返回示例：</p>
-            <div class="code-wrapper">
-                <div class="copy-btn" onclick="copyCode(this)">复制</div>
-                <div class="code-block">{
-  "code": 200,
-  "data": [
-    {
-      "service_code": "tg",
-      "service_name": "Telegram",
-      "price": 1.50,
-      "countries": [
-        { "id": 1, "name": "美国", "code": "US" },
-        { "id": 2, "name": "英国", "code": "UK" }
-      ]
-    }
-  ]
-}</div>
-            </div>
-        </div>
-
-        <!-- 2. 请求取号 (锁资) -->
-        <div class="mb-8 border-t border-slate-100 pt-6">
-            <div class="flex items-center mb-3">
-                <span class="tag-post">POST</span>
-                <span class="font-mono text-[15px] font-bold text-slate-800">/sms/get</span>
-            </div>
-            <p class="text-[13px] text-slate-500 mb-3">发起取号请求。调用后，用户账户将冻结对应金额，并返回一个手机号。</p>
-            <table class="api-table">
-                <tr><th>参数名</th><th>类型</th><th>必填</th><th>描述</th></tr>
-                <tr><td>service_code</td><td>string</td><td>是</td><td>服务标识（如 tg）</td></tr>
-                <tr><td>country_id</td><td>int</td><td>是</td><td>国家 ID（可选填 0 代表任意国家）</td></tr>
-            </table>
-            <div class="code-wrapper">
-                <div class="copy-btn" onclick="copyCode(this)">复制</div>
-                <div class="code-block">curl -X POST "https://web.lynli.me/api/v1/sms/get" \
--H "Authorization: Bearer sk_sms_xxxxxx" \
--H "Content-Type: application/json" \
--d '{ "service_code": "tg", "country_id": 1 }'</div>
-            </div>
-            <p class="text-[13px] font-bold text-slate-700 mb-2">成功返回 (生成 session_id)：</p>
-            <div class="code-wrapper">
-                <div class="copy-btn" onclick="copyCode(this)">复制</div>
-                <div class="code-block">{
-  "code": 200,
-  "msg": "取号成功，请开始监听",
-  "data": {
-    "session_id": "SESS_998877",
-    "phone": "+12025550143",
-    "expire_in": 900
-  }
-}</div>
-            </div>
-        </div>
-
-        <!-- 3. 监听获取验证码 -->
-        <div class="mb-8 border-t border-slate-100 pt-6">
-            <div class="flex items-center mb-3">
-                <span class="tag-get">GET</span>
-                <span class="font-mono text-[15px] font-bold text-slate-800">/sms/check</span>
-            </div>
-            <p class="text-[13px] text-slate-500 mb-3">轮询获取短信内容。建议每 3-5 秒请求一次。收到短信后自动扣除冻结资金。</p>
-            <table class="api-table">
-                <tr><th>参数名</th><th>类型</th><th>必填</th><th>描述</th></tr>
-                <tr><td>session_id</td><td>string</td><td>是</td><td>取号接口返回的会话 ID</td></tr>
-            </table>
-            <div class="code-wrapper">
-                <div class="copy-btn" onclick="copyCode(this)">复制</div>
-                <div class="code-block">curl -X GET "https://web.lynli.me/api/v1/sms/check?session_id=SESS_998877" \
--H "Authorization: Bearer sk_sms_xxxxxx"</div>
-            </div>
+        <!-- 基础信息 -->
+        <div class="mb-8">
+            <h2 class="text-[24px] font-extrabold text-slate-800 mb-2">接码系统 API</h2>
+            <p class="text-[14px] text-slate-500 mb-4 leading-relaxed">全面支持动态验证码接收、长期号码租借以及关键词监听。请使用 <code class="text-blue-600">sk_sms_</code> 开头的 API Key 进行调用。</p>
             
-            <p class="text-[13px] font-bold text-slate-700 mb-2 mt-4">状态 1：等待中（继续轮询）</p>
-            <div class="code-wrapper">
-                <div class="copy-btn" onclick="copyCode(this)">复制</div>
-                <div class="code-block">{ "code": 404, "msg": "等待验证码中..." }</div>
+            <div class="bg-slate-50 rounded-xl p-4 border border-slate-100 mb-4">
+                <p class="text-[13px] text-slate-600 mb-2"><b>接口网关：</b><code class="bg-white px-1.5 py-0.5 border border-slate-200 rounded text-blue-600 font-mono">https://web.lynli.me/api/v1/sms</code></p>
+                <p class="text-[13px] text-slate-600"><b>鉴权方式：</b>在请求头中携带 <code class="bg-white px-1.5 py-0.5 border border-slate-200 rounded text-blue-600 font-mono">X-API-Key: sk_sms_xxxxxx</code></p>
             </div>
-
-            <p class="text-[13px] font-bold text-slate-700 mb-2 mt-4">状态 2：收到验证码</p>
-            <div class="code-wrapper">
-                <div class="copy-btn" onclick="copyCode(this)">复制</div>
-                <div class="code-block">{
-  "code": 200,
-  "data": {
-    "sms_code": "458921",
-    "full_text": "Your Telegram code is 458921"
-  }
-}</div>
+            <div class="bg-amber-50 border border-amber-100 rounded-lg p-3 text-[13px] text-amber-700 font-medium">
+                ⚠️ 资金安全机制：请求号码时先<b>冻结对应金额</b>。成功获取到短信验证码后才会实际扣费；若未收到或主动释放，资金将全额退回。
             </div>
         </div>
 
-        <!-- 4. 释放号码 -->
-        <div class="border-t border-slate-100 pt-6">
-            <div class="flex items-center mb-3">
-                <span class="tag-post">POST</span>
-                <span class="font-mono text-[15px] font-bold text-slate-800">/sms/release</span>
+        <!-- ================= 模块 1：验证码接收 ================= -->
+        <div class="mb-4 bg-white rounded-xl border border-slate-200 overflow-hidden">
+            <button onclick="toggleAccordion('acc-sms-1', 'icon-sms-1')" class="w-full px-5 py-4 flex justify-between items-center bg-white active:bg-slate-50 transition">
+                <div class="flex items-center gap-3">
+                    <span class="text-[18px] font-bold text-slate-800">1. 验证码接收 (按服务)</span>
+                </div>
+                <svg id="icon-sms-1" class="w-5 h-5 text-slate-400 transition-transform duration-300 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </button>
+            <div id="acc-sms-1" class="accordion-content active bg-white border-t border-slate-100">
+                <div class="p-5 space-y-8">
+                    <!-- 获取国家和服务 -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <div class="flex items-center mb-2"><span class="tag-get">GET</span><span class="font-mono text-[13px] font-bold">/countries</span></div>
+                            <p class="text-[12px] text-slate-500 mb-2">获取国家列表</p>
+                            <div class="code-wrapper"><div class="copy-btn" onclick="copyCode(this)">复制</div><div class="code-block">{
+  "ok": true,
+  "data": [{"code": "US", "name": "美国"}]
+}</div></div>
+                        </div>
+                        <div>
+                            <div class="flex items-center mb-2"><span class="tag-get">GET</span><span class="font-mono text-[13px] font-bold">/services</span></div>
+                            <p class="text-[12px] text-slate-500 mb-2">获取服务项目(可传country过滤)</p>
+                            <div class="code-wrapper"><div class="copy-btn" onclick="copyCode(this)">复制</div><div class="code-block">{
+  "ok": true,
+  "data": [{"id": 510042, "name": "WeChat"}]
+}</div></div>
+                        </div>
+                    </div>
+
+                    <!-- 请求号码 -->
+                    <div>
+                        <div class="flex items-center mb-3"><span class="tag-post">POST</span><span class="font-mono text-[15px] font-bold">/orders/create</span></div>
+                        <p class="text-[13px] text-slate-500 mb-3">请求分配号码。调用时冻结资金。</p>
+                        <table class="api-table">
+                            <tr><th>参数名</th><th>类型</th><th>必填</th><th>描述</th></tr>
+                            <tr><td>service_id</td><td>int</td><td>是</td><td>服务ID (如 510042)</td></tr>
+                            <tr><td>country_name</td><td>string</td><td>是</td><td>国家名称 (如 泰国)</td></tr>
+                        </table>
+                        <div class="code-wrapper"><div class="copy-btn" onclick="copyCode(this)">复制</div><div class="code-block">curl -X POST "https://web.lynli.me/api/v1/sms/orders/create" \
+-H "X-API-Key: sk_sms_xxxxxx" \
+-d '{"service_id": 510042, "country_name": "泰国"}'</div></div>
+                    </div>
+
+                    <!-- 获取短信 -->
+                    <div class="border-t border-slate-100 pt-6">
+                        <div class="flex items-center mb-3"><span class="tag-post">POST</span><span class="font-mono text-[15px] font-bold">/orders/{order_id}/sms</span></div>
+                        <p class="text-[13px] text-slate-500 mb-3">轮询获取短信。等待状态可重复请求；成功返回短信时才扣费。</p>
+                        <div class="code-wrapper"><div class="copy-btn" onclick="copyCode(this)">复制</div><div class="code-block">{
+  "ok": true,
+  "data": { "sms_code": "123456", "full_text": "Your code is 123456" }
+}</div></div>
+                    </div>
+
+                    <!-- 释放号码 -->
+                    <div class="border-t border-slate-100 pt-6">
+                        <div class="flex items-center mb-3"><span class="tag-post">POST</span><span class="font-mono text-[15px] font-bold">/orders/{order_id}/release</span></div>
+                        <p class="text-[13px] text-slate-500 mb-3">未收到短信时释放号码。若释放前已回码，将按成功处理并扣费，否则全额退款。</p>
+                        <div class="code-wrapper"><div class="copy-btn" onclick="copyCode(this)">复制</div><div class="code-block">{ "ok": true, "msg": "号码已释放" }</div></div>
+                    </div>
+
+                    <!-- 获取记录 -->
+                    <div class="border-t border-slate-100 pt-6">
+                        <div class="flex items-center mb-3"><span class="tag-get">GET</span><span class="font-mono text-[15px] font-bold">/orders</span></div>
+                        <p class="text-[13px] text-slate-500 mb-3">获取历史短信订单记录。</p>
+                        <div class="code-wrapper"><div class="copy-btn" onclick="copyCode(this)">复制</div><div class="code-block">curl -X GET "https://web.lynli.me/api/v1/sms/orders" \
+-H "X-API-Key: sk_sms_xxxxxx"</div></div>
+                    </div>
+                </div>
             </div>
-            <p class="text-[13px] text-slate-500 mb-3">主动放弃接码。若资金仍处于冻结状态，将立即全额退还至用户余额。</p>
-            <table class="api-table">
-                <tr><th>参数名</th><th>类型</th><th>必填</th><th>描述</th></tr>
-                <tr><td>session_id</td><td>string</td><td>是</td><td>需要释放的会话 ID</td></tr>
-            </table>
-            <div class="code-wrapper">
-                <div class="copy-btn" onclick="copyCode(this)">复制</div>
-                <div class="code-block">{
-  "code": 200,
-  "msg": "已释放号码，冻结资金已退回"
-}</div>
+        </div>
+
+        <!-- ================= 模块 2：租借号码 ================= -->
+        <div class="mb-4 bg-white rounded-xl border border-slate-200 overflow-hidden">
+            <button onclick="toggleAccordion('acc-sms-2', 'icon-sms-2')" class="w-full px-5 py-4 flex justify-between items-center bg-white active:bg-slate-50 transition">
+                <div class="flex items-center gap-3">
+                    <span class="text-[18px] font-bold text-slate-800">2. 长期租借号码</span>
+                </div>
+                <svg id="icon-sms-2" class="w-5 h-5 text-slate-400 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </button>
+            <div id="acc-sms-2" class="accordion-content bg-white border-t border-slate-100">
+                <div class="p-5 space-y-8">
+                    <!-- 获取可租借地区 -->
+                    <div>
+                        <div class="flex items-center mb-3"><span class="tag-get">GET</span><span class="font-mono text-[15px] font-bold">/rent/tariffs</span></div>
+                        <p class="text-[13px] text-slate-500 mb-3">不传参数返回地区列表；传 <code>area_code</code> 返回该地区可租月份和售价。</p>
+                        <div class="code-wrapper"><div class="copy-btn" onclick="copyCode(this)">复制</div><div class="code-block">curl -X GET "https://web.lynli.me/api/v1/sms/rent/tariffs?area_code=US" \
+-H "X-API-Key: sk_sms_xxxxxx"</div></div>
+                    </div>
+
+                    <!-- 租借号码 -->
+                    <div class="border-t border-slate-100 pt-6">
+                        <div class="flex items-center mb-3"><span class="tag-post">POST</span><span class="font-mono text-[15px] font-bold">/rent/create</span></div>
+                        <p class="text-[13px] text-slate-500 mb-3">租借成功后立即扣费。开始 20 分钟内未收到短信且处于可关闭状态时，可退款。</p>
+                        <table class="api-table">
+                            <tr><th>参数名</th><th>类型</th><th>必填</th><th>描述</th></tr>
+                            <tr><td>area_code</td><td>string</td><td>是</td><td>地区代码 (如 US)</td></tr>
+                            <tr><td>time</td><td>int</td><td>是</td><td>租借月数</td></tr>
+                        </table>
+                        <div class="code-wrapper"><div class="copy-btn" onclick="copyCode(this)">复制</div><div class="code-block">curl -X POST "https://web.lynli.me/api/v1/sms/rent/create" \
+-H "X-API-Key: sk_sms_xxxxxx" \
+-d '{"area_code": "US", "time": 1}'</div></div>
+                    </div>
+
+                    <!-- 获取租借订单/短信 -->
+                    <div class="border-t border-slate-100 pt-6">
+                        <div class="flex items-center mb-3"><span class="tag-get">GET</span><span class="font-mono text-[15px] font-bold">/rent/orders</span></div>
+                        <p class="text-[13px] text-slate-500 mb-3">获取订单列表，支持传参 <code>tab=active</code> 或 <code>tab=expired</code>。</p>
+                    </div>
+                    <div>
+                        <div class="flex items-center mb-3"><span class="tag-post">POST</span><span class="font-mono text-[15px] font-bold">/rent/{order_id}/sms</span></div>
+                        <p class="text-[13px] text-slate-500 mb-3">获取该租借号码的短信记录。</p>
+                    </div>
+
+                    <!-- 关闭/续租 -->
+                    <div class="border-t border-slate-100 pt-6">
+                        <div class="flex items-center mb-3"><span class="tag-post">POST</span><span class="font-mono text-[15px] font-bold">/rent/{order_id}/close</span></div>
+                        <p class="text-[13px] text-slate-500 mb-3">处于可关闭状态时关闭号码，成功后平台自动退回该订单扣除的余额。</p>
+                    </div>
+                    <div>
+                        <div class="flex items-center mb-3"><span class="tag-post">POST</span><span class="font-mono text-[15px] font-bold">/rent/{order_id}/renew</span></div>
+                        <p class="text-[13px] text-slate-500 mb-3">续租号码（可先调 GET /renew-options 查询续租价格）。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= 模块 3：通用短信监听 ================= -->
+        <div class="mb-4 bg-white rounded-xl border border-slate-200 overflow-hidden">
+            <button onclick="toggleAccordion('acc-sms-3', 'icon-sms-3')" class="w-full px-5 py-4 flex justify-between items-center bg-white active:bg-slate-50 transition">
+                <div class="flex items-center gap-3">
+                    <span class="text-[18px] font-bold text-slate-800">3. 通用短信监听 (按关键词)</span>
+                </div>
+                <svg id="icon-sms-3" class="w-5 h-5 text-slate-400 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </button>
+            <div id="acc-sms-3" class="accordion-content bg-white border-t border-slate-100">
+                <div class="p-5">
+                    <!-- 请求号码 -->
+                    <div class="mb-6">
+                        <div class="flex items-center mb-3"><span class="tag-post">POST</span><span class="font-mono text-[15px] font-bold">/keyword-orders/create</span></div>
+                        <p class="text-[13px] text-slate-500 mb-3">不指定具体服务，而是分配一个号码并监听包含特定关键词的短信。</p>
+                        <table class="api-table">
+                            <tr><th>参数名</th><th>类型</th><th>必填</th><th>描述</th></tr>
+                            <tr><td>country</td><td>string</td><td>是</td><td>国家名称 (如 中国)</td></tr>
+                            <tr><td>keyword</td><td>string</td><td>是</td><td>短信关键词 (如 验证码)</td></tr>
+                        </table>
+                        <div class="code-wrapper"><div class="copy-btn" onclick="copyCode(this)">复制</div><div class="code-block">curl -X POST "https://web.lynli.me/api/v1/sms/keyword-orders/create" \
+-H "X-API-Key: sk_sms_xxxxxx" \
+-d '{"country": "中国", "keyword": "验证码"}'</div></div>
+                    </div>
+                    
+                    <p class="text-[13px] text-slate-500 mb-3">获取短信与释放号码接口，复用上方 <code>/orders/{order_id}/sms</code> 和 <code>/orders/{order_id}/release</code> 接口即可。</p>
+                </div>
             </div>
         </div>
     </main>
 
     <script src="/ai-widget.js"></script>
     <script>
+        function toggleAccordion(contentId, iconId) {
+            const content = document.getElementById(contentId);
+            const icon = document.getElementById(iconId);
+            if (content.classList.contains('active')) {
+                content.classList.remove('active');
+                content.style.maxHeight = null;
+                icon.classList.remove('rotate-180');
+            } else {
+                content.classList.add('active');
+                content.style.maxHeight = content.scrollHeight + "px";
+                icon.classList.add('rotate-180');
+            }
+        }
+
         function copyCode(btn) {
             const textToCopy = btn.nextElementSibling.innerText;
             if(navigator.clipboard && window.isSecureContext) {

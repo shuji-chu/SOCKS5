@@ -3,260 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>接码服务 - SOCKS5</title>
+    <title>接码控制台 - SOCKS5</title>
     <link rel="icon" href="/logo.jpg" type="image/jpeg">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
-        body { background-color: #f1f5f9; color: #1e293b; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 900; display: none; align-items: center; justify-content: center; }
-        .modal-overlay.active { display: flex; }
-        .bottom-sheet { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-radius: 24px 24px 0 0; z-index: 999; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding: 24px; padding-bottom: calc(24px + env(safe-area-inset-bottom)); }
-        .bottom-sheet.active { transform: translateY(0); }
-        .sheet-overlay { z-index: 998; background: rgba(0,0,0,0.5); }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #f8fafc; color: #1e293b; }
+        .card { background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; }
+        .tab-btn { flex: 1; padding: 12px 0; font-size: 14px; font-weight: bold; color: #64748b; border-bottom: 2px solid transparent; cursor: pointer; }
+        .tab-btn.active { color: #2563eb; border-bottom-color: #2563eb; }
+        
+        /* 底部抽屉 */
+        .drawer-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 9999; display: none; }
+        .drawer-overlay.active { display: block; }
+        .drawer-panel { position: fixed; bottom: -100%; left: 0; right: 0; background: #fff; border-radius: 20px 20px 0 0; z-index: 10000; transition: bottom 0.3s ease; padding-bottom: env(safe-area-inset-bottom); }
+        .drawer-panel.active { bottom: 0; }
     </style>
 </head>
-<body class="pb-10">
-    <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center gap-3 sticky top-0 z-50">
-        <button onclick="window.history.back()" class="text-slate-600 text-xl font-bold px-2">←</button>
-        <h1 class="text-lg font-bold text-slate-800">接码与短信</h1>
+<body class="pb-12">
+    <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
+        <div class="flex items-center gap-3">
+            <a href="/index.html" class="text-slate-600 text-xl font-bold px-2">←</a>
+            <h1 class="text-[17px] font-bold text-slate-800">接码控制台</h1>
+        </div>
+        <div class="bg-blue-50 text-blue-600 px-3 py-1 rounded-lg text-[12px] font-bold">余额: $ 120.00</div>
     </header>
 
-    <div class="bg-white border-b border-slate-100 sticky top-[57px] z-40">
-        <div class="flex overflow-x-auto no-scrollbar px-2 pt-2 pb-0">
-            <button onclick="switchTab('service', this)" class="tab-btn flex-1 whitespace-nowrap px-4 py-2 text-[14px] font-semibold border-b-2 border-blue-500 text-blue-600">按服务接码</button>
-            <button onclick="switchTab('keyword', this)" class="tab-btn flex-1 whitespace-nowrap px-4 py-2 text-[14px] font-medium border-b-2 border-transparent text-slate-500">关键词/通用</button>
-            <button onclick="switchTab('rent', this)" class="tab-btn flex-1 whitespace-nowrap px-4 py-2 text-[14px] font-medium border-b-2 border-transparent text-slate-500">长期租赁</button>
-            <button onclick="switchTab('broadcast', this)" class="tab-btn flex-1 whitespace-nowrap px-4 py-2 text-[14px] font-medium border-b-2 border-transparent text-slate-500">短信群发</button>
+    <main class="max-w-lg mx-auto">
+        <div class="flex border-b border-slate-200 bg-white">
+            <div class="tab-btn active" onclick="switchTab('service')">按服务</div>
+            <div class="tab-btn" onclick="switchTab('keyword')">关键词</div>
+            <div class="tab-btn" onclick="switchTab('longterm')">长租</div>
         </div>
-    </div>
 
-    <main>
-        <!-- Tab 1: 按服务 -->
-        <div id="tab-service" class="block">
-            <div class="bg-white px-4 pt-3 pb-2 sticky top-[105px] z-30 border-b border-slate-100">
-                <div class="mb-3">
-                    <button class="w-full bg-white border border-slate-300 text-slate-700 px-4 py-2.5 rounded-lg flex justify-between items-center text-sm">
-                        <span class="font-medium">国家</span>
-                        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                    </button>
-                </div>
-                <div class="flex-1 bg-white border border-slate-300 rounded-lg flex items-center px-3 py-2.5">
-                    <input type="text" placeholder="搜索服务 (如: telegram)" class="bg-transparent outline-none text-[14px] w-full text-slate-700">
-                </div>
-            </div>
-            <div class="p-4 space-y-3">
-                <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-100 flex justify-between items-center">
-                    <div>
-                        <h3 class="text-[16px] font-bold text-slate-800 mb-1 flex items-center"><span class="bg-teal-400 text-white text-[10px] px-1.5 py-0.5 rounded mr-2">推荐</span>Telegram</h3>
-                        <p class="text-[13px] text-slate-500 mb-1">美国 / API直连</p>
-                        <div class="text-[18px] font-bold text-slate-900">$ 0.50</div>
+        <!-- 按服务 -->
+        <div id="tab-service" class="p-4 space-y-3">
+            <div class="card p-4 flex justify-between items-center active:bg-slate-50 cursor-pointer" onclick="openDrawer('Telegram')">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-500 flex items-center justify-center">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .33z"/></svg>
                     </div>
-                    <button onclick="openSmsPanel('Telegram', '美国', '0.50')" class="bg-blue-500 text-white text-[15px] font-bold px-6 py-2.5 rounded-lg">取号</button>
+                    <div>
+                        <h3 class="text-[15px] font-bold text-slate-800">Telegram</h3>
+                        <p class="text-[12px] text-slate-500">支持 60+ 国家号码</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-[16px] font-bold text-orange-500">$0.15</p>
+                    <p class="text-[11px] text-slate-400">库存充足</p>
                 </div>
             </div>
         </div>
-
-        <!-- Tab 2: 关键词/通用 -->
-        <div id="tab-keyword" class="hidden p-4">
-            <div class="bg-[#fffbf0] border border-orange-200 rounded-xl p-4 mb-4">
-                <h3 class="flex items-center text-red-600 font-bold mb-2 text-[15px]"><span class="w-2 h-2 bg-red-500 rounded-full mr-2"></span>验证码收不到提示</h3>
-                <p class="text-[13px] text-slate-700 leading-relaxed mb-3">如短信提示“已被当前号码提供方屏蔽”，说明该号码已被运营商拦截，平台无法强制接收。请直接更换其他号码。</p>
-                <div class="flex flex-col items-center gap-2">
-                    <span class="bg-red-100 text-red-600 text-sm font-bold px-6 py-1 rounded-full border border-red-200">介意的不要下单！！！</span>
-                </div>
-            </div>
-            <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-5">
-                <label class="block text-sm font-bold text-slate-700 mb-2">选择国家</label>
-                <select class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-3 text-sm mb-4 outline-none"><option>中国 (86)</option></select>
-                
-                <label class="block text-sm font-bold text-slate-700 mb-2 flex items-center">
-                    短信关键词 
-                    <span class="w-5 h-5 bg-blue-100 text-blue-500 rounded-full flex items-center justify-center text-xs ml-2 cursor-pointer" onclick="showKeywordTip()">?</span>
-                </label>
-                <input type="text" placeholder="请输入短信中包含的关键词" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-3 text-sm mb-4 outline-none">
-                
-                <label class="block text-sm font-bold text-slate-700 mb-2">指定号码</label>
-                <input type="text" placeholder="获取新号码留空，只能填写已经获取过" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-3 text-sm mb-4 outline-none">
-                
-                <label class="block text-sm font-bold text-slate-700 mb-2">过滤重复号码</label>
-                <select class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-3 text-sm mb-6 outline-none"><option>否</option><option>是</option></select>
-
-                <button onclick="openSmsPanel('通用接码', '中国', '0.08')" class="w-full py-3.5 bg-blue-500 text-white font-bold rounded-lg text-[15px]">获取号码</button>
-            </div>
-        </div>
-
-        <!-- Tab 3: 长租 -->
-        <div id="tab-rent" class="hidden p-4">
-             <div class="bg-[#fffbf0] border border-orange-200 rounded-xl p-4 mb-4">
-                <p class="text-[13px] text-slate-700 leading-relaxed">长期租借虚拟号码接收短信，租借时长以月为单位。租借开始 20 分钟内未收到短信，可关闭号码并自动退款。</p>
-            </div>
-            <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-5">
-                <h3 class="font-bold text-slate-800 mb-3 text-sm">可租赁地区</h3>
-                <div class="border border-blue-500 bg-blue-50 rounded-lg p-4 mb-3">
-                    <p class="font-bold text-blue-600 text-[15px]">美国 (物理)</p>
-                    <p class="text-xs text-blue-500 mt-1">US · 可用 566</p>
-                </div>
-                <h3 class="font-bold text-slate-800 mt-6 mb-3 text-sm">租赁套餐</h3>
-                <div class="border border-blue-500 bg-blue-50 rounded-lg p-4 mb-3">
-                    <p class="font-bold text-blue-600 text-[15px]">1 个月</p>
-                    <p class="text-xs text-blue-500 mt-1">$ 14.40</p>
-                </div>
-                <div class="border border-slate-200 rounded-lg p-4 mb-3">
-                    <p class="font-bold text-slate-700 text-[15px]">2 个月</p>
-                    <p class="text-xs text-slate-500 mt-1">$ 28.80</p>
-                </div>
-                <button class="w-full mt-4 py-3.5 bg-blue-500 text-white font-bold rounded-lg text-[15px]">租借号码</button>
-            </div>
-        </div>
-
-        <!-- Tab 4: 群发 -->
-        <div id="tab-broadcast" class="hidden p-4">
-            <div class="bg-[#fffbf0] border border-orange-200 rounded-xl p-4 mb-4">
-                <p class="text-[13px] text-slate-700">短信发送功能暂时无法使用。需要发送短信时请先联系客服确认资费和权限。</p>
-            </div>
-            <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-5 text-center text-slate-400">
-                没有更多数据了...
-            </div>
-        </div>
+        
+        <div id="tab-keyword" class="p-4 hidden text-center text-slate-400 py-10">关键词监听功能准备中...</div>
+        <div id="tab-longterm" class="p-4 hidden text-center text-slate-400 py-10">长租号码功能准备中...</div>
     </main>
 
-    <!-- 全局自定义弹窗 (用来替代 alert) -->
-    <div id="custom-modal" class="modal-overlay">
-        <div class="bg-white rounded-2xl p-6 w-[85%] max-w-[320px] relative" id="custom-modal-content">
-            <div class="text-center">
-                <h3 class="text-lg font-bold text-slate-800 mb-2 flex items-center justify-center gap-2">
-                    <img src="/logo.jpg" class="w-5 h-5 rounded"> <span id="modal-title">提示</span>
-                </h3>
-                <p id="modal-desc" class="text-sm text-slate-500 mb-6 leading-relaxed text-left bg-slate-50 p-4 rounded-lg">这是提示内容</p>
-                <button onclick="closeCustomAlert()" class="w-full py-2.5 bg-blue-500 text-white font-bold rounded-xl text-sm shadow-sm">我知道了</button>
-            </div>
+    <!-- 底部半屏抽屉 -->
+    <div id="drawer-overlay" class="drawer-overlay" onclick="closeDrawer()"></div>
+    <div id="drawer-panel" class="drawer-panel px-5 pt-5">
+        <div class="flex justify-between items-center mb-5">
+            <h3 class="text-[18px] font-bold text-slate-800" id="drawer-title">获取号码</h3>
+            <button onclick="closeDrawer()" class="text-slate-400"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
         </div>
-    </div>
-
-    <!-- 全局遮罩 -->
-    <div id="overlay" class="modal-overlay sheet-overlay" onclick="closeSmsPanel()"></div>
-
-    <!-- 底部接码抽屉 -->
-    <div id="sms-drawer" class="bottom-sheet">
-        <div class="w-10 h-1 bg-slate-200 rounded-full mx-auto mb-6"></div>
         
-        <!-- 状态1: 加载中 -->
-        <div id="sms-loading" class="text-center py-6">
-            <div class="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p class="text-slate-600 font-medium">正在从号池抢号...</p>
+        <div id="drawer-step-1">
+            <p class="text-[13px] text-slate-500 mb-4">选择国家：</p>
+            <div class="flex gap-2 overflow-x-auto no-scrollbar mb-6">
+                <div class="px-4 py-2 bg-blue-50 border border-blue-200 text-blue-600 rounded-lg text-sm font-bold whitespace-nowrap">美国 (+1)</div>
+                <div class="px-4 py-2 bg-slate-50 border border-slate-200 text-slate-600 rounded-lg text-sm font-bold whitespace-nowrap">英国 (+44)</div>
+            </div>
+            <button onclick="getNumber()" class="w-full py-3.5 bg-blue-600 text-white font-bold rounded-xl text-[16px] active:opacity-80">立即取号 (冻结 $0.15)</button>
         </div>
 
-        <!-- 状态2: 等待短信 -->
-        <div id="sms-waiting" class="hidden">
-            <div class="text-center mb-6">
-                <p class="text-sm text-slate-500 mb-1">您的专属号码 (<span id="drawer-service"></span>)</p>
-                <p class="text-3xl font-bold text-slate-800 tracking-wider font-mono" id="drawer-phone">+86 138 8888 8888</p>
-                <button class="mt-2 text-blue-500 text-sm font-medium">复制号码</button>
-            </div>
-            
-            <div class="bg-slate-50 rounded-xl p-6 text-center border border-slate-100 mb-6">
-                <p class="text-slate-500 text-sm mb-2">等待接收短信...</p>
-                <p class="text-2xl font-bold text-red-500 font-mono" id="drawer-timer">04:59</p>
-            </div>
-            
-            <div class="flex gap-3">
-                <button onclick="closeSmsPanel()" class="flex-1 py-3.5 border border-slate-300 text-slate-600 font-bold rounded-xl text-[15px]">释放号码 (不扣费)</button>
-                <button onclick="simulateReceiveCode()" class="flex-1 py-3.5 bg-blue-500 text-white font-bold rounded-xl text-[15px]">手动刷新短信</button>
+        <div id="drawer-step-2" class="hidden">
+            <div class="text-center py-4">
+                <p class="text-[13px] text-slate-500 mb-2">已为您分配号码：</p>
+                <h4 class="text-[28px] font-bold text-slate-800 font-mono mb-4">+1 202 555 0143</h4>
+                <p class="text-[13px] text-blue-600 mb-6">正在等待接收短信验证码...</p>
+                <div class="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-6"></div>
+                <button onclick="closeDrawer()" class="w-full py-3.5 bg-slate-100 text-slate-600 font-bold rounded-xl text-[16px]">释放号码并退款</button>
             </div>
         </div>
-
-        <!-- 状态3: 收到短信 -->
-        <div id="sms-success" class="hidden text-center">
-            <div class="w-16 h-16 bg-green-100 text-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-            </div>
-            <p class="text-slate-500 mb-2">已收到短信，金额已扣除</p>
-            <div class="bg-slate-50 rounded-xl p-6 border border-slate-200 mb-6">
-                <p class="text-xs text-slate-400 mb-2">您的验证码是</p>
-                <p class="text-3xl font-bold text-slate-800 font-mono" id="drawer-code">8888</p>
-            </div>
-            <button onclick="closeSmsPanel()" class="w-full py-3.5 bg-slate-800 text-white font-bold rounded-xl text-[15px]">完成并关闭</button>
-        </div>
+        <div class="h-6"></div>
     </div>
-
+    
+    <script src="/notice.js"></script>
+    <script src="/ai-widget.js"></script>
     <script>
-        let smsTimer = null;
-        let timeLeft = 300;
-
-        function switchTab(tabId, btn) {
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
             document.getElementById('tab-service').classList.add('hidden');
             document.getElementById('tab-keyword').classList.add('hidden');
-            document.getElementById('tab-rent').classList.add('hidden');
-            document.getElementById('tab-broadcast').classList.add('hidden');
-            document.querySelectorAll('.tab-btn').forEach(b => b.className = 'tab-btn flex-1 whitespace-nowrap px-4 py-2 text-[14px] font-medium border-b-2 border-transparent text-slate-500');
-            document.getElementById('tab-' + tabId).classList.remove('hidden');
-            btn.className = 'tab-btn flex-1 whitespace-nowrap px-4 py-2 text-[14px] font-semibold border-b-2 border-blue-500 text-blue-600';
+            document.getElementById('tab-longterm').classList.add('hidden');
+            document.getElementById('tab-' + tab).classList.remove('hidden');
         }
-
-        // 自定义弹窗逻辑
-        function showCustomAlert(title, desc) {
-            document.getElementById('modal-title').innerText = title;
-            document.getElementById('modal-desc').innerText = desc;
-            document.getElementById('custom-modal').classList.add('active');
+        function openDrawer(name) {
+            document.getElementById('drawer-title').innerText = '获取 ' + name + ' 号码';
+            document.getElementById('drawer-step-1').classList.remove('hidden');
+            document.getElementById('drawer-step-2').classList.add('hidden');
+            document.getElementById('drawer-overlay').classList.add('active');
+            document.getElementById('drawer-panel').classList.add('active');
         }
-        function closeCustomAlert() {
-            document.getElementById('custom-modal').classList.remove('active');
+        function closeDrawer() {
+            document.getElementById('drawer-overlay').classList.remove('active');
+            document.getElementById('drawer-panel').classList.remove('active');
         }
-
-        // 关键词问号提示弹窗
-        function showKeywordTip() {
-            showCustomAlert('关键词举例', '短信内容为：【南极圈】验证码xxxx...\n\n关键词可填为：北极企鹅 或者 南极圈');
-        }
-
-        function openSmsPanel(service, country, price) {
-            document.getElementById('overlay').classList.add('active');
-            document.getElementById('sms-drawer').classList.add('active');
-            
-            document.getElementById('sms-loading').classList.remove('hidden');
-            document.getElementById('sms-waiting').classList.add('hidden');
-            document.getElementById('sms-success').classList.add('hidden');
-            
-            document.getElementById('drawer-service').innerText = service;
-
-            setTimeout(() => {
-                document.getElementById('sms-loading').classList.add('hidden');
-                document.getElementById('sms-waiting').classList.remove('hidden');
-                
-                timeLeft = 300;
-                document.getElementById('drawer-timer').innerText = '05:00';
-                clearInterval(smsTimer);
-                smsTimer = setInterval(() => {
-                    timeLeft--;
-                    let m = Math.floor(timeLeft / 60);
-                    let s = timeLeft % 60;
-                    document.getElementById('drawer-timer').innerText = `0${m}:${s<10?'0'+s:s}`;
-                    if(timeLeft <= 0) {
-                        clearInterval(smsTimer);
-                        showCustomAlert('提示', '超时未收到短信，金额已退回余额');
-                        closeSmsPanel();
-                    }
-                }, 1000);
-            }, 1500);
-        }
-
-        function closeSmsPanel() {
-            document.getElementById('overlay').classList.remove('active');
-            document.getElementById('sms-drawer').classList.remove('active');
-            clearInterval(smsTimer);
-        }
-
-        function simulateReceiveCode() {
-            clearInterval(smsTimer);
-            document.getElementById('sms-waiting').classList.add('hidden');
-            document.getElementById('sms-success').classList.remove('hidden');
-            document.getElementById('sms-code').innerText = Math.floor(Math.random()*900000 + 100000);
+        function getNumber() {
+            document.getElementById('drawer-step-1').classList.add('hidden');
+            document.getElementById('drawer-step-2').classList.remove('hidden');
         }
     </script>
-<script src="/ai-widget.js"></script>
-
-
-<script src="/notice.js"></script>
 </body>
 </html>

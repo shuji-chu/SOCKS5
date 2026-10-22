@@ -122,27 +122,23 @@
                         </div>
                     </div>
 
-                    <!-- API 文档 (动态生成) -->
+                    <!-- API 文档 (精准动态生成) -->
                     <div id="tab-docs" class="hidden">
                         <h4 class="font-bold text-slate-800 mb-1">请求地址</h4>
                         <p class="text-[12px] text-slate-500 font-mono mb-4" id="api-endpoint">POST https://web.lynli.me/api/v1/query</p>
                         
                         <h4 class="font-bold text-slate-800 mb-1">请求参数</h4>
                         <div class="border border-slate-200 rounded-lg overflow-hidden mb-4">
-                            <table class="api-table" id="api-params-table">
-                                <!-- 动态渲染 -->
-                            </table>
+                            <table class="api-table" id="api-params-table"></table>
                         </div>
 
                         <h4 class="font-bold text-slate-800 mb-1">返回示例</h4>
                         <div class="code-block" id="json-example"></div>
                     </div>
 
-                    <!-- 应用场景 (动态生成) -->
+                    <!-- 应用场景 (精准动态生成) -->
                     <div id="tab-scenes" class="hidden">
-                        <div class="space-y-4" id="scenes-list">
-                            <!-- 动态渲染 -->
-                        </div>
+                        <div class="space-y-4" id="scenes-list"></div>
                     </div>
                 </div>
             </div>
@@ -165,14 +161,9 @@
         };
 
         const categoryColors = {
-            '手机号码': 'text-blue-600 bg-blue-50',
-            '实名认证': 'text-green-600 bg-green-50',
-            '交通与车辆': 'text-orange-600 bg-orange-50',
-            '企业工商': 'text-indigo-600 bg-indigo-50',
-            '生活服务': 'text-teal-600 bg-teal-50',
-            '网站域名': 'text-purple-600 bg-purple-50',
-            '金融风险': 'text-red-600 bg-red-50',
-            '默认': 'text-slate-600 bg-slate-50'
+            '手机号码': 'text-blue-600 bg-blue-50', '实名认证': 'text-green-600 bg-green-50', '交通与车辆': 'text-orange-600 bg-orange-50',
+            '企业工商': 'text-indigo-600 bg-indigo-50', '生活服务': 'text-teal-600 bg-teal-50', '网站域名': 'text-purple-600 bg-purple-50',
+            '金融风险': 'text-red-600 bg-red-50', '默认': 'text-slate-600 bg-slate-50'
         };
 
         function switchDetailTab(tab, el) {
@@ -188,13 +179,15 @@
             const urlParams = new URLSearchParams(window.location.search);
             const apiId = parseInt(urlParams.get('id')) || 1;
             const currentApi = apisData.find(a => a.id === apiId) || apisData[0];
+            const title = currentApi.title;
 
             const iconPath = categoryIcons[currentApi.category] || categoryIcons['默认'];
             const colorClass = categoryColors[currentApi.category] || categoryColors['默认'];
             const isFree = currentApi.price === '免费';
 
+            // 基础信息渲染
             document.getElementById('breadcrumb-category').innerText = currentApi.category;
-            document.getElementById('api-name').innerText = currentApi.title;
+            document.getElementById('api-name').innerText = title;
             document.getElementById('api-desc').innerText = currentApi.desc;
             document.getElementById('api-category').innerText = currentApi.category;
             document.getElementById('api-id').innerText = currentApi.id;
@@ -203,101 +196,82 @@
             document.getElementById('api-icon-container').className = `w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border border-slate-100 ${colorClass}`;
             document.getElementById('api-icon-container').innerHTML = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">${iconPath}</svg>`;
 
-            document.getElementById('api-price').innerHTML = isFree 
-                ? '<span class="text-green-500 font-bold">免费</span>' 
-                : `$${currentApi.price}<span class="text-[12px] font-sans font-normal text-slate-400">/次</span>`;
-
+            document.getElementById('api-price').innerHTML = isFree ? '<span class="text-green-500 font-bold">免费</span>' : `$${currentApi.price}<span class="text-[12px] font-sans font-normal text-slate-400">/次</span>`;
             document.getElementById('stat-apps').innerText = (currentApi.id * 3 + 5) + ' 个';
             document.getElementById('stat-calls').innerText = (currentApi.id * 113 + 24) + ' 次';
 
-            // ================= 智能动态生成 API 文档 =================
-            document.getElementById('api-endpoint').innerText = `POST https://web.lynli.me/api/v1/query/${currentApi.id}`;
-            
-            const paramTable = document.getElementById('api-params-table');
-            const jsonBlock = document.getElementById('json-example');
-            
-            let paramsHtml = `<tr><th>参数名</th><th>必填</th><th>说明</th></tr>
-                <tr><td>api_id</td><td>是</td><td>接口ID (${currentApi.id})</td></tr>
-                <tr><td>key</td><td>是</td><td>您的专属 API Key</td></tr>`;
-            
-            let jsonStr = `{\n  "code": 200,\n  "msg": "success",\n  "api_name": "${currentApi.title}",\n  "data": {\n`;
+            // ================= 基于标题的极客级智能匹配 =================
+            let paramHtml = `<tr><th>参数名</th><th>必填</th><th>说明</th></tr><tr><td>api_id</td><td>是</td><td>接口ID (${currentApi.id})</td></tr><tr><td>key</td><td>是</td><td>您的专属 API Key</td></tr>`;
+            let jsonStr = `{\n  "code": 200,\n  "msg": "success",\n  "data": {\n`;
+            let scenes = [];
 
-            if (currentApi.category === '交通与车辆') {
-                paramsHtml += `<tr><td>plate_no</td><td>是</td><td>车牌号或车架号VIN</td></tr>`;
-                jsonStr += `    "plate_no": "粤B12345",\n    "car_info": "品牌型号匹配",\n    "result": 1\n`;
-            } else if (currentApi.category === '手机号码' || currentApi.category === '实名认证') {
-                paramsHtml += `<tr><td>name</td><td>是</td><td>真实姓名</td></tr><tr><td>id_card / phone</td><td>是</td><td>身份证号或手机号</td></tr>`;
-                jsonStr += `    "name": "张三",\n    "verify_status": 1,\n    "desc": "验证一致"\n`;
-            } else if (currentApi.category === '企业工商') {
-                paramsHtml += `<tr><td>keyword</td><td>是</td><td>企业名称或法人名字</td></tr>`;
-                jsonStr += `    "company_name": "某某科技有限公司",\n    "legal_person": "李四",\n    "status": "存续"\n`;
-            } else if (currentApi.category === '网站域名') {
-                paramsHtml += `<tr><td>domain</td><td>是</td><td>需要查询的域名</td></tr>`;
-                jsonStr += `    "domain": "example.com",\n    "icp_no": "粤ICP备xxxx号",\n    "status": "正常"\n`;
+            // 核心智能判断逻辑
+            if (title.includes('话费')) {
+                paramHtml += `<tr><td>phone</td><td>是</td><td>手机号码</td></tr>`;
+                jsonStr += `    "phone": "138xxxx",\n    "balance": "12.50",\n    "carrier": "中国移动"\n`;
+                scenes = ['电商平台一键充值接口', '企业话费报销自动核验', '虚拟运营商号码状态监控'];
+            } else if (title.includes('时长')) {
+                paramHtml += `<tr><td>phone</td><td>是</td><td>手机号码</td></tr>`;
+                jsonStr += `    "phone": "138xxxx",\n    "in_net_time": "5年2个月",\n    "status": "正常"\n`;
+                scenes = ['信贷反欺诈：识别新号薅羊毛', '社交平台注册防刷', '高价值账号评估'];
+            } else if (title.includes('IP') || title.includes('归属地')) {
+                paramHtml += `<tr><td>ip</td><td>是</td><td>IPv4或IPv6地址</td></tr>`;
+                jsonStr += `    "ip": "8.8.8.8",\n    "country": "美国",\n    "province": "加利福尼亚",\n    "city": "洛杉矶"\n`;
+                scenes = ['用户登录行为分析', '网络安全日志溯源', '广告投放地域定向'];
+            } else if (title.includes('车牌') || title.includes('VIN') || title.includes('车架号') || title.includes('车辆') || title.includes('ETC')) {
+                paramHtml += `<tr><td>plate_no / vin</td><td>是</td><td>车牌号或车架号</td></tr>`;
+                jsonStr += `    "plate_no": "京A88888",\n    "brand": "奔驰",\n    "model": "S级",\n    "vin": "Lxxxxxxx"\n`;
+                scenes = ['二手车交易真伪验证', '车险理赔定损', '人车关系核验风控'];
+            } else if (title.includes('身份证') || title.includes('人脸') || title.includes('二要素') || title.includes('三要素') || title.includes('银行卡') || title.includes('失信') || title.includes('限高')) {
+                paramHtml += `<tr><td>name</td><td>是</td><td>真实姓名</td></tr><tr><td>id_card</td><td>是</td><td>身份证号码或银行卡号</td></tr>`;
+                jsonStr += `    "name": "张三",\n    "id_card": "110xxxx",\n    "verify_result": "一致",\n    "score": 99\n`;
+                scenes = ['金融借贷实名认证', '大额转账风控', '政务/医疗平台身份核验'];
+            } else if (title.includes('企业') || title.includes('工商') || title.includes('任职')) {
+                paramHtml += `<tr><td>company_name</td><td>是</td><td>企业全称或关键字</td></tr>`;
+                jsonStr += `    "company_name": "阿里xx有限公司",\n    "legal_person": "马云",\n    "reg_capital": "1000万",\n    "status": "存续"\n`;
+                scenes = ['B2B供应链入驻审核', '企业背调与尽职调查', '商业线索拓客'];
+            } else if (title.includes('域名') || title.includes('ICP') || title.includes('备案') || title.includes('百度') || title.includes('网站')) {
+                paramHtml += `<tr><td>domain</td><td>是</td><td>网站域名</td></tr>`;
+                jsonStr += `    "domain": "example.com",\n    "icp_no": "京ICP备xxxx号",\n    "weight": "3",\n    "included_count": 1200\n`;
+                scenes = ['山寨钓鱼网站监控', '站长工具SEO分析', '企业品牌域名保护'];
+            } else if (title.includes('黄金') || title.includes('汇率') || title.includes('彩票')) {
+                paramHtml += `<tr><td>type</td><td>否</td><td>查询类型(如: 今日, 历史)</td></tr>`;
+                jsonStr += `    "update_time": "2026-10-22 10:00:00",\n    "price": "580.50",\n    "rate": 7.12\n`;
+                scenes = ['金融理财APP行情展示', '跨境外贸汇率自动结算', '数据大屏可视化展示'];
+            } else if (title.includes('快递') || title.includes('物流')) {
+                paramHtml += `<tr><td>tracking_no</td><td>是</td><td>快递单号</td></tr><tr><td>phone</td><td>否</td><td>收件人手机号后四位</td></tr>`;
+                jsonStr += `    "tracking_no": "SF12345678",\n    "company": "顺丰速运",\n    "status": "已签收",\n    "list": []\n`;
+                scenes = ['电商ERP订单轨迹同步', '客服系统查询物流状态', '自动化仓储物流监控'];
+            } else if (title.includes('短信') || title.includes('验证码')) {
+                paramHtml += `<tr><td>phone</td><td>是</td><td>接收手机号</td></tr><tr><td>content</td><td>是</td><td>短信内容</td></tr>`;
+                jsonStr += `    "msg_id": "MSG12345",\n    "status": "发送成功"\n`;
+                scenes = ['平台注册登录验证码下发', '支付确认通知', '系统告警与业务提醒'];
             } else {
-                paramsHtml += `<tr><td>query_data</td><td>是</td><td>需查询的具体内容</td></tr>`;
-                jsonStr += `    "query_data": "test",\n    "result": "查询成功"\n`;
+                // 兜底
+                paramHtml += `<tr><td>keyword</td><td>是</td><td>查询关键词</td></tr>`;
+                jsonStr += `    "keyword": "test",\n    "result": "查询成功"\n`;
+                scenes = ['注册/下单环节自动校验', '后台系统自动审核', '风控策略数据支撑'];
             }
 
             jsonStr += `    ,"cost": ${isFree ? 0 : currentApi.price}\n  }\n}`;
 
-            paramTable.innerHTML = paramsHtml;
-            jsonBlock.innerText = jsonStr;
+            document.getElementById('api-params-table').innerHTML = paramHtml;
+            document.getElementById('json-example').innerText = jsonStr;
+            document.getElementById('api-endpoint').innerText = `POST https://web.lynli.me/api/v1/query/${currentApi.id}`;
 
-            // ================= 智能动态生成应用场景 =================
-            const scenesList = document.getElementById('scenes-list');
-            let scenes = [];
-            
-            if (currentApi.category === '交通与车辆') {
-                scenes = [
-                    '二手车交易平台调用核验车辆真实信息与违章记录。',
-                    '车险定损系统接入，快速查询车辆过户与出险历史。',
-                    '物流车队管理系统自动校验名下车辆状态。',
-                    '汽车金融风控环节，核实人车关系真伪。'
-                ];
-            } else if (currentApi.category === '手机号码') {
-                scenes = [
-                    '用户注册环节拦截虚假号码，拦截羊毛党。',
-                    '金融借贷平台进行实名认证与紧急联系人核验。',
-                    '电商风控系统识别高危/沉默号码，降低营销成本。',
-                    '后台运营系统批量清洗客户数据，提高转化率。'
-                ];
-            } else if (currentApi.category === '企业工商' || currentApi.category === '金融风险') {
-                scenes = [
-                    'B2B供应链平台审核入驻企业资质与经营状态。',
-                    '投资尽调环节，全面挖掘企业关联图谱与涉诉风险。',
-                    '企业HR背调系统，一键核验候选人真实履历。',
-                    '助贷机构审批环节，识别空壳企业与失信被执行人。'
-                ];
-            } else if (currentApi.category === '网站域名') {
-                scenes = [
-                    '域名抢注监控，实时查询WHOIS与备案状态。',
-                    '站长工具统计网站权重与百度收录量。',
-                    '企业内网安全监控，及时发现山寨/钓鱼域名。',
-                    'CDN/云服务商拦截未备案的违规网站。'
-                ];
-            } else {
-                scenes = [
-                    `${currentApi.title}可接入注册、下单、审核、查询等业务流程。`,
-                    `后台系统、运营工具和风控平台可直接调用接口获得结构化结果。`,
-                    `适合需要快速上线 API 能力、减少自建成本的业务场景。`,
-                    `可与用户中心的调用记录和余额管理配合，便于排查问题。`
-                ];
-            }
-
-            scenesList.innerHTML = scenes.map((text, i) => `
+            // 渲染场景
+            document.getElementById('scenes-list').innerHTML = scenes.map((text, i) => `
                 <div class="flex gap-3 ${i !== 0 ? 'border-t border-slate-100 pt-3' : ''}">
                     <span class="text-[18px] font-bold text-blue-300">0${i+1}</span>
                     <p class="text-[13px] text-slate-600 leading-relaxed">${text}</p>
                 </div>
             `).join('');
 
-            // 渲染相关推荐
+            // 相关推荐
             const relatedList = document.getElementById('related-apis');
             let related = apisData.filter(a => a.category === currentApi.category && a.id !== currentApi.id).slice(0, 4);
             if(related.length < 4) {
-                const fill = apisData.filter(a => a.id !== currentApi.id && a.category !== currentApi.category).slice(0, 4 - related.length);
-                related = related.concat(fill);
+                related = related.concat(apisData.filter(a => a.id !== currentApi.id && a.category !== currentApi.category).slice(0, 4 - related.length));
             }
 
             relatedList.innerHTML = related.map(a => `

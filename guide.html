@@ -14,12 +14,11 @@
         .faq-q { font-weight: bold; color: #1e293b; margin-bottom: 4px; display: block; }
         .faq-a { color: #64748b; font-size: 13px; line-height: 1.6; margin-bottom: 12px; display: block; }
         
-        /* 抽屉动画 */
         .drawer-panel { transition: transform 0.3s ease-in-out; }
     </style>
 </head>
 <body>
-    <!-- 头部区域，右上角加上 API 文档按钮 -->
+    <!-- 头部区域 -->
     <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
         <div class="flex items-center gap-3">
             <a href="/index.html" class="text-slate-600 text-xl font-bold px-2">←</a>
@@ -119,27 +118,13 @@
                 </div>
             </div>
 
-            <!-- 7. FAQ -->
-            <div>
-                <h3 class="text-[16px] font-bold text-slate-800 mb-4 flex items-center">
-                    <span class="title-bar bg-slate-500"></span> 新手常见问题 FAQ
-                </h3>
-                <div class="text-[14px] text-slate-600">
-                    <span class="faq-q">Q1: 购买后没收到卡密怎么办？</span>
-                    <span class="faq-a">A1: 卡密不发邮件。请支付成功后，返回网站首页，点击右下角“我的” -> “订单查询”，在对应订单中点击“查看卡密”。</span>
-                    
-                    <span class="faq-q">Q2: 接码一直没收到验证码怎么办？</span>
-                    <span class="faq-a">A2: 接码存在上游网络延迟。若超时未收到，系统会自动释放冻结资金。若一直失败，建议更换服务商或国家重新取号。</span>
-                </div>
-            </div>
-
-            <!-- 8. 售后免责与风控底线 -->
+            <!-- 7. 售后免责与风控底线 -->
             <div>
                 <h3 class="text-[16px] font-bold text-slate-800 mb-4 flex items-center">
                     <span class="title-bar bg-red-600"></span> 售后说明与风控免责声明
                 </h3>
                 <ul class="text-[14px] text-slate-600 space-y-3 leading-relaxed">
-                    <li><b>1. 平台合规底线：</b>严禁使用本平台任何资源进行诈骗、黑灰产或触犯当地法律的行为。一经举报查实，平台将<span class="highlight">第一时间永久封禁 IP 及账户</span>，并保留移交司法机关的权利。</li>
+                    <li><b>1. 平台合规底线：</b>严禁使用本平台任何资源进行诈骗、黑灰产或触犯当地法律的行为。一经举报查实，平台将<span class="highlight">第一时间永久封禁 IP 及账户</span>。</li>
                     <li><b>2. 售后支持时间：</b>官方客服在线 10:00 - 22:00。如遇异常，请携带订单凭证联系 TG 客服：<a href="https://t.me/qingtian_Boss" class="text-blue-500 underline">@qingtian_Boss</a>。</li>
                 </ul>
             </div>
@@ -151,42 +136,63 @@
         </div>
     </main>
 
-    <!-- API 文档侧边抽屉 -->
-    <div id="api-drawer-overlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[9999] hidden" onclick="closeApiDrawer(event)">
-        <div id="api-drawer-panel" class="drawer-panel fixed right-0 top-0 bottom-0 w-[80%] max-w-[300px] bg-white shadow-2xl transform translate-x-full flex flex-col" onclick="event.stopPropagation()">
-            <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                <h3 class="text-[16px] font-bold text-slate-800">开发者 API 文档</h3>
+    <!-- 极简风 API 文档侧边抽屉 -->
+    <div id="api-drawer-overlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[9999] hidden" onclick="closeApiDrawer(event)">
+        <div id="api-drawer-panel" class="drawer-panel fixed right-0 top-0 bottom-0 w-[70%] max-w-[280px] bg-white shadow-2xl transform translate-x-full flex flex-col" onclick="event.stopPropagation()">
+            <div class="p-4 border-b border-slate-100 flex justify-between items-center">
+                <h3 class="text-[15px] font-bold text-slate-800">API 文档目录</h3>
                 <button onclick="closeApiDrawer()" class="text-slate-400 p-1"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
             </div>
-            <div class="p-4 flex-1 overflow-y-auto space-y-2">
-                <a href="/doc.html" class="block p-4 bg-white border border-slate-200 rounded-xl active:bg-slate-50">
-                    <p class="text-[14px] font-bold text-slate-800">基础接口 (余额/商品)</p>
-                    <p class="text-[12px] text-slate-500 mt-1">查询账户余额与所有上架商品</p>
-                </a>
-                <a href="/doc-account.html" class="block p-4 bg-white border border-slate-200 rounded-xl active:bg-slate-50">
-                    <p class="text-[14px] font-bold text-slate-800">账号接口 (静态卡密)</p>
-                    <p class="text-[12px] text-slate-500 mt-1">TG / 邮箱等账号自动分发</p>
-                </a>
-                <a href="/doc-node.html" class="block p-4 bg-white border border-slate-200 rounded-xl active:bg-slate-50">
-                    <p class="text-[14px] font-bold text-slate-800">节点接口 (订阅管理)</p>
-                    <p class="text-[12px] text-slate-500 mt-1">Clash / v2ray 节点订阅下发</p>
-                </a>
-                <a href="/doc-sms.html" class="block p-4 bg-white border border-slate-200 rounded-xl active:bg-slate-50">
-                    <p class="text-[14px] font-bold text-slate-800">接码接口 (验证码)</p>
-                    <p class="text-[12px] text-slate-500 mt-1">动态接码 / 长租号码 / 关键词监听</p>
-                </a>
-                <a href="/doc-query.html" class="block p-4 bg-white border border-slate-200 rounded-xl active:bg-slate-50">
-                    <p class="text-[14px] font-bold text-slate-800">查询接口 (二/三要素)</p>
-                    <p class="text-[12px] text-slate-500 mt-1">60+ 网关数据核验</p>
-                </a>
-                <a href="/doc-pay.html" class="block p-4 bg-white border border-slate-200 rounded-xl active:bg-slate-50">
-                    <p class="text-[14px] font-bold text-slate-800">支付接口 (聚合代收)</p>
-                    <p class="text-[12px] text-slate-500 mt-1">易支付代收与回调</p>
-                </a>
-                <a href="/doc-email.html" class="block p-4 bg-white border border-slate-200 rounded-xl active:bg-slate-50">
-                    <p class="text-[14px] font-bold text-slate-800">邮箱网关 (发信)</p>
-                    <p class="text-[12px] text-slate-500 mt-1">SMTP 高送达率 API</p>
-                </a>
+            
+            <div class="flex-1 overflow-y-auto px-4 py-2">
+                <!-- 分类 1：核心业务 -->
+                <div class="mb-6 mt-2">
+                    <h4 class="text-[11px] font-bold text-slate-400 tracking-wider mb-2">业务接口</h4>
+                    <div class="space-y-0">
+                        <a href="/doc-account.html" class="flex justify-between items-center py-3 border-b border-slate-50 active:bg-slate-50">
+                            <span class="text-[14px] text-slate-700">账号接口</span>
+                            <svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        </a>
+                        <a href="/doc-node.html" class="flex justify-between items-center py-3 border-b border-slate-50 active:bg-slate-50">
+                            <span class="text-[14px] text-slate-700">节点接口</span>
+                            <svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        </a>
+                        <a href="/doc-sms.html" class="flex justify-between items-center py-3 border-b border-slate-50 active:bg-slate-50">
+                            <span class="text-[14px] text-slate-700">接码接口</span>
+                            <svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 分类 2：工具与财务 -->
+                <div class="mb-6">
+                    <h4 class="text-[11px] font-bold text-slate-400 tracking-wider mb-2">工具与财务</h4>
+                    <div class="space-y-0">
+                        <a href="/doc-query.html" class="flex justify-between items-center py-3 border-b border-slate-50 active:bg-slate-50">
+                            <span class="text-[14px] text-slate-700">查询接口</span>
+                            <svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        </a>
+                        <a href="/doc-pay.html" class="flex justify-between items-center py-3 border-b border-slate-50 active:bg-slate-50">
+                            <span class="text-[14px] text-slate-700">支付接口</span>
+                            <svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        </a>
+                        <a href="/doc-email.html" class="flex justify-between items-center py-3 active:bg-slate-50">
+                            <span class="text-[14px] text-slate-700">邮箱网关</span>
+                            <svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 分类 3：基础信息 -->
+                <div class="mb-6">
+                    <h4 class="text-[11px] font-bold text-slate-400 tracking-wider mb-2">基础信息</h4>
+                    <div class="space-y-0">
+                        <a href="/doc.html" class="flex justify-between items-center py-3 active:bg-slate-50">
+                            <span class="text-[14px] text-slate-700">基础接口(余额/商品)</span>
+                            <svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

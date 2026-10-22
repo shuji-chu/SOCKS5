@@ -30,10 +30,21 @@
         <!-- 顶部接口信息 -->
         <div class="card p-5">
             <div class="bg-blue-50/50 rounded-xl p-4 border border-blue-100/50 mb-4">
-                <h2 class="text-[18px] font-bold text-slate-800 mb-1" id="api-name">加载中...</h2>
-                <p class="text-[13px] text-slate-500 mb-3" id="api-desc">...</p>
+                <!-- 头部：图标 + 标题分类 -->
+                <div class="flex items-start gap-3 mb-3">
+                    <!-- 动态图标容器 -->
+                    <div id="api-icon-container" class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 shadow-sm border border-slate-100 bg-white">
+                        <svg id="api-icon-svg" class="w-6 h-6 drop-shadow-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24"></svg>
+                    </div>
+                    <div class="flex-1 pt-1">
+                        <h2 class="text-[18px] font-bold text-slate-800 leading-tight mb-1" id="api-name">加载中...</h2>
+                        <p class="text-[12px] text-slate-500" id="api-category">分类</p>
+                    </div>
+                </div>
+
+                <p class="text-[13px] text-slate-500 mb-4 leading-relaxed" id="api-desc">...</p>
                 
-                <div class="flex justify-between items-end">
+                <div class="flex justify-between items-end pt-3 border-t border-blue-100/50">
                     <div>
                         <p class="text-[12px] text-slate-500 mb-0.5">调用单价</p>
                         <p class="text-[24px] font-bold text-amber-600 font-mono leading-none" id="api-price">$0.00<span class="text-[12px] text-slate-400 font-sans font-normal">/次</span></p>
@@ -71,8 +82,8 @@
             <p class="text-[13px] text-slate-500 mb-4">无需写代码，直接在此测试接口并查看返回结果。</p>
             
             <div class="space-y-3 mb-5">
-                <input type="text" id="test-name" placeholder="请输入姓名" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px] outline-none focus:border-blue-500 focus:bg-white transition">
-                <input type="text" id="test-phone" placeholder="请输入手机号/身份证/企业名等" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px] outline-none focus:border-blue-500 focus:bg-white transition">
+                <input type="text" id="test-name" placeholder="请输入姓名/参数1" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px] outline-none focus:border-blue-500 focus:bg-white transition">
+                <input type="text" id="test-phone" placeholder="请输入手机号/身份证/参数2" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px] outline-none focus:border-blue-500 focus:bg-white transition">
             </div>
             
             <button onclick="runTest()" id="btn-test" class="w-full py-3.5 bg-slate-800 text-white font-bold rounded-xl text-[15px] active:opacity-80 transition shadow-sm">立即在线测试</button>
@@ -96,21 +107,52 @@
     <script>
         let currentApi = null;
 
+        // 图标字典 (与列表页完全一致)
+        const categoryIcons = {
+            '手机号码': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>',
+            '实名认证': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>',
+            '交通与车辆': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"></path>',
+            '企业工商': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>',
+            '生活服务': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>',
+            '网站域名': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path>',
+            '金融风险': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>',
+            '默认': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>'
+        };
+
+        const categoryColors = {
+            '手机号码': 'text-blue-600 bg-blue-50',
+            '实名认证': 'text-green-600 bg-green-50',
+            '交通与车辆': 'text-orange-600 bg-orange-50',
+            '企业工商': 'text-indigo-600 bg-indigo-50',
+            '生活服务': 'text-teal-600 bg-teal-50',
+            '网站域名': 'text-purple-600 bg-purple-50',
+            '金融风险': 'text-red-600 bg-red-50',
+            '默认': 'text-slate-600 bg-slate-50'
+        };
+
         document.addEventListener('DOMContentLoaded', () => {
-            // 获取 URL 中的 id
             const urlParams = new URLSearchParams(window.location.search);
             const apiId = parseInt(urlParams.get('id')) || 1;
 
-            // 从数据源中查找对应的接口
             currentApi = apisData.find(a => a.id === apiId) || apisData[0];
+
+            // 获取对应图标与颜色
+            const iconPath = categoryIcons[currentApi.category] || categoryIcons['默认'];
+            const colorClass = categoryColors[currentApi.category] || categoryColors['默认'];
 
             // 渲染页面数据
             document.getElementById('api-name').innerText = currentApi.title;
+            document.getElementById('api-category').innerText = currentApi.category;
             document.getElementById('api-desc').innerText = currentApi.desc;
             document.getElementById('api-id').innerText = currentApi.id;
             document.getElementById('api-method').innerText = currentApi.method;
+            
+            document.getElementById('api-icon-svg').innerHTML = iconPath;
+            // 应用颜色类 (拆分文本颜色和背景颜色)
+            document.getElementById('api-icon-container').className = `w-12 h-12 rounded-xl flex items-center justify-center shrink-0 shadow-sm border border-slate-100 ${colorClass}`;
+
             document.getElementById('api-price').innerHTML = currentApi.price === '免费' 
-                ? '免费' 
+                ? '<span class="text-green-500">免费</span>' 
                 : `$${currentApi.price}<span class="text-[12px] text-slate-400 font-sans font-normal">/次</span>`;
         });
 
@@ -131,7 +173,6 @@
                 btn.disabled = false;
                 btn.classList.remove('opacity-70');
                 
-                // 模拟真实的接口返回 JSON
                 const mockResult = {
                     "code": 200,
                     "msg": "success",
@@ -141,7 +182,7 @@
                         "input_name": name,
                         "input_query": phone,
                         "result_status": "1",
-                        "result_desc": "查询成功/一致",
+                        "result_desc": "查询成功",
                         "cost": currentApi.price === '免费' ? 0 : parseFloat(currentApi.price)
                     }
                 };

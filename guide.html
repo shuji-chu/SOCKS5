@@ -11,9 +11,8 @@
         body { background-color: #ffffff; color: #1e293b; }
         .title-bar { width: 4px; height: 18px; border-radius: 2px; display: inline-block; margin-right: 8px; vertical-align: middle; }
         .highlight { color: #2563eb; font-weight: bold; }
-        .code-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px; font-size: 13px; margin-bottom: 10px; font-family: monospace; }
-        .btn-press { transition: transform 0.1s, background-color 0.2s; }
-        .btn-press:active { transform: scale(0.98); background-color: #f8fafc; }
+        .faq-q { font-weight: bold; color: #1e293b; margin-bottom: 4px; display: block; }
+        .faq-a { color: #64748b; font-size: 13px; line-height: 1.6; margin-bottom: 12px; display: block; }
     </style>
 </head>
 <body>
@@ -27,7 +26,7 @@
         <div class="py-6 border-b border-slate-100">
             <h2 class="text-[26px] font-extrabold text-slate-800 mb-3 tracking-tight">SOCKS5 全球数字资产生态白皮书</h2>
             <p class="text-[14px] text-slate-500 leading-relaxed">
-                我们致力于为全球开发者和企业提供 <span class="highlight">极速、稳定、高可用</span> 的底层数字基础设施。从高质量账号矩阵、毫秒级接码网关，到企业级防红短链、商务邮箱与节点网络，一站式赋能您的全球化业务。
+                我们致力于为全球开发者和企业提供 <span class="highlight">极速、稳定、高可用</span> 的底层数字基础设施。从高质量账号矩阵、毫秒级接码网关，到企业级防红短链、商务邮箱与节点网络，一站式赋能您的全球化业务。本指南将为您深度拆解各项业务的核心机制与操作细节。
             </p>
         </div>
 
@@ -35,85 +34,120 @@
             <!-- 1. 账号矩阵与发货 -->
             <div>
                 <h3 class="text-[16px] font-bold text-slate-800 mb-4 flex items-center">
-                    <span class="title-bar bg-blue-500"></span> 账号矩阵与极速发货
+                    <span class="title-bar bg-blue-500"></span> 高质量账号矩阵与极速发货
                 </h3>
                 <ul class="text-[14px] text-slate-600 space-y-3 leading-relaxed">
-                    <li><b>🚀 极速全自动发货：</b>支付成功后，系统立即弹出卡密或生成限时链接，确保业务无缝衔接。</li>
-                    <li><b>📜 完整交易背书：</b>每个账号用户下单，系统均生成包含订单号、时间、金额的完整电子凭证。平台承诺所有售出商品均经过严格库存校验，支持随时查阅交易流水。</li>
-                    <li><b>📦 涵盖业务：</b>支持 Telegram、Gmail、Discord 等千款高权重账号，以及各类定制化数字资产卡密。</li>
+                    <li><b>🚀 极速全自动发货：</b>支付成功后，系统毫秒级下发卡密或生成限时链接。所有静态卡密均支持库存实时扣减，坚决杜绝超卖。</li>
+                    <li><b>📜 完整交易背书：</b>每一个订单均生成不可篡改的电子凭证（含单号、时间、明细）。您的每一次消费都在“个人中心-订单”中有迹可循，售后核验零死角。</li>
+                    <li><b>📦 庞大生态涵盖：</b>支持 Telegram、Gmail、Discord、Twitter 等千款高权重海外社媒账号，以及指纹浏览器等定制化数字资产。</li>
                 </ul>
             </div>
 
             <!-- 2. 接码服务核心机制 -->
             <div>
                 <h3 class="text-[16px] font-bold text-slate-800 mb-4 flex items-center">
-                    <span class="title-bar bg-green-500"></span> 接码服务核心机制
+                    <span class="title-bar bg-green-500"></span> 毫秒级接码与金融级资金保护
                 </h3>
                 <ul class="text-[14px] text-slate-600 space-y-3 leading-relaxed">
-                    <li><b>1. 金融级锁资保护：</b>取号瞬间仅冻结预估额度，<b>绝不直接扣费</b>。收到短信验证码后才实际扣除；若超时未收到，冻结资金全额释放退回。</li>
-                    <li><b>2. 多国长租与监听：</b>支持 60+ 国家地区号码长期独占租赁，以及针对特定业务的短信关键词精准监听，完美适配出海注册与解封业务。</li>
+                    <li><b>🔒 金融级锁资机制：</b>取号瞬间仅冻结预估额度，绝不直接扣费。只有真实收到短信验证码后才实际扣除；若 15 分钟内未收到，冻结资金将全额释放退回余额。</li>
+                    <li><b>🌍 多国长租与监听：</b>覆盖 60+ 国家地区号码。支持包月长期独占租赁，以及根据“关键词”进行短信精准监听，完美适配出海注册、防封测试与账号解封业务。</li>
+                    <li><b>⚡ 高并发 API 接入：</b>支持多线程并发取号，毫秒级响应。无论是单兵作战还是工作室批量矩阵，都能保证通道畅通。</li>
                 </ul>
             </div>
 
             <!-- 3. 节点代理网络 (详尽版) -->
             <div>
                 <h3 class="text-[16px] font-bold text-slate-800 mb-4 flex items-center">
-                    <span class="title-bar bg-indigo-500"></span> 企业级节点代理网络
+                    <span class="title-bar bg-indigo-500"></span> 企业级节点代理与防连坐网络
                 </h3>
                 <div class="text-[14px] text-slate-600 space-y-4 leading-relaxed">
-                    <p><b>🖥 服务器切换说明：</b><br>当代理服务器遇到异常（如被封），管理员会把您的代理迁移至备用服务器。<br>
-                    ✅ 不需要重新购买<br>✅ 用户名与密码不会变<br>✅ 到期时间不会变<br>
-                    <span class="text-slate-500">您会收到推送（含新 IP+端口及一键导入按钮），或在客户端手动修改 IP+端口即可。我们的节点完美支持高速传输文件、图片与链接。</span></p>
+                    <p><b>🛡️ 域名级防连坐隔离：</b>全站节点采用独立域名分配机制，一人一域。彻底杜绝公共 IP 泛滥导致的“一人违规，整段封禁”的连坐风险。原生支持高速传输大文件、图片与链接流。</p>
+                    <p><b>🖥 无缝灾备与自动切服：</b>若主服务器遭遇攻击或封锁，系统自动为您迁移至备用服务器。<br>
+                    ✅ 不需要重新购买<br>✅ 账号与密码不会变<br>✅ 到期时间不会变<br>
+                    只需在收到推送后，一键导入新 IP，或在客户端手动修改即可恢复业务。</p>
 
-                    <p><b>🔌 如何使用代理：</b><br>
-                    <b>方法一（推荐）：</b>到「📦 我的代理」页面，点「🚀 一键导入」，Telegram 自动添加。<br>
-                    <b>方法二（手动）：</b>协议填 SOCKS5，输入服务器、端口及代理卡片里的用户名/密码即可，无需高级设置。</p>
+                    <p><b>🔌 如何优雅地使用代理：</b><br>
+                    <b>方法一：</b>在 TG 客户端到「📦 我的代理」页面，点「🚀 一键导入」，自动配置。<br>
+                    <b>方法二：</b>使用第三方客户端（如 Clash），协议选 SOCKS5，填入服务器 IP、端口及分配的用户名密码，无需任何高级设置。</p>
 
-                    <p><b>🔄 续费与到期规则：</b><br>
-                    <b>到期前：</b>在「我的代理」点「购买套餐」续费，保留原账号/密码/端口，时长叠加。<br>
-                    <b>到期后：</b>代理自动关闭释放，需重新购买开通。</p>
+                    <p><b>🔄 续费与生命周期规则：</b><br>
+                    <b>到期前续费：</b>在「我的代理」点「购买套餐」，原账号密码端口全部保留，时长直接叠加。<br>
+                    <b>到期后释放：</b>代理自动关闭，入站流量释放，需重新购买开通新代理。</p>
                 </div>
             </div>
 
-            <!-- 4. 短链与商务邮箱 (新增) -->
+            <!-- 4. 短链与商务邮箱 (应用场景) -->
             <div>
                 <h3 class="text-[16px] font-bold text-slate-800 mb-4 flex items-center">
-                    <span class="title-bar bg-purple-500"></span> 域名短链与商务邮箱
+                    <span class="title-bar bg-purple-500"></span> 商务防红短链与专属企业邮箱
                 </h3>
                 <ul class="text-[14px] text-slate-600 space-y-3 leading-relaxed">
-                    <li><b>🔗 商务防红短链：</b>提供高权重、抗拦截的短域名生成服务。无论是引流跳转还是防屏蔽，保障您的转化路径畅通，支持自定义后缀。</li>
-                    <li><b>✉️ 品牌专属邮箱：</b>支持绑定企业域名，生成 <span class="highlight">name@yourdomain.com</span> 的专属邮箱。底层直连高送达率 SMTP 网关，支持高并发 API 发信，瞬间提升品牌形象。</li>
+                    <li><b>🔗 高权重防红短链：</b>专为 TG/微信/QQ 引流设计。支持自定义后缀，自带防拦截跳转技术。无论您发送营销链接还是下载地址，都能极大降低被平台风控红名的概率。</li>
+                    <li><b>✉️ 品牌企业邮箱：</b>支持绑定您自己的域名，一键生成如 <span class="highlight">ceo@yourbrand.com</span> 的专属邮箱。底层直连高送达率 SMTP 网关，支持高并发发信，确保您的验证码与营销邮件精准触达客户，不进垃圾箱。</li>
                 </ul>
             </div>
 
-            <!-- 5. 支付与签到生态 (详尽版) -->
+            <!-- 5. 防封指南与养号秘籍 (新增) -->
             <div>
                 <h3 class="text-[16px] font-bold text-slate-800 mb-4 flex items-center">
-                    <span class="title-bar bg-amber-500"></span> 支付与签到分红生态
+                    <span class="title-bar bg-red-500"></span> 核心防封指南与养号秘籍
+                </h3>
+                <ul class="text-[14px] text-slate-600 space-y-3 leading-relaxed">
+                    <li><b>1. 环境隔离（核心）：</b>批量操作时，务必使用指纹浏览器（如 AdsPower、Hubstudio）进行多开，确保每个账号的浏览器指纹、缓存、代理 IP 完全独立，切断关联。</li>
+                    <li><b>2. IP 纯净度：</b>购买账号后，严禁使用免费机场或公共节点登录。请务必使用本站的高质量节点或纯净住宅 IP 进行登录。</li>
+                    <li><b>3. 模拟真人操作：</b>新号登录后，切勿立刻修改密码或疯狂群发消息。建议静置 24 小时，正常浏览一下频道、点赞，模拟真人行为。</li>
+                    <li><b>4. 2FA 密码保护：</b>登录成功后，立刻在客户端设置中开启两步验证，并牢记二级密码，防止账号被恶意盗用申诉。</li>
+                </ul>
+            </div>
+
+            <!-- 6. 支付与签到生态 -->
+            <div>
+                <h3 class="text-[16px] font-bold text-slate-800 mb-4 flex items-center">
+                    <span class="title-bar bg-amber-500"></span> 支付、余额与签到分红生态
                 </h3>
                 <div class="text-[14px] text-slate-600 space-y-4 leading-relaxed">
-                    <p><b>💎 余额与支付：</b><br>
-                    支持 USDT (TRC20) / 支付宝（易支付扫码），支付完成后 30 秒内自动开通。若分红余额 ≥ 套餐价格，可直接余额支付，即时开通。</p>
+                    <p><b>💎 支付与在线充值：</b><br>
+                    支持 USDT (TRC20) / 支付宝（易支付扫码）。支付完成后 30 秒内自动到账。若您的分红余额 ≥ 套餐价格，支持直接使用余额一键抵扣，即时开通。</p>
 
-                    <p><b>📜 余额来源：</b><br>
-                    · 每日签到（群内，1-3GB）<br>
-                    · 邀请好友奖励（每人 +0.625U 起，递增）<br>
-                    · 好友充值 15% 分红（U）</p>
+                    <p><b>📜 余额与分红来源：</b><br>
+                    · 每日签到（TG 群内，1-3GB）<br>
+                    · 邀请好友注册（每人 +0.625U 起，递增）<br>
+                    · 下级好友充值（返 15% 分红）</p>
 
-                    <p><b>📅 签到说明：</b><br>
+                    <p><b>📅 签到防坑说明：</b><br>
                     签到群：<a href="https://t.me/qingtian_vip" class="text-blue-500 underline">点击加入</a><br>
                     1️⃣ 先私聊机器人发送 /start 激活<br>
                     2️⃣ 加入签到群<br>
                     3️⃣ 在群里发送「签到」<br>
                     4️⃣ 随机获得 1-3GB 流量<br>
-                    <span class="text-red-500">⚠️ 每天限签一次，私聊无法签到。每次签到会新建节点覆盖旧的，节点有效期到次日 0 点。</span></p>
+                    <span class="text-red-500">⚠️ 私聊无法签到！每天限签一次。每次签到会新建节点覆盖旧的，节点有效期到次日 0 点。</span></p>
                 </div>
             </div>
 
-            <!-- 6. 推荐客户端 -->
+            <!-- 7. 新手常见问题 FAQ (新增) -->
             <div>
                 <h3 class="text-[16px] font-bold text-slate-800 mb-4 flex items-center">
-                    <span class="title-bar bg-slate-500"></span> 📱 推荐客户端
+                    <span class="title-bar bg-slate-500"></span> 新手常见问题 FAQ
+                </h3>
+                <div class="text-[14px] text-slate-600">
+                    <span class="faq-q">Q1: 购买后没收到卡密怎么办？</span>
+                    <span class="faq-a">A1: 卡密不发邮件。请在支付成功后，返回网站首页，点击右下角“我的” -> “订单查询”，在对应订单中点击“查看卡密”即可。</span>
+                    
+                    <span class="faq-q">Q2: 接码一直没收到验证码怎么办？</span>
+                    <span class="faq-a">A2: 接码存在上游网络延迟，请耐心等待。若超时未收到，系统会自动释放冻结资金回到您的余额。若一直失败，建议更换一个服务商或国家号码重新取号。</span>
+                    
+                    <span class="faq-q">Q3: 赠送的域名怎么解析？</span>
+                    <span class="faq-a">A3: 在“个人中心”进入“域名中心”，点击管理，即可添加 A 记录或 CNAME 记录，底层调用 Cloudflare API，解析秒级生效。免费域名默认最多 5 条记录。</span>
+
+                    <span class="faq-q">Q4: 账号购买后可以退换吗？</span>
+                    <span class="faq-a">A4: 虚拟商品具有可复制性。非商品质量问题（如密码错误无法登录），一经售出概不退款。请在购买后 24 小时内完成首次登录验号。</span>
+                </div>
+            </div>
+
+            <!-- 8. 推荐客户端 -->
+            <div>
+                <h3 class="text-[16px] font-bold text-slate-800 mb-4 flex items-center">
+                    <span class="title-bar bg-cyan-500"></span> 📱 推荐客户端
                 </h3>
                 <ul class="text-[14px] text-slate-600 space-y-2 leading-relaxed">
                     <li><b>Windows：</b>Proxifier / Clash / v2rayN</li>
@@ -124,19 +158,18 @@
                 </ul>
             </div>
 
-            <!-- 7. 售后免责与风控底线 -->
+            <!-- 9. 售后免责与风控底线 -->
             <div>
                 <h3 class="text-[16px] font-bold text-slate-800 mb-4 flex items-center">
-                    <span class="title-bar bg-red-500"></span> 售后说明与风控免责声明
+                    <span class="title-bar bg-red-600"></span> 售后说明与风控免责声明
                 </h3>
                 <ul class="text-[14px] text-slate-600 space-y-3 leading-relaxed">
-                    <li><b>1. 虚拟资产售后：</b>账号卡密非质量问题（如密码错误无法登录）不支持退款，请在 24 小时内首登验号。</li>
-                    <li><b>2. 平台风控底线：</b>严禁使用本平台任何资源（含域名、节点、短链）进行诈骗、黑灰产或触犯当地法律的行为。一经举报查实，平台将<span class="highlight">第一时间永久封禁 IP 及账户</span>，并保留移交司法机关的权利。</li>
-                    <li><b>3. 官方唯一售后：</b>如遇订单异常，请携带完整订单凭证联系官方 TG 客服：<a href="https://t.me/qingtian_Boss" class="text-blue-500 underline">@qingtian_Boss</a>。</li>
+                    <li><b>1. 平台合规底线：</b>严禁使用本平台任何资源（含域名、节点、短链）进行诈骗、黑灰产、恶意爬虫或触犯当地法律的行为。一经举报查实，平台将<span class="highlight">第一时间永久封禁 IP 及账户</span>，并保留移交司法机关的权利。</li>
+                    <li><b>2. 售后支持时间：</b>官方人工客服在线时间 10:00 - 22:00。如遇订单异常，请携带完整订单凭证联系 TG 客服：<a href="https://t.me/qingtian_Boss" class="text-blue-500 underline">@qingtian_Boss</a>。</li>
                 </ul>
             </div>
 
-            <!-- 8. 开发者 API 接口导航 (新增邮箱) -->
+            <!-- 10. 开发者 API 接口导航 -->
             <div class="pt-4 border-t border-slate-100">
                 <h3 class="text-[15px] font-bold text-slate-800 mb-2">开发者 API 接入</h3>
                 <p class="text-[13px] text-slate-500 mb-3">如需通过代码深度对接平台能力，请点击下方接口查阅文档：</p>
@@ -151,15 +184,13 @@
                 </div>
             </div>
             
-            <!-- 底部版权声明 -->
+            <!-- 底部版权 -->
             <div class="text-center pt-6 pb-4">
                 <p class="text-[11px] text-slate-400">© 2026 SOCKS5 开放平台。All Rights Reserved.</p>
-                <p class="text-[11px] text-slate-400 mt-1">Built for Developers, Secured by Innovation.</p>
             </div>
         </div>
     </main>
 
-    <!-- 引入全局 AI 客服脚本 -->
     <script src="/ai-widget.js"></script>
 </body>
 </html>

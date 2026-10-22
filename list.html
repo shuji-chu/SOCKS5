@@ -10,6 +10,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
         body { background-color: #ffffff; color: #1e293b; }
         .seamless-item { border-bottom: 1px solid #f1f5f9; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body>
@@ -20,9 +21,19 @@
 
     <main>
         <div class="px-4 py-3 bg-white sticky top-[56px] z-30 border-b border-slate-100">
-            <div class="flex-1 bg-slate-50 rounded-lg flex items-center px-3 py-2 border border-slate-100">
+            <div class="flex-1 bg-slate-50 rounded-lg flex items-center px-3 py-2 border border-slate-100 mb-3">
                 <svg class="w-4 h-4 text-slate-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                 <input type="text" id="search-input" oninput="renderProducts()" placeholder="搜索当前分类商品..." class="bg-transparent outline-none text-[14px] w-full text-slate-700">
+            </div>
+            
+            <!-- 只有节点分类才显示的协议筛选栏 -->
+            <div id="protocol-filter" class="hidden flex overflow-x-auto no-scrollbar gap-2 text-[13px]">
+                <button onclick="filterProtocol('全部', this)" class="filter-btn bg-blue-500 text-white px-3 py-1.5 rounded-full whitespace-nowrap">全部</button>
+                <button onclick="filterProtocol('Socks5', this)" class="filter-btn bg-slate-100 text-slate-600 px-3 py-1.5 rounded-full whitespace-nowrap">Socks5</button>
+                <button onclick="filterProtocol('MTProto', this)" class="filter-btn bg-slate-100 text-slate-600 px-3 py-1.5 rounded-full whitespace-nowrap">MTProto</button>
+                <button onclick="filterProtocol('VMess', this)" class="filter-btn bg-slate-100 text-slate-600 px-3 py-1.5 rounded-full whitespace-nowrap">VMess</button>
+                <button onclick="filterProtocol('Trojan', this)" class="filter-btn bg-slate-100 text-slate-600 px-3 py-1.5 rounded-full whitespace-nowrap">Trojan</button>
+                <button onclick="filterProtocol('Hysteria2', this)" class="filter-btn bg-slate-100 text-slate-600 px-3 py-1.5 rounded-full whitespace-nowrap">Hysteria2</button>
             </div>
         </div>
         <div id="product-list" class="px-4 pb-10"></div>
@@ -33,9 +44,45 @@
         const pageType = urlParams.get('type') || '默认分类';
         document.getElementById('page-title').innerText = pageType;
 
-        const allProducts = [];
-        for(let i=1; i<=15; i++) {
-            allProducts.push({ title: `[${pageType}商品] 优质稳定 - 编号 ${i}`, price: (Math.random()*50+10).toFixed(2), stock: Math.floor(Math.random()*100) });
+        let allProducts = [];
+        let currentProtocol = '全部';
+
+        // 根据业务分类生成高度逼真的数据
+        function generateData() {
+            const data = [];
+            if (pageType === '节点') {
+                document.getElementById('protocol-filter').classList.remove('hidden');
+                const protocols = ['Socks5', 'MTProto', 'VMess', 'Trojan', 'Hysteria2'];
+                const ips = ['静态独享', '动态住宅', '原生纯净'];
+                const countries = ['美国', '日本', '香港', '新加坡'];
+                
+                for(let i=1; i<=15; i++) {
+                    let p = protocols[i % protocols.length];
+                    let ip = ips[i % ips.length];
+                    let c = countries[i % countries.length];
+                    data.push({
+                        title: `[${p}] ${c} ${ip} IP | 极速专线 | 解锁流媒体`,
+                        protocol: p,
+                        price: (Math.random()*30+10).toFixed(2),
+                        stock: Math.floor(Math.random()*100)
+                    });
+                }
+            } else {
+                for(let i=1; i<=15; i++) {
+                    data.push({ title: `[${pageType}商品] 优质稳定 - 编号 ${i}`, protocol: '', price: (Math.random()*50+10).toFixed(2), stock: Math.floor(Math.random()*100) });
+                }
+            }
+            return data;
+        }
+        allProducts = generateData();
+
+        function filterProtocol(protocol, btn) {
+            currentProtocol = protocol;
+            document.querySelectorAll('.filter-btn').forEach(b => {
+                b.className = 'filter-btn bg-slate-100 text-slate-600 px-3 py-1.5 rounded-full whitespace-nowrap';
+            });
+            btn.className = 'filter-btn bg-blue-500 text-white px-3 py-1.5 rounded-full whitespace-nowrap';
+            renderProducts();
         }
 
         function renderProducts() {
@@ -43,19 +90,32 @@
             const keyword = document.getElementById('search-input').value.trim().toLowerCase();
             listEl.innerHTML = '';
 
-            const filtered = allProducts.filter(p => p.title.toLowerCase().includes(keyword));
+            const filtered = allProducts.filter(p => {
+                const matchKeyword = p.title.toLowerCase().includes(keyword);
+                const matchProtocol = pageType === '节点' ? (currentProtocol === '全部' || p.protocol === currentProtocol) : true;
+                return matchKeyword && matchProtocol;
+            });
 
             const fragment = document.createDocumentFragment();
             filtered.forEach(p => {
                 const a = document.createElement('a');
                 a.href = "javascript:void(0)";
-                a.onclick = () => { alert(`准备购买：${p.title}\n金额：¥${p.price}`); };
+                a.onclick = () => { 
+                    if(!localStorage.getItem('socks5_token')) { window.location.href = '/login.html'; return; }
+                    showCustomAlert('购买确认', `准备购买：\n${p.title}\n金额：¥${p.price}`); 
+                };
                 a.className = "block py-4 seamless-item active:bg-slate-50";
+                
+                // 节点专属高亮标识
+                let tagHtml = p.protocol ? `<span class="bg-indigo-50 text-indigo-600 border border-indigo-100 text-[10px] px-1.5 py-0.5 rounded mr-2">${p.protocol}</span>` : '';
+
                 a.innerHTML = `
                     <div class="flex items-start gap-3.5">
                         <img src="/logo.jpg" class="w-10 h-10 rounded-xl object-cover shrink-0 mt-0.5 shadow-sm">
                         <div class="flex-1 min-w-0">
-                            <h3 class="text-[14.5px] font-semibold text-slate-800 leading-snug line-clamp-2">${p.title}</h3>
+                            <h3 class="text-[14.5px] font-semibold text-slate-800 leading-snug line-clamp-2 flex items-center">
+                                ${tagHtml}${p.title}
+                            </h3>
                             <div class="flex justify-between items-end mt-3.5">
                                 <span class="text-[18px] font-bold text-red-500">¥${p.price}</span>
                                 <span class="text-xs text-slate-400">库存: <span class="text-green-500 font-medium">${p.stock}</span></span>
@@ -68,7 +128,43 @@
             listEl.appendChild(fragment);
         }
 
+        // 全局弹窗
+        function showCustomAlert(title, desc) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-desc').innerText = desc;
+            document.getElementById('custom-modal').classList.add('active');
+        }
+        function closeCustomAlert() { document.getElementById('custom-modal').classList.remove('active'); }
+
         document.addEventListener('DOMContentLoaded', renderProducts);
+    </script>
+
+    <!-- 全局自定义弹窗 -->
+    <div id="custom-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] hidden items-center justify-center">
+        <div class="bg-white rounded-2xl p-6 w-[85%] max-w-[320px] relative" id="custom-modal-content">
+            <div class="text-center">
+                <h3 class="text-lg font-bold text-slate-800 mb-2 flex items-center justify-center gap-2">
+                    <img src="/logo.jpg" class="w-5 h-5 rounded"> <span id="modal-title">提示</span>
+                </h3>
+                <p id="modal-desc" class="text-sm text-slate-500 mb-6 leading-relaxed text-left bg-slate-50 p-4 rounded-lg">内容</p>
+                <button onclick="closeCustomAlert()" class="w-full py-2.5 bg-blue-500 text-white font-bold rounded-xl text-sm shadow-sm">我知道了</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        // 为这个页面单独补充一下显示/隐藏的 class
+        const originalShowAlert = showCustomAlert;
+        showCustomAlert = function(title, desc) {
+            document.getElementById('custom-modal').classList.remove('hidden');
+            document.getElementById('custom-modal').classList.add('flex');
+            originalShowAlert(title, desc);
+        };
+        const originalCloseAlert = closeCustomAlert;
+        closeCustomAlert = function() {
+            document.getElementById('custom-modal').classList.add('hidden');
+            document.getElementById('custom-modal').classList.remove('flex');
+            originalCloseAlert();
+        }
     </script>
 </body>
 </html>

@@ -3,181 +3,224 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>SOCKS5 商城</title>
+    <title>SOCKS5 - 账号购买中心</title>
     <link rel="icon" href="/logo.jpg" type="image/jpeg">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
-        body { background-color: #ffffff; color: #1e293b; padding-bottom: 80px; }
-        .seamless-item { border-bottom: 1px solid #f1f5f9; }
-        .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 9999; display: none; align-items: center; justify-content: center; }
-        .modal-overlay.active { display: flex; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #f8fafc; color: #1e293b; padding-bottom: 80px; }
+        
+        /* 底部 Tab 专属样式 */
+        .bottom-tab { position: fixed; bottom: 0; width: 100%; background: #ffffff; border-top: 1px solid #f1f5f9; display: flex; height: 56px; padding-bottom: env(safe-area-inset-bottom); z-index: 50; }
+        .tab-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: #94a3b8; text-decoration: none; }
+        .tab-item.active { color: #2563eb; }
+        .tab-text { font-size: 10px; font-weight: bold; }
+
+        /* 筛选抽屉 */
+        .drawer-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.5); backdrop-filter: blur(2px); z-index: 9999; display: none; opacity: 0; transition: opacity 0.3s; }
+        .drawer-overlay.active { display: block; opacity: 1; }
+        .drawer-panel { position: fixed; bottom: -100%; left: 0; right: 0; background: #fff; border-radius: 20px 20px 0 0; z-index: 10000; transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding-bottom: env(safe-area-inset-bottom); }
+        .drawer-panel.active { bottom: 0; }
+
+        /* 动画 */
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
-    <header class="bg-white px-4 py-3 flex items-center justify-between sticky top-0 z-50 border-b border-slate-100">
+    <header class="bg-white px-4 py-4 flex justify-between items-center sticky top-0 z-50">
         <div class="flex items-center gap-2">
-            <img src="/logo.jpg" class="w-8 h-8 rounded-lg object-cover">
-            <h1 class="text-xl font-bold text-slate-800 tracking-tight">SOCKS5</h1>
+            <div class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+            </div>
+            <h1 class="text-[20px] font-bold text-slate-800 tracking-wide">SOCKS5</h1>
         </div>
-        <div class="relative cursor-pointer p-1" onclick="openAdModal()">
-            <svg class="w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
-            <span id="ad-dot" class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border border-white hidden"></span>
+        <div class="relative cursor-pointer">
+            <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+            <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
         </div>
     </header>
 
-    <main>
-        <div class="px-4 pt-6 pb-4">
-            <h2 class="text-[22px] font-bold text-slate-800 mb-2">SOCKS5 账号购买中心</h2>
-            <p class="text-[13px] text-slate-400 font-medium mb-3">专业社交媒体及数字资产出售平台</p>
-            <p class="text-[13px] text-slate-500 leading-relaxed mb-6">提供高质量 Telegram 账号、稳定代理节点、纯净接码服务。支持免费赠送子域名，全自动发货。</p>
-            
-            <div class="grid grid-cols-3 gap-y-6 gap-x-2 text-center">
-                <a href="/list.html?type=TG" class="flex flex-col items-center gap-2 group">
-                    <div class="w-12 h-12 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center group-hover:scale-105 transition-transform"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg></div>
-                    <span class="text-[13px] font-medium text-slate-700">TG账号</span>
-                </a>
-                <a href="/list.html?type=节点" class="flex flex-col items-center gap-2 group">
-                    <div class="w-12 h-12 bg-indigo-50 text-indigo-500 rounded-2xl flex items-center justify-center group-hover:scale-105 transition-transform"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg></div>
-                    <span class="text-[13px] font-medium text-slate-700">代理节点</span>
-                </a>
-                <a href="/sms.html" class="flex flex-col items-center gap-2 group">
-                    <div class="w-12 h-12 bg-green-50 text-green-500 rounded-2xl flex items-center justify-center group-hover:scale-105 transition-transform"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg></div>
-                    <span class="text-[13px] font-medium text-slate-700">接码服务</span>
-                </a>
-                <a href="/domain.html" class="flex flex-col items-center gap-2 group">
-                    <div class="w-12 h-12 bg-orange-50 text-orange-500 rounded-2xl flex items-center justify-center group-hover:scale-105 transition-transform"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg></div>
-                    <span class="text-[13px] font-medium text-slate-700">免费域名</span>
-                </a>
-                <a href="/api-market.html" class="flex flex-col items-center gap-2 group">
-                    <div class="w-12 h-12 bg-purple-50 text-purple-500 rounded-2xl flex items-center justify-center group-hover:scale-105 transition-transform"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></div>
-                    <span class="text-[13px] font-medium text-slate-700">数据查询</span>
-                </a>
-                <a href="/email-market.html" class="flex flex-col items-center gap-2 group">
-                    <div class="w-12 h-12 bg-pink-50 text-pink-500 rounded-2xl flex items-center justify-center group-hover:scale-105 transition-transform"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg></div>
-                    <span class="text-[13px] font-medium text-slate-700">邮箱账号</span>
-                </a>
+    <main class="max-w-lg mx-auto">
+        <!-- Hero 区域 -->
+        <div class="px-5 pt-4 pb-6">
+            <h2 class="text-[26px] font-extrabold text-slate-900 mb-2 leading-tight">SOCKS5 账号购买中心</h2>
+            <p class="text-[14px] text-slate-500 mb-3">专业社交媒体及数字资产出售平台</p>
+            <p class="text-[13px] text-slate-400 leading-relaxed">提供高质量 Telegram 账号、稳定代理节点、纯净接码服务。支持免费赠送子域名，全自动发货。</p>
+        </div>
+
+        <!-- 六大金刚 -->
+        <div class="grid grid-cols-3 gap-y-6 gap-x-2 px-5 mb-8">
+            <a href="/email-market.html" class="flex flex-col items-center gap-2 active:opacity-60">
+                <div class="w-14 h-14 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg></div>
+                <span class="text-[13px] font-medium text-slate-700">TG账号</span>
+            </a>
+            <a href="/product-detail.html?id=node" class="flex flex-col items-center gap-2 active:opacity-60">
+                <div class="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-500 flex items-center justify-center"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg></div>
+                <span class="text-[13px] font-medium text-slate-700">代理节点</span>
+            </a>
+            <a href="/sms.html" class="flex flex-col items-center gap-2 active:opacity-60">
+                <div class="w-14 h-14 rounded-2xl bg-green-50 text-green-500 flex items-center justify-center"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg></div>
+                <span class="text-[13px] font-medium text-slate-700">接码服务</span>
+            </a>
+            <a href="/domain.html" class="flex flex-col items-center gap-2 active:opacity-60">
+                <div class="w-14 h-14 rounded-2xl bg-orange-50 text-orange-500 flex items-center justify-center"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg></div>
+                <span class="text-[13px] font-medium text-slate-700">免费域名</span>
+            </a>
+            <a href="/doc-query.html" class="flex flex-col items-center gap-2 active:opacity-60">
+                <div class="w-14 h-14 rounded-2xl bg-purple-50 text-purple-500 flex items-center justify-center"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></div>
+                <span class="text-[13px] font-medium text-slate-700">数据查询</span>
+            </a>
+            <a href="/email-market.html" class="flex flex-col items-center gap-2 active:opacity-60">
+                <div class="w-14 h-14 rounded-2xl bg-pink-50 text-pink-500 flex items-center justify-center"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg></div>
+                <span class="text-[13px] font-medium text-slate-700">邮箱账号</span>
+            </a>
+        </div>
+
+        <!-- 搜索与筛选栏 -->
+        <div class="px-4 flex gap-2 mb-4 sticky top-[68px] z-40 bg-slate-50 py-2">
+            <div class="flex-1 bg-white rounded-xl flex items-center px-3 py-2.5 border border-slate-200 shadow-sm focus-within:border-blue-500 transition-colors">
+                <svg class="w-5 h-5 text-slate-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                <input type="text" id="search-input" oninput="handleSearch()" placeholder="搜索 TG, Gmail, 节点..." class="bg-transparent outline-none text-[14px] w-full text-slate-700">
             </div>
+            <button onclick="openFilterDrawer()" class="bg-white border border-slate-200 px-4 py-2.5 rounded-xl text-[14px] font-bold text-slate-600 shadow-sm active:bg-slate-100 transition">
+                筛选
+            </button>
         </div>
 
-        <div class="px-4 py-3 bg-white sticky top-[60px] z-40 border-b border-slate-100">
-            <div class="flex gap-2">
-                <div class="flex-1 bg-slate-50 rounded-lg flex items-center px-3 py-2 border border-slate-100">
-                    <svg class="w-4 h-4 text-slate-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    <input type="text" placeholder="搜索商品..." class="bg-transparent outline-none text-[14px] w-full text-slate-700 placeholder-slate-400">
-                </div>
-                <button class="bg-slate-50 rounded-lg px-4 py-2 text-sm font-medium text-slate-600 border border-slate-100">筛选</button>
-            </div>
-        </div>
-
-        <div class="px-4 pb-6">
-            <!-- 商品 1: TG -->
-            <a href="/product-detail.html" class="block py-4 seamless-item active:bg-slate-50">
-                <div class="flex items-start gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <h3 class="text-[14px] font-medium text-slate-800 leading-snug line-clamp-2">[货号3965] Telegram 飞机号 | +1 美国电话注册 | 成品号 | API接码登录</h3>
-                        <div class="flex justify-between items-end mt-3">
-                            <span class="text-lg font-bold text-red-500">¥8.72</span>
-                            <span class="text-xs text-slate-400">库存: <span class="text-green-500 font-medium">128</span></span>
-                        </div>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 商品 2: 邮箱 -->
-            <a href="/product-detail.html" class="block py-4 seamless-item active:bg-slate-50">
-                <div class="flex items-start gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-pink-50 text-pink-500 flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <h3 class="text-[14px] font-medium text-slate-800 leading-snug line-clamp-2">[库存号] 谷歌 Gmail 白号 | 2019年老号 | 纯手工注册 | 带辅助邮箱</h3>
-                        <div class="flex justify-between items-end mt-3">
-                            <span class="text-lg font-bold text-red-500">¥12.35</span>
-                            <span class="text-xs text-slate-400">库存: <span class="text-green-500 font-medium">120</span></span>
-                        </div>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 商品 3: 节点 -->
-            <a href="/product-detail.html" class="block py-4 seamless-item active:bg-slate-50">
-                <div class="flex items-start gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-500 flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <h3 class="text-[14px] font-medium text-slate-800 leading-snug line-clamp-2">[节点402] Socks5 独享高速节点 | 美国原生IP | 月付套餐</h3>
-                        <div class="flex justify-between items-end mt-3">
-                            <span class="text-lg font-bold text-red-500">¥15.00</span>
-                            <span class="text-xs text-slate-400">库存: <span class="text-green-500 font-medium">99</span></span>
-                        </div>
-                    </div>
-                </div>
-            </a>
-        </div>
+        <!-- 商品列表 -->
+        <div id="product-list" class="px-4 pb-12 space-y-3"></div>
     </main>
 
-    <div class="fixed bottom-0 left-0 right-0 bg-white flex justify-around py-3 border-t border-slate-200 z-50 pb-[calc(10px+env(safe-area-inset-bottom))]">
-        <a href="/index.html" class="flex flex-col items-center gap-1 text-blue-500">
-            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-            <span class="text-[10px] font-medium">首页</span>
-        </a>
-        <a href="/profile.html" class="flex flex-col items-center gap-1 text-slate-400">
-            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-            <span class="text-[10px]">我的</span>
-        </a>
-    </div>
-
-    <!-- 全局自定义弹窗 -->
-    <div id="custom-modal" class="modal-overlay">
-        <div class="bg-white rounded-2xl p-6 w-[85%] max-w-[320px] relative transform scale-95 transition-transform duration-200" id="custom-modal-content">
-            <div class="text-center">
-                <h3 class="text-lg font-bold text-slate-800 mb-2 flex items-center justify-center gap-2">
-                    <img src="/logo.jpg" class="w-5 h-5 rounded"> <span id="modal-title">SOCKS5 提示</span>
-                </h3>
-                <p id="modal-desc" class="text-sm text-slate-500 mb-6 leading-relaxed">这是提示内容</p>
-                <button onclick="closeCustomAlert()" class="w-full py-2.5 bg-blue-500 text-white font-bold rounded-xl text-sm shadow-sm active:scale-95 transition-transform">我知道了</button>
-            </div>
+    <!-- 筛选抽屉 -->
+    <div id="filter-overlay" class="drawer-overlay" onclick="closeFilterDrawer(event)"></div>
+    <div id="filter-panel" class="drawer-panel">
+        <div class="p-4 border-b border-slate-100 flex justify-between items-center">
+            <h3 class="text-[16px] font-bold text-slate-800">商品分类筛选</h3>
+            <button onclick="closeFilterDrawer()" class="text-slate-400 p-1"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+        </div>
+        <div class="p-4 grid grid-cols-2 gap-3" id="filter-options">
+            <!-- JS 动态渲染 -->
         </div>
     </div>
 
-    <!-- 广告公告弹窗 -->
-    <div id="ad-modal" class="modal-overlay">
-        <div class="bg-white rounded-2xl p-6 w-[85%] max-w-[320px] relative">
-            <button onclick="closeAdModal()" class="absolute top-3 right-3 text-slate-400 text-lg">✕</button>
-            <div class="text-center">
-                <h3 class="text-lg font-bold text-slate-800 mb-2">平台公告</h3>
-                <p class="text-sm text-slate-500 mb-5 leading-relaxed">欢迎使用 SOCKS5 商城！新增接码业务，支持按服务、关键词及长租，欢迎体验。</p>
-                <button onclick="closeAdModal()" class="w-full py-2.5 bg-blue-500 text-white font-bold rounded-xl text-sm">我知道了</button>
-            </div>
-        </div>
+    <!-- 底部 Tab -->
+    <div class="bottom-tab">
+        <a href="/index.html" class="tab-item active">
+            <svg class="w-[22px] h-[22px]" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
+            <span class="tab-text">首页</span>
+        </a>
+        <a href="/profile.html" class="tab-item">
+            <svg class="w-[22px] h-[22px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+            <span class="tab-text">我的</span>
+        </a>
     </div>
 
     <script>
-        function showCustomAlert(title, desc) {
-            document.getElementById('modal-title').innerText = title;
-            document.getElementById('modal-desc').innerText = desc;
-            document.getElementById('custom-modal').classList.add('active');
-            setTimeout(() => document.getElementById('custom-modal-content').classList.replace('scale-95', 'scale-100'), 10);
+        // 模拟商品数据库
+        const mockProducts = [
+            { id: '3965', title: '[货号3965] Telegram飞机号 | +1美国电话注册 | 成品号 | API接码登录', category: 'TG账号', price: '8.72', stock: 1934, tags: ['推荐', '热门', '自动发货'], icon: 'tg' },
+            { id: '1907', title: '[库存号] 谷歌 Gmail 白号 | 2019年老号 | 纯手工注册', category: '邮箱账号', price: '12.35', stock: 120, tags: ['老号', '带辅助邮箱'], icon: 'gmail' },
+            { id: 'node1', title: 'MTP 高速代理节点 | 支持流媒体 | 极速稳定', category: '代理节点', price: '15.00', stock: 999, tags: ['防封', '高可用'], icon: 'node' },
+            { id: 'sms1', title: '全球接码服务 | 60+国家支持 | 验证码实时接收', category: '接码服务', price: '1.50', stock: 9999, tags: ['锁资保护', '极速回码'], icon: 'sms' },
+            { id: 'domain1', title: '免费二级域名赠送 | 支持CF解析 | 90天有效期', category: '域名服务', price: '0.00', stock: 500, tags: ['免费领取', '限购1个'], icon: 'domain' },
+            { id: 'api1', title: '二要素/三要素 API 接口 | 数据核验 | 聚合网关', category: '数据查询', price: '0.05', stock: 9999, tags: ['极速响应', '高并发'], icon: 'api' }
+        ];
+
+        let currentCategory = '全部';
+        let searchQuery = '';
+
+        // 图标库
+        const icons = {
+            tg: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>',
+            gmail: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>',
+            node: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>',
+            sms: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>',
+            domain: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path>',
+            api: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>'
+        };
+
+        function renderProducts() {
+            const list = document.getElementById('product-list');
+            
+            // 过滤数据
+            const filtered = mockProducts.filter(p => {
+                const matchCategory = currentCategory === '全部' || p.category === currentCategory;
+                const matchSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase()) || p.category.toLowerCase().includes(searchQuery.toLowerCase());
+                return matchCategory && matchSearch;
+            });
+
+            if (filtered.length === 0) {
+                list.innerHTML = '<div class="text-center py-10 text-slate-400 text-[14px]">没有找到相关商品</div>';
+                return;
+            }
+
+            // 渲染卡片 (瘦身版)
+            list.innerHTML = filtered.map(p => `
+                <a href="/product-detail.html?id=${p.id}" class="block bg-white rounded-xl p-3 border border-slate-100 shadow-sm active:bg-slate-50 transition fade-in">
+                    <div class="flex gap-3">
+                        <!-- 图标 -->
+                        <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${p.icon === 'tg' ? 'bg-blue-50 text-blue-500' : p.icon === 'gmail' ? 'bg-pink-50 text-pink-500' : p.icon === 'node' ? 'bg-indigo-50 text-indigo-500' : p.icon === 'sms' ? 'bg-green-50 text-green-500' : p.icon === 'domain' ? 'bg-orange-50 text-orange-500' : 'bg-purple-50 text-purple-500'}">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">${icons[p.icon] || icons.tg}</svg>
+                        </div>
+                        
+                        <!-- 内容 -->
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-[14px] font-bold text-slate-800 leading-snug line-clamp-2 mb-1">${p.title}</h3>
+                            <div class="flex gap-1.5 mb-2">
+                                ${p.tags.map(t => `<span class="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded border border-slate-200">${t}</span>`).join('')}
+                            </div>
+                            <div class="flex justify-between items-end">
+                                <span class="text-[18px] font-bold text-red-500 leading-none">¥${p.price}</span>
+                                <span class="text-[11px] text-slate-400">库存: <span class="text-green-500 font-medium">${p.stock}</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            `).join('');
         }
-        function closeCustomAlert() {
-            document.getElementById('custom-modal-content').classList.replace('scale-100', 'scale-95');
-            setTimeout(() => document.getElementById('custom-modal').classList.remove('active'), 150);
+
+        function handleSearch() {
+            searchQuery = document.getElementById('search-input').value.trim();
+            renderProducts();
         }
+
+        // 筛选抽屉逻辑
+        const categories = ['全部', 'TG账号', '邮箱账号', '代理节点', '接码服务', '域名服务', '数据查询'];
         
-        function openAdModal() { 
-            document.getElementById('ad-modal').classList.add('active'); 
-            document.getElementById('ad-dot').classList.add('hidden');
-            localStorage.setItem('ad_read', 'true');
+        function renderFilterOptions() {
+            const container = document.getElementById('filter-options');
+            container.innerHTML = categories.map(cat => `
+                <div onclick="selectCategory('${cat}')" class="py-2.5 text-center text-[14px] font-medium rounded-lg border ${currentCategory === cat ? 'border-blue-500 bg-blue-50 text-blue-600' : 'border-slate-200 text-slate-600'} active:bg-slate-100 transition cursor-pointer">
+                    ${cat}
+                </div>
+            `).join('');
         }
-        function closeAdModal() { document.getElementById('ad-modal').classList.remove('active'); }
-        if (!localStorage.getItem('ad_read')) { document.getElementById('ad-dot').classList.remove('hidden'); }
+
+        function selectCategory(cat) {
+            currentCategory = cat;
+            renderFilterOptions();
+            closeFilterDrawer();
+            renderProducts();
+        }
+
+        function openFilterDrawer() {
+            document.getElementById('filter-overlay').classList.add('active');
+            document.getElementById('filter-panel').classList.add('active');
+        }
+        function closeFilterDrawer(e) {
+            if(e && e.target !== e.currentTarget && e.target.tagName !== 'BUTTON') return;
+            document.getElementById('filter-overlay').classList.remove('active');
+            document.getElementById('filter-panel').classList.remove('active');
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            renderFilterOptions();
+            renderProducts();
+        });
     </script>
-<script src="/ai-widget.js"></script>
-<script src="/notice.js"></script>
+    <script src="/ai-widget.js"></script>
+    <script src="/notice.js"></script>
 </body>
 </html>

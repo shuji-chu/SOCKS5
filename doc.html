@@ -3,171 +3,259 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>开发者文档中心 - SOCKS5</title>
+    <title>API 开发指南 - SOCKS5</title>
     <link rel="icon" href="/logo.jpg" type="image/jpeg">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: #ffffff; color: #1e293b; }
+        body { background-color: #f8fafc; color: #1e293b; }
+        .card { background: #ffffff; border-radius: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); border: 1px solid #f1f5f9; }
+        .num-box { width: 28px; height: 28px; background: #eff6ff; color: #2563eb; font-weight: bold; font-size: 14px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
         .code-wrapper { position: relative; margin: 12px 0 20px 0; }
         .code-block { background: #1e293b; color: #e2e8f0; padding: 16px; border-radius: 10px; font-family: 'Courier New', Courier, monospace; font-size: 13px; overflow-y: auto; max-height: 300px; line-height: 1.6; white-space: pre-wrap; word-wrap: break-word; }
         .copy-btn { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.1); color: #cbd5e1; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-family: sans-serif; cursor: pointer; transition: all 0.2s; }
         .copy-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
-        .tag-get { background: #eff6ff; color: #2563eb; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-right: 8px; border: 1px solid #bfdbfe; }
-        .api-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 13px; }
-        .api-table th { text-align: left; padding: 8px 12px; background: #f8fafc; color: #64748b; font-weight: bold; border-bottom: 1px solid #e2e8f0; }
-        .api-table td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; color: #1e293b; }
-        .api-table td:first-child { font-family: monospace; color: #2563eb; }
+        
+        /* 侧边导航圆点 */
+        .nav-dot { width: 6px; height: 6px; border-radius: 50%; background: #cbd5e1; display: inline-block; margin-right: 8px; transition: all 0.2s; }
+        .nav-item.active .nav-dot { background: #2563eb; width: 16px; border-radius: 4px; }
+        .nav-item.active { color: #2563eb; font-weight: bold; }
     </style>
 </head>
 <body>
     <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center gap-3 sticky top-0 z-50">
-        <a href="/console.html" class="text-slate-600 text-xl font-bold px-2">←</a>
-        <h1 class="text-[17px] font-bold text-slate-800">文档中心</h1>
+        <a href="/guide.html" class="text-slate-600 text-xl font-bold px-2">←</a>
+        <h1 class="text-[17px] font-bold text-slate-800">API 开发指南</h1>
     </header>
 
-    <main class="px-5 py-6 pb-24 max-w-2xl mx-auto">
-        <!-- 基础鉴权 -->
+    <main class="px-4 py-6 pb-24 max-w-2xl mx-auto">
+        <!-- Hero 区域 -->
         <div class="mb-8">
-            <h2 class="text-[24px] font-extrabold text-slate-800 mb-2">API 接入指南</h2>
-            <p class="text-[14px] text-slate-500 mb-4 leading-relaxed">对接 SOCKS5 开放平台。所有接口均采用 HTTPS 协议，数据格式为 JSON。</p>
+            <h2 class="text-[28px] font-extrabold text-slate-800 mb-2 tracking-tight">SOCKS5 API 开发指南</h2>
+            <p class="text-[15px] text-slate-500 mb-5 leading-relaxed">从注册、申请 Key、充值到正式调用，按开发者实际接入路径整理。</p>
+            <div class="flex flex-wrap gap-2">
+                <span class="bg-blue-50 text-blue-600 text-[12px] font-bold px-3 py-1 rounded-full">稳定网关服务</span>
+                <span class="bg-blue-50 text-blue-600 text-[12px] font-bold px-3 py-1 rounded-full">专属 Key 调用</span>
+                <span class="bg-blue-50 text-blue-600 text-[12px] font-bold px-3 py-1 rounded-full">单次价格透明</span>
+            </div>
+        </div>
+
+        <!-- 顶部快速锚点导航 -->
+        <div class="flex overflow-x-auto no-scrollbar gap-6 border-b border-slate-200 pb-3 mb-8 text-[13px] text-slate-500">
+            <a href="#step1" class="nav-item active flex items-center whitespace-nowrap"><span class="nav-dot"></span>快速接入</a>
+            <a href="#step2" class="nav-item flex items-center whitespace-nowrap"><span class="nav-dot"></span>账号与 Key</a>
+            <a href="#step3" class="nav-item flex items-center whitespace-nowrap"><span class="nav-dot"></span>请求规范</a>
+            <a href="#step4" class="nav-item flex items-center whitespace-nowrap"><span class="nav-dot"></span>充值计费</a>
+            <a href="#step5" class="nav-item flex items-center whitespace-nowrap"><span class="nav-dot"></span>调试排查</a>
+            <a href="#step6" class="nav-item flex items-center whitespace-nowrap"><span class="nav-dot"></span>常见问题</a>
+        </div>
+
+        <!-- 01 快速接入 -->
+        <div id="step1" class="mb-10 scroll-mt-20">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="num-box">01</div>
+                <h3 class="text-[18px] font-bold text-slate-800">快速接入</h3>
+            </div>
+            <p class="text-[13px] text-slate-500 mb-4">四步完成从账号到正式调用的准备。</p>
             
-            <div class="bg-slate-50 rounded-xl p-4 border border-slate-100 mb-4">
-                <p class="text-[13px] text-slate-600 mb-3"><b>接口网关：</b><code class="bg-white px-1.5 py-0.5 border border-slate-200 rounded text-blue-600 font-mono">https://web.lynli.me/api/v1</code></p>
-                <p class="text-[13px] text-slate-600"><b>鉴权方式：</b>请求头必须携带 <code class="bg-white px-1.5 py-0.5 border border-slate-200 rounded text-blue-600 font-mono">Authorization: Bearer YOUR_API_KEY</code></p>
-            </div>
-
-            <!-- 权限隔离警告 -->
-            <div class="bg-red-50 rounded-xl p-4 border border-red-100">
-                <p class="text-[14px] font-bold text-red-600 mb-1 flex items-center gap-1">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                    严格权限隔离机制
-                </p>
-                <p class="text-[13px] text-red-500 leading-relaxed">本平台实行严格的接口隔离原则。<b>账号接口的 Key（sk_tg_...）只能调用账号相关接口</b>，节点（sk_jd_...）、接码（sk_sms_...）等其他模块的 Key 无法越权交叉调用。如强行跨模块请求，系统将直接返回 <code>403 Forbidden</code>。</p>
-            </div>
-        </div>
-
-        <!-- 通用基础接口 -->
-        <div class="mb-8 border-t border-slate-100 pt-6">
-            <h3 class="text-[18px] font-bold text-slate-800 mb-4 flex items-center gap-2">
-                <span class="w-1.5 h-4 bg-slate-400 rounded-full"></span> 通用基础接口
-            </h3>
-            <p class="text-[13px] text-slate-500 mb-4">查询余额与商品数据不受模块隔离限制，任意有效 Key 均可调用。</p>
-
-            <!-- 查询余额 -->
-            <div class="mb-6">
-                <div class="flex items-center mb-2">
-                    <span class="tag-get">GET</span>
-                    <span class="font-mono text-[14px] font-bold text-slate-800">/user/balance</span>
-                </div>
-                <p class="text-[13px] text-slate-500 mb-3">查询当前 Key 所属账户的可用余额与冻结余额。</p>
-                <div class="code-wrapper">
-                    <div class="copy-btn" onclick="copyCode(this)">复制</div>
-                    <div class="code-block">{
-  "code": 200,
-  "data": {
-    "balance": 120.50,
-    "frozen": 0.00
-  }
-}</div>
-                </div>
-            </div>
-
-            <!-- 获取商品列表 -->
-            <div>
-                <div class="flex items-center mb-2">
-                    <span class="tag-get">GET</span>
-                    <span class="font-mono text-[14px] font-bold text-slate-800">/products</span>
-                </div>
-                <p class="text-[13px] text-slate-500 mb-3">获取平台商品列表，支持通过参数拉取指定数量与分类。</p>
-                
-                <p class="text-[13px] font-bold text-slate-700 mb-2">请求参数 (Query)：</p>
-                <table class="api-table">
-                    <tr><th>参数名</th><th>类型</th><th>必填</th><th>描述</th></tr>
-                    <tr><td>type</td><td>string</td><td>否</td><td>筛选商品类型：account / node / sms 等</td></tr>
-                    <tr><td>limit</td><td>int</td><td>否</td><td><b>指定调取数量</b>（默认 20，最大 100）</td></tr>
-                    <tr><td>page</td><td>int</td><td>否</td><td>页码（用于分页拉取）</td></tr>
-                </table>
-
-                <p class="text-[13px] font-bold text-slate-700 mb-2">请求示例 (获取前 5 个账号):</p>
-                <div class="code-wrapper">
-                    <div class="copy-btn" onclick="copyCode(this)">复制</div>
-                    <div class="code-block">curl -X GET "https://web.lynli.me/api/v1/products?type=account&limit=5" \
--H "Authorization: Bearer sk_tg_xxxxxx"</div>
-                </div>
-
-                <p class="text-[13px] font-bold text-slate-700 mb-2">成功返回示例：</p>
-                <div class="code-wrapper">
-                    <div class="copy-btn" onclick="copyCode(this)">复制</div>
-                    <div class="code-block">{
-  "code": 200,
-  "data": [
-    { "id": 3965, "name": "TG 飞机号", "price": 8.72, "stock": 1934 },
-    { "id": 1907, "name": "Gmail 老号", "price": 12.35, "stock": 0 }
-    // ... 共 5 条
-  ]
-}</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 模块文档导航 -->
-        <div class="border-t border-slate-100 pt-6">
-            <h3 class="text-[18px] font-bold text-slate-800 mb-4 flex items-center gap-2">
-                <span class="w-1.5 h-4 bg-blue-500 rounded-full"></span> 业务模块文档
-            </h3>
             <div class="space-y-3">
-                <a href="/doc-account.html" class="flex justify-between items-center p-4 bg-white border border-slate-200 rounded-xl active:bg-slate-50 transition">
-                    <div class="flex items-center gap-3">
-                        <span class="text-[16px] font-bold text-slate-800">1. 账号接口 (静态卡密)</span>
+                <div class="card p-4 flex gap-4 items-start">
+                    <div class="text-[12px] font-bold text-blue-500 bg-blue-50 px-2 py-1 rounded">01</div>
+                    <div>
+                        <h4 class="text-[14px] font-bold text-slate-800 mb-1">注册并登录</h4>
+                        <p class="text-[13px] text-slate-500">注册成功后默认进入登录状态，控制台会同步账号、余额和 API Key 信息。</p>
                     </div>
-                    <span class="text-[13px] text-blue-500 font-medium">查看文档 →</span>
-                </a>
-                <a href="/doc-node.html" class="flex justify-between items-center p-4 bg-white border border-slate-200 rounded-xl active:bg-slate-50 transition">
-                    <div class="flex items-center gap-3">
-                        <span class="text-[16px] font-bold text-slate-800">2. 节点接口 (动态/静态IP)</span>
+                </div>
+                <div class="card p-4 flex gap-4 items-start">
+                    <div class="text-[12px] font-bold text-blue-500 bg-blue-50 px-2 py-1 rounded">02</div>
+                    <div>
+                        <h4 class="text-[14px] font-bold text-slate-800 mb-1">选择接口</h4>
+                        <p class="text-[13px] text-slate-500">在首页或控制台查看接口分类，点击进入对应文档查看接口地址和参数说明。</p>
                     </div>
-                    <span class="text-[13px] text-blue-500 font-medium">查看文档 →</span>
-                </a>
-                <a href="/doc-sms.html" class="flex justify-between items-center p-4 bg-white border border-slate-200 rounded-xl active:bg-slate-50 transition">
-                    <div class="flex items-center gap-3">
-                        <span class="text-[16px] font-bold text-slate-800">3. 接码接口 (取号/监听)</span>
+                </div>
+                <div class="card p-4 flex gap-4 items-start">
+                    <div class="text-[12px] font-bold text-blue-500 bg-blue-50 px-2 py-1 rounded">03</div>
+                    <div>
+                        <h4 class="text-[14px] font-bold text-slate-800 mb-1">申请专属 Key</h4>
+                        <p class="text-[13px] text-slate-500">登录后在控制台查看或重置专属 API Key，正式调用时替换示例里的 demo key。</p>
                     </div>
-                    <span class="text-[13px] text-blue-500 font-medium">查看文档 →</span>
-                </a>
+                </div>
+                <div class="card p-4 flex gap-4 items-start">
+                    <div class="text-[12px] font-bold text-blue-500 bg-blue-50 px-2 py-1 rounded">04</div>
+                    <div>
+                        <h4 class="text-[14px] font-bold text-slate-800 mb-1">充值并调用</h4>
+                        <p class="text-[13px] text-slate-500">余额充足后即可发起正式调用，每次按接口展示的单次价格扣费。</p>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="mt-10 border-t border-slate-100 pt-8 pb-4">
-            <h3 class="text-[18px] font-bold text-slate-800 mb-2 flex items-center gap-2">
-                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7"></path></svg>
-                技术底座：Lynli Panel
-            </h3>
-            <p class="text-[13px] text-slate-500 mb-4 leading-relaxed">平台底层节点调度与订阅管理基于自研的轻量级管理系统 <b>Lynli Panel</b>。零框架依赖、多协议兼容、毫秒级订阅下发。</p>
+        <!-- 02 账号与 API Key -->
+        <div id="step2" class="mb-10 scroll-mt-20">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="num-box">02</div>
+                <h3 class="text-[18px] font-bold text-slate-800">账号与 API Key</h3>
+            </div>
+            <p class="text-[13px] text-slate-500 mb-4">正式调用前，把账号、接口分类和专属 Key 准备好。</p>
             
-            <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 space-y-3">
-                <div class="flex flex-wrap gap-2 text-[11px] font-medium text-slate-600">
-                    <span class="bg-white border border-slate-200 px-2 py-0.5 rounded">Python 3.8+</span>
-                    <span class="bg-white border border-slate-200 px-2 py-0.5 rounded">SQLite 高并发</span>
-                    <span class="bg-white border border-slate-200 px-2 py-0.5 rounded">零框架原生前端</span>
-                    <span class="bg-white border border-slate-200 px-2 py-0.5 rounded">Clash / V2Ray / sing-box</span>
+            <div class="grid grid-cols-1 gap-3">
+                <div class="card p-4 flex gap-4 items-center">
+                    <div class="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center font-bold text-slate-500 text-lg">A</div>
+                    <div>
+                        <h4 class="text-[14px] font-bold text-slate-800">平台账号</h4>
+                        <p class="text-[13px] text-slate-500">用于管理余额、充值、消费记录和专属 API Key。</p>
+                    </div>
                 </div>
-                <div class="flex gap-3 pt-2">
-                    <a href="https://github.com/shuji-chu/Lynli-Panel" target="_blank" class="flex-1 py-2 bg-slate-800 text-white text-[13px] font-bold text-center rounded-lg active:opacity-80 flex items-center justify-center gap-1">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.418 22 12c0-5.523-4.477-10-10-10z"></path></svg>
-                        GitHub 仓库
-                    </a>
-                    <a href="https://github.com/shuji-chu/Lynli-Panel" target="_blank" class="w-full py-2 bg-slate-800 text-white text-[13px] font-bold text-center rounded-lg active:opacity-80 flex items-center justify-center gap-1">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.418 22 12c0-5.523-4.477-10-10-10z"></path></svg>
-                        访问 Lynli Panel 仓库
-                    </a>
+                <div class="card p-4 flex gap-4 items-center">
+                    <div class="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center font-bold text-slate-500 text-lg">ID</div>
+                    <div>
+                        <h4 class="text-[14px] font-bold text-slate-800">接口分类</h4>
+                        <p class="text-[13px] text-slate-500">账号、节点、接码等独立分类，调用对应 Key 即可。</p>
+                    </div>
+                </div>
+                <div class="card p-4 flex gap-4 items-center">
+                    <div class="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center font-bold text-slate-500 text-sm">Key</div>
+                    <div>
+                        <h4 class="text-[14px] font-bold text-slate-800">专属 Key</h4>
+                        <p class="text-[13px] text-slate-500">在控制台生成和维护，调用时放入请求头中。</p>
+                    </div>
                 </div>
             </div>
-            <p class="text-[11px] text-slate-400 mt-3 text-center">本项目基于 AGPL-3.0 许可发布 · 仅供合法合规学习交流</p>
+            <p class="text-[12px] text-red-500 mt-3">⚠️ 不要把正式 Key 写进前端代码或公开仓库，服务端调用建议通过环境变量保存。</p>
+        </div>
+
+        <!-- 03 请求规范 -->
+        <div id="step3" class="mb-10 scroll-mt-20">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="num-box">03</div>
+                <h3 class="text-[18px] font-bold text-slate-800">请求规范</h3>
+            </div>
+            <p class="text-[13px] text-slate-500 mb-4">统一网关地址，参数按接口详情页填写。</p>
+
+            <div class="card p-5">
+                <h4 class="text-[14px] font-bold text-slate-800 mb-2">基础请求格式</h4>
+                <p class="text-[13px] text-slate-600 mb-3 font-mono bg-slate-50 p-2 rounded">GET https://web.lynli.me/api/v1/xxx</p>
+                
+                <h4 class="text-[14px] font-bold text-slate-800 mb-2">鉴权请求头</h4>
+                <div class="code-wrapper">
+                    <div class="copy-btn" onclick="copyCode(this)">复制</div>
+                    <div class="code-block">Authorization: Bearer YOUR_API_KEY</div>
+                </div>
+
+                <h4 class="text-[14px] font-bold text-slate-800 mb-2 mt-4">cURL 示例</h4>
+                <div class="code-wrapper">
+                    <div class="copy-btn" onclick="copyCode(this)">复制</div>
+                    <div class="code-block">curl -X GET "https://web.lynli.me/api/v1/user/balance" \
+-H "Authorization: Bearer sk_live_xxxxxx"</div>
+                </div>
+
+                <ul class="text-[13px] text-slate-600 space-y-2 mt-4">
+                    <li><b class="text-blue-600">Key</b>：必填。控制台申请的专属 API Key。</li>
+                    <li><b class="text-blue-600">业务参数</b>：按接口文档参数表填写，不同接口参数不同。</li>
+                    <li><b class="text-blue-600">返回格式</b>：以接口详情页展示为准，通常为 JSON。</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 04 充值计费 -->
+        <div id="step4" class="mb-10 scroll-mt-20">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="num-box">04</div>
+                <h3 class="text-[18px] font-bold text-slate-800">充值计费</h3>
+            </div>
+            <p class="text-[13px] text-slate-500 mb-4">价格、充值和记录按控制台统一管理。</p>
+            
+            <div class="card p-5 space-y-4">
+                <div>
+                    <h4 class="text-[14px] font-bold text-slate-800 mb-1">单次价格</h4>
+                    <p class="text-[13px] text-slate-500">接口市场和详情页展示单次价格，正式调用按单次价格从余额扣除。</p>
+                </div>
+                <div class="border-t border-slate-100 pt-3">
+                    <h4 class="text-[14px] font-bold text-slate-800 mb-1">充值方式</h4>
+                    <p class="text-[13px] text-slate-500">控制台支持 USDT、支付宝充值，到账后可直接用于接口调用。</p>
+                </div>
+                <div class="border-t border-slate-100 pt-3">
+                    <h4 class="text-[14px] font-bold text-slate-800 mb-1">记录查询</h4>
+                    <p class="text-[13px] text-slate-500">收支明细和消费记录按页展示，便于核对余额变化与调用结果。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 05 调试排查 -->
+        <div id="step5" class="mb-10 scroll-mt-20">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="num-box">05</div>
+                <h3 class="text-[18px] font-bold text-slate-800">调试排查</h3>
+            </div>
+            <p class="text-[13px] text-slate-500 mb-4">常见错误可以先按下面几项快速定位。</p>
+
+            <div class="space-y-3">
+                <div class="card p-4">
+                    <h4 class="text-[14px] font-bold text-slate-800 mb-1 text-red-500">401 Unauthorized</h4>
+                    <p class="text-[13px] text-slate-600">请求里没有传 API Key，或 Key 无效。</p>
+                    <p class="text-[12px] text-slate-400 mt-1">解决办法：登录控制台查看或重置 Key。</p>
+                </div>
+                <div class="card p-4">
+                    <h4 class="text-[14px] font-bold text-slate-800 mb-1 text-red-500">402 Insufficient Balance</h4>
+                    <p class="text-[13px] text-slate-600">账户余额不够支付本次调用。</p>
+                    <p class="text-[12px] text-slate-400 mt-1">解决办法：进入控制台完成充值后再试。</p>
+                </div>
+                <div class="card p-4">
+                    <h4 class="text-[14px] font-bold text-slate-800 mb-1 text-amber-500">403 Forbidden</h4>
+                    <p class="text-[13px] text-slate-600">接口未申请或 IP 不在白名单。</p>
+                    <p class="text-[12px] text-slate-400 mt-1">解决办法：在控制台检查权限状态与全局白名单。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 06 常见问题 -->
+        <div id="step6" class="mb-10 scroll-mt-20">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="num-box">06</div>
+                <h3 class="text-[18px] font-bold text-slate-800">常见问题</h3>
+            </div>
+            <p class="text-[13px] text-slate-500 mb-4">把接入前最容易卡住的点放在这里。</p>
+
+            <div class="card p-5 space-y-4">
+                <div>
+                    <h4 class="text-[14px] font-bold text-slate-800 mb-1">注册后为什么要进入控制台？</h4>
+                    <p class="text-[13px] text-slate-500">控制台用于申请 Key、充值、查看余额和消费记录。正式接口调用依赖您的专属 Key。</p>
+                </div>
+                <div class="border-t border-slate-100 pt-3">
+                    <h4 class="text-[14px] font-bold text-slate-800 mb-1">接口参数在哪里看？</h4>
+                    <p class="text-[13px] text-slate-500">请点击下方的对应接口模块，进入详细文档查看具体的请求参数和示例。</p>
+                </div>
+                <div class="border-t border-slate-100 pt-3">
+                    <h4 class="text-[14px] font-bold text-slate-800 mb-1">调用失败会不会扣费？</h4>
+                    <p class="text-[13px] text-slate-500">通常只有成功返回业务数据的请求才会实际扣费，失败请求会返回对应的错误码且不扣费（接码业务的资金冻结机制除外）。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部模块导航 -->
+        <div class="border-t border-slate-200 pt-8 mt-8">
+            <h3 class="text-[16px] font-bold text-slate-800 mb-4">业务模块文档</h3>
+            <div class="grid grid-cols-2 gap-3">
+                <a href="/doc-account.html" class="card p-4 active:bg-slate-50">
+                    <p class="text-[14px] font-bold text-slate-800">账号接口</p>
+                    <p class="text-[12px] text-slate-500 mt-1">静态卡密</p>
+                </a>
+                <a href="/doc-node.html" class="card p-4 active:bg-slate-50">
+                    <p class="text-[14px] font-bold text-slate-800">节点接口</p>
+                    <p class="text-[12px] text-slate-500 mt-1">订阅管理</p>
+                </a>
+                <a href="/doc-sms.html" class="card p-4 active:bg-slate-50">
+                    <p class="text-[14px] font-bold text-slate-800">接码接口</p>
+                    <p class="text-[12px] text-slate-500 mt-1">验证码接收</p>
+                </a>
+                <a href="/doc-query.html" class="card p-4 active:bg-slate-50">
+                    <p class="text-[14px] font-bold text-slate-800">查询接口</p>
+                    <p class="text-[12px] text-slate-500 mt-1">数据核验</p>
+                </a>
+            </div>
         </div>
     </main>
 
-    <script src="/ai-widget.js"></script>
     <script>
         function copyCode(btn) {
             const textToCopy = btn.nextElementSibling.innerText;
@@ -178,6 +266,26 @@
                 });
             }
         }
+
+        // 滚动监听高亮导航
+        const sections = document.querySelectorAll('div[id^="step"]');
+        const navItems = document.querySelectorAll('.nav-item');
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (scrollY >= sectionTop - 100) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('href') === `#${current}`) {
+                    item.classList.add('active');
+                }
+            });
+        });
     </script>
 </body>
 </html>

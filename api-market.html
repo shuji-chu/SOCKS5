@@ -85,8 +85,32 @@
     <script src="/api-data.js"></script>
     <script src="/notice.js"></script>
     <script src="/ai-widget.js"></script>
+    
     <script>
         let currentCategory = '全部';
+
+        // 专属分类图标字典
+        const categoryIcons = {
+            '手机号码': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>',
+            '实名认证': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>',
+            '交通与车辆': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"></path>',
+            '企业工商': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>',
+            '生活服务': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>',
+            '网站域名': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path>',
+            '金融风险': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>',
+            '默认': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>'
+        };
+
+        const categoryColors = {
+            '手机号码': 'text-blue-600',
+            '实名认证': 'text-green-600',
+            '交通与车辆': 'text-orange-600',
+            '企业工商': 'text-indigo-600',
+            '生活服务': 'text-teal-600',
+            '网站域名': 'text-purple-600',
+            '金融风险': 'text-red-600',
+            '默认': 'text-slate-600'
+        };
 
         function setCategory(cat, el) {
             document.querySelectorAll('.pill-btn').forEach(btn => btn.classList.remove('active'));
@@ -100,12 +124,10 @@
             const list = document.getElementById('api-list');
             let filtered = [...apisData];
 
-            // 1. 分类过滤
             if (currentCategory !== '全部') {
                 filtered = filtered.filter(a => a.category === currentCategory);
             }
 
-            // 2. 付费类型过滤
             const payType = document.getElementById('pay-type-select').value;
             if (payType === 'paid') {
                 filtered = filtered.filter(a => a.price !== '免费');
@@ -113,7 +135,6 @@
                 filtered = filtered.filter(a => a.price === '免费');
             }
 
-            // 3. 排序
             const sortType = document.getElementById('sort-select').value;
             if (sortType === 'price-asc') {
                 filtered.sort((a, b) => {
@@ -129,60 +150,24 @@
                 });
             }
 
-            // 更新总数
             document.getElementById('total-count').innerText = filtered.length;
 
-            // 渲染空状态
             if (filtered.length === 0) {
                 list.innerHTML = '<div class="text-center py-12 text-slate-400 text-[14px]">没有符合条件的接口</div>';
                 return;
             }
 
-            // 渲染卡片
-            list.innerHTML = filtered.map(api => `
-                <a href="/api-detail.html?id=${api.id}" class="block card p-5 active:bg-slate-50 transition relative">
-                    <!-- 顶部：图标 + 分类 + ID -->
-                    <div class="flex justify-between items-start mb-3">
-                        <div class="w-12 h-12 rounded-xl relative overflow-hidden shrink-0 shadow-sm border border-slate-100">
-                            <img src="https://picsum.photos/seed/${api.id}/100/100" class="absolute inset-0 w-full h-full object-cover opacity-90">
-                            <div class="absolute inset-0 flex items-center justify-center bg-white/40 backdrop-blur-sm text-blue-600">
-                                <svg class="w-6 h-6 drop-shadow-md" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-[12px] text-slate-500 font-bold">${api.category}</p>
-                            <p class="text-[11px] text-slate-400 font-mono mt-1">ID: ${api.id}</p>
-                        </div>
-                    </div>
-                    
-                    <!-- 标题与热门标签 -->
-                    <h3 class="text-[16px] font-bold text-slate-800 mb-1 flex items-center gap-2">
-                        ${api.title}
-                        ${api.isHot ? '<span class="text-[10px] bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded border border-orange-200">热门</span>' : ''}
-                        ${api.status === '维护' ? '<span class="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded border border-slate-200">维护</span>' : ''}
-                    </h3>
-                    
-                    <!-- 描述 -->
-                    <p class="text-[13px] text-slate-500 leading-relaxed mb-4 line-clamp-2">${api.desc}</p>
-                    
-                    <!-- 价格与请求方式 -->
-                    <div class="flex gap-2 mb-4">
-                        <span class="text-[11px] bg-slate-100 text-slate-500 px-2 py-1 rounded">${api.price === '免费' ? '免费' : '付费'}</span>
-                        <span class="text-[11px] ${api.price === '免费' ? 'bg-green-50 text-green-600' : 'bg-orange-50 text-orange-600'} font-bold px-2 py-1 rounded">${api.price === '免费' ? '免费' : '$' + api.price + '/次'}</span>
-                        <span class="text-[11px] bg-blue-50 text-blue-600 px-2 py-1 rounded">${api.method}</span>
-                    </div>
-                    
-                    <!-- 底部按钮区 -->
-                    <div class="flex justify-between items-center pt-3 border-t border-slate-50">
-                        <span class="text-[12px] text-slate-400">开发者 API</span>
-                        <span class="text-[13px] text-blue-600 font-bold flex items-center gap-1">查看文档并测试 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></span>
-                    </div>
-                </a>
-            `).join('');
+            list.innerHTML = filtered.map(api => {
+                // 获取对应图标与颜色
+                const iconPath = categoryIcons[api.category] || categoryIcons['默认'];
+                const iconColor = categoryColors[api.category] || categoryColors['默认'];
+
+                return ;
+            }).join('');
         }
 
-        // 初始化渲染
         renderApis();
     </script>
+
 </body>
 </html>

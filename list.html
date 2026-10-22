@@ -3,154 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>接码与短信 - SOCKS5</title>
+    <title>商品列表 - SOCKS5</title>
     <link rel="icon" href="/logo.jpg" type="image/jpeg">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
-        body { background-color: #f1f5f9; color: #1e293b; padding-bottom: 20px;}
-        /* 隐藏滚动条 */
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .dropdown-menu { display: none; }
-        .dropdown-menu.active { display: block; }
+        body { background-color: #ffffff; color: #1e293b; }
+        .seamless-item { border-bottom: 1px solid #f1f5f9; }
     </style>
 </head>
 <body>
-    <!-- 顶部导航 -->
     <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center gap-3 sticky top-0 z-50">
         <a href="/index.html" class="text-slate-600 text-xl font-bold px-2">←</a>
-        <h1 class="text-lg font-bold text-slate-800">接码与短信</h1>
+        <h1 id="page-title" class="text-lg font-bold text-slate-800">商品列表</h1>
     </header>
 
-    <!-- 四个 Tab (横向可滑动) -->
-    <div class="bg-white border-b border-slate-100 sticky top-[57px] z-40">
-        <div class="flex overflow-x-auto no-scrollbar px-2 pt-2 pb-0">
-            <button onclick="switchTab('service', this)" class="tab-btn flex-1 whitespace-nowrap px-4 py-2 text-[14px] font-semibold border-b-2 border-blue-500 text-blue-600 transition-colors">按服务接码</button>
-            <button onclick="switchTab('keyword', this)" class="tab-btn flex-1 whitespace-nowrap px-4 py-2 text-[14px] font-medium border-b-2 border-transparent text-slate-500 transition-colors">关键词/通用</button>
-            <button onclick="switchTab('rent', this)" class="tab-btn flex-1 whitespace-nowrap px-4 py-2 text-[14px] font-medium border-b-2 border-transparent text-slate-500 transition-colors">长期租赁</button>
-            <button onclick="switchTab('broadcast', this)" class="tab-btn flex-1 whitespace-nowrap px-4 py-2 text-[14px] font-medium border-b-2 border-transparent text-slate-500 transition-colors">短信群发</button>
-        </div>
-    </div>
-
     <main>
-        
-        <!-- ================= Tab 1: 按服务接码 ================= -->
-        <div id="tab-service" class="block">
-            <div class="bg-white px-4 pt-3 pb-2 sticky top-[105px] z-30 border-b border-slate-100 shadow-sm">
-                <div class="relative mb-3">
-                    <button onclick="toggleDropdown()" class="w-full bg-white border border-slate-300 text-slate-700 px-4 py-2.5 rounded-lg flex justify-between items-center text-sm">
-                        <span id="selected-country-text" class="font-medium">API 支持的全部国家</span>
-                        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                    </button>
-                    <div id="country-dropdown" class="dropdown-menu absolute left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-xl max-h-60 overflow-y-auto z-50">
-                        <ul id="country-list" class="py-1"></ul>
-                    </div>
-                </div>
-                <div class="flex-1 bg-white border border-slate-300 rounded-lg flex items-center px-3 py-2.5">
-                    <input type="text" placeholder="搜索服务 (如: telegram)" class="bg-transparent outline-none text-[14px] w-full text-slate-700 placeholder-slate-400">
-                </div>
-            </div>
-            <div class="p-4 space-y-3">
-                <!-- 模拟一条服务 -->
-                <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-100 flex justify-between items-center">
-                    <div class="flex-1">
-                        <h3 class="text-[16px] font-bold text-slate-800 mb-1 flex items-center"><span class="bg-teal-400 text-white text-[10px] px-1.5 py-0.5 rounded mr-2">推荐</span>Telegram</h3>
-                        <p class="text-[13px] text-slate-500 mb-1">美国 / API直连</p>
-                        <div class="text-[18px] font-bold text-slate-900">$ 0.50</div>
-                    </div>
-                    <button class="bg-blue-500 text-white text-[15px] font-bold px-6 py-2.5 rounded-lg shadow-sm">取号</button>
-                </div>
+        <div class="px-4 py-3 bg-white sticky top-[56px] z-30 border-b border-slate-100">
+            <div class="flex-1 bg-slate-50 rounded-lg flex items-center px-3 py-2 border border-slate-100">
+                <svg class="w-4 h-4 text-slate-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                <input type="text" id="search-input" oninput="renderProducts()" placeholder="搜索当前分类商品..." class="bg-transparent outline-none text-[14px] w-full text-slate-700">
             </div>
         </div>
-
-        <!-- ================= Tab 2: 关键词/通用 ================= -->
-        <div id="tab-keyword" class="hidden p-4">
-            <div class="bg-orange-50 border border-orange-200 rounded-xl p-4 mb-4">
-                <h3 class="flex items-center text-red-500 font-bold mb-2 text-[15px]"><span class="w-2 h-2 bg-red-500 rounded-full mr-2"></span>验证码收不到提示</h3>
-                <p class="text-[13px] text-slate-700 leading-relaxed mb-3">如短信提示<b class="text-red-500">“已被当前号码提供方屏蔽”</b>，说明该号码已被运营商拦截，平台无法强制接收。请直接更换其他号码。</p>
-                <div class="flex flex-col items-center gap-2">
-                    <span class="bg-red-100 text-red-600 text-sm font-bold px-6 py-1 rounded-full border border-red-200">介意的不要下单！！！</span>
-                </div>
-            </div>
-            <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-5">
-                <label class="block text-sm font-bold text-slate-700 mb-2">选择国家</label>
-                <select class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm mb-4"><option>中国 (86)</option></select>
-                <label class="block text-sm font-bold text-slate-700 mb-2">短信关键词</label>
-                <input type="text" placeholder="请输入短信中包含的关键词" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm mb-4">
-                <button class="w-full py-3 bg-blue-500 text-white font-bold rounded-lg">获取号码</button>
-            </div>
-        </div>
-
-        <!-- ================= Tab 3: 长期租赁 ================= -->
-        <div id="tab-rent" class="hidden p-4">
-            <div class="bg-orange-50 border border-orange-200 rounded-xl p-4 mb-4">
-                <p class="text-[13px] text-orange-800 leading-relaxed">长期租借虚拟号码接收短信，租借时长以月为单位。租借开始 20 分钟内未收到短信，可关闭号码并自动退款。</p>
-            </div>
-            <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-5 mb-4">
-                <h3 class="font-bold text-slate-800 mb-3 text-sm">可租赁地区</h3>
-                <div class="border border-blue-500 bg-blue-50 rounded-lg p-3 mb-3">
-                    <p class="font-bold text-blue-600 text-[15px]">美国 (物理)</p>
-                    <p class="text-xs text-blue-500 mt-1">US · 可用 566</p>
-                </div>
-                <div class="border border-slate-200 rounded-lg p-3">
-                    <p class="font-bold text-slate-700 text-[15px]">加拿大</p>
-                    <p class="text-xs text-slate-400 mt-1">CA · 可用 510</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- ================= Tab 4: 短信群发 ================= -->
-        <div id="tab-broadcast" class="hidden p-4">
-            <div class="bg-orange-50 border border-orange-200 rounded-xl p-4 mb-4">
-                <p class="text-[13px] text-orange-800 leading-relaxed">短信发送功能暂时无法使用。需要发送短信时请先联系客服确认资费和权限。</p>
-            </div>
-            
-            <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
-                <div class="flex border-b border-slate-100 bg-slate-50">
-                    <div class="flex-1 py-3 text-center text-sm font-bold text-slate-700">接收方</div>
-                    <div class="flex-1 py-3 text-center text-sm font-bold text-slate-700 border-l border-slate-100">短信内容</div>
-                </div>
-                <div class="p-6 flex flex-col items-center justify-center text-slate-400">
-                    <p class="text-[14px]">没有更多数据了...</p>
-                </div>
-            </div>
-        </div>
-
+        <div id="product-list" class="px-4 pb-10"></div>
     </main>
 
     <script>
-        // Tab 切换逻辑
-        function switchTab(tabId, btn) {
-            // 隐藏所有
-            document.getElementById('tab-service').classList.add('hidden');
-            document.getElementById('tab-keyword').classList.add('hidden');
-            document.getElementById('tab-rent').classList.add('hidden');
-            document.getElementById('tab-broadcast').classList.add('hidden');
-            
-            // 重置所有按钮样式
-            document.querySelectorAll('.tab-btn').forEach(b => {
-                b.className = 'tab-btn flex-1 whitespace-nowrap px-4 py-2 text-[14px] font-medium border-b-2 border-transparent text-slate-500 transition-colors';
-            });
-            
-            // 显示选中的
-            document.getElementById('tab-' + tabId).classList.remove('hidden');
-            btn.className = 'tab-btn flex-1 whitespace-nowrap px-4 py-2 text-[14px] font-semibold border-b-2 border-blue-500 text-blue-600 transition-colors';
+        const urlParams = new URLSearchParams(window.location.search);
+        const pageType = urlParams.get('type') || '默认分类';
+        document.getElementById('page-title').innerText = pageType;
+
+        const allProducts = [];
+        for(let i=1; i<=15; i++) {
+            allProducts.push({ title: `[${pageType}商品] 优质稳定 - 编号 ${i}`, price: (Math.random()*50+10).toFixed(2), stock: Math.floor(Math.random()*100) });
         }
 
-        // 模拟国家下拉数据
-        const countries = [{code: 'US', name: '美国'}, {code: 'HK', name: '香港'}, {code: 'ID', name: '印度尼西亚'}];
-        function toggleDropdown() { document.getElementById('country-dropdown').classList.toggle('active'); }
-        
-        // 初始化渲染国家列表
-        document.addEventListener('DOMContentLoaded', () => {
-            const listEl = document.getElementById('country-list');
-            countries.forEach(c => {
-                const li = document.createElement('li');
-                li.className = "px-4 py-2.5 hover:bg-slate-50 cursor-pointer text-sm border-b border-slate-50 flex justify-between";
-                li.innerHTML = `<span>${c.name}</span><span class="text-slate-400">${c.code}</span>`;
-                listEl.appendChild(li);
+        function renderProducts() {
+            const listEl = document.getElementById('product-list');
+            const keyword = document.getElementById('search-input').value.trim().toLowerCase();
+            listEl.innerHTML = '';
+
+            const filtered = allProducts.filter(p => p.title.toLowerCase().includes(keyword));
+
+            const fragment = document.createDocumentFragment();
+            filtered.forEach(p => {
+                const a = document.createElement('a');
+                a.href = "javascript:void(0)";
+                a.onclick = () => { alert(`准备购买：${p.title}\n金额：¥${p.price}`); };
+                a.className = "block py-4 seamless-item active:bg-slate-50";
+                a.innerHTML = `
+                    <div class="flex items-start gap-3.5">
+                        <img src="/logo.jpg" class="w-10 h-10 rounded-xl object-cover shrink-0 mt-0.5 shadow-sm">
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-[14.5px] font-semibold text-slate-800 leading-snug line-clamp-2">${p.title}</h3>
+                            <div class="flex justify-between items-end mt-3.5">
+                                <span class="text-[18px] font-bold text-red-500">¥${p.price}</span>
+                                <span class="text-xs text-slate-400">库存: <span class="text-green-500 font-medium">${p.stock}</span></span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                fragment.appendChild(a);
             });
-        });
+            listEl.appendChild(fragment);
+        }
+
+        document.addEventListener('DOMContentLoaded', renderProducts);
     </script>
 </body>
 </html>

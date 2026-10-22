@@ -23,110 +23,122 @@
     </header>
 
     <main class="px-5 pb-24 max-w-lg mx-auto">
-        <!-- 头部标题 -->
         <div class="py-6">
             <h2 class="text-[26px] font-bold text-slate-800 mb-2">新手必读与业务指南</h2>
             <p class="text-[14px] text-slate-500">深入了解 SOCKS5 全系数字资产的安全购买、使用与接入流程。</p>
         </div>
 
         <div class="space-y-8">
-            <!-- 1. 购买与全自动发货 -->
+            <!-- 1. 购买与官方背书 -->
             <div>
                 <h3 class="text-[16px] font-bold text-slate-800 mb-4 flex items-center">
-                    <span class="title-bar bg-blue-500"></span> 购买与全自动发货
+                    <span class="title-bar bg-blue-500"></span> 购买与官方背书
                 </h3>
                 <ul class="text-[14px] text-slate-600 space-y-3 leading-relaxed">
-                    <li><b>1. 注册认证：</b>注册并登录 SOCKS5 账号，确保账户余额充足。</li>
-                    <li><b>2. 选购商品：</b>在首页或对应分类下，选择您所需的商品（如静态卡密、接码服务、数据查询等）。</li>
-                    <li><b>3. 极速发货：</b>支付成功后，系统将自动弹出卡密或生成限时链接。您也可以在“个人中心-订单管理”中随时查阅。</li>
+                    <li><b>1. 极速全自动发货：</b>支付成功后，系统立即弹出卡密或生成限时链接，确保业务无缝衔接。</li>
+                    <li><b>2. 完整交易背书：</b>每个账号用户下单，系统均生成包含订单号、时间、金额的完整电子凭证。平台承诺所有售出商品均经过严格库存校验，支持随时查阅交易流水。</li>
+                    <li><b>3. 安全防护：</b>所有资金交互与订单数据全程加密，保障您的交易安全。</li>
                 </ul>
             </div>
 
-            <!-- 2. 接码服务说明 -->
+            <!-- 2. 节点代理业务详解 -->
             <div>
                 <h3 class="text-[16px] font-bold text-slate-800 mb-4 flex items-center">
-                    <span class="title-bar bg-green-500"></span> 接码服务核心机制
+                    <span class="title-bar bg-indigo-500"></span> 节点代理业务详解
                 </h3>
-                <ul class="text-[14px] text-slate-600 space-y-3 leading-relaxed">
-                    <li><b>1. 锁资保护：</b>用户点击取号时，系统仅冻结对应的预估资金，<b>绝不直接扣费</b>。</li>
-                    <li><b>2. 成功计费：</b>只有真正收到短信验证码后，资金才会实际扣除；若超时未收到，冻结资金将全额释放退回。</li>
-                    <li><b>3. 长租与群发：</b>支持长期独占号码租赁，以及针对特定业务的短信群发监听服务，满足多样化业务矩阵需求。</li>
+                <div class="text-[14px] text-slate-600 space-y-4 leading-relaxed">
+                    <p><b>🖥 服务器切换说明：</b><br>当代理服务器遇到异常（如被封），管理员会将您的代理迁移至备用服务器。<br>
+                    ✅ 不需要重新购买<br>✅ 用户名与密码不会变<br>✅ 到期时间不会变<br>
+                    <span class="text-slate-500">您会收到推送（含新 IP+端口及一键导入按钮），或在客户端手动修改 IP+端口。支持高速传输文件、图片与链接。</span></p>
+
+                    <p><b>🔌 如何使用代理：</b><br>
+                    <b>方法一：</b>到「📦 我的代理」页面，点「🚀 一键导入」，Telegram 自动添加。<br>
+                    <b>方法二：</b>手动配置。协议填 SOCKS5，输入服务器、端口及代理卡片里的用户名/密码即可，无需高级设置。</p>
+
+                    <p><b>🔄 续费与到期规则：</b><br>
+                    <b>到期前：</b>在「我的代理」点「购买套餐」续费，保留原账号/密码/端口，时长叠加。<br>
+                    <b>到期后：</b>代理自动关闭释放，需重新购买开通。</p>
+                </div>
+            </div>
+
+            <!-- 3. 支付与签到分红 -->
+            <div>
+                <h3 class="text-[16px] font-bold text-slate-800 mb-4 flex items-center">
+                    <span class="title-bar bg-green-500"></span> 支付与签到分红
+                </h3>
+                <div class="text-[14px] text-slate-600 space-y-4 leading-relaxed">
+                    <p><b>💎 余额与支付：</b><br>
+                    支持 USDT (TRC20) / 支付宝（易支付扫码），支付完成后 30 秒内自动开通。<br>
+                    若分红余额 ≥ 套餐价格，可直接余额支付，即时开通。</p>
+
+                    <p><b>📜 余额来源：</b><br>
+                    · 每日签到（群内，1-3GB）<br>
+                    · 邀请好友奖励（每人 +0.625U 起，递增）<br>
+                    · 好友充值 15% 分红（U）</p>
+
+                    <p><b>📅 签到说明：</b><br>
+                    签到群：<a href="https://t.me/qingtian_vip" class="text-blue-500 underline">点击加入</a><br>
+                    1️⃣ 先私聊机器人发送 /start 激活<br>
+                    2️⃣ 加入签到群<br>
+                    3️⃣ 在群里发送「签到」<br>
+                    4️⃣ 随机获得 1-3GB 流量<br>
+                    <span class="text-red-500">⚠️ 每天限签一次，私聊无法签到。每次签到会新建节点覆盖旧的，节点有效期到次日 0 点自动失效。</span></p>
+                </div>
+            </div>
+
+            <!-- 4. 推荐客户端 -->
+            <div>
+                <h3 class="text-[16px] font-bold text-slate-800 mb-4 flex items-center">
+                    <span class="title-bar bg-purple-500"></span> 📱 推荐客户端
+                </h3>
+                <ul class="text-[14px] text-slate-600 space-y-2 leading-relaxed">
+                    <li><b>Windows：</b>Proxifier / Clash / v2rayN</li>
+                    <li><b>macOS：</b>ClashX / Surge</li>
+                    <li><b>iOS：</b>Shadowrocket（付费）/ Stash / Loon</li>
+                    <li><b>Android：</b>NekoBox / Clash for Android</li>
+                    <li><b>Telegram 内置（最简单）：</b>直接点「📦 我的代理」→「🚀 一键导入」</li>
                 </ul>
             </div>
 
-            <!-- 3. 节点与域名分发 (重点业务) -->
+            <!-- 5. 售后与免责条款 -->
             <div>
                 <h3 class="text-[16px] font-bold text-slate-800 mb-4 flex items-center">
-                    <span class="title-bar bg-indigo-500"></span> 节点与域名分发特权
-                </h3>
-                <ul class="text-[14px] text-slate-600 space-y-3 leading-relaxed">
-                    <li><b>1. 节点域名隔离：</b>所有代理节点均采用严格的域名隔离机制。每个用户独享专属域名，彻底杜绝连坐封禁风险。</li>
-                    <li><b>2. 免费域名裂变：</b>完成首单并加入官方 TG 签到群，即可免费领取一次二级域名解析特权。</li>
-                    <li><b>3. 解析额度：</b>赠送的域名有效期为 90 天，单域名最多支持绑定 5 条解析记录。支持消费满额或邀请好友赠送更多配额。</li>
-                </ul>
-            </div>
-
-            <!-- 4. 账号安全与防封提醒 -->
-            <div>
-                <h3 class="text-[16px] font-bold text-slate-800 mb-4 flex items-center">
-                    <span class="title-bar bg-red-500"></span> 账号安全与防封提醒
-                </h3>
-                <ul class="text-[14px] text-slate-600 space-y-3 leading-relaxed">
-                    <li><b>1. IP 环境隔离：</b>购买账号后，必须使用纯净的住宅 IP 或我们的专属代理节点，严禁使用公共免费机场。</li>
-                    <li><b>2. 设备指纹隔离：</b>批量操作时，强烈建议使用指纹浏览器（如 AdsPower、Hubstudio）进行多开防关联。</li>
-                    <li><b>3. 养号周期：</b>新号登录后请静置 24 小时，进行正常浏览即可，切勿立刻修改密码或高频群发消息。</li>
-                </ul>
-            </div>
-
-            <!-- 5. 售后与免责声明 -->
-            <div>
-                <h3 class="text-[16px] font-bold text-slate-800 mb-4 flex items-center">
-                    <span class="title-bar bg-amber-500"></span> 售后说明与免责条款
+                    <span class="title-bar bg-red-500"></span> 售后说明与免责条款
                 </h3>
                 <ul class="text-[14px] text-slate-600 space-y-3 leading-relaxed">
                     <li><b>1. 虚拟商品属性：</b>卡密一经售出，非质量问题（如密码错误、无法登录）概不退款。请于购买后 24 小时内完成首登验号。</li>
-                    <li><b>2. 违规封禁：</b>因用户自身违规操作（如发送广告、诈骗、涉政等）导致的封号，平台不承担任何责任。</li>
+                    <li><b>2. 违规封禁：</b>因用户自身违规操作（如恶意爬虫、黑灰产多开、触犯上游服务商风控政策等）导致的封号或节点封禁，平台不承担退款责任。</li>
                     <li><b>3. 客服支持：</b>如遇系统故障或订单异常，请携带订单号联系官方 Telegram 客服：<a href="https://t.me/qingtian_Boss" class="text-blue-500">@qingtian_Boss</a>。</li>
                 </ul>
             </div>
 
-            <!-- 6. 开发者 API 接口导航 -->
+            <!-- 6. 开发者 API 接口导航 (轻量化蓝字列表) -->
             <div>
                 <h3 class="text-[16px] font-bold text-slate-800 mb-2 flex items-center">
-                    <span class="title-bar bg-purple-500"></span> 开发者 API 接口导航
+                    <span class="title-bar bg-slate-400"></span> 开发者 API 接口导航
                 </h3>
-                <p class="text-[13px] text-slate-500 mb-4">如需通过代码调用平台能力，请点击下方对应接口查看详细对接文档。</p>
+                <p class="text-[13px] text-slate-500 mb-4">如需通过代码调用平台能力，请点击下方对应接口查看对接文档。</p>
                 
-                <div class="bg-white rounded-xl border border-slate-100 overflow-hidden">
-                    <a href="/doc.html#tg" class="flex justify-between items-center p-4 border-b border-slate-50 active:bg-slate-50 btn-press">
-                        <div class="flex items-center gap-3">
-                            <span class="text-[14px] font-bold text-slate-700">账号接口 (TG / 邮箱卡密)</span>
-                        </div>
-                        <span class="text-[12px] text-blue-500">查看调用详情 →</span>
+                <div class="space-y-0">
+                    <a href="/doc.html#tg" class="flex justify-between items-center py-3.5 border-b border-slate-100 active:bg-slate-50">
+                        <span class="text-[14px] text-slate-700 font-medium">账号接口 (TG / 邮箱卡密)</span>
+                        <span class="text-[13px] text-blue-500">查看文档 →</span>
                     </a>
-                    <a href="/doc.html#jd" class="flex justify-between items-center p-4 border-b border-slate-50 active:bg-slate-50 btn-press">
-                        <div class="flex items-center gap-3">
-                            <span class="text-[14px] font-bold text-slate-700">节点接口 (IP 提取 / 订阅)</span>
-                        </div>
-                        <span class="text-[12px] text-blue-500">查看调用详情 →</span>
+                    <a href="/doc.html#jd" class="flex justify-between items-center py-3.5 border-b border-slate-100 active:bg-slate-50">
+                        <span class="text-[14px] text-slate-700 font-medium">节点接口 (IP 提取 / 订阅)</span>
+                        <span class="text-[13px] text-blue-500">查看文档 →</span>
                     </a>
-                    <a href="/doc.html#sms" class="flex justify-between items-center p-4 border-b border-slate-50 active:bg-slate-50 btn-press">
-                        <div class="flex items-center gap-3">
-                            <span class="text-[14px] font-bold text-slate-700">接码接口 (取号 / 监听)</span>
-                        </div>
-                        <span class="text-[12px] text-blue-500">查看调用详情 →</span>
+                    <a href="/doc.html#sms" class="flex justify-between items-center py-3.5 border-b border-slate-100 active:bg-slate-50">
+                        <span class="text-[14px] text-slate-700 font-medium">接码接口 (取号 / 监听)</span>
+                        <span class="text-[13px] text-blue-500">查看文档 →</span>
                     </a>
-                    <a href="/doc.html#cx" class="flex justify-between items-center p-4 border-b border-slate-50 active:bg-slate-50 btn-press">
-                        <div class="flex items-center gap-3">
-                            <span class="text-[14px] font-bold text-slate-700">查询接口 (二要素 / 数据核验)</span>
-                        </div>
-                        <span class="text-[12px] text-blue-500">查看调用详情 →</span>
+                    <a href="/doc.html#cx" class="flex justify-between items-center py-3.5 border-b border-slate-100 active:bg-slate-50">
+                        <span class="text-[14px] text-slate-700 font-medium">查询接口 (二要素 / 数据核验)</span>
+                        <span class="text-[13px] text-blue-500">查看文档 →</span>
                     </a>
-                    <a href="/doc.html#zf" class="flex justify-between items-center p-4 active:bg-slate-50 btn-press">
-                        <div class="flex items-center gap-3">
-                            <span class="text-[14px] font-bold text-slate-700">支付接口 (易支付代收)</span>
-                        </div>
-                        <span class="text-[12px] text-blue-500">查看调用详情 →</span>
+                    <a href="/doc.html#zf" class="flex justify-between items-center py-3.5 active:bg-slate-50">
+                        <span class="text-[14px] text-slate-700 font-medium">支付接口 (易支付代收)</span>
+                        <span class="text-[13px] text-blue-500">查看文档 →</span>
                     </a>
                 </div>
             </div>

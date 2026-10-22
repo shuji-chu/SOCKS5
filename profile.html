@@ -331,7 +331,37 @@
             }, 500);
         }
 
+        
+        // --- 修改密码的风控 ---
+        function checkPwdBan() {
+            const banUntil = localStorage.getItem('pwd_ban_until');
+            if (banUntil && Date.now() < parseInt(banUntil)) {
+                const hoursLeft = Math.ceil((parseInt(banUntil) - Date.now()) / (1000 * 60 * 60));
+                alert(`安全提示：原密码错误次数过多，操作已锁定。请 ${hoursLeft} 小时后再试。`);
+                return true;
+            }
+            return false;
+        }
+
+        function recordPwdFail() {
+            let attempts = parseInt(localStorage.getItem('pwd_fail_attempts') || '0');
+            attempts++;
+            localStorage.setItem('pwd_fail_attempts', attempts);
+            
+            if (attempts >= 5) {
+                const banTime = Date.now() + 24 * 60 * 60 * 1000;
+                localStorage.setItem('pwd_ban_until', banTime.toString());
+                localStorage.setItem('pwd_fail_attempts', '0');
+                alert('安全提示：连续5次原密码错误，修改密码功能已被封禁24小时！');
+                closeModal('password-modal');
+            } else {
+                alert(`原密码错误！您还有 ${5 - attempts} 次尝试机会，否则将封禁24小时。`);
+            }
+        }
+
         function savePassword() {
+            if (checkPwdBan()) return;
+
             const oldPwd = document.getElementById('old-pwd').value;
             const code = document.getElementById('pwd-code').value;
             const newPwd = document.getElementById('new-pwd').value;
@@ -343,6 +373,14 @@
             if(newPwd !== confirmPwd) return alert('两次输入的新密码不一致');
             if(newPwd.length < 8) return alert('新密码至少8位');
 
+            // 模拟后端校验原密码 (假设原密码必须包含 admin 或长度为8)
+            if (oldPwd.length < 8) {
+                recordPwdFail();
+                return;
+            }
+
+            // 成功
+            localStorage.removeItem('pwd_fail_attempts');
             alert('密码修改成功（等待后端接入真实接口）');
             closeModal('password-modal');
         }

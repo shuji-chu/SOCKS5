@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>接码接口文档 - SOCKS5</title>
+    <link rel="icon" href="/logo.jpg" type="image/jpeg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #ffffff; color: #1e293b; }
+        .code-wrapper { position: relative; margin: 12px 0 20px 0; }
+        .code-block { background: #1e293b; color: #e2e8f0; padding: 16px; border-radius: 10px; font-family: 'Courier New', Courier, monospace; font-size: 13px; overflow-y: auto; max-height: 300px; line-height: 1.6; white-space: pre-wrap; word-wrap: break-word; }
+        .copy-btn { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.1); color: #cbd5e1; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-family: sans-serif; cursor: pointer; transition: all 0.2s; }
+        .copy-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
+        .tag-get { background: #eff6ff; color: #2563eb; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-right: 8px; border: 1px solid #bfdbfe; }
+        .tag-post { background: #f0fdf4; color: #16a34a; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-right: 8px; border: 1px solid #bbf7d0; }
+        .api-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 13px; }
+        .api-table th { text-align: left; padding: 8px 12px; background: #f8fafc; color: #64748b; font-weight: bold; border-bottom: 1px solid #e2e8f0; }
+        .api-table td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; color: #1e293b; }
+        .api-table td:first-child { font-family: monospace; color: #2563eb; }
+    </style>
+</head>
+<body>
+    <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center gap-3 sticky top-0 z-50">
+        <a href="/doc.html" class="text-slate-600 text-xl font-bold px-2">←</a>
+        <h1 class="text-[17px] font-bold text-slate-800">接码接口 API</h1>
+    </header>
+
+    <main class="px-5 py-6 pb-24 max-w-2xl mx-auto">
+        <div class="mb-6">
+            <h2 class="text-[22px] font-extrabold text-slate-800 mb-2">实时验证码接码接口</h2>
+            <p class="text-[14px] text-slate-500 leading-relaxed mb-4">
+                全自动取号、监听短信、成功扣费。<b>请使用 <code class="text-blue-600">sk_sms_</code> 开头的 API Key 进行调用。</b>
+            </p>
+            <div class="bg-amber-50 border border-amber-100 rounded-lg p-3 text-[13px] text-amber-600 font-medium">
+                资金机制说明：调用取号接口时，系统将<b>冻结</b>对应金额。收到验证码后实际扣费；超时未收到（默认15分钟）或主动释放，则自动解冻退款。
+            </div>
+        </div>
+
+        <!-- 1. 获取服务项目及国家 -->
+        <div class="mb-8 border-t border-slate-100 pt-6">
+            <div class="flex items-center mb-3">
+                <span class="tag-get">GET</span>
+                <span class="font-mono text-[15px] font-bold text-slate-800">/sms/products</span>
+            </div>
+            <p class="text-[13px] text-slate-500 mb-3">获取支持接码的 APP 项目（如 Telegram、WhatsApp）及对应可用国家列表。</p>
+            <div class="code-wrapper">
+                <div class="copy-btn" onclick="copyCode(this)">复制</div>
+                <div class="code-block">curl -X GET "https://web.lynli.me/api/v1/sms/products" \
+-H "Authorization: Bearer sk_sms_xxxxxx"</div>
+            </div>
+            <p class="text-[13px] font-bold text-slate-700 mb-2">返回示例：</p>
+            <div class="code-wrapper">
+                <div class="copy-btn" onclick="copyCode(this)">复制</div>
+                <div class="code-block">{
+  "code": 200,
+  "data": [
+    {
+      "service_code": "tg",
+      "service_name": "Telegram",
+      "price": 1.50,
+      "countries": [
+        { "id": 1, "name": "美国", "code": "US" },
+        { "id": 2, "name": "英国", "code": "UK" }
+      ]
+    }
+  ]
+}</div>
+            </div>
+        </div>
+
+        <!-- 2. 请求取号 (锁资) -->
+        <div class="mb-8 border-t border-slate-100 pt-6">
+            <div class="flex items-center mb-3">
+                <span class="tag-post">POST</span>
+                <span class="font-mono text-[15px] font-bold text-slate-800">/sms/get</span>
+            </div>
+            <p class="text-[13px] text-slate-500 mb-3">发起取号请求。调用后，用户账户将冻结对应金额，并返回一个手机号。</p>
+            <table class="api-table">
+                <tr><th>参数名</th><th>类型</th><th>必填</th><th>描述</th></tr>
+                <tr><td>service_code</td><td>string</td><td>是</td><td>服务标识（如 tg）</td></tr>
+                <tr><td>country_id</td><td>int</td><td>是</td><td>国家 ID（可选填 0 代表任意国家）</td></tr>
+            </table>
+            <div class="code-wrapper">
+                <div class="copy-btn" onclick="copyCode(this)">复制</div>
+                <div class="code-block">curl -X POST "https://web.lynli.me/api/v1/sms/get" \
+-H "Authorization: Bearer sk_sms_xxxxxx" \
+-H "Content-Type: application/json" \
+-d '{ "service_code": "tg", "country_id": 1 }'</div>
+            </div>
+            <p class="text-[13px] font-bold text-slate-700 mb-2">成功返回 (生成 session_id)：</p>
+            <div class="code-wrapper">
+                <div class="copy-btn" onclick="copyCode(this)">复制</div>
+                <div class="code-block">{
+  "code": 200,
+  "msg": "取号成功，请开始监听",
+  "data": {
+    "session_id": "SESS_998877",
+    "phone": "+12025550143",
+    "expire_in": 900
+  }
+}</div>
+            </div>
+        </div>
+
+        <!-- 3. 监听获取验证码 -->
+        <div class="mb-8 border-t border-slate-100 pt-6">
+            <div class="flex items-center mb-3">
+                <span class="tag-get">GET</span>
+                <span class="font-mono text-[15px] font-bold text-slate-800">/sms/check</span>
+            </div>
+            <p class="text-[13px] text-slate-500 mb-3">轮询获取短信内容。建议每 3-5 秒请求一次。收到短信后自动扣除冻结资金。</p>
+            <table class="api-table">
+                <tr><th>参数名</th><th>类型</th><th>必填</th><th>描述</th></tr>
+                <tr><td>session_id</td><td>string</td><td>是</td><td>取号接口返回的会话 ID</td></tr>
+            </table>
+            <div class="code-wrapper">
+                <div class="copy-btn" onclick="copyCode(this)">复制</div>
+                <div class="code-block">curl -X GET "https://web.lynli.me/api/v1/sms/check?session_id=SESS_998877" \
+-H "Authorization: Bearer sk_sms_xxxxxx"</div>
+            </div>
+            
+            <p class="text-[13px] font-bold text-slate-700 mb-2 mt-4">状态 1：等待中（继续轮询）</p>
+            <div class="code-wrapper">
+                <div class="copy-btn" onclick="copyCode(this)">复制</div>
+                <div class="code-block">{ "code": 404, "msg": "等待验证码中..." }</div>
+            </div>
+
+            <p class="text-[13px] font-bold text-slate-700 mb-2 mt-4">状态 2：收到验证码</p>
+            <div class="code-wrapper">
+                <div class="copy-btn" onclick="copyCode(this)">复制</div>
+                <div class="code-block">{
+  "code": 200,
+  "data": {
+    "sms_code": "458921",
+    "full_text": "Your Telegram code is 458921"
+  }
+}</div>
+            </div>
+        </div>
+
+        <!-- 4. 释放号码 -->
+        <div class="border-t border-slate-100 pt-6">
+            <div class="flex items-center mb-3">
+                <span class="tag-post">POST</span>
+                <span class="font-mono text-[15px] font-bold text-slate-800">/sms/release</span>
+            </div>
+            <p class="text-[13px] text-slate-500 mb-3">主动放弃接码。若资金仍处于冻结状态，将立即全额退还至用户余额。</p>
+            <table class="api-table">
+                <tr><th>参数名</th><th>类型</th><th>必填</th><th>描述</th></tr>
+                <tr><td>session_id</td><td>string</td><td>是</td><td>需要释放的会话 ID</td></tr>
+            </table>
+            <div class="code-wrapper">
+                <div class="copy-btn" onclick="copyCode(this)">复制</div>
+                <div class="code-block">{
+  "code": 200,
+  "msg": "已释放号码，冻结资金已退回"
+}</div>
+            </div>
+        </div>
+    </main>
+
+    <script src="/ai-widget.js"></script>
+    <script>
+        function copyCode(btn) {
+            const textToCopy = btn.nextElementSibling.innerText;
+            if(navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    btn.innerText = '已复制!'; btn.style.color = '#10b981';
+                    setTimeout(() => { btn.innerText = '复制'; btn.style.color = '#cbd5e1'; }, 2000);
+                });
+            }
+        }
+    </script>
+</body>
+</html>

@@ -10,31 +10,24 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: #f8fafc; color: #1e293b; padding-bottom: 80px; }
         .card { background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; }
-        
-        /* 弹窗样式 */
         .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 0 16px; }
         .modal-overlay.active { display: flex; }
         .modal-box { background: #fff; width: 100%; max-width: 360px; border-radius: 16px; padding: 20px; text-align: left; transform: scale(0.95); transition: transform 0.2s; opacity: 0; }
         .modal-overlay.active .modal-box { transform: scale(1); opacity: 1; }
-        
-        /* 长文本滚动 */
         .doc-content { max-height: 50vh; overflow-y: auto; font-size: 13px; color: #475569; line-height: 1.7; }
         .doc-content p { margin-bottom: 8px; }
         .doc-content b { color: #1e293b; }
-        .doc-content a { color: #2563eb; text-decoration: underline; }
-
-        /* 底部购买栏 */
         .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 1px solid #f1f5f9; padding: 12px 16px; padding-bottom: env(safe-area-inset-bottom); z-index: 50; display: flex; align-items: center; justify-content: space-between; }
-        
-        /* 支付倒计时遮罩 */
         .pay-step { display: none; }
         .pay-step.active { display: block; }
     </style>
 </head>
 <body>
-    <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center gap-3 sticky top-0 z-50">
-        <button onclick="goBack()" class="text-slate-600 text-xl font-bold px-2">←</button>
-        <h1 class="text-[17px] font-bold text-slate-800">商品详情</h1>
+    <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
+        <div class="flex items-center gap-3">
+            <button onclick="window.history.back()" class="text-slate-600 text-xl font-bold px-2">←</button>
+            <h1 class="text-[17px] font-bold text-slate-800">商品详情</h1>
+        </div>
     </header>
 
     <main class="px-4 py-4 max-w-lg mx-auto space-y-4">
@@ -51,7 +44,18 @@
             </div>
         </div>
 
-        <!-- 购买操作区 (支付宝 / USDT 双通道) -->
+        <!-- 购买须知 -->
+        <div class="card p-5 mb-4">
+            <h3 class="text-[15px] font-bold text-slate-800 mb-3 border-l-4 border-amber-500 pl-2">购买须知</h3>
+            <div class="text-[12px] text-slate-500 space-y-2 leading-relaxed bg-amber-50/50 p-3 rounded-lg border border-amber-100">
+                <p>1. 支付宝/微信支付限额 <b class="text-slate-700">1-500元</b>，低于1元请充值后再购买。</p>
+                <p>2. 订单支付成功后，系统将自动生成专属订阅链接。</p>
+                <p>3. 请联系客服或在“个人中心-订单查询”中随时提取您的节点。</p>
+                <p>4. 联系客服：<a href="https://t.me/qingtian_Boss" class="text-blue-500">TG:点此联系客服</a>，售后处理时限为下单起 24 小时内。</p>
+            </div>
+        </div>
+
+        <!-- 购买操作区 -->
         <div class="card p-5">
             <div class="flex justify-between items-center mb-4">
                 <span class="text-[14px] text-slate-600 font-medium">购买数量</span>
@@ -76,13 +80,10 @@
             </div>
         </div>
 
-        <!-- 商品描述与教程入口 -->
+        <!-- 商品描述 -->
         <div class="card p-5 mb-6">
             <h3 class="text-[15px] font-bold text-slate-800 mb-3 border-l-4 border-blue-500 pl-2">商品描述</h3>
-            <div class="text-[13px] text-slate-600 space-y-2 leading-relaxed" id="p-desc">
-                加载中...
-            </div>
-            <div id="action-area" class="mt-4"></div>
+            <div class="text-[13px] text-slate-600 space-y-2 leading-relaxed" id="p-desc">加载中...</div>
         </div>
 
         <!-- 底部教程与声明区 -->
@@ -92,16 +93,6 @@
                 <span onclick="openDocModal('warning')" class="cursor-pointer text-blue-600 font-medium underline underline-offset-2">重要防封提醒</span>
                 <span onclick="openDocModal('compliance')" class="cursor-pointer text-red-500 font-medium underline underline-offset-2">平台合规声明</span>
             </div>
-
-            <div class="flex justify-center items-center gap-3 text-[12px] text-slate-400 mt-4">
-                <span class="text-slate-300">开发者接口:</span>
-                <a href="/doc-account.html" class="active:text-blue-500">账号</a>
-                <a href="/doc-node.html" class="active:text-blue-500">节点</a>
-                <a href="/doc-sms.html" class="active:text-blue-500">接码</a>
-                <a href="/doc-query.html" class="active:text-blue-500">查询</a>
-                <a href="/doc-pay.html" class="active:text-blue-500">支付</a>
-            </div>
-
             <p class="text-[11px] text-slate-300 mt-4 px-6">© 2026 SOCKS5 版权所有 | 本平台所有账号仅供合法合规用途，严禁用于任何违法违规行为。</p>
         </div>
     </main>
@@ -115,147 +106,84 @@
         <button onclick="openPayModal()" class="bg-blue-600 text-white font-bold px-8 py-2.5 rounded-xl text-[15px] active:opacity-80 shadow-sm">立即购买</button>
     </div>
 
-    <!-- 统一弹窗组件 (教程/防封/合规) -->
+    <!-- 弹窗组件 -->
     <div id="doc-modal" class="modal-overlay">
         <div class="modal-box">
             <h3 class="text-[17px] font-bold text-slate-800 mb-3 text-center border-b border-slate-100 pb-3" id="doc-title">标题</h3>
             <div class="doc-content" id="doc-body"></div>
-            <button onclick="closeModal('doc-modal')" class="mt-5 w-full py-2.5 bg-slate-100 text-slate-600 font-bold rounded-xl text-[15px] active:bg-slate-200">我知道了</button>
+            <button onclick="closeModal('doc-modal')" class="mt-5 w-full py-2.5 bg-slate-100 text-slate-600 font-bold rounded-xl text-[15px]">我知道了</button>
         </div>
     </div>
 
-    <!-- 支付扫码弹窗 (带 600 秒倒计时) -->
+    <!-- 支付弹窗 -->
     <div id="pay-modal" class="modal-overlay">
         <div class="modal-box text-center">
-            <!-- 步骤1：展示二维码 -->
             <div id="pay-step-1" class="pay-step active">
                 <h3 class="text-[17px] font-bold text-slate-800 mb-1">扫码支付</h3>
                 <p class="text-[13px] text-slate-500 mb-2" id="pay-tip">请使用支付宝扫码</p>
-                
                 <div class="w-40 h-40 bg-slate-50 mx-auto rounded-xl flex items-center justify-center mb-3 border border-slate-100">
                     <img id="pay-qr" src="" class="w-full h-full object-contain hidden">
                 </div>
-                
                 <p class="text-[12px] text-slate-400 mb-1">需支付金额</p>
                 <p class="text-[22px] font-bold text-red-500 mb-2" id="pay-amount">¥ 0.00</p>
-
-                <!-- USDT 专属地址 -->
                 <div id="pay-usdt-addr" class="hidden bg-slate-50 p-2 rounded-lg text-left mb-3 border border-slate-100">
                     <p class="text-[10px] text-slate-500 mb-1">TRC20 收款地址</p>
                     <p class="text-[11px] font-mono text-slate-700 break-all select-all">TYu8x9ZqP3vK2mN4wL5jR6tB7cV8bA9sD0</p>
                 </div>
-                
                 <div class="bg-red-50 text-red-600 text-[11px] p-2.5 rounded-lg border border-red-100 text-left mb-3">
                     <p class="font-bold mb-1">⚠️ 支付合规警告</p>
-                    <p class="leading-tight">严禁使用黑钱、诈骗款、洗钱等非法资金进行支付。平台已接入反洗钱风控系统，请务必使用您本人的合法资金付款。如发现资金来源异常，平台有权立即终止交易并冻结相关账户，并依法向监管及司法机关移交数据。</p>
+                    <p class="leading-tight">严禁使用黑钱、诈骗款、洗钱等非法资金进行支付。平台已接入反洗钱风控系统，请务必使用您本人的合法资金付款。</p>
                 </div>
-
                 <p class="text-[13px] text-amber-500 font-bold mb-4">订单将在 <span id="countdown">600</span> 秒后失效</p>
-
                 <div class="flex gap-3">
                     <button onclick="closeModal('pay-modal')" class="flex-1 py-2.5 bg-slate-100 text-slate-600 font-bold rounded-xl text-[14px]">取消订单</button>
                     <button onclick="mockPaySuccess()" class="flex-1 py-2.5 bg-blue-600 text-white font-bold rounded-xl text-[14px]">我已完成支付</button>
                 </div>
             </div>
             
-            <!-- 步骤2：支付成功 -->
             <div id="pay-step-2" class="pay-step text-center py-6">
                 <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full mx-auto flex items-center justify-center mb-4">
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                 </div>
                 <h3 class="text-[20px] font-bold text-slate-800 mb-2">支付成功！</h3>
-                <p class="text-[13px] text-slate-500 mb-6">系统已自动发货，请前往订单中心查看卡密。</p>
-                <button onclick="window.location.href='/profile.html'" class="w-full py-3 bg-blue-600 text-white font-bold rounded-xl text-[15px]">前往个人中心</button>
+                <p class="text-[13px] text-slate-500 mb-6">系统已自动发货，请前往订单中心提取节点。</p>
+                <button id="btn-go-order" onclick="window.location.href='/profile.html'" class="w-full py-3 bg-blue-600 text-white font-bold rounded-xl text-[15px]">前往个人中心</button>
             </div>
         </div>
     </div>
 
     <script>
-        // ================= 核心数据 =================
-        // 模拟从后端获取的商品数据（大号商 1700+ 商品同理，这里只演示两个）
-        
-
-        // 全局合规声明
-        const complianceText = `
-            <p><b>【平台合规声明】</b></p>
-            <p>1. 本平台提供的所有数字资产、代理节点、域名及 API 接口，仅供合法合规的跨境业务、开发测试及学术研究使用。</p>
-            <p>2. <b>严禁违法违规使用：</b>严禁用于任何触犯当地法律、电信诈骗、洗钱、黑客攻击、恶意爬虫或侵犯他人隐私的行为。</p>
-            <p>3. <b>域名与节点风控：</b>平台系统会不定时向用户发送正规使用提醒。如发现或接到举报查实用户利用本平台资源进行违法违规活动，平台有权第一时间收回资源、封禁对应 IP 及账户，且不予退款。</p>
-            <p>4. 用户需自行承担因违规使用带来的法律责任，本平台不承担任何连带责任。</p>
-        `;
-
-        
-        // 智能返回逻辑
-        function goBack() {
-            // 如果是从其他页面跳转来的，直接后退，保留之前的页面状态（搜索词、滚动条）
-            if (document.referrer && document.referrer.includes(window.location.host)) {
-                window.history.back();
-            } else {
-                // 如果是直接分享链接打开，没有上一页，兜底回首页
-                window.location.href = '/index.html';
-            }
-        }
-
-        // ================= 页面初始化 =================
+        // ================= 页面数据初始化 =================
         let currentProduct = null;
         let currentPayType = 'alipay';
+        let timer = null;
+        let timeLeft = 600;
 
+        // 从 URL 获取商品 ID
         document.addEventListener('DOMContentLoaded', async () => {
-            // 从 URL 获取商品 ID
             const urlParams = new URLSearchParams(window.location.search);
             const productId = urlParams.get('id') || '3965';
 
             try {
-                // 真实企业级做法：从后端或配置读取
                 const res = await fetch('/products.json');
                 const data = await res.json();
-                
-                // 查找对应 ID 的商品，找不到就默认用第一个
+                // 如果你要强制只卖节点，在这里可以加个判断。但为了兼容目前的数据，先全加载。
                 currentProduct = data.find(p => p.id === productId) || data[0];
 
-                // 渲染数据
                 document.getElementById('p-title').innerText = currentProduct.title;
                 
-                // 动态币种符号
                 const symbol = currentProduct.currency === 'USDT' ? '$' : '¥';
                 document.getElementById('p-price').innerText = `${symbol} ${currentProduct.price.toFixed(2)}`;
                 document.getElementById('p-stock').innerText = currentProduct.stock;
                 document.getElementById('p-desc').innerHTML = currentProduct.desc;
                 
-                if (currentProduct.category === '接码服务') {
-                    document.getElementById('action-area').innerHTML = '<a href="/sms.html" class="block text-center w-full py-2.5 bg-blue-50 text-blue-600 font-bold rounded-xl border border-blue-100">立即前往接码控制台</a>';
-                } else if (currentProduct.category === '数据查询') {
-                    document.getElementById('action-area').innerHTML = '<a href="/api-market.html" class="block text-center w-full py-2.5 bg-blue-50 text-blue-600 font-bold rounded-xl border border-blue-100">立即前往数据查询中心</a>';
-                }
-                
                 updateTotal();
-
-                // 核心逻辑拦截：如果是接码或查询，隐藏常规购买操作
-                if (currentProduct.category === '接码服务' || currentProduct.category === '数据查询') {
-                    // 隐藏数量、金额、支付方式卡片
-                    document.querySelectorAll('.card.p-5')[1].style.display = 'none'; 
-                    
-                    // 修改底部购买栏
-                    const bottomBar = document.querySelector('.bottom-bar');
-                    const targetUrl = currentProduct.category === '接码服务' ? '/sms.html' : '/api-market.html';
-                    const btnText = currentProduct.category === '接码服务' ? '进入接码控制台' : '进入数据查询中心';
-                    
-                    bottomBar.innerHTML = `
-                        <div class="flex flex-col w-full">
-                            <p class="text-[12px] text-slate-500 mb-1">该项业务按次实时扣费，请确保账户余额充足</p>
-                            <button onclick="window.location.href='${targetUrl}'" class="w-full py-3 bg-blue-600 text-white font-bold rounded-xl text-[15px] active:opacity-80">${btnText}</button>
-                        </div>
-                    `;
-                    bottomBar.style.padding = '16px';
-                }
-
             } catch (e) {
                 console.error('商品加载失败', e);
-                document.getElementById('p-title').innerText = '商品数据加载失败';
+                document.getElementById('p-title').innerText = '商品加载失败';
             }
         });
 
-        // ================= 购买逻辑 =================
         function changeQty(step) {
             const input = document.getElementById('buy-qty');
             let qty = parseInt(input.value) + step;
@@ -265,6 +193,7 @@
         }
 
         function updateTotal() {
+            if(!currentProduct) return;
             const qty = parseInt(document.getElementById('buy-qty').value);
             const total = (qty * currentProduct.price).toFixed(2);
             const symbol = currentProduct.currency === 'USDT' ? '$' : '¥';
@@ -276,7 +205,6 @@
             currentPayType = type;
             const alipay = document.getElementById('btn-alipay');
             const usdt = document.getElementById('btn-usdt');
-            
             if (type === 'alipay') {
                 alipay.className = 'flex-1 border-2 border-blue-500 bg-blue-50 text-blue-600 font-bold text-[14px] py-2 rounded-lg text-center cursor-pointer transition';
                 usdt.className = 'flex-1 border border-slate-200 text-slate-600 font-medium text-[14px] py-2 rounded-lg text-center cursor-pointer transition';
@@ -286,22 +214,19 @@
             }
         }
 
-        // ================= 弹窗逻辑 =================
         function openDocModal(type) {
             const titleEl = document.getElementById('doc-title');
             const bodyEl = document.getElementById('doc-body');
-            
             if (type === 'tutorial') {
-                titleEl.innerText = '使用教程与接码说明';
+                titleEl.innerText = '使用教程';
                 bodyEl.innerHTML = currentProduct.tutorial;
             } else if (type === 'warning') {
                 titleEl.innerText = '重要防封提醒';
                 bodyEl.innerHTML = currentProduct.warning;
             } else if (type === 'compliance') {
                 titleEl.innerText = '平台合规声明';
-                bodyEl.innerHTML = complianceText;
+                bodyEl.innerHTML = '<p>1. 本平台提供的所有数字资产仅供合法合规用途。</p><p>2. 严禁违法违规使用。</p><p>3. 用户需自行承担法律责任。</p>';
             }
-            
             document.getElementById('doc-modal').classList.add('active');
         }
 
@@ -314,15 +239,11 @@
             }
         }
 
-        // ================= 支付与倒计时逻辑 =================
-        let timer = null;
-        let timeLeft = 600; // 600秒 = 10分钟
-
+        // ================= 支付核心逻辑 =================
         function openPayModal() {
             const totalStr = document.getElementById('total-amount').innerText;
             const total = parseFloat(totalStr.replace(/[¥$]/g, ''));
             
-            // 初始化 UI
             document.getElementById('pay-modal').classList.add('active');
             document.getElementById('pay-step-1').classList.add('active');
             document.getElementById('pay-step-2').classList.remove('active');
@@ -334,20 +255,17 @@
 
             if (currentPayType === 'alipay') {
                 tip.innerText = '请使用支付宝扫码付款';
-                // 如果商品本身是USDT，按汇率换算成人民币
                 amount.innerText = currentProduct.currency === 'USDT' ? `¥ ${(total * 8).toFixed(2)}` : `¥ ${total.toFixed(2)}`;
                 usdtAddr.classList.add('hidden');
                 qr.src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=alipay_order_' + total;
             } else {
                 tip.innerText = '请转账至以下 TRC20 地址';
-                // 如果商品本身是人民币，按汇率换算成USDT
                 amount.innerText = currentProduct.currency === 'USDT' ? `${total.toFixed(2)} USDT` : `${(total / 8).toFixed(2)} USDT`;
                 usdtAddr.classList.remove('hidden');
                 qr.src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=TYu8x9ZqP3vK2mN4wL5jR6tB7cV8bA9sD0';
             }
             qr.classList.remove('hidden');
 
-            // 启动 600 秒倒计时
             timeLeft = 600;
             document.getElementById('countdown').innerText = timeLeft;
             clearInterval(timer);
@@ -357,7 +275,6 @@
                 if (timeLeft <= 0) {
                     clearInterval(timer);
                     closeModal('pay-modal');
-                    alert('订单已超时，请重新下单');
                 }
             }, 1000);
         }
@@ -366,6 +283,17 @@
             clearInterval(timer);
             document.getElementById('pay-step-1').classList.remove('active');
             document.getElementById('pay-step-2').classList.add('active');
+            
+            // 生成订单号并绑定跳转
+            const qty = document.getElementById('buy-qty').value;
+            const orderNo = 'ORD' + Date.now() + Math.floor(Math.random() * 1000);
+            const finalBtn = document.getElementById('btn-go-order');
+            
+            finalBtn.innerText = '查看订单并提取节点';
+            finalBtn.onclick = () => {
+                // 使用单引号包裹模板字符串，避免被 bash 解析
+                window.location.href = '/order-detail.html?id=' + currentProduct.id + '&order_no=' + orderNo + '&qty=' + qty;
+            };
         }
     </script>
     <script src="/ai-widget.js"></script>

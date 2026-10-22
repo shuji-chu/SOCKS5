@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: #f8fafc; color: #1e293b; }
+        body { background-color: #f8fafc; color: #1e293b; padding-bottom: 20px; }
         .card { background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; margin-bottom: 16px; overflow: hidden; }
         .card-header { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between; background: #f8fafc; }
         .card-title { font-size: 15px; font-weight: bold; color: #1e293b; display: flex; align-items: center; gap: 8px; }
@@ -17,30 +17,24 @@
         .info-row:last-child { margin-bottom: 0; }
         .info-label { color: #64748b; }
         .info-value { color: #1e293b; font-weight: 500; text-align: right; word-break: break-all; max-width: 65%; }
-        
         .status-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
         .status-success { background: #ecfdf5; color: #10b981; border: 1px solid #a7f3d0; }
     </style>
 </head>
-<body class="pb-12">
+<body>
     <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
         <div class="flex items-center gap-3">
             <a href="/profile.html" class="text-slate-600 text-xl font-bold px-2">←</a>
             <h1 class="text-[17px] font-bold text-slate-800">订单详情</h1>
         </div>
-        <button onclick="window.location.reload()" class="text-blue-600 text-[13px] font-bold px-2 flex items-center gap-1">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>刷新
-        </button>
+        <button onclick="window.location.reload()" class="text-blue-600 text-[13px] font-bold px-2">刷新</button>
     </header>
 
     <main class="px-4 py-4 max-w-lg mx-auto">
         <!-- 基本信息 -->
         <div class="card">
             <div class="card-header">
-                <div class="card-title">
-                    <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    基本信息
-                </div>
+                <div class="card-title">基本信息</div>
             </div>
             <div class="card-body">
                 <div class="info-row">
@@ -50,7 +44,7 @@
                 <div class="info-row border-t border-slate-50 pt-3 mt-3">
                     <span class="info-label">订单号</span>
                     <div class="flex items-center gap-2">
-                        <span class="info-value font-mono" id="o-no">...</span>
+                        <span class="info-value font-mono text-[12px]" id="o-no">...</span>
                         <button onclick="copyText('o-no')" class="text-blue-500 bg-blue-50 px-2 py-1 rounded text-[11px] font-bold">复制</button>
                     </div>
                 </div>
@@ -64,10 +58,7 @@
         <!-- 订单状态 -->
         <div class="card">
             <div class="card-header">
-                <div class="card-title">
-                    <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    订单状态
-                </div>
+                <div class="card-title">订单状态</div>
             </div>
             <div class="card-body">
                 <div class="info-row">
@@ -88,10 +79,7 @@
         <!-- 金额信息 -->
         <div class="card">
             <div class="card-header">
-                <div class="card-title">
-                    <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
-                    金额信息
-                </div>
+                <div class="card-title">金额信息</div>
             </div>
             <div class="card-body">
                 <div class="info-row">
@@ -109,32 +97,29 @@
             </div>
         </div>
 
-        <!-- 卡密信息 (动态展示：普通卡密/节点信息) -->
+        <!-- 核心发货区：节点专属 -->
         <div class="card border-blue-200">
             <div class="card-header bg-blue-50">
-                <div class="card-title text-blue-700">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
-                    <span id="deliver-title">卡密信息</span>
-                </div>
-                <button onclick="copyDeliver()" class="bg-blue-600 text-white px-3 py-1.5 rounded text-[12px] font-bold active:opacity-80">一键复制</button>
+                <div class="card-title text-blue-700">节点提取</div>
+                <button onclick="copySubUrl()" class="bg-blue-600 text-white px-3 py-1.5 rounded text-[12px] font-bold active:opacity-80">一键复制订阅</button>
             </div>
-            <div class="card-body bg-blue-50/30">
-                <!-- 文本卡密区 -->
-                <textarea id="deliver-content" readonly class="w-full bg-white border border-blue-100 rounded-lg p-3 text-[13px] font-mono text-slate-700 leading-relaxed resize-none h-24 focus:outline-none hidden"></textarea>
+            <div class="card-body bg-blue-50/30 flex flex-col items-center py-6">
                 
-                <!-- 节点专属导出区 -->
-                <div id="node-export-area" class="hidden flex flex-col items-center">
-                    <div class="bg-white p-2 rounded-xl border border-blue-100 mb-4 shadow-sm">
-                        <!-- 节点二维码 (占位图，实际通过订阅链接生成) -->
-                        <img id="node-qrcode" src="" class="w-40 h-40">
-                    </div>
-                    <p class="text-[12px] text-slate-500 mb-3 text-center">扫码或使用下方链接导入客户端</p>
-                    <div class="flex gap-2 w-full">
-                        <a id="btn-download-node" href="#" download="config.yaml" class="flex-1 py-2.5 bg-white border border-blue-200 text-blue-600 text-[13px] font-bold rounded-lg text-center active:bg-blue-50">下载节点文件</a>
-                        <button onclick="copyText('node-url-text')" class="flex-1 py-2.5 bg-blue-600 text-white text-[13px] font-bold rounded-lg text-center active:opacity-80">复制订阅链接</button>
-                    </div>
-                    <p id="node-url-text" class="text-[11px] text-slate-400 mt-3 break-all text-center hidden">https://web.lynli.me/api/v1/sub/abc123token</p>
+                <!-- 二维码展示区 -->
+                <div class="bg-white p-3 rounded-2xl shadow-sm border border-blue-100 mb-4 relative">
+                    <img id="node-qrcode" src="" class="w-44 h-44" alt="Loading...">
+                    <p class="text-center text-[11px] text-slate-400 mt-2">扫码导入节点</p>
                 </div>
+
+                <!-- 下载按钮 -->
+                <div class="w-full flex gap-3 mt-2">
+                    <a id="btn-download-node" href="#" download="socks5_node.txt" class="flex-1 py-3 bg-white border-2 border-blue-600 text-blue-600 text-[14px] font-bold rounded-xl text-center active:bg-blue-50 transition shadow-sm">
+                        下载配置文件
+                    </a>
+                </div>
+
+                <p id="node-url-text" class="text-[11px] text-slate-400 mt-4 break-all text-center px-4"></p>
+                <p class="text-[12px] text-slate-500 mt-2">使用说明：点击上方按钮下载文件，或复制链接导入 Clash / v2ray 等客户端。</p>
             </div>
         </div>
 
@@ -145,23 +130,19 @@
     </main>
 
     <script>
-        // 从 URL 获取参数进行前端模拟渲染
         const urlParams = new URLSearchParams(window.location.search);
-        const pId = urlParams.get('id') || '3965';
+        const pId = urlParams.get('id') || 'node1';
         const orderNo = urlParams.get('order_no') || 'UNKNOWN_' + Date.now();
         const qty = parseInt(urlParams.get('qty')) || 1;
         
-        // 模拟商品数据库
         const productDB = {
-            '3965': { title: '[货号3965] Telegram飞机号 | +1美国电话注册 | 成品号', price: 8.72, currency: 'CNY', isNode: false },
-            '1907': { title: '[库存号] 谷歌 Gmail 白号 | 2019年老号', price: 12.35, currency: 'CNY', isNode: false },
-            'node1': { title: 'MTP 高速代理节点 | 支持流媒体 | 极速稳定', price: 15.00, currency: 'CNY', isNode: true },
-            'sms1': { title: '全球接码服务', price: 0.15, currency: 'USDT', isNode: false }
+            'node1': { title: 'MTP 高速代理节点 | 支持流媒体 | 极速稳定', price: 15.00, currency: 'CNY' },
+            '3965': { title: 'Telegram飞机号', price: 8.72, currency: 'CNY' },
+            'sms1': { title: '全球接码服务', price: 0.15, currency: 'USDT' }
         };
 
-        // 初始化页面数据
         document.addEventListener('DOMContentLoaded', () => {
-            const product = productDB[pId] || productDB['3965'];
+            const product = productDB[pId] || productDB['node1'];
             const symbol = product.currency === 'USDT' ? '$' : '¥';
             const total = (product.price * qty).toFixed(2);
 
@@ -172,44 +153,30 @@
             document.getElementById('o-qty').innerText = qty;
             document.getElementById('o-total').innerText = `${symbol} ${total}`;
 
-            // 根据商品类型渲染发货内容
-            if (product.isNode) {
-                // 节点类商品
-                document.getElementById('deliver-title').innerText = '节点提取';
-                document.getElementById('deliver-content').classList.add('hidden');
-                document.getElementById('node-export-area').classList.remove('hidden');
-                
-                // 生成一个假的订阅链接和二维码
-                const mockSubUrl = `https://web.lynli.me/api/v1/sub/${orderNo}`;
-                document.getElementById('node-url-text').innerText = mockSubUrl;
-                document.getElementById('node-qrcode').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(mockSubUrl)}`;
-                document.getElementById('btn-download-node').href = mockSubUrl;
-                
-                // 让复制按钮指向节点链接
-                window.copyDeliver = () => {
-                    navigator.clipboard.writeText(mockSubUrl).then(() => alert('订阅链接已复制'));
-                };
-            } else {
-                // 普通卡密类商品
-                document.getElementById('deliver-title').innerText = '卡密信息';
-                document.getElementById('node-export-area').classList.add('hidden');
-                const textarea = document.getElementById('deliver-content');
-                textarea.classList.remove('hidden');
-                
-                // 生成假卡密
-                textarea.value = pId === '3965' 
-                    ? `+19705593874----\nhttps://tgapi.tgsms.vip/ffe3d7af-08fe-4939-bd4a-d68de4649fbf/GetHTML`
-                    : `test@gmail.com----password123----aux@gmail.com----US`;
-                    
-                window.copyDeliver = () => {
-                    navigator.clipboard.writeText(textarea.value).then(() => alert('卡密已复制'));
-                };
-            }
+            // 生成专属节点订阅链接 (使用订单号作为token)
+            const mockSubUrl = `https://web.lynli.me/api/v1/sub/${orderNo}`;
+            document.getElementById('node-url-text').innerText = mockSubUrl;
+
+            // 生成二维码
+            document.getElementById('node-qrcode').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(mockSubUrl)}`;
+
+            // 配置下载文件的链接和内容 (这里生成一段虚拟的 Clash 配置)
+            const fakeYamlContent = `proxies:\n  - name: "SOCKS5_NODE_${orderNo}"\n    type: ss\n    server: server.lynli.me\n    port: 8388\n    cipher: aes-256-gcm\n    password: "your_password_${orderNo}"`;
+            
+            // 将文本内容转换为 Blob 供下载
+            const blob = new Blob([fakeYamlContent], { type: 'text/yaml' });
+            const downloadUrl = URL.createObjectURL(blob);
+            document.getElementById('btn-download-node').href = downloadUrl;
         });
 
         function copyText(id) {
             const text = document.getElementById(id).innerText;
             if(navigator.clipboard) navigator.clipboard.writeText(text).then(() => alert('已复制'));
+        }
+
+        function copySubUrl() {
+            const url = document.getElementById('node-url-text').innerText;
+            if(navigator.clipboard) navigator.clipboard.writeText(url).then(() => alert('订阅链接已复制，可直接导入APP'));
         }
     </script>
 </body>

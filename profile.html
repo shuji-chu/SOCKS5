@@ -11,15 +11,19 @@
         body { background-color: #f1f5f9; color: #1e293b; padding-bottom: 80px; }
         .top-nav { background: #3b82f6; color: white; padding: 16px; font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 8px; position: sticky; top: 0; z-index: 50; }
         .app-card { background: white; border-radius: 12px; margin: 12px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .asset-box { display: flex; flex-direction: column; justify-content: center; background: #f8fafc; border-radius: 10px; padding: 16px; border: 1px solid #f1f5f9; cursor: pointer; transition: all 0.2s; text-decoration: none; }
+        .asset-box { display: flex; flex-direction: column; justify-content: center; background: #f8fafc; border-radius: 10px; padding: 16px; border: 1px solid #f1f5f9; cursor: pointer; transition: all 0.2s; }
         .asset-box:active { background: #f1f5f9; transform: scale(0.98); }
         .menu-item { display: flex; justify-content: space-between; align-items: center; padding: 16px; background: white; border-bottom: 1px solid #f1f5f9; cursor: pointer; text-decoration: none; color: inherit; }
         .menu-item:last-child { border-bottom: none; }
-        .menu-item:active { background: #f8fafc; }
         .nav-tab-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #ffffff; display: flex; justify-content: space-around; padding: 10px 0 calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid #e2e8f0; z-index: 50; }
         .nav-tab-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: #94a3b8; text-decoration: none; }
         .nav-tab-item.active { color: #2563eb; }
         .nav-tab-item svg { width: 24px; height: 24px; margin-bottom: 4px; fill: currentColor; }
+        
+        .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 9999; display: none; align-items: flex-end; justify-content: center; }
+        .modal-overlay.active { display: flex; }
+        .modal-content { background: white; width: 100%; max-width: 400px; border-radius: 24px 24px 0 0; padding: 24px; padding-bottom: 30px; max-height: 80vh; display: flex; flex-direction: column; animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -45,36 +49,36 @@
         <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
     </a>
 
-    <!-- 四个资产/数据格子 -->
+    <!-- 四个资产/数据格子 (改为弹窗) -->
     <div class="grid grid-cols-2 gap-3 mx-3">
-        <a href="/assets.html" class="asset-box">
+        <div class="asset-box" onclick="openDetail('账户余额明细', '暂无资金变动记录')">
             <div class="flex items-center gap-2 mb-1">
                 <div class="w-6 h-6 bg-blue-500 rounded text-white flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg></div>
                 <span class="text-xs text-slate-500">账户余额</span>
             </div>
             <p class="text-xl font-bold text-slate-800">¥ 0.00</p>
-        </a>
-        <a href="/assets.html" class="asset-box">
+        </div>
+        <div class="asset-box" onclick="openDetail('佣金余额明细', '暂无佣金变动记录')">
             <div class="flex items-center gap-2 mb-1">
                 <div class="w-6 h-6 bg-orange-500 rounded text-white flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
                 <span class="text-xs text-slate-500">佣金余额</span>
             </div>
             <p class="text-xl font-bold text-slate-800">¥ 0.00</p>
-        </a>
-        <a href="/assets.html" class="asset-box">
+        </div>
+        <div class="asset-box" onclick="openDetail('消费总额明细', '暂无消费记录')">
             <div class="flex items-center gap-2 mb-1">
                 <div class="w-6 h-6 bg-green-500 rounded text-white flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg></div>
                 <span class="text-xs text-slate-500">消费总额</span>
             </div>
             <p class="text-xl font-bold text-slate-800">¥ 0.00</p>
-        </a>
-        <a href="/orders.html" class="asset-box">
+        </div>
+        <div class="asset-box" onclick="openDetail('订单数量明细', '暂无订单记录')">
             <div class="flex items-center gap-2 mb-1">
                 <div class="w-6 h-6 bg-slate-500 rounded text-white flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></div>
                 <span class="text-xs text-slate-500">订单数量</span>
             </div>
             <p class="text-xl font-bold text-slate-800">0</p>
-        </a>
+        </div>
     </div>
 
     <!-- 功能入口卡片 -->
@@ -95,6 +99,20 @@
         </a>
     </div>
 
+    <!-- 明细弹窗 -->
+    <div id="detail-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
+                <h3 id="detail-title" class="text-lg font-bold text-slate-800">明细记录</h3>
+                <button onclick="closeDetail()" class="text-slate-400 text-xl font-bold px-2">✕</button>
+            </div>
+            <div class="flex-1 flex flex-col items-center justify-center text-slate-400 py-10">
+                <svg class="w-12 h-12 mb-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+                <p id="detail-text">暂无数据</p>
+            </div>
+        </div>
+    </div>
+
     <div class="nav-tab-bar">
         <a href="/index.html" class="nav-tab-item"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span>首页</span></a>
         <a href="/profile.html" class="nav-tab-item active"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg><span>我的</span></a>
@@ -109,6 +127,16 @@
         document.getElementById('user-nickname').innerText = localStorage.getItem('socks5_nickname') || email.split('@')[0];
         document.getElementById('user-id').innerText = localStorage.getItem('socks5_user_id') || (isBoss ? '10001' : '---');
         document.getElementById('user-avatar').src = localStorage.getItem('socks5_avatar') || '/logo.jpg';
+
+        // 弹窗逻辑
+        function openDetail(title, text) {
+            document.getElementById('detail-title').innerText = title;
+            document.getElementById('detail-text').innerText = text;
+            document.getElementById('detail-modal').classList.add('active');
+        }
+        function closeDetail() {
+            document.getElementById('detail-modal').classList.remove('active');
+        }
     </script>
 </body>
 </html>

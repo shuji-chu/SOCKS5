@@ -255,14 +255,36 @@
 
     <script>
         // --- 初始化读取用户头像 ---
+        // 初始化
         document.addEventListener('DOMContentLoaded', () => {
-            const userAvatar = localStorage.getItem('user_avatar'); // 从个人中心传过来的头像base64或url
+            // 头像读取逻辑
+            const userAvatar = localStorage.getItem('user_avatar');
             const avatarContainer = document.getElementById('user-avatar-container');
             if (userAvatar) {
                 avatarContainer.innerHTML = `<img src="${userAvatar}" class="w-full h-full object-cover">`;
             } else {
-                // 如果没设置，默认显示名字首字母，绝不显示飞机图
                 avatarContainer.innerHTML = `<span class="text-blue-500 font-bold text-xl">B</span>`;
+            }
+
+            apis.forEach(api => { if (!apiKeys[api.id]) apiKeys[api.id] = `sk_${api.prefix}_` + Math.random().toString(36).substring(2); });
+            localStorage.setItem('api_keys', JSON.stringify(apiKeys));
+
+            renderDashboard();
+            renderApis();
+            renderKeys();
+            renderList();
+
+            // 处理跳转锚点
+            if (window.location.hash === '#bill-tab') {
+                switchBillTab('bill');
+                setTimeout(() => {
+                    document.getElementById('tab-btn-bill').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 300);
+            } else if (window.location.hash === '#request-tab') {
+                switchBillTab('request');
+                setTimeout(() => {
+                    document.getElementById('tab-btn-request').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 300);
             }
         });
 
@@ -628,8 +650,38 @@
         }
 
         // 初始化
+        // 初始化
         document.addEventListener('DOMContentLoaded', () => {
+            // 头像读取逻辑
+            const userAvatar = localStorage.getItem('user_avatar');
+            const avatarContainer = document.getElementById('user-avatar-container');
+            if (userAvatar) {
+                avatarContainer.innerHTML = `<img src="${userAvatar}" class="w-full h-full object-cover">`;
+            } else {
+                avatarContainer.innerHTML = `<span class="text-blue-500 font-bold text-xl">B</span>`;
+            }
+
             apis.forEach(api => { if (!apiKeys[api.id]) apiKeys[api.id] = `sk_${api.prefix}_` + Math.random().toString(36).substring(2); });
+            localStorage.setItem('api_keys', JSON.stringify(apiKeys));
+
+            renderDashboard();
+            renderApis();
+            renderKeys();
+            renderList();
+
+            // 处理跳转锚点
+            if (window.location.hash === '#bill-tab') {
+                switchBillTab('bill');
+                setTimeout(() => {
+                    document.getElementById('tab-btn-bill').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 300);
+            } else if (window.location.hash === '#request-tab') {
+                switchBillTab('request');
+                setTimeout(() => {
+                    document.getElementById('tab-btn-request').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 300);
+            }
+        });
             localStorage.setItem('api_keys', JSON.stringify(apiKeys));
 
             renderDashboard();

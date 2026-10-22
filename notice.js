@@ -19,32 +19,42 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.insertAdjacentHTML('beforeend', modalHtml);
     }
 
-    // 智能寻找页面右上角带红点的铃铛容器
-    // 不管它是哪个页面的铃铛，只要包含红点，就给它绑定点击事件
-    const redDots = document.querySelectorAll('.bg-red-500.rounded-full');
-    redDots.forEach(dot => {
-        const bellContainer = dot.closest('.relative') || dot.parentElement;
-        if (bellContainer) {
-            bellContainer.style.cursor = 'pointer';
-            bellContainer.onclick = (e) => {
-                e.stopPropagation(); // 防止冒泡
-                // 弹出公告
-                document.getElementById('notice-modal').classList.remove('hidden');
-                document.getElementById('notice-modal').classList.add('flex');
+    // 智能寻找右上角的图标区域
+    // 无论是首页还是我的页，右上角肯定是一个 icon，我们直接抓取包含 svg 的 relative 容器
+    const relativeContainers = document.querySelectorAll('.relative');
+    let foundBell = false;
+
+    relativeContainers.forEach(container => {
+        // 如果容器里含有 SVG（铃铛），并且不是底部导航，我们就当作是公告图标
+        if (container.querySelector('svg') && !container.closest('nav') && !container.closest('.bottom-tab')) {
+            foundBell = true;
+            container.style.cursor = 'pointer';
+            
+            // 绑定点击事件
+            container.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // 弹窗
+                const modal = document.getElementById('notice-modal');
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
                 setTimeout(() => {
                     document.getElementById('notice-modal-inner').classList.replace('scale-95', 'scale-100');
                 }, 10);
                 
-                // 标记已读并隐藏
+                // 标记已读，隐藏红点
                 localStorage.setItem('notice_read', 'true');
-                dot.style.display = 'none';
+                const dot = container.querySelector('.bg-red-500');
+                if (dot) dot.style.display = 'none';
             };
         }
     });
 
-    // 初始化检查已读状态
+    // 初始化检查已读状态，如果已读，隐藏所有红点
     if (localStorage.getItem('notice_read') === 'true') {
-        redDots.forEach(dot => dot.style.display = 'none');
+        const dots = document.querySelectorAll('.bg-red-500.rounded-full');
+        dots.forEach(dot => dot.style.display = 'none');
     }
 });
 

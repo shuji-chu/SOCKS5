@@ -52,6 +52,7 @@
             <a href="#step2" class="nav-item flex items-center whitespace-nowrap"><span class="nav-dot"></span>零配置绑定</a>
             <a href="#step3" class="nav-item flex items-center whitespace-nowrap"><span class="nav-dot"></span>推送接口</a>
             <a href="#step4" class="nav-item flex items-center whitespace-nowrap"><span class="nav-dot"></span>计费说明</a>
+            <a href="#step5" class="nav-item flex items-center whitespace-nowrap"><span class="nav-dot"></span>发送记录</a>
         </div>
 
         <!-- 01 快速接入 -->
@@ -180,6 +181,39 @@
                 <div class="border-t border-slate-100 pt-3">
                     <h4 class="text-[14px] font-bold text-slate-800 mb-1">域名绑定月租费</h4>
                     <p>为确保通道不被恶意滥用，绑定独立域名需按年/月缴纳基础维护费，同时赠送额外发信额度。</p>
+                </div>
+            </div>
+        </div>
+    
+        <div id="step5" class="mb-10 scroll-mt-20">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="num-box">05</div>
+                <h3 class="text-[18px] font-bold text-slate-800">发送记录查询</h3>
+            </div>
+            
+            <div class="card p-5">
+                <div class="flex items-center mb-3">
+                    <span class="bg-blue-50 text-blue-600 px-2 py-1 rounded text-[11px] font-bold border border-blue-200 mr-2">GET</span>
+                    <span class="font-mono text-[14px] font-bold text-slate-800">/email/logs</span>
+                </div>
+                <p class="text-[12px] text-slate-500 mb-4">请求地址：<code>https://web.lynli.me/api/v1/email/logs</code></p>
+                <p class="text-[13px] text-slate-600 mb-4">查询您的历史发信记录，包含投递状态（成功/失败/进入垃圾箱）和退信原因。</p>
+                
+                <p class="text-[13px] font-bold text-slate-700 mb-2">返回示例：</p>
+                <div class="code-wrapper">
+                    <div class="copy-btn" onclick="copyCode(this)">复制</div>
+                    <div class="code-block">{
+  "code": 200,
+  "data": [
+    {
+      "message_id": "msg_99887766",
+      "to": "user@example.com",
+      "subject": "您的注册验证码",
+      "status": "delivered",
+      "send_time": "2026-10-22 15:30:00"
+    }
+  ]
+}</div>
                 </div>
             </div>
         </div>

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>接码控制台 - SOCKS5</title>
-    <link rel="icon" href="/logo.jpg" type="image/jpeg">
+    <link rel="icon" href="./logo.jpg" type="image/jpeg">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
@@ -20,7 +20,7 @@
 <body class="pb-12">
     <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
         <div class="flex items-center gap-3">
-            <a href="/index.html" class="text-slate-600 text-xl font-bold px-2">←</a>
+            <a href="./index.html" class="text-slate-600 text-xl font-bold px-2">←</a>
             <h1 class="text-[17px] font-bold text-slate-800">接码控制台</h1>
         </div>
         <div class="bg-blue-50 text-blue-600 px-3 py-1 rounded-lg text-[12px] font-bold">余额: $ <span id="sms-balance">120.00</span></div>
@@ -90,8 +90,8 @@
         <div class="h-6"></div>
     </div>
     
-    <script src="/notice.js"></script>
-    <script src="/ai-widget.js"></script>
+    <script src="./notice.js"></script>
+    <script src="./ai-widget.js"></script>
     <script>
         // 真实余额显示
         let balance = parseFloat(localStorage.getItem('user_balance') || '120.00');

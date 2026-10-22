@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>域名分发中心 - SOCKS5</title>
-    <link rel="icon" href="/logo.jpg" type="image/jpeg">
+    <link rel="icon" href="./logo.jpg" type="image/jpeg">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
@@ -15,7 +15,7 @@
 <body>
     <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
         <div class="flex items-center gap-3">
-            <a href="/index.html" class="text-slate-600 text-xl font-bold px-2">←</a>
+            <a href="./index.html" class="text-slate-600 text-xl font-bold px-2">←</a>
             <h1 class="text-[17px] font-bold text-slate-800">域名分发</h1>
         </div>
     </header>
@@ -27,7 +27,7 @@
                     <p class="text-[13px] text-blue-100 mb-1">当前可用额度</p>
                     <p class="text-[36px] font-extrabold" id="domain-quota">1</p>
                 </div>
-                <a href="/invite.html" class="bg-white/20 px-3 py-1.5 rounded-lg text-[12px] backdrop-blur-sm">获取更多额度</a>
+                <a href="./invite.html" class="bg-white/20 px-3 py-1.5 rounded-lg text-[12px] backdrop-blur-sm">获取更多额度</a>
             </div>
             <p class="text-[12px] text-blue-200">消费满 200 / 邀请 5 人 / 首单加群 即可获赠额度。有效期 90 天。</p>
         </div>
@@ -50,8 +50,8 @@
         </div>
     </main>
 
-    <script src="/notice.js"></script>
-    <script src="/ai-widget.js"></script>
+    <script src="./notice.js"></script>
+    <script src="./ai-widget.js"></script>
     <script>
         let quota = parseInt(localStorage.getItem('domain_quota') || '1');
         let myDomains = JSON.parse(localStorage.getItem('my_domains') || '[]');
@@ -76,7 +76,7 @@
                         <p class="text-[15px] font-bold text-blue-600">${d.name}.lynli.me</p>
                         <p class="text-[11px] text-slate-400 mt-1">注册: ${d.date} | 到期: ${d.expire}</p>
                     </div>
-                    <a href="/domain-manage.html?domain=${d.name}" class="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-[13px] font-bold">解析管理</a>
+                    <a href="./domain-manage.html?domain=${d.name}" class="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-[13px] font-bold">解析管理</a>
                 </div>
             `).join('');
         }

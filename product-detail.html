@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>商品详情 - SOCKS5</title>
-    <link rel="icon" href="/logo.jpg" type="image/jpeg">
+    <link rel="icon" href="./logo.jpg" type="image/jpeg">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
@@ -165,7 +165,7 @@
             const productId = urlParams.get('id') || '3965';
 
             try {
-                const res = await fetch('/products.json');
+                const res = await fetch('./products.json');
                 const data = await res.json();
                 // 如果你要强制只卖节点，在这里可以加个判断。但为了兼容目前的数据，先全加载。
                 currentProduct = data.find(p => p.id === productId) || data[0];
@@ -293,7 +293,7 @@
             try {
                 // 【老板请注意】这里是你后端对接的真实入口
                 /*
-                const response = await fetch('/api/pay/notify/check', {
+                const response = await fetch('./api/pay/notify/check', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -325,9 +325,9 @@
         }
 
     </script>
-    <script src="/ai-widget.js"></script>
+    <script src="./ai-widget.js"></script>
     
 
-<script src="/notice.js"></script>
+<script src="./notice.js"></script>
 </body>
 </html>

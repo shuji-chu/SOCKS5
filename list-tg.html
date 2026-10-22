@@ -2,33 +2,66 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>TG 账号 - SOCKS5</title>
+    <link rel="icon" href="/logo.jpg" type="image/jpeg">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="/style.css?v=41">
-<link rel="icon" href="/logo.jpg" type="image/jpeg">
+    <style>* { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; } body { background-color: #f1f5f9; padding-bottom: 80px; }</style>
 </head>
 <body>
-    <header class="app-header">
-        <a href="/index.html" class="back-btn mr-2">← 返回</a>
-        <h1 class="app-title">TG 账号</h1>
+    <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center gap-3 sticky top-0 z-50">
+        <a href="/index.html" class="text-slate-600 text-xl font-bold px-2">←</a>
+        <h1 class="text-lg font-bold text-slate-800">TG 账号</h1>
     </header>
-    <main class="content-wrap">
-        <div class="space-y-4">
-            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm flex flex-col">
-                <div class="flex justify-between items-start mb-2">
-                    <h4 class="font-bold text-slate-800 text-[15px]">优质 TG 账号 (自营)</h4>
-                    <span class="text-blue-600 font-bold text-lg">¥ 68.00</span>
-                </div>
-                <p class="text-xs text-slate-500 mb-4 leading-relaxed">已稳定运行，附带原始凭证，纯净环境，防封性强。</p>
-                <button class="btn-primary w-full py-2.5 rounded-lg text-sm font-medium" onclick="buyProduct(1, 'TG 账号', 68.00)">立即获取</button>
+
+    <main class="p-4 space-y-3">
+        <a href="javascript:void(0)" onclick="buyProduct(1, 'TG 旗舰防封号', 68.00)" class="block bg-white rounded-xl p-4 shadow-sm border border-slate-100 active:bg-slate-50 transition-colors">
+            <div class="flex justify-between items-start mb-2">
+                <h3 class="text-[15px] font-bold text-slate-800 leading-snug">TG 旗舰防封号 (美国)</h3>
+                <span class="text-lg font-bold text-red-500 shrink-0 ml-2">¥ 68.00</span>
             </div>
-        </div>
+            <p class="text-[13px] text-slate-500 mb-4 line-clamp-2">已稳定养号 90 天以上，附带原始邮箱与 2FA 密保。纯净住宅 IP 注册，防封性强。</p>
+            <div class="flex justify-between items-center">
+                <span class="text-xs text-slate-400">库存: <span class="text-green-500 font-medium">18</span></span>
+                <button class="bg-blue-500 text-white text-sm px-6 py-1.5 rounded-lg font-medium shadow-sm">立即购买</button>
+            </div>
+        </a>
+
+        <a href="javascript:void(0)" onclick="buyProduct(2, 'TG 双因素认证号', 35.00)" class="block bg-white rounded-xl p-4 shadow-sm border border-slate-100 active:bg-slate-50 transition-colors">
+            <div class="flex justify-between items-start mb-2">
+                <h3 class="text-[15px] font-bold text-slate-800 leading-snug">TG 双因素认证号 (东南亚)</h3>
+                <span class="text-lg font-bold text-red-500 shrink-0 ml-2">¥ 35.00</span>
+            </div>
+            <p class="text-[13px] text-slate-500 mb-4 line-clamp-2">物理实体卡注册，无任何违规记录，支持直登改密。</p>
+            <div class="flex justify-between items-center">
+                <span class="text-xs text-slate-400">库存: <span class="text-green-500 font-medium">42</span></span>
+                <button class="bg-blue-500 text-white text-sm px-6 py-1.5 rounded-lg font-medium shadow-sm">立即购买</button>
+            </div>
+        </a>
     </main>
-    <nav class="app-tab-bar">
-        <a href="/index.html" class="tab-item"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span>首页</span></a>
-        <a href="/profile.html" class="tab-item"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg><span>我的</span></a>
-    </nav>
-    <script src="/app.js?v=41"></script>
+
+    <!-- 统一底部导航 -->
+    <div class="nav-tab-bar fixed bottom-0 left-0 right-0 bg-white flex justify-around py-3 border-t border-slate-200 z-50 pb-[calc(10px+env(safe-area-inset-bottom))]">
+        <a href="/index.html" class="flex flex-col items-center gap-1 text-blue-500">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+            <span class="text-[10px] font-medium">首页</span>
+        </a>
+        <a href="/guide.html" class="flex flex-col items-center gap-1 text-slate-400">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg>
+            <span class="text-[10px]">说明</span>
+        </a>
+        <a href="/profile.html" class="flex flex-col items-center gap-1 text-slate-400">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            <span class="text-[10px]">我的</span>
+        </a>
+    </div>
+
+    <script>
+        function buyProduct(id, name, price) {
+            const token = localStorage.getItem('socks5_token');
+            if(!token) { window.location.href = '/login.html'; return; }
+            alert(`正在为您创建订单：${name}\n金额：¥${price}`);
+        }
+    </script>
 </body>
 </html>

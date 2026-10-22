@@ -5,38 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>登录 - SOCKS5</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
         body { background-color: #f8fafc; color: #1e293b; min-height: 100vh; display: flex; flex-direction: column; padding: 24px; }
         .header { text-align: center; margin-top: 30px; margin-bottom: 32px; }
-        .header img { width: 64px; height: 64px; border-radius: 20px; margin-bottom: 16px; object-fit: cover; border: 1px solid #e2e8f0; }
-        .header h2 { font-size: 22px; font-weight: 700; color: #0f172a; }
+        .header img { width: 64px; height: 64px; border-radius: 20px; margin-bottom: 16px; object-fit: cover; }
+        .header h2 { font-size: 22px; font-weight: 700; }
         .header p { font-size: 13px; color: #64748b; margin-top: 6px; }
-        .card { background: #ffffff; padding: 24px; border-radius: 24px; box-shadow: 0 4px 20px -2px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; width: 100%; max-width: 380px; margin: 0 auto; }
+        .card { background: #ffffff; padding: 24px; border-radius: 24px; box-shadow: 0 4px 20px -2px rgba(0,0,0,0.05); width: 100%; max-width: 380px; margin: 0 auto; }
         .input-group { margin-bottom: 16px; }
-        .input-group input { width: 100%; padding: 14px 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; font-size: 15px; outline: none; transition: all 0.2s; }
-        .input-group input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+        .input-group input { width: 100%; padding: 14px 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; font-size: 15px; outline: none; }
         .options { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; font-size: 13px; color: #64748b; }
         .options label { display: flex; align-items: center; gap: 6px; }
         .options input[type="checkbox"] { width: 16px; height: 16px; accent-color: #2563eb; }
         .options a { color: #2563eb; text-decoration: none; cursor: pointer; }
-        .btn-primary { width: 100%; padding: 14px; background: #2563eb; color: white; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
-        .btn-primary:active { background: #1d4ed8; transform: scale(0.98); }
+        .btn-primary { width: 100%; padding: 14px; background: #2563eb; color: white; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; }
         .link-text { text-align: center; margin-top: 24px; }
         .link-text a { font-size: 14px; color: #2563eb; text-decoration: none; font-weight: 500; }
         .footer { text-align: center; margin-top: auto; padding-top: 40px; margin-bottom: 16px; }
         .footer img { width: 28px; height: 28px; border-radius: 8px; margin-bottom: 12px; opacity: 0.4; }
-        .footer p.brand { font-size: 10px; font-weight: 600; color: #94a3b8; letter-spacing: 1.5px; margin-bottom: 16px; }
-        .footer-links { display: flex; justify-content: center; gap: 12px; font-size: 12px; color: #94a3b8; }
-        .footer-links button { background: none; border: none; color: #94a3b8; cursor: pointer; }
-        .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 9999; display: none; align-items: flex-end; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 9999; display: none; align-items: flex-end; justify-content: center; }
         .modal-overlay.active { display: flex; }
-        .modal-content { background: white; width: 100%; max-width: 400px; border-radius: 24px 24px 0 0; padding: 24px; padding-bottom: 40px; max-height: 80vh; display: flex; flex-direction: column; animation: slideUp 0.3s ease-out; margin: 0 auto; }
+        .modal-content { background: white; width: 100%; max-width: 400px; border-radius: 24px 24px 0 0; padding: 24px; padding-bottom: 40px; }
         .modal-header { display: flex; justify-content: space-between; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 16px; }
-        .modal-body { font-size: 14px; color: #475569; line-height: 1.6; }
-        /* 高级 Toast 样式 */
-        #toast { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); background: rgba(30, 41, 59, 0.95); color: white; padding: 12px 24px; border-radius: 12px; font-size: 14px; font-weight: 500; transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); z-index: 99999; display: flex; align-items: center; gap: 8px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2); }
+        #toast { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); background: rgba(30,41,59,0.95); color: white; padding: 12px 24px; border-radius: 12px; font-size: 14px; transition: all 0.3s; z-index: 99999; display: flex; align-items: center; gap: 8px; }
         #toast.show { top: 30px; }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -48,22 +40,27 @@
             <div class="input-group"><input type="password" id="password" required placeholder="密码"></div>
             <div class="options">
                 <label><input type="checkbox" id="remember-me"> 记住密码</label>
-                <a onclick="showToast('请联系官方客服处理')">忘记密码？</a>
+                <a onclick="openModal()">忘记密码？</a>
             </div>
             <button type="submit" class="btn-primary" id="submit-btn">安全登录</button>
         </form>
         <div class="link-text"><a href="/register.html">没有账号？立即注册</a></div>
     </div>
-    <div class="footer">
-        <img src="/logo.jpg"><p class="brand">Powered by SOCKS5 Secure</p>
-        <div class="footer-links">
-            <button onclick="openModal('privacy')">隐私政策</button> | <button onclick="openModal('terms')">用户协议</button> | <button onclick="openModal('about')">关于我们</button>
-        </div>
-    </div>
-    <div id="info-modal" class="modal-overlay">
+    <div class="footer"><img src="/logo.jpg"><p>Powered by SOCKS5 Secure</p></div>
+
+    <div id="reset-modal" class="modal-overlay">
         <div class="modal-content">
-            <div class="modal-header"><h3 id="modal-title" style="font-size:18px;font-weight:700;">标题</h3><button onclick="closeModal()" style="border:none;background:none;font-size:20px;color:#94a3b8;">✕</button></div>
-            <div class="modal-body" id="modal-body-content"></div>
+            <div class="modal-header">
+                <h3 style="font-size:18px;font-weight:700;">重置密码</h3>
+                <button onclick="closeModal()" style="border:none;background:none;font-size:20px;color:#94a3b8;">✕</button>
+            </div>
+            <div class="input-group"><input type="email" id="reset-email" placeholder="输入注册邮箱"></div>
+            <div class="input-group" style="display:flex; gap:10px;">
+                <input type="text" id="reset-code" placeholder="验证码" style="flex:1;">
+                <button type="button" id="reset-code-btn" style="width:100px; background:#f1f5f9; border:1px solid #e2e8f0; border-radius:12px; font-size:13px;" onclick="sendResetCode()">获取验证码</button>
+            </div>
+            <div class="input-group"><input type="password" id="reset-pwd" placeholder="设置新密码 (至少8位)"></div>
+            <button class="btn-primary" onclick="handleReset()">确认重置</button>
         </div>
     </div>
 
@@ -76,63 +73,66 @@
             clearTimeout(toastTimer);
             toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
         }
-
-        window.onload = function() {
-            const savedEmail = localStorage.getItem('remembered_email');
-            const savedPwd = localStorage.getItem('remembered_pwd');
-            if (savedEmail && savedPwd) {
-                document.getElementById('email').value = savedEmail;
-                document.getElementById('password').value = savedPwd;
-                document.getElementById('remember-me').checked = true;
-            }
-        };
+        function openModal() { document.getElementById('reset-modal').classList.add('active'); }
+        function closeModal() { document.getElementById('reset-modal').classList.remove('active'); }
 
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('submit-btn');
             btn.innerText = '登录中...'; btn.disabled = true;
-            
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const remember = document.getElementById('remember-me').checked;
-
             try {
-                const res = await fetch('https://api.lynli.me/s5api/api/v1/passport/auth/login', {
-                    method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ email, password })
+                const res = await fetch('https://api.lynli.me/api/v1/passport/auth/login', {
+                    method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ email: document.getElementById('email').value, password: document.getElementById('password').value })
                 });
                 const data = await res.json();
                 if (res.ok) {
-                    if (remember) {
-                        localStorage.setItem('remembered_email', email);
-                        localStorage.setItem('remembered_pwd', password);
-                    } else {
-                        localStorage.removeItem('remembered_email');
-                        localStorage.removeItem('remembered_pwd');
-                    }
-                    localStorage.setItem('socks5_email', email);
+                    localStorage.setItem('socks5_email', document.getElementById('email').value);
                     localStorage.setItem('socks5_token', data.data?.token || data.token || '');
                     window.location.href = '/index.html';
-                } else { 
-                    showToast(data.message || '邮箱或密码错误'); 
-                    btn.innerText = '安全登录'; btn.disabled = false;
-                }
-            } catch (err) { 
-                showToast('网络连接失败，请检查网络'); 
-                btn.innerText = '安全登录'; btn.disabled = false;
-            }
+                } else { showToast(data.message || '登录失败'); btn.innerText = '安全登录'; btn.disabled = false; }
+            } catch (err) { showToast('网络错误'); btn.innerText = '安全登录'; btn.disabled = false; }
         });
 
-        const modalContent = {
-            'privacy': { title: '隐私政策', text: '我们深知个人信息对您的重要性...' },
-            'terms': { title: '用户协议', text: '欢迎使用 SOCKS5 服务...' },
-            'about': { title: '关于我们', text: 'SOCKS5 致力于为您提供全球领先的虚拟资产...' }
-        };
-        function openModal(type) {
-            document.getElementById('modal-title').innerText = modalContent[type].title;
-            document.getElementById('modal-body-content').innerText = modalContent[type].text;
-            document.getElementById('info-modal').classList.add('active');
+        async function sendResetCode() {
+            const email = document.getElementById('reset-email').value;
+            if(!email) { showToast('请输入邮箱'); return; }
+            const btn = document.getElementById('reset-code-btn');
+            btn.disabled = true;
+            try {
+                const res = await fetch('https://api.lynli.me/api/v1/passport/auth/send-code', {
+                    method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ email })
+                });
+                if(res.ok) {
+                    showToast('验证码已发送');
+                    let cd = 60; const timer = setInterval(() => { cd--; btn.innerText = `${cd}s`; if(cd <= 0) { clearInterval(timer); btn.disabled = false; btn.innerText = '获取验证码'; } }, 1000);
+                } else { 
+                    const data = await res.json();
+                    showToast(data.message || data.detail || '发送失败'); 
+                    btn.disabled = false; 
+                }
+            } catch(e) { showToast('网络错误'); btn.disabled = false; }
         }
-        function closeModal() { document.getElementById('info-modal').classList.remove('active'); }
+
+        async function handleReset() {
+            const email = document.getElementById('reset-email').value;
+            const code = document.getElementById('reset-code').value;
+            const pwd = document.getElementById('reset-pwd').value;
+            if(!email || !code || pwd.length < 8) { showToast('请填写完整，密码至少8位'); return; }
+            
+            try {
+                const res = await fetch('https://api.lynli.me/api/v1/passport/auth/reset-password', {
+                    method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ email, code, password: pwd })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    showToast('密码重置成功，请重新登录');
+                    document.getElementById('email').value = email;
+                    closeModal();
+                } else {
+                    showToast(data.detail || data.message || '重置失败');
+                }
+            } catch(e) { showToast('网络错误'); }
+        }
     </script>
 </body>
 </html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>商户中心 - SOCKS5 支付平台</title>
+    <link rel="icon" href="/logo.jpg" type="image/jpeg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #f8fafc; color: #1e293b; }
+        .card { background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; }
+        .num-font { font-family: 'DIN Alternate', 'Helvetica Neue', Arial, sans-serif; }
+        .btn-press { transition: transform 0.1s; }
+        .btn-press:active { transform: scale(0.97); }
+        
+        /* 7天柱状图 */
+        .bar-chart { display: flex; align-items: flex-end; justify-content: space-between; height: 120px; margin-top: 16px; }
+        .bar-col { display: flex; flex-direction: column; align-items: center; width: 12%; }
+        .bar-fill { width: 100%; background: #bfdbfe; border-radius: 4px 4px 0 0; transition: height 0.3s; min-height: 4px; }
+        .bar-label { font-size: 10px; color: #94a3b8; margin-top: 8px; }
+    </style>
+</head>
+<body class="pb-12">
+    <!-- 顶部导航 -->
+    <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
+        <div class="flex items-center gap-3">
+            <a href="/console.html" class="text-slate-600 text-xl font-bold px-2">←</a>
+            <h1 class="text-[17px] font-bold text-slate-800">商户中心</h1>
+        </div>
+        <span class="text-[12px] bg-green-50 text-green-600 px-2 py-1 rounded border border-green-200 font-bold">商户状态：正常</span>
+    </header>
+
+    <main class="px-4 py-4 space-y-4 max-w-lg mx-auto">
+        
+        <!-- 欢迎与快捷操作 -->
+        <div class="flex justify-between items-center">
+            <div>
+                <h2 class="text-[20px] font-bold text-slate-800">你好，Hr Amelia</h2>
+                <p class="text-[12px] text-slate-500 mt-1">欢迎使用 SOCKS5 聚合支付平台</p>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="showToast('API 信息已复制')" class="px-3 py-1.5 bg-slate-100 text-slate-600 text-[12px] rounded-lg font-bold active:bg-slate-200">▣ API信息</button>
+                <button onclick="showToast('修改资料功能开发中')" class="px-3 py-1.5 bg-slate-100 text-slate-600 text-[12px] rounded-lg font-bold active:bg-slate-200">⚙ 修改资料</button>
+            </div>
+        </div>
+
+        <!-- 资产看板 -->
+        <div class="card p-5">
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <p class="text-[12px] text-slate-500 mb-1">可提现 USDT (已扣费)</p>
+                    <p class="text-[24px] font-bold text-slate-800 num-font">0.000000</p>
+                </div>
+                <div>
+                    <p class="text-[12px] text-slate-500 mb-1">待提现 USDT</p>
+                    <p class="text-[24px] font-bold text-amber-500 num-font">0.000000</p>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4 mt-5 pt-4 border-t border-slate-100">
+                <div>
+                    <p class="text-[12px] text-slate-500 mb-1">订单总数</p>
+                    <p class="text-[20px] font-bold text-slate-800 num-font">85 <span class="text-[12px] font-normal text-slate-400">个</span></p>
+                </div>
+                <div>
+                    <p class="text-[12px] text-slate-500 mb-1">今日订单</p>
+                    <p class="text-[20px] font-bold text-slate-800 num-font">0 <span class="text-[12px] font-normal text-slate-400">个</span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 通道统计 -->
+        <div class="card p-5">
+            <h3 class="text-[15px] font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <span class="w-1.5 h-4 bg-blue-500 rounded-full"></span> 通道统计
+            </h3>
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-8 h-8 rounded bg-blue-50 text-blue-600 flex items-center justify-center font-bold">支</div>
+                <div>
+                    <h4 class="text-[14px] font-bold text-slate-800">支付宝</h4>
+                    <p class="text-[11px] text-slate-400">通道成功率：100% | 费率：8%</p>
+                </div>
+            </div>
+            <div class="flex justify-between bg-slate-50 p-3 rounded-lg border border-slate-100">
+                <div>
+                    <p class="text-[11px] text-slate-500 mb-1">今日收入</p>
+                    <p class="text-[14px] font-bold text-green-600">0.00 元</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-[11px] text-slate-500 mb-1">昨日收入</p>
+                    <p class="text-[14px] font-bold text-slate-700">0.00 元</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 7天走势 -->
+        <div class="card p-5">
+            <div class="flex justify-between items-center mb-1">
+                <h3 class="text-[15px] font-bold text-slate-800">近 7 天收入走势</h3>
+                <span class="text-[12px] text-slate-400">按支付时间统计净收入</span>
+            </div>
+            
+            <div class="bar-chart">
+                <!-- 循环生成 7 个柱子 -->
+                <div class="bar-col"><div class="bar-fill" style="height: 4px;"></div><div class="bar-label">10-16</div></div>
+                <div class="bar-col"><div class="bar-fill" style="height: 4px;"></div><div class="bar-label">10-17</div></div>
+                <div class="bar-col"><div class="bar-fill" style="height: 4px;"></div><div class="bar-label">10-18</div></div>
+                <div class="bar-col"><div class="bar-fill" style="height: 4px;"></div><div class="bar-label">10-19</div></div>
+                <div class="bar-col"><div class="bar-fill" style="height: 4px;"></div><div class="bar-label">10-20</div></div>
+                <div class="bar-col"><div class="bar-fill" style="height: 4px;"></div><div class="bar-label">10-21</div></div>
+                <div class="bar-col"><div class="bar-fill" style="height: 4px;"></div><div class="bar-label">10-22</div></div>
+            </div>
+            <p class="text-center text-[12px] text-slate-400 mt-4">近7天总净收入：￥0.00 (0 单)</p>
+        </div>
+
+        <!-- 新商户快速开始 -->
+        <div class="card p-5 bg-gradient-to-br from-blue-50 to-white">
+            <h3 class="text-[15px] font-bold text-blue-800 mb-2">新商户快速开始</h3>
+            <p class="text-[12px] text-blue-600/80 mb-4">账号进入后 API 已自动开通，按下面三步即可收款。</p>
+            <div class="space-y-3 text-[13px] text-slate-700">
+                <div class="flex gap-2"><span class="w-5 h-5 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-[11px] font-bold shrink-0">1</span>查看商户 ID、MD5 密钥、RSA 密钥</div>
+                <div class="flex gap-2"><span class="w-5 h-5 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-[11px] font-bold shrink-0">2</span>复制聚合收款链接，或在 TG 机器人直接发送金额</div>
+                <div class="flex gap-2"><span class="w-5 h-5 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-[11px] font-bold shrink-0">3</span>打开开发文档，把接口地址替换成本站地址</div>
+            </div>
+        </div>
+
+        <!-- 通道说明与料性规则 -->
+        <div class="card p-5">
+            <h3 class="text-[15px] font-bold text-slate-800 mb-3 flex items-center gap-2">
+                <span class="w-1.5 h-4 bg-slate-400 rounded-full"></span> 通道说明
+            </h3>
+            <p class="text-[13px] font-bold text-slate-700 mb-1">原生 H5 支付通道</p>
+            <p class="text-[12px] text-slate-500 mb-4 leading-relaxed">面向低投诉量业务，支持盘口 API 对接，稳定回 U。全天 80+ 笔，无日切，不限海外。</p>
+
+            <h4 class="text-[13px] font-bold text-green-600 mb-2">✓ 交易料性 (支持)</h4>
+            <div class="flex flex-wrap gap-2 mb-4">
+                <span class="bg-green-50 text-green-700 text-[11px] px-2 py-1 rounded border border-green-100">vpn</span>
+                <span class="bg-green-50 text-green-700 text-[11px] px-2 py-1 rounded border border-green-100">发卡</span>
+                <span class="bg-green-50 text-green-700 text-[11px] px-2 py-1 rounded border border-green-100">游戏私服</span>
+                <span class="bg-green-50 text-green-700 text-[11px] px-2 py-1 rounded border border-green-100">漫画</span>
+                <span class="bg-green-50 text-green-700 text-[11px] px-2 py-1 rounded border border-green-100">AI</span>
+                <span class="bg-green-50 text-green-700 text-[11px] px-2 py-1 rounded border border-green-100">论坛</span>
+                <span class="bg-green-50 text-green-700 text-[11px] px-2 py-1 rounded border border-green-100">IDC</span>
+                <span class="bg-green-50 text-green-700 text-[11px] px-2 py-1 rounded border border-green-100">无版权影视</span>
+                <span class="bg-green-50 text-green-700 text-[11px] px-2 py-1 rounded border border-green-100">纯视频播放器</span>
+                <span class="bg-green-50 text-green-700 text-[11px] px-2 py-1 rounded border border-green-100">打赏</span>
+                <span class="bg-green-50 text-green-700 text-[11px] px-2 py-1 rounded border border-green-100">直播</span>
+            </div>
+
+            <h4 class="text-[13px] font-bold text-red-600 mb-2">✕ 禁止料性</h4>
+            <p class="text-[12px] text-red-500 bg-red-50 p-2 rounded mb-4">三嘿、zp；禁止混料。导致司法或砖头、冻结由盘口承担一切责任。</p>
+
+            <div class="grid grid-cols-2 gap-4 text-[12px]">
+                <div>
+                    <p class="text-slate-400 mb-1">充值范围</p>
+                    <p class="font-bold text-slate-700">金额可任意定制</p>
+                </div>
+                <div>
+                    <p class="text-slate-400 mb-1">入款方式</p>
+                    <p class="font-bold text-slate-700">自营 H5 支付宝/微信</p>
+                </div>
+                <div class="col-span-2 border-t border-slate-100 pt-2 mt-2">
+                    <p class="text-slate-400 mb-1">结算说明</p>
+                    <p class="font-bold text-slate-700">API 对接盘口，回 U</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center py-6">
+            <p class="text-[12px] text-slate-400">SOCKS5 支付平台 · 商户服务</p>
+        </div>
+    </main>
+
+    <div id="toast" style="visibility: hidden; min-width: 200px; background-color: #334155; color: #fff; text-align: center; border-radius: 8px; padding: 10px 16px; position: fixed; z-index: 10000; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 13px; opacity: 0; transition: opacity 0.3s;">提示内容</div>
+
+    <script src="/ai-widget.js"></script>
+    <script>
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg; 
+            toast.style.visibility = 'visible'; toast.style.opacity = '1';
+            setTimeout(() => { 
+                toast.style.visibility = 'hidden'; toast.style.opacity = '0';
+            }, 2500);
+        }
+    </script>
+</body>
+</html>

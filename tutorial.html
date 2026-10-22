@@ -14,7 +14,7 @@
         .platform-tab { padding: 8px 16px; font-size: 14px; font-weight: bold; color: #64748b; border-radius: 8px; white-space: nowrap; transition: all 0.2s; cursor: pointer; }
         .platform-tab.active { background: #2563eb; color: #fff; }
 
-        .sub-tab { flex: 1; padding: 8px 0; text-align: center; font-size: 13px; font-weight: bold; color: #64748b; border-bottom: 2px solid transparent; cursor: pointer; }
+        .sub-tab { flex: 1; padding: 8px 0; text-align: center; font-size: 13px; font-weight: bold; color: #64748b; border-bottom: 2px solid transparent; cursor: pointer; white-space: nowrap; }
         .sub-tab.active { color: #2563eb; border-bottom-color: #2563eb; }
         
         .accordion-btn { width: 100%; text-align: left; padding: 16px; font-size: 15px; font-weight: bold; color: #1e293b; display: flex; justify-content: space-between; align-items: center; background: #fff; border-bottom: 1px solid #f1f5f9; }
@@ -29,10 +29,13 @@
         .danger-box { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; font-size: 13px; padding: 12px; border-radius: 8px; line-height: 1.6; }
         
         .highlight-text { background: #e0e7ff; color: #4338ca; font-family: monospace; font-weight: bold; padding: 0 4px; border-radius: 4px; }
-        .cookie-box { background: #f1f5f9; padding: 8px; border-radius: 6px; font-family: monospace; font-size: 11px; word-break: break-all; color: #475569; border: 1px solid #e2e8f0; margin-top: 4px;}
         
-        .ai-prompt-box { background: #1e293b; color: #e2e8f0; padding: 16px; border-radius: 8px; font-family: monospace; font-size: 12px; position: relative; margin-top: 12px; }
-        .copy-btn { position: absolute; top: 8px; right: 8px; background: #3b82f6; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; border: none; font-family: sans-serif; font-weight: bold;}
+        /* 新增名词解释专用样式 */
+        .term-item { margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed #e2e8f0; }
+        .term-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .term-title { font-size: 14px; font-weight: bold; color: #1e293b; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+        .term-title::before { content: ''; display: inline-block; width: 4px; height: 12px; background: #3b82f6; border-radius: 2px; }
+        .term-desc { font-size: 13px; color: #64748b; line-height: 1.6; }
     </style>
 </head>
 <body>
@@ -60,10 +63,11 @@
         </div>
 
         <!-- Facebook 专属的内层 Tab 切换 -->
-        <div id="fb-tabs" class="flex border-b border-slate-200 mb-4 hidden text-center">
+        <div id="fb-tabs" class="flex border-b border-slate-200 mb-4 hidden overflow-x-auto no-scrollbar whitespace-nowrap">
             <div class="sub-tab active" onclick="switchFbTab('mobile', this)">手机 2FA 登录</div>
             <div class="sub-tab" onclick="switchFbTab('cookie', this)">电脑 Cookie 登录</div>
             <div class="sub-tab" onclick="switchFbTab('unlock', this)">账号解锁教程</div>
+            <div class="sub-tab" onclick="switchFbTab('terms', this)">账号类目详解</div>
         </div>
 
         <div id="tutorial-content"></div>
@@ -75,26 +79,11 @@
                 title: 'Telegram 登录问题解决指南',
                 subtitle: '首次使用请仔细阅读对应平台的使用教程',
                 hasSubTab: false,
-                sections: [
-                    {
-                        title: '一、Telegram 登录问题解决方法',
-                        content: `
-                            <div class="p-4 space-y-4">
-                                <div class="flex gap-3">
-                                    <div class="step-num">1</div>
-                                    <div>
-                                        <h4 class="text-[14px] font-bold text-slate-800 mb-1">先尝试电脑端登录</h4>
-                                        <p class="text-[13px] text-slate-600 leading-relaxed">使用 Telegram 官方 Web 端或电脑桌面客户端登录。检查是否收到了验证码消息。</p>
-                                    </div>
-                                </div>
-                            </div>
-                        `
-                    }
-                ]
+                sections: [{ title: '教程准备中...', content: '<p class="p-4 text-slate-500">请稍后</p>' }]
             },
             'facebook': {
-                title: 'Facebook 登录与解锁指南',
-                subtitle: '卡密解析 · 登录方法 · 解锁申诉',
+                title: 'Facebook 登录与类目指南',
+                subtitle: '卡密解析 · 登录方法 · 账号黑话大全',
                 hasSubTab: true,
                 mobileSections: [
                     {
@@ -144,11 +133,6 @@
                                     <p class="text-[13px] text-slate-600"><b>国家代码：</b>RU</p>
                                     <p class="text-[13px] text-red-500 font-bold mt-2"><b>Cookie：</b>[JSON 格式的 Cookie 数据]</p>
                                 </div>
-
-                                <div class="alert-box mt-4 text-[12px]">
-                                    ⚠️ 卡密分隔符号会不一致，有时候是 <b>:</b> 有时候是 <b>;</b> 有时候是 <b>｜</b> 有时候是 <b>——</b>。<br>
-                                    如果看不懂，可以复制卡密发送给客服，并附上提示词：<b>“Facebook 账号分卡密”</b>。
-                                </div>
                             </div>
                         `
                     },
@@ -159,31 +143,28 @@
                                 <div class="flex gap-3">
                                     <div class="step-num">1</div>
                                     <div>
-                                        <h4 class="text-[14px] font-bold text-slate-800 mb-1">使用 Google Chrome 并安装插件</h4>
-                                        <p class="text-[13px] text-slate-600 leading-relaxed mb-2">建议使用电脑端 Chrome 浏览器，并安装 <b>Cookie Editor</b> 插件。</p>
+                                        <h4 class="text-[14px] font-bold text-slate-800 mb-1">安装 Cookie Editor 插件</h4>
+                                        <p class="text-[13px] text-slate-600 leading-relaxed mb-2">建议使用电脑端 Chrome 浏览器，并安装插件。</p>
                                         <div class="flex gap-2 flex-wrap">
                                             <a href="https://www.google.cn/chrome/" target="_blank" class="link-btn">🌐 Chrome 下载</a>
                                             <a href="https://chromewebstore.google.com/detail/cookie-editor/hlkenndednhfkekhgcdicdfddnkalmdm" target="_blank" class="link-btn">🔗 Cookie 插件</a>
                                         </div>
                                     </div>
                                 </div>
-                                
                                 <div class="flex gap-3 border-t border-slate-100 pt-4">
                                     <div class="step-num">2</div>
                                     <div>
                                         <h4 class="text-[14px] font-bold text-slate-800 mb-1">清理旧数据</h4>
-                                        <p class="text-[13px] text-slate-600 leading-relaxed">打开 Facebook 网页，点击插件，将当前页面的 Cookie <b>全部清理</b>，避免冲突。</p>
+                                        <p class="text-[13px] text-slate-600 leading-relaxed">打开 Facebook 网页，将当前页面的 Cookie <b>全部清理</b>。</p>
                                     </div>
                                 </div>
-
                                 <div class="flex gap-3 border-t border-slate-100 pt-4">
                                     <div class="step-num">3</div>
                                     <div>
                                         <h4 class="text-[14px] font-bold text-slate-800 mb-1">导入完整 Cookie</h4>
-                                        <p class="text-[13px] text-slate-600 leading-relaxed">复制卡密中那一长串的 <b>[JSON格式的Cookie]</b>。在插件里选择 Import，粘贴并保存。<br><span class="text-red-500 font-bold">千万不要只复制一部分，必须全部复制。</span></p>
+                                        <p class="text-[13px] text-slate-600 leading-relaxed">复制卡密中那一长串的 <b>[JSON格式的Cookie]</b>。在插件里选择 Import，粘贴并保存。</p>
                                     </div>
                                 </div>
-
                                 <div class="flex gap-3 border-t border-slate-100 pt-4">
                                     <div class="step-num">4</div>
                                     <div>
@@ -201,7 +182,6 @@
                         content: `
                             <div class="p-4 space-y-5">
                                 <p class="text-[13px] text-slate-600 leading-relaxed">如果你的账号出现被锁定的提示，不要慌，按以下步骤申诉：</p>
-                                
                                 <div class="flex gap-3">
                                     <div class="step-num">1</div>
                                     <div>
@@ -209,7 +189,6 @@
                                         <p class="text-[13px] text-slate-600 leading-relaxed">出现锁定提示时，点击页面上的“开始解锁”。</p>
                                     </div>
                                 </div>
-                                
                                 <div class="flex gap-3 border-t border-slate-100 pt-4">
                                     <div class="step-num">2</div>
                                     <div>
@@ -217,7 +196,6 @@
                                         <p class="text-[13px] text-slate-600 leading-relaxed">点击“继续”，进入下一步。</p>
                                     </div>
                                 </div>
-
                                 <div class="flex gap-3 border-t border-slate-100 pt-4">
                                     <div class="step-num">3</div>
                                     <div>
@@ -225,39 +203,101 @@
                                         <p class="text-[13px] text-slate-600 leading-relaxed">确认卡密中的邮箱无误，点击“获取验证码”。</p>
                                     </div>
                                 </div>
-
                                 <div class="flex gap-3 border-t border-slate-100 pt-4">
                                     <div class="step-num">4</div>
                                     <div>
                                         <h4 class="text-[14px] font-bold text-slate-800 mb-1">登录邮箱获取验证码</h4>
                                         <p class="text-[13px] text-slate-600 leading-relaxed mb-2">去登录卡密中的邮箱获取验证码。</p>
                                         <div class="alert-box text-[12px]">
-                                            <b>注意：</b><br>
-                                            1. 如果邮箱出现提示，点击“下一步”即可。<br>
-                                            2. 红框处填写自己能收到验证码的手机号。<br>
-                                            3. 如果提示“手机号频繁”，换一个手机号即可。<br>
-                                            4. 最后一步可以跳过，也可以填自己的邮箱。
+                                            <b>注意：</b>如果提示“手机号频繁”，换一个手机号即可。最后一步可以跳过，也可以填自己的邮箱。
                                         </div>
                                     </div>
                                 </div>
-
                                 <div class="flex gap-3 border-t border-slate-100 pt-4">
                                     <div class="step-num">5</div>
                                     <div>
                                         <h4 class="text-[14px] font-bold text-slate-800 mb-1">填入验证码，解锁完成</h4>
-                                        <p class="text-[13px] text-slate-600 leading-relaxed">把从邮箱获取的验证码填入第三步的页面，即可解锁成功，返回 Facebook 正常使用。</p>
+                                        <p class="text-[13px] text-slate-600 leading-relaxed">把从邮箱获取的验证码填入第三步的页面，即可解锁成功。</p>
                                     </div>
                                 </div>
                             </div>
                         `
                     }
+                ],
+                termsSections: [
+                    {
+                        title: '一、个人号类目',
+                        content: `
+                            <div class="p-4">
+                                <div class="term-item"><div class="term-title">二解号（956）</div><div class="term-desc">广告投放权限挂了一次，然后申诉回来的个人账号（956 是指二解号的简称）。</div></div>
+                                <div class="term-item"><div class="term-title">三解号（902）</div><div class="term-desc">广告投放权限挂了二次，然后申诉回来的个人账号（902 是指三解号的简称）。</div></div>
+                                <div class="term-item"><div class="term-title">耐用号</div><div class="term-desc">注册时间较长的个人账号。</div></div>
+                                <div class="term-item"><div class="term-title">小黑号</div><div class="term-desc">活跃度很低，好友数量在 0-30 左右，没有加双重验证，格式一般是账号+密码+cookie。</div></div>
+                                <div class="term-item"><div class="term-title">大黑号</div><div class="term-desc">活跃度较高，好友数量在 30 以上，没有加双重验证，格式一般是账号+密码+cookie。</div></div>
+                                <div class="term-item"><div class="term-title">专业号</div><div class="term-desc">带有公共主页的个人账号。</div></div>
+                                <div class="term-item"><div class="term-title">小白号</div><div class="term-desc">刚注册不久的个人账号，里面什么资源和内容都没有。</div></div>
+                                <div class="term-item"><div class="term-title">老白号</div><div class="term-desc">注册时间在 2-3 个月左右的账号。</div></div>
+                                <div class="term-item"><div class="term-title">商城号</div><div class="term-desc">带有 Marketplace 的账号，可以直接在 Marketplace 下单，无需跳转第三方。</div></div>
+                                <div class="term-item"><div class="term-title">申诉号</div><div class="term-desc">可以使用于申诉公共主页等其他资产的个人账号。</div></div>
+                                <div class="term-item"><div class="term-title">有缘号</div><div class="term-desc">使用于交友聊天的账号。</div></div>
+                                <div class="term-item"><div class="term-title">CC号</div><div class="term-desc">带 Facebook 官方客服的账号，可以联系官方客服申诉资产或咨询支付限额等问题。</div></div>
+                                <div class="term-item"><div class="term-title">本土号</div><div class="term-desc">指定国家的账号，信息内容和注册地址都是当地的个人账号。</div></div>
+                                <div class="term-item"><div class="term-title">账单号 / 余额户 / 预充值号</div><div class="term-desc">个人号里面的个人户带有支付记录、一定余额或可进行充值。</div></div>
+                                <div class="term-item"><div class="term-title">鱼号</div><div class="term-desc">格式只有 cookie，没有账号密码，通过某种技术钓鱼获取。</div></div>
+                            </div>
+                        `
+                    },
+                    {
+                        title: '二、公共主页类目',
+                        content: `
+                            <div class="p-4">
+                                <div class="term-item"><div class="term-title">新主页 / 老主页</div><div class="term-desc">新主页注册一般在一年以内，粉丝较少；老主页注册在 1 年以上，粉丝 0-99 随机。</div></div>
+                                <div class="term-item"><div class="term-title">百粉 / 千粉 / 万粉主页</div><div class="term-desc">注册时间在 1 年以上，粉丝数量分别在 100-999、1000-9999、10000 以上。</div></div>
+                                <div class="term-item"><div class="term-title">五星主页</div><div class="term-desc">评分是满分，一般都是做实体生意或者有产品的网店生意。</div></div>
+                                <div class="term-item"><div class="term-title">申诉主页</div><div class="term-desc">挂了一次，然后申诉回来的主页。</div></div>
+                                <div class="term-item"><div class="term-title">蓝V主页</div><div class="term-desc">主页认证了企业或者个人的身份，有一个打钩的蓝色 V 图标。</div></div>
+                                <div class="term-item"><div class="term-title">速推主页</div><div class="term-desc">直播的时候可以速推，可以花钱推广在线直播。</div></div>
+                            </div>
+                        `
+                    },
+                    {
+                        title: '三、广告账号类目',
+                        content: `
+                            <div class="p-4">
+                                <h4 class="text-[14px] font-bold text-slate-800 mb-2 mt-2">1. 个人户</h4>
+                                <p class="text-[13px] text-slate-600 mb-3 leading-relaxed">普通个人户限额分为 25-50、250、1500、不限额等。账单户同理。余额户指广告账户是预充值模式，带一定余额。</p>
+                                
+                                <h4 class="text-[14px] font-bold text-slate-800 mb-2 mt-4">2. 国内户</h4>
+                                <div class="term-item"><div class="term-title">电商户</div><div class="term-desc">日限额 450 刀，限制主页、限制域名，跑广告只能使用下户提交的主页和域名。</div></div>
+                                <div class="term-item"><div class="term-title">游戏户</div><div class="term-desc">日限额 1000 刀，不限域名、限制主页，可联系 Facebook 解限。</div></div>
+                                <div class="term-item"><div class="term-title">国内三不限</div><div class="term-desc">不限域名、不限主页、不限额，需要经销商 BM (PABM) 绑定。</div></div>
+
+                                <h4 class="text-[14px] font-bold text-slate-800 mb-2 mt-4">3. BM 户</h4>
+                                <p class="text-[13px] text-slate-600 mb-3 leading-relaxed">广告账户由 BM 创建而来。BM1、BM5、BM10、BM100、BM2500 代表该 BM 可创建的广告账户数量上限。市面上的玩法是拿空的不限额 BM5 拉账单号，变成不限额的。</p>
+
+                                <h4 class="text-[14px] font-bold text-slate-800 mb-2 mt-4">4. 海外户</h4>
+                                <p class="text-[13px] text-slate-600 mb-3 leading-relaxed">海外代理商通过当地企业主体申请下来的广告账户（不限域名、不限消耗、不限主页），处理问题需倒时差。</p>
+                            </div>
+                        `
+                    },
+                    {
+                        title: '四、BM 类目详解',
+                        content: `
+                            <div class="p-4">
+                                <div class="term-item"><div class="term-title">新 BM / 老 BM</div><div class="term-desc">创建时间分别在一两年以内/以上。</div></div>
+                                <div class="term-item"><div class="term-title">企业认证 BM</div><div class="term-desc">BM 的企业信息认证了主体，权重更高。</div></div>
+                                <div class="term-item"><div class="term-title">经销商 BM（PABM）</div><div class="term-desc">由国内主体通过一代申请下来的。</div></div>
+                                <div class="term-item"><div class="term-title">像素 BM</div><div class="term-desc">可共享像素 BM。</div></div>
+                                
+                                <h4 class="text-[14px] font-bold text-slate-800 mb-2 mt-6">各账号类型定义详解</h4>
+                                <div class="term-item"><div class="term-title">BM1、3、5、10... 与 BM250/1500</div><div class="term-desc">前者指可创建账户数量上限，后者指账户额度。初次建立大多为 $50。</div></div>
+                                <div class="term-item"><div class="term-title">半限额与不限额</div><div class="term-desc">半限额指日限额 $250 或 $350 等，不限额大多数能花到 $5000。</div></div>
+                                <div class="term-item"><div class="term-title">不死 BM</div><div class="term-desc">经过特殊方法使 BM 受限，但广告功能正常使用（已失效）。</div></div>
+                                <div class="term-item"><div class="term-title">代理商账号 / 国内户</div><div class="term-desc">通过国内代理开的账户，需要提交公司信息。</div></div>
+                            </div>
+                        `
+                    }
                 ]
-            },
-            'twitter': {
-                title: 'Twitter / X 教程',
-                subtitle: '正在整理中...',
-                hasSubTab: false,
-                sections: []
             }
         };
 
@@ -272,10 +312,10 @@
             const fbTabs = document.getElementById('fb-tabs');
             if (data.hasSubTab) {
                 fbTabs.classList.remove('hidden');
-                // 重置为默认激活
                 document.querySelectorAll('.sub-tab')[0].classList.add('active');
                 document.querySelectorAll('.sub-tab')[1].classList.remove('active');
                 document.querySelectorAll('.sub-tab')[2].classList.remove('active');
+                document.querySelectorAll('.sub-tab')[3].classList.remove('active');
                 renderFbContent('mobile');
             } else {
                 fbTabs.classList.add('hidden');
@@ -297,6 +337,8 @@
                 renderSections(data.cookieSections);
             } else if (mode === 'unlock') {
                 renderSections(data.unlockSections);
+            } else if (mode === 'terms') {
+                renderSections(data.termsSections);
             }
         }
 

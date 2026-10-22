@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>账号与 API 管理 - SOCKS5</title>
+    <link rel="icon" href="/logo.jpg" type="image/jpeg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #f8fafc; color: #1e293b; }
+        .card { background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; }
+        .status-btn { display: inline-flex; align-items: center; justify-content: center; padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
+        .status-pending { background: #eff6ff; color: #2563eb; }
+        .status-review { background: #fffbeb; color: #d97706; cursor: default; }
+        .status-active { background: #ecfdf5; color: #059669; cursor: default; }
+        .key-card { transition: all 0.2s; border: 1px solid #f1f5f9; }
+        .key-body { display: none; }
+        .key-card.expanded .key-body { display: block; }
+        .key-card.expanded .arrow-icon { transform: rotate(180deg); }
+        .btn-press { transition: transform 0.1s; }
+        .btn-press:active { transform: scale(0.97); }
+        #toast { visibility: hidden; min-width: 200px; background-color: #334155; color: #fff; text-align: center; border-radius: 8px; padding: 10px 16px; position: fixed; z-index: 10000; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 13px; opacity: 0; transition: opacity 0.3s; }
+        #toast.show { visibility: visible; opacity: 1; }
+    </style>
+</head>
+<body class="pb-12">
+    <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
+        <div class="flex items-center gap-3">
+            <a href="/console.html" class="text-slate-600 text-xl font-bold px-2">←</a>
+            <h1 class="text-[17px] font-bold text-slate-800">账号与秘钥</h1>
+        </div>
+        <button onclick="logout()" class="text-[13px] text-red-500 font-bold px-2 active:opacity-60">退出登录</button>
+    </header>
+
+    <main class="px-4 py-4 space-y-4 max-w-lg mx-auto">
+        <!-- 账户信息区 -->
+        <div class="card p-5">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="w-[48px] h-[48px] rounded-full bg-blue-50 text-blue-500 flex items-center justify-center font-bold text-xl">B</div>
+                <div>
+                    <h2 class="text-[18px] font-bold text-slate-800">boss</h2>
+                    <p class="text-[12px] text-slate-500 mt-0.5">ID: 10001 | 余额: ¥ 120.00</p>
+                </div>
+            </div>
+            
+            <!-- 接口权限列表 -->
+            <h3 class="text-[13px] font-bold text-slate-700 mb-2">接口权限开通状态</h3>
+            <div id="api-list" class="space-y-1"></div>
+        </div>
+
+        <!-- 秘钥与白名单 -->
+        <div class="card p-5">
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="text-[14px] font-bold text-slate-700">您的专属 API 秘钥</h3>
+                <button onclick="toggleKeyMask()" class="text-[12px] text-slate-400 flex items-center gap-1 active:opacity-60">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>切换可见
+                </button>
+            </div>
+            <div id="key-list" class="space-y-3 mb-6"></div>
+
+            <div class="border-t border-slate-100 pt-4">
+                <label class="block text-[13px] font-bold text-slate-700 mb-1">全局 IP 白名单</label>
+                <p class="text-[11px] text-slate-400 mb-2">保存后即刻生效，不在白名单内的 IP 将被拒绝访问</p>
+                <textarea rows="3" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-[13px] text-slate-700 focus:outline-none focus:border-blue-500 focus:bg-white transition resize-none" placeholder="一行一个 IP，例如：&#10;127.0.0.1&#10;8.8.8.8"></textarea>
+            </div>
+            <button onclick="showToast('全局 IP 白名单已保存')" class="mt-3 w-full py-2.5 bg-blue-600 text-white font-bold rounded-lg text-[14px] active:opacity-80 transition shadow-sm">保存白名单</button>
+        </div>
+    </main>
+
+    <div id="toast">提示内容</div>
+
+    <script>
+        const apis = [
+            { id: 'account', prefix: 'tg', name: '账号接口' },
+            { id: 'node', prefix: 'jd', name: '节点接口' },
+            { id: 'sms', prefix: 'sms', name: '接码接口' },
+            { id: 'query', prefix: 'cx', name: '查询接口' },
+            { id: 'pay', prefix: 'zf', name: '支付接口' }
+        ];
+        // 模拟状态：1未申请, 2审核中, 3启用中
+        let apiStatus = { account: 3, node: 1, sms: 2, query: 1, pay: 3 };
+        let apiKeys = { account: 'sk_tg_7a8b9c0d1e2f', node: 'sk_jd_456', sms: 'sk_sms_789', query: 'sk_cx_000', pay: 'sk_zf_999' };
+        let isMasked = false;
+
+        function renderApis() {
+            document.getElementById('api-list').innerHTML = apis.map(a => {
+                const status = apiStatus[a.id];
+                let btnHtml = '';
+                if (status === 1) btnHtml = `<button class="status-btn status-pending" onclick="showToast('已提交申请，等待审核')">申请调用</button>`;
+                else if (status === 2) btnHtml = `<span class="status-btn status-review">⏳ 审核中</span>`;
+                else btnHtml = `<span class="status-btn status-active">🟢 启用中</span>`;
+
+                return `
+                    <div class="flex justify-between items-center py-3 border-b border-slate-50 last:border-0">
+                        <p class="text-[14px] font-medium text-slate-800">${a.name}</p>
+                        ${btnHtml}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderKeys() {
+            document.getElementById('key-list').innerHTML = apis.map(a => {
+                // 只有启用状态(3)的才显示秘钥，其他状态显示未激活
+                if (apiStatus[a.id] !== 3) {
+                    return `
+                        <div class="p-3 bg-slate-50 border rounded-lg opacity-60">
+                            <p class="text-[12px] font-bold mb-1">${a.name} Key</p>
+                            <div class="font-mono text-[12px] text-slate-400">需审核通过后可用</div>
+                        </div>
+                    `;
+                }
+
+                const displayKey = isMasked ? `sk_${a.prefix}_****************` : apiKeys[a.id];
+                return `
+                    <div class="key-card rounded-lg overflow-hidden ${expandedKeyId === a.id ? 'expanded' : ''}">
+                        <div onclick="toggleKeyCard('${a.id}')" class="flex justify-between items-center bg-slate-50 px-3 py-2.5 cursor-pointer active:bg-slate-100 transition">
+                            <div class="flex items-center gap-2">
+                                <span class="text-[13px] font-bold text-slate-700">${a.name} Key</span>
+                                <span class="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded border border-green-200">已启用</span>
+                            </div>
+                            <svg class="w-4 h-4 text-slate-400 arrow-icon transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                        <div class="key-body bg-white p-3 border-t border-slate-100">
+                            <div class="flex items-center bg-slate-50 border border-slate-200 rounded px-2 py-2 mb-2">
+                                <span class="font-mono text-[12px] text-slate-600 flex-1 truncate select-all">${displayKey}</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="copyKey('${apiKeys[a.id]}')" class="flex-1 py-1.5 bg-white text-blue-600 text-[12px] font-bold rounded border border-slate-200 active:bg-slate-50 transition">复制</button>
+                                <button onclick="showToast('秘钥重置成功')" class="flex-1 py-1.5 bg-red-50 text-red-600 text-[12px] font-bold rounded border border-red-100 active:bg-red-100 transition">重置</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        let expandedKeyId = null;
+        function toggleKeyCard(id) {
+            expandedKeyId = (expandedKeyId === id) ? null : id;
+            renderKeys();
+        }
+        function toggleKeyMask() {
+            isMasked = !isMasked;
+            renderKeys();
+        }
+        function copyKey(key) {
+            if(navigator.clipboard) {
+                navigator.clipboard.writeText(key).then(() => { showToast('秘钥已复制'); });
+            }
+        }
+
+        function showToast(msg) { const t = document.getElementById('toast'); t.innerText = msg; t.className = 'show'; setTimeout(() => t.className = '', 2000); }
+        function logout() { localStorage.clear(); window.location.href = '/login.html'; }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderApis(); renderKeys();
+        });
+    </script>
+</body>
+</html>

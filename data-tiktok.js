@@ -118,18 +118,75 @@ const tiktokData = {
         {
             title: '换绑邮箱及修改密码',
             content: `
-                <div class="p-4 text-center text-slate-500 text-[13px]">
-                    正在整理中，敬请期待...
+                <div class="p-4 space-y-4 text-[13px] text-slate-600 leading-relaxed">
+                    <div class="bg-blue-50 text-blue-800 p-3 rounded-lg border border-blue-100 mb-4">
+                        如果购买的账号带有邮箱，可以自行登录邮箱接码，无需联系工作人员。<br>
+                        换绑的时候出现超时请按照下面步骤进行：
+                    </div>
+                    <div class="flex gap-2">
+                        <div class="w-5 h-5 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-[11px] shrink-0 mt-0.5">1</div>
+                        <p><b>绑定手机号码</b>（国内的也可以）</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <div class="w-5 h-5 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-[11px] shrink-0 mt-0.5">2</div>
+                        <p><b>解除绑定邮箱</b>（切记是<b>解除邮箱</b>不是更换邮箱），联系工作人员获取验证码</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <div class="w-5 h-5 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-[11px] shrink-0 mt-0.5">3</div>
+                        <p>解除邮箱之后，绑定你自己的邮箱即可成功</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <div class="w-5 h-5 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-[11px] shrink-0 mt-0.5">4</div>
+                        <p>绑定邮箱成功后，想解除手机号码同样方法操作，点击手机号码解除即可。</p>
+                    </div>
                 </div>
             `
         }
     ],
     frequentError: [
         {
-            title: '频繁及密码错误解决',
+            title: '一、出现最大次数（美区最经常出现此问题）',
             content: `
-                <div class="p-4 text-center text-slate-500 text-[13px]">
-                    正在整理中，敬请期待...
+                <div class="p-4 space-y-4 text-[13px] text-slate-600 leading-relaxed">
+                    <div class="alert-box mb-4">
+                        首先确认网络时区是否一致，定位是否关闭，其次尽量选择双 ISP 节点，卸载软件重装。
+                    </div>
+                    <div class="flex gap-2">
+                        <div class="w-5 h-5 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-[11px] shrink-0 mt-0.5">1</div>
+                        <p>输入邮箱登录</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <div class="w-5 h-5 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-[11px] shrink-0 mt-0.5">2</div>
+                        <p>输入邮箱验证码</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <div class="w-5 h-5 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-[11px] shrink-0 mt-0.5">3</div>
+                        <p>输入 TK 密码</p>
+                    </div>
+                    <p class="mt-2">一般情况下这个时候都可以登录成功。<b>如果还是出现最大次数，这时候要刷机、重装软件。</b></p>
+                </div>
+            `
+        },
+        {
+            title: '二、登录时候密码错误怎么办？',
+            content: `
+                <div class="p-4 space-y-4 text-[13px] text-slate-600 leading-relaxed">
+                    <div class="flex gap-2">
+                        <div class="w-5 h-5 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-[11px] shrink-0 mt-0.5">1</div>
+                        <p>通过邮箱登录，然后选择使用密码登录</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <div class="w-5 h-5 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-[11px] shrink-0 mt-0.5">2</div>
+                        <p>选择忘记密码登录</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <div class="w-5 h-5 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-[11px] shrink-0 mt-0.5">3</div>
+                        <p>输入账号对应的邮箱</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <div class="w-5 h-5 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-[11px] shrink-0 mt-0.5">4</div>
+                        <p>输入对应验证码即可重置密码</p>
+                    </div>
                 </div>
             `
         }

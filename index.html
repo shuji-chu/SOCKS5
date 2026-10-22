@@ -28,6 +28,10 @@
     </style>
 </head>
 <body>
+    <!-- 顶部公告条 -->
+    <div class="bg-gray-900 text-white text-[11px] text-center py-2 px-4">
+      ⚠️ 订单卡密仅保留30天，逾期自动清除，请及时备份！ | 平台实时在线 · 即时发货
+    </div>
     <header class="bg-white px-4 py-4 flex justify-between items-center sticky top-0 z-50">
         <div class="flex items-center gap-2">
             <div class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center">
@@ -164,21 +168,23 @@
             }
 
             list.innerHTML = filtered.map(p => `
-                <a href="${p.category === '接码服务' ? '/sms.html' : (p.category === '数据查询' ? '/api-market.html' : '/product-detail.html?id=' + p.id)}" class="block bg-white rounded-xl p-3 border border-slate-100 shadow-sm active:bg-slate-50 transition fade-in">
-                    <div class="flex gap-3">
-                        <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${p.icon === 'tg' ? 'bg-blue-50 text-blue-500' : p.icon === 'gmail' ? 'bg-pink-50 text-pink-500' : p.icon === 'node' ? 'bg-indigo-50 text-indigo-500' : p.icon === 'sms' ? 'bg-green-50 text-green-500' : p.icon === 'domain' ? 'bg-orange-50 text-orange-500' : 'bg-purple-50 text-purple-500'}">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">${icons[p.icon] || icons.tg}</svg>
+                <a href="${p.category === '接码服务' ? '/sms.html' : (p.category === '数据查询' ? '/api-market.html' : '/product-detail.html?id=' + p.id)}" class="block bg-white rounded-lg border border-gray-200 p-5 hover:shadow-md transition-shadow">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="inline-flex items-center justify-center w-8 h-8 rounded-md bg-gray-100 text-gray-600">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">${icons[p.icon] || icons.tg}</svg>
+                        </span>
+                        <span class="text-[11px] font-medium text-gray-500 uppercase tracking-wide">${p.category}</span>
+                    </div>
+                    <h3 class="text-[15px] font-bold text-gray-900 mb-2 leading-snug line-clamp-2">${p.title}</h3>
+                    <div class="flex flex-wrap gap-1.5 mb-4">
+                        ${(p.tags || []).map(t => `<span class="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded">${t}</span>`).join('')}
+                    </div>
+                    <div class="flex items-end justify-between">
+                        <div>
+                            <span class="text-xl font-bold text-gray-900">${p.currency === 'USDT' ? '$' : '¥'}${p.price}</span>
+                            <span class="text-[10px] text-gray-400 ml-1">起</span>
                         </div>
-                        <div class="flex-1 min-w-0">
-                            <h3 class="text-[14px] font-bold text-slate-800 leading-snug line-clamp-2 mb-1">${p.title}</h3>
-                            <div class="flex gap-1.5 mb-2">
-                                ${(p.tags || []).map(t => `<span class="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded border border-slate-200">${t}</span>`).join('')}
-                            </div>
-                            <div class="flex justify-between items-end">
-                                <span class="text-[18px] font-bold text-red-500 leading-none">${p.currency === 'USDT' ? '$' : '¥'}${p.price}</span>
-                                <span class="text-[11px] text-slate-400">${p.category === '接码服务' || p.category === '数据查询' ? '点击进入控制台' : '库存: <span class="text-green-500 font-medium">' + p.stock + '</span>'}</span>
-                            </div>
-                        </div>
+                        <span class="text-[11px] text-gray-400">${p.category === '接码服务' || p.category === '数据查询' ? '进入控制台' : '库存 <span class="text-green-600 font-medium">' + p.stock + '</span>'}</span>
                     </div>
                 </a>
             `).join('');

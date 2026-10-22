@@ -4,87 +4,65 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>我的账户 - SOCKS5</title>
+    <link rel="icon" href="/logo.jpg" type="image/jpeg">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
         body { background-color: #f1f5f9; color: #1e293b; padding-bottom: 80px; }
-        
-        /* 顶部导航栏 */
         .top-nav { background: #3b82f6; color: white; padding: 16px; font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 8px; position: sticky; top: 0; z-index: 50; }
-        
-        /* 通用卡片样式 */
         .app-card { background: white; border-radius: 12px; margin: 12px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        
-        /* 资产小方块 */
         .asset-box { display: flex; align-items: center; gap: 12px; background: #f8fafc; border-radius: 10px; padding: 16px; border: 1px solid #f1f5f9; }
         .asset-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; }
-        
-        /* Tab 切换 */
         .tab-header { display: flex; border-bottom: 1px solid #e2e8f0; padding: 0 12px; margin-bottom: 16px; }
         .tab-item { flex: 1; text-align: center; padding: 16px 0; font-size: 15px; font-weight: 600; color: #64748b; border-bottom: 2px solid transparent; }
         .tab-item.active { color: #3b82f6; border-bottom-color: #3b82f6; }
-        
-        /* 订单卡片 */
         .order-box { border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px; margin-bottom: 12px; }
+        
+        /* 弹窗 */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 9999; display: none; align-items: center; justify-content: center; }
+        .modal-overlay.active { display: flex; }
+        .modal-content { background: white; width: 90%; max-width: 360px; border-radius: 20px; padding: 24px; animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     </style>
 </head>
 <body>
 
-    <!-- 顶部导航 -->
     <div class="top-nav">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
         我的账户
     </div>
 
     <!-- 个人资料卡片 -->
-    <div class="app-card flex items-center gap-4 mt-4">
-        <div class="w-16 h-16 bg-slate-200 rounded-full flex items-center justify-center text-slate-400">
-            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-        </div>
+    <div class="app-card flex items-center gap-4 mt-4 cursor-pointer hover:bg-slate-50 transition-colors" onclick="openEditModal()">
+        <img id="user-avatar" src="/logo.jpg" class="w-16 h-16 rounded-full object-cover border border-slate-200">
         <div>
-            <h2 class="text-lg font-bold text-slate-800" id="user-email">加载中...</h2>
-            <p class="text-xs text-slate-400 mt-1">账号：<span id="user-email-sub"></span></p>
+            <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                <span id="user-nickname">加载中...</span>
+                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+            </h2>
+            <p class="text-xs text-slate-400 mt-1">专属ID: <span id="user-id" class="font-mono text-blue-500 font-bold"></span></p>
+            <p class="text-xs text-slate-400 mt-0.5">账号：<span id="user-email-sub"></span></p>
         </div>
     </div>
 
     <!-- 资产概览网格 -->
     <div class="grid grid-cols-2 gap-3 mx-3">
         <div class="asset-box">
-            <div class="asset-icon bg-blue-500">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
-            </div>
-            <div>
-                <p class="text-lg font-bold text-slate-800">¥ 0.00</p>
-                <p class="text-xs text-slate-500">账户余额</p>
-            </div>
+            <div class="asset-icon bg-blue-500"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg></div>
+            <div><p class="text-lg font-bold text-slate-800">¥ 0.00</p><p class="text-xs text-slate-500">账户余额</p></div>
         </div>
         <div class="asset-box relative">
-            <div class="asset-icon bg-orange-500">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            </div>
-            <div>
-                <p class="text-lg font-bold text-slate-800">¥ 0.00</p>
-                <p class="text-xs text-slate-500">佣金余额</p>
-            </div>
+            <div class="asset-icon bg-orange-500"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
+            <div><p class="text-lg font-bold text-slate-800">¥ 0.00</p><p class="text-xs text-slate-500">佣金余额</p></div>
             <button class="absolute top-2 right-2 text-[10px] bg-blue-500 text-white px-2 py-0.5 rounded">+充值</button>
         </div>
         <div class="asset-box">
-            <div class="asset-icon bg-green-500">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-            </div>
-            <div>
-                <p class="text-lg font-bold text-slate-800">¥ 169.81</p>
-                <p class="text-xs text-slate-500">消费总额</p>
-            </div>
+            <div class="asset-icon bg-green-500"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg></div>
+            <div><p class="text-lg font-bold text-slate-800">¥ 0.00</p><p class="text-xs text-slate-500">消费总额</p></div>
         </div>
         <div class="asset-box">
-            <div class="asset-icon bg-slate-500">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
-            </div>
-            <div>
-                <p class="text-lg font-bold text-slate-800">23</p>
-                <p class="text-xs text-slate-500">订单数量</p>
-            </div>
+            <div class="asset-icon bg-slate-500"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></div>
+            <div><p class="text-lg font-bold text-slate-800">0</p><p class="text-xs text-slate-500">订单数量</p></div>
         </div>
     </div>
 
@@ -92,24 +70,21 @@
     <div class="app-card">
         <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
             <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
-            API 配置
+            API 配置 (支持外部对接)
         </h3>
         <div class="mb-3">
-            <p class="text-xs text-slate-500 mb-1">APP ID:</p>
+            <p class="text-xs text-slate-500 mb-1">APP ID (用户ID):</p>
             <div class="flex border border-slate-200 rounded-lg overflow-hidden">
-                <input type="text" readonly value="31105" class="flex-1 px-3 py-2 text-sm bg-slate-50 outline-none">
-                <button class="px-4 bg-slate-100 text-slate-500 border-l border-slate-200">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                </button>
+                <input type="text" id="api-id" readonly class="flex-1 px-3 py-2 text-sm bg-slate-50 outline-none">
+                <button class="px-4 bg-slate-100 text-slate-500 border-l border-slate-200" onclick="copyVal('api-id')">复制</button>
             </div>
         </div>
         <div>
             <p class="text-xs text-slate-500 mb-1">APP Secret:</p>
             <div class="flex border border-slate-200 rounded-lg overflow-hidden">
-                <input type="password" readonly value="12345678901234567890" class="flex-1 px-3 py-2 text-sm bg-slate-50 outline-none">
-                <button class="px-4 bg-slate-100 text-slate-500 border-l border-slate-200">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                </button>
+                <input type="password" id="api-secret" readonly class="flex-1 px-3 py-2 text-sm bg-slate-50 outline-none">
+                <button class="px-4 bg-slate-100 text-slate-500 border-l border-slate-200" onclick="togglePwd('api-secret')">👁</button>
+                <button class="px-4 bg-slate-100 text-slate-500 border-l border-slate-200" onclick="copyVal('api-secret')">复制</button>
             </div>
         </div>
     </div>
@@ -121,39 +96,10 @@
             <div class="tab-item" onclick="switchTab('invite', this)">我的推广</div>
         </div>
 
-        <!-- 订单查询列表 -->
+        <!-- 订单查询列表 (保留原样) -->
         <div id="tab-orders" class="p-4">
-            <div class="order-box">
-                <p class="text-[13px] text-blue-600 bg-blue-50 px-2 py-1 rounded inline-block mb-2">[货号3965] ➔ Telegram 飞机号 / +1 美国电话注册 | 成品号</p>
-                <p class="text-xs text-slate-400 mb-3">2026/10/11 14:58:46</p>
-                
-                <div class="flex justify-between items-center border-t border-slate-100 pt-3">
-                    <div class="space-y-1">
-                        <p class="text-xs text-slate-500">订单号：1558735597693071360</p>
-                        <p class="text-xs text-slate-500">支付状态：已支付</p>
-                        <p class="text-xs text-slate-500">发货状态：已发货</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-sm font-bold text-orange-500 mb-2">¥ 8.72</p>
-                        <button class="bg-blue-500 text-white text-xs px-4 py-1.5 rounded">查看详情</button>
-                    </div>
-                </div>
-            </div>
-            <div class="order-box">
-                <p class="text-[13px] text-blue-600 bg-blue-50 px-2 py-1 rounded inline-block mb-2">[货号3567] ➔ Telegram 飞机号 / +57 哥伦比亚电话注册 | 成品号</p>
-                <p class="text-xs text-slate-400 mb-3">2026/10/08 11:05:18</p>
-                
-                <div class="flex justify-between items-center border-t border-slate-100 pt-3">
-                    <div class="space-y-1">
-                        <p class="text-xs text-slate-500">订单号：1557589681405718528</p>
-                        <p class="text-xs text-slate-500">支付状态：已支付</p>
-                        <p class="text-xs text-slate-500">发货状态：已发货</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-sm font-bold text-orange-500 mb-2">¥ 5.62</p>
-                        <button class="bg-blue-500 text-white text-xs px-4 py-1.5 rounded">查看详情</button>
-                    </div>
-                </div>
+            <div class="text-center py-8">
+                <p class="text-slate-400 text-sm">暂无订单记录</p>
             </div>
         </div>
 
@@ -172,55 +118,109 @@
 
             <p class="text-xs text-slate-500 mb-2">我的专属推广链接</p>
             <div class="flex gap-2 mb-6">
-                <input type="text" readonly value="https://dahaoshang.com?from=31105" class="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-600 outline-none">
-                <button class="bg-blue-500 text-white text-xs px-4 rounded-lg">复制</button>
-            </div>
-            
-            <div class="text-center py-6">
-                <p class="text-slate-400 text-sm">暂无推广数据</p>
+                <input type="text" id="invite-link" readonly class="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-600 outline-none">
+                <button class="bg-blue-500 text-white text-xs px-4 rounded-lg" onclick="copyVal('invite-link')">复制</button>
             </div>
         </div>
     </div>
 
     <!-- 退出按钮 -->
     <div class="mx-3 mt-4">
-        <button onclick="logout()" class="w-full py-3.5 bg-white text-red-500 text-sm font-bold rounded-xl shadow-sm border border-slate-200 active:bg-slate-50">
-            退出登录
-        </button>
+        <button onclick="logout()" class="w-full py-3.5 bg-white text-red-500 text-sm font-bold rounded-xl shadow-sm border border-slate-200 active:bg-slate-50">退出登录</button>
+    </div>
+
+    <!-- 修改资料弹窗 -->
+    <div id="edit-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 class="text-lg font-bold text-slate-800 mb-4">修改个人资料</h3>
+            <div class="mb-4">
+                <label class="block text-xs text-slate-500 mb-1">昵称</label>
+                <input type="text" id="edit-nickname" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none">
+            </div>
+            <div class="mb-6">
+                <label class="block text-xs text-slate-500 mb-1">头像链接</label>
+                <input type="text" id="edit-avatar" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none">
+            </div>
+            <div class="flex gap-3">
+                <button onclick="closeEditModal()" class="flex-1 py-2.5 bg-slate-100 text-slate-600 font-bold rounded-lg">取消</button>
+                <button onclick="saveProfile()" class="flex-1 py-2.5 bg-blue-500 text-white font-bold rounded-lg">保存</button>
+            </div>
+        </div>
     </div>
 
     <script>
-        // 渲染用户邮箱
         const email = localStorage.getItem('socks5_email');
+        const uid = localStorage.getItem('socks5_user_id');
+        const appSecret = localStorage.getItem('socks5_app_secret');
+        const nickname = localStorage.getItem('socks5_nickname');
+        const avatar = localStorage.getItem('socks5_avatar');
+
         if (!email) {
             window.location.href = '/login.html';
         } else {
-            document.getElementById('user-email').innerText = email;
             document.getElementById('user-email-sub').innerText = email;
+            document.getElementById('api-id').value = uid || '暂无';
+            document.getElementById('api-secret').value = appSecret || '暂无';
+            document.getElementById('user-nickname').innerText = nickname || email.split('@')[0];
+            document.getElementById('user-id').innerText = uid || '暂无';
+            document.getElementById('user-avatar').src = avatar || '/logo.jpg';
+            document.getElementById('invite-link').value = `https://web.lynli.me/?from=${uid}`;
         }
 
-        // 切换 Tab
+        function copyVal(id) {
+            const val = document.getElementById(id).value;
+            if(!val || val === '暂无') return;
+            navigator.clipboard.writeText(val).then(() => alert('已复制到剪贴板'));
+        }
+
+        function togglePwd(id) {
+            const input = document.getElementById(id);
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+
         function switchTab(type, el) {
-            // 样式切换
             document.querySelectorAll('.tab-item').forEach(item => item.classList.remove('active'));
             el.classList.add('active');
-
-            // 内容切换
             document.getElementById('tab-orders').classList.add('hidden');
             document.getElementById('tab-invite').classList.add('hidden');
-
-            if (type === 'orders') {
-                document.getElementById('tab-orders').classList.remove('hidden');
-            } else {
-                document.getElementById('tab-invite').classList.remove('hidden');
-            }
+            document.getElementById('tab-' + type).classList.remove('hidden');
         }
 
-        // 退出
         function logout() {
-            localStorage.removeItem('socks5_email');
-            localStorage.removeItem('socks5_token');
+            localStorage.clear();
             window.location.href = '/login.html';
+        }
+
+        // 弹窗逻辑
+        function openEditModal() {
+            document.getElementById('edit-nickname').value = document.getElementById('user-nickname').innerText;
+            document.getElementById('edit-avatar').value = document.getElementById('user-avatar').src;
+            document.getElementById('edit-modal').classList.add('active');
+        }
+        function closeEditModal() {
+            document.getElementById('edit-modal').classList.remove('active');
+        }
+
+        async function saveProfile() {
+            const nNickname = document.getElementById('edit-nickname').value;
+            const nAvatar = document.getElementById('edit-avatar').value;
+            
+            try {
+                const res = await fetch('https://sendmail.lynli.me/update-profile', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ email: email, nickname: nNickname, avatar: nAvatar })
+                });
+                if (res.ok) {
+                    localStorage.setItem('socks5_nickname', nNickname);
+                    localStorage.setItem('socks5_avatar', nAvatar);
+                    location.reload();
+                } else {
+                    alert('修改失败');
+                }
+            } catch(e) {
+                alert('网络错误');
+            }
         }
     </script>
 </body>

@@ -74,7 +74,7 @@
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             try {
-                const res = await fetch('https://api.shuji.cc.cd/s5api/api/v1/passport/auth/login', {
+                const res = await fetch('https://api.lynli.me/s5api/api/v1/passport/auth/login', {
                     method: 'POST', headers: {'Content-Type': 'application/json'}, 
                     body: JSON.stringify({ email: document.getElementById('email').value, password: document.getElementById('password').value })
                 });

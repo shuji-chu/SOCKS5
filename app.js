@@ -1,6 +1,6 @@
 const tg = window.Telegram?.WebApp;
 const safew = window.SafeW || window.SafeWApp;
-const API_HOST = 'https://api.shuji.cc.cd/s5api/api/v1';
+const API_HOST = 'https://api.lynli.me/s5api/api/v1';
 
 let currentUser = localStorage.getItem('socks5_email') || null;
 let currentToken = localStorage.getItem('socks5_token') || null;

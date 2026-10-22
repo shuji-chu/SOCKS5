@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>注册 - SOCKS5</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="/style.css?v=40">
+    <link rel="stylesheet" href="/style.css?v=41">
 </head>
 <body class="bg-slate-50 flex flex-col justify-center min-h-screen p-6">
     <div class="text-center mb-8">
@@ -37,7 +37,7 @@
             if(!email || !email.includes('@')) { alert('请输入正确邮箱'); return; }
             this.disabled = true; this.innerText = '发送中...';
             try {
-                const res = await fetch('https://api.shuji.cc.cd/s5api/api/v1/passport/auth/send-code', {
+                const res = await fetch('https://api.lynli.me/s5api/api/v1/passport/auth/send-code', {
                     method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ email })
                 });
                 const data = await res.json();
@@ -51,7 +51,7 @@
         document.getElementById('reg-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             try {
-                const res = await fetch('https://api.shuji.cc.cd/s5api/api/v1/passport/auth/register', {
+                const res = await fetch('https://api.lynli.me/s5api/api/v1/passport/auth/register', {
                     method: 'POST', headers: {'Content-Type': 'application/json'}, 
                     body: JSON.stringify({ email: document.getElementById('email').value, password: document.getElementById('password').value, code: document.getElementById('code').value })
                 });

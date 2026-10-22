@@ -14,6 +14,12 @@
         .menu-item { background: #fff; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid #f1f5f9; active:bg-slate-50 transition; }
         .menu-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
     </style>
+
+    <script>
+        // 强制拦截：如果没有管理员 Token，直接踢回登录页
+            window.location.href = '/admin-login.html';
+        }
+    </script>
 </head>
 <body>
     <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center justify-between sticky top-0 z-50">

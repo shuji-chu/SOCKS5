@@ -1,6 +1,6 @@
 const telegramData = {
     title: 'Telegram 教程大全',
-    subtitle: '短信费解决 · 多客户端支持 · 防封养号',
+    subtitle: '登录问题解决 · SMS Fee · 防封养号',
     sections: [
         {
             title: '登录前：先看懂卡密格式',
@@ -16,14 +16,14 @@ const telegramData = {
             `
         },
         {
-            title: '图文教程：Telegram 登录步骤',
+            title: '图文教程：Telegram 手机端登录步骤',
             content: `
                 <div class="p-4 space-y-5">
                     <div class="flex gap-3">
                         <div class="step-num">1</div>
                         <div>
                             <h4 class="text-[14px] font-bold text-slate-800 mb-1">确认手机号码和国家区号</h4>
-                            <p class="text-[13px] text-slate-600 leading-relaxed">发货手机号码中已经包含国家区号，登录时请注意正确区分国家号和电话号码。例如发货号码：27605077772，27 为国家区号，605077772 为电话号码。</p>
+                            <p class="text-[13px] text-slate-600 leading-relaxed">发货手机号码中已经包含国家区号，登录时请注意正确区分国家号和电话号码。例如发货号码：27605077772，27 为国家区号，605077772 为电话号码。登录时根据客户端选择对应国家区号，再填写剩余手机号码即可。</p>
                         </div>
                     </div>
                     <div class="flex gap-3 border-t border-slate-100 pt-4">
@@ -51,10 +51,10 @@ const telegramData = {
             `
         },
         {
-            title: '一、Telegram 登录问题解决方法',
+            title: 'Telegram 登录异常解决与防封指南',
             content: `
                 <div class="p-4 space-y-4">
-                    <p class="text-[13px] text-slate-600 leading-relaxed">如果登录 Telegram 时遇到邮箱验证、短信费用提示或一直收不到验证码，可以参考下面的方法。不同账号的验证流程可能不同，请根据实际提示操作。</p>
+                    <p class="text-[13px] text-slate-600 leading-relaxed">如果登录 Telegram 时遇到邮箱验证、一直收不到验证码，或者提示账号被限制，可以参考以下方法：</p>
                     <div class="flex gap-3">
                         <div class="step-num">1</div>
                         <div>
@@ -76,15 +76,15 @@ const telegramData = {
                     <div class="flex gap-3 border-t border-slate-100 pt-4">
                         <div class="step-num">3</div>
                         <div>
-                            <h4 class="text-[14px] font-bold text-slate-800 mb-1">尝试其他兼容客户端</h4>
-                            <p class="text-[13px] text-slate-600 leading-relaxed">如果最新版 Telegram 一直出现邮箱验证、短信费用或验证码异常，可以尝试使用下方提供的第三方客户端。</p>
+                            <h4 class="text-[14px] font-bold text-slate-800 mb-1">使用指纹浏览器防封</h4>
+                            <p class="text-[13px] text-slate-600 leading-relaxed">Telegram 的封号机制主要检测异常行为和关联风险，长期使用建议配置独立的指纹浏览器环境，绑定固定的住宅 IP，新号不要立刻频繁发消息，先养号 3-5 天。</p>
                         </div>
                     </div>
                 </div>
             `
         },
         {
-            title: '二、Telegram 提示短信费用(SMS Fee)怎么办？',
+            title: 'Telegram 提示短信费用 (SMS Fee) 怎么办？',
             content: `
                 <div class="p-4 space-y-5">
                     <div>
@@ -97,7 +97,6 @@ const telegramData = {
                         <ul class="text-[13px] text-slate-500 space-y-1 list-disc list-inside">
                             <li>礼品卡必须与 Apple 账号的商店地区匹配。</li>
                             <li>先确认实际需要支付的金额，2 美元的礼品卡就足够了。</li>
-                            <li>礼品卡只是付款方式之一，不保证一定能解决登录问题。</li>
                         </ul>
                     </div>
                     <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
@@ -106,16 +105,16 @@ const telegramData = {
                         <a href="/index.html" class="block text-center w-full py-2.5 bg-blue-600 text-white font-bold rounded-lg text-[14px]">前往查看 Telegram Premium 套餐</a>
                     </div>
                     <div class="alert-box">
-                        ⚠️ <b>注意：</b>开通 Premium 不保证所有账号都能解除短信验证限制。如果只是要求邮箱验证码，并没有出现付费提示，也不需要盲目购买会员。请以当前登录页面的实际要求为准。
+                        ⚠️ <b>注意：</b>开通 Premium 不保证所有账号都能解除短信验证限制。如果只是要求邮箱验证码，并没有出现付费提示，也不需要盲目购买会员。
                     </div>
                 </div>
             `
         },
         {
-            title: '三、第三方 Telegram 客户端合集',
+            title: '第三方 Telegram 客户端合集',
             content: `
                 <div class="p-4">
-                    <p class="text-[13px] text-slate-600 leading-relaxed mb-2">如果官方客户端无法正常登录，也可以参考以下兼容客户端名单。<br><b>标记说明：</b> ✅ 开源　❌ 闭源 (下载前请确认项目状态、权限及来源)</p>
+                    <p class="text-[13px] text-slate-600 leading-relaxed mb-2">如果官方客户端无法正常登录（如提示短信费或验证码异常），也可以参考以下兼容客户端名单。<br><b>标记说明：</b> ✅ 开源　❌ 闭源 (下载前请确认项目状态、权限及来源)</p>
                     
                     <h5 class="font-bold text-slate-800 text-[13px] mt-4 mb-2"># Android</h5>
                     <div class="client-list">
@@ -156,46 +155,16 @@ const telegramData = {
                         <div class="client-item"><span>Aka</span> <span>❌</span></div>
                     </div>
 
-                    <h5 class="font-bold text-slate-800 text-[13px] mt-4 mb-2"># Windows</h5>
+                    <h5 class="font-bold text-slate-800 text-[13px] mt-4 mb-2"># Windows / macOS / Linux</h5>
                     <div class="client-list">
-                        <div class="client-item"><span>64Gram</span> <span>✅</span></div>
-                        <div class="client-item"><span>Unigram</span> <span>✅</span></div>
-                        <div class="client-item"><span>AyuGram</span> <span>✅</span></div>
-                        <div class="client-item"><span>Forkgram</span> <span>✅</span></div>
-                        <div class="client-item"><span>Kotatogram</span> <span>✅</span></div>
-                        <div class="client-item"><span>materialgram</span> <span>✅</span></div>
-                        <div class="client-item"><span>iMe</span> <span>❌</span></div>
+                        <div class="client-item"><span>64Gram (Win/Mac)</span> <span>✅</span></div>
+                        <div class="client-item"><span>Unigram (Win)</span> <span>✅</span></div>
+                        <div class="client-item"><span>AyuGram (Win)</span> <span>✅</span></div>
+                        <div class="client-item"><span>Forkgram (Win)</span> <span>✅</span></div>
+                        <div class="client-item"><span>Kotatogram (Win/Mac)</span> <span>✅</span></div>
+                        <div class="client-item"><span>materialgram (全平台)</span> <span>✅</span></div>
+                        <div class="client-item"><span>iMe (Win)</span> <span>❌</span></div>
                     </div>
-
-                    <h5 class="font-bold text-slate-800 text-[13px] mt-4 mb-2"># macOS / Linux / WearOS</h5>
-                    <div class="client-list">
-                        <div class="client-item"><span>64Gram (mac)</span> <span>✅</span></div>
-                        <div class="client-item"><span>Kotatogram (mac)</span> <span>✅</span></div>
-                        <div class="client-item"><span>materialgram (mac/Linux)</span> <span>✅</span></div>
-                        <div class="client-item"><span>HandyGram (Wear)</span> <span>✅</span></div>
-                    </div>
-                </div>
-            `
-        },
-        {
-            title: '四、Telegram 防封与养号指南',
-            content: `
-                <div class="p-4 space-y-4">
-                    <p class="text-[13px] text-slate-600 leading-relaxed">Telegram 的封号机制主要检测异常行为和关联风险，你的目标就是让账号行为看起来像一个真实的普通用户。</p>
-                    <div class="alert-box">
-                        <b>核心原则：模仿真人，减少异常。</b><br><br>
-                        ✅ 使用指纹浏览器隔离环境，绑定固定的住宅 IP。<br>
-                        ✅ 新号切勿立即进行大量操作！建议至少养号 5-7 天。<br>
-                        ✅ 操作频率要慢，避免短时间大量关注、点赞或群发。<br>
-                        ✅ 严禁发布垃圾链接、色情、暴力等违规内容。
-                    </div>
-                    <h4 class="text-[14px] font-bold text-slate-800 mt-4">安全登录检查清单</h4>
-                    <ul class="text-[13px] text-slate-600 space-y-1 list-disc list-inside">
-                        <li>环境：是否为每个账号配置了独立的指纹浏览器 + 固定 IP？</li>
-                        <li>信息：账号资料是否完整、像真人？</li>
-                        <li>行为：日常操作频率是否在安全阈值内？</li>
-                        <li>稳定：是否避免了频繁切换登录环境和 IP？</li>
-                    </ul>
                 </div>
             `
         }

@@ -12,7 +12,7 @@
         .card { background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; }
         .pill-btn { padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: bold; white-space: nowrap; background: #f1f5f9; color: #64748b; transition: all 0.2s; cursor: pointer; }
         .pill-btn.active { background: #2563eb; color: #ffffff; box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2); }
-        .filter-select { appearance: none; background-color: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; font-size: 13px; color: #475569; outline: none; font-weight: 500;}
+        .filter-select { appearance: none; background-color: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; font-size: 13px; color: #475569; outline: none; font-weight: 500; cursor: pointer;}
     </style>
 </head>
 <body>
@@ -24,40 +24,54 @@
     </header>
 
     <main class="max-w-lg mx-auto">
+        <!-- 顶部 Banner -->
         <div class="px-4 pt-4 pb-2">
-            <h2 class="text-[22px] font-extrabold text-slate-800 mb-1">探索 API 接口</h2>
-            <p class="text-[13px] text-slate-500">按业务场景查找能力，让接入更简单。</p>
+            <div class="bg-gradient-to-r from-slate-900 to-slate-800 rounded-xl p-5 text-white shadow-lg relative overflow-hidden">
+                <h2 class="text-[18px] font-bold mb-1 relative z-10">开发者 API 市场</h2>
+                <p class="text-[12px] text-slate-300 mb-3 relative z-10">聚合 65+ 优质数据源，毫秒级响应，合规稳定</p>
+                <div class="flex gap-2 relative z-10">
+                    <span class="bg-white/20 text-[11px] px-2 py-1 rounded backdrop-blur-sm">官方直连</span>
+                    <span class="bg-white/20 text-[11px] px-2 py-1 rounded backdrop-blur-sm">实时计费</span>
+                </div>
+                <svg class="absolute -right-4 -bottom-4 w-32 h-32 text-white/5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
+            </div>
         </div>
 
-        <!-- 真实的分类过滤 -->
+        <!-- 分类过滤 -->
         <div id="category-tabs" class="flex overflow-x-auto no-scrollbar gap-2 px-4 py-3 sticky top-[57px] bg-slate-50 z-40">
-            <div class="pill-btn active" onclick="filterCategory('全部', this)">全部</div>
-            <div class="pill-btn" onclick="filterCategory('实名认证', this)">实名认证</div>
-            <div class="pill-btn" onclick="filterCategory('生活服务', this)">生活服务</div>
-            <div class="pill-btn" onclick="filterCategory('手机号码', this)">手机号码</div>
-            <div class="pill-btn" onclick="filterCategory('企业工商', this)">企业工商</div>
-            <div class="pill-btn" onclick="filterCategory('网站域名', this)">网站域名</div>
-            <div class="pill-btn" onclick="filterCategory('金融风险', this)">金融风险</div>
-            <div class="pill-btn" onclick="filterCategory('交通与车辆', this)">交通与车辆</div>
+            <div class="pill-btn active" onclick="setCategory('全部', this)">全部</div>
+            <div class="pill-btn" onclick="setCategory('实名认证', this)">实名认证</div>
+            <div class="pill-btn" onclick="setCategory('生活服务', this)">生活服务</div>
+            <div class="pill-btn" onclick="setCategory('手机号码', this)">手机号码</div>
+            <div class="pill-btn" onclick="setCategory('企业工商', this)">企业工商</div>
+            <div class="pill-btn" onclick="setCategory('网站域名', this)">网站域名</div>
+            <div class="pill-btn" onclick="setCategory('金融风险', this)">金融风险</div>
+            <div class="pill-btn" onclick="setCategory('交通与车辆', this)">交通与车辆</div>
         </div>
 
         <div class="px-4 mb-2">
             <h3 class="text-[18px] font-bold text-slate-800 mb-1" id="current-title">全部接口</h3>
-            <p class="text-[12px] text-slate-500">当前展示 <span class="text-blue-600 font-bold" id="total-count">65</span> 个接口，点击卡片查看详情。</p>
+            <p class="text-[12px] text-slate-500">当前展示 <span class="text-blue-600 font-bold" id="total-count">0</span> 个接口，点击卡片查看详情。</p>
         </div>
 
+        <!-- 排序与付费筛选 (真实生效) -->
         <div class="px-4 flex gap-3 mb-4">
-            <select class="filter-select flex-1">
-                <option>排序：综合</option>
+            <select id="sort-select" onchange="renderApis()" class="filter-select flex-1">
+                <option value="default">排序：综合</option>
+                <option value="price-asc">价格：从低到高</option>
+                <option value="price-desc">价格：从高到低</option>
             </select>
-            <select class="filter-select flex-1">
-                <option>付费类型：全部</option>
+            <select id="pay-type-select" onchange="renderApis()" class="filter-select flex-1">
+                <option value="all">付费类型：全部</option>
+                <option value="paid">付费接口</option>
+                <option value="free">免费接口</option>
             </select>
         </div>
 
+        <!-- 列表容器 -->
         <div id="api-list" class="px-4 pb-6 space-y-4"></div>
 
-        <!-- 分页 (暂做静态展示) -->
+        <!-- 分页 (静态展示) -->
         <div class="flex flex-wrap items-center justify-center gap-2 px-4 pb-12 mt-4">
             <button class="px-3 py-1.5 bg-white border border-slate-200 text-slate-500 text-[13px] rounded-lg">上一页</button>
             <button class="px-3 py-1.5 bg-blue-600 text-white text-[13px] rounded-lg">1</button>
@@ -74,49 +88,7 @@
     <script>
         let currentCategory = '全部';
 
-        function renderApis() {
-            const list = document.getElementById('api-list');
-            const filtered = currentCategory === '全部' 
-                ? apisData 
-                : apisData.filter(a => a.category === currentCategory);
-
-            document.getElementById('total-count').innerText = filtered.length;
-
-            if (filtered.length === 0) {
-                list.innerHTML = '<div class="text-center py-10 text-slate-400">该分类下暂无接口</div>';
-                return;
-            }
-
-            list.innerHTML = filtered.map(api => `
-                <a href="/api-detail.html?id=${api.id}" class="block card p-5 active:bg-slate-50 transition relative">
-                    <div class="absolute top-5 right-5 text-[12px] text-slate-400">${api.category}</div>
-                    
-                    <div class="w-10 h-10 rounded-xl bg-red-50 text-red-500 flex items-center justify-center mb-3">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                    </div>
-                    
-                    <h3 class="text-[16px] font-bold text-slate-800 mb-1 flex items-center gap-2">
-                        ${api.title}
-                        ${api.isHot ? '<span class="text-[10px] bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded border border-orange-200">热门</span>' : ''}
-                        ${api.status === '维护' ? '<span class="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded border border-slate-200">维护</span>' : ''}
-                    </h3>
-                    <p class="text-[13px] text-slate-500 leading-relaxed mb-4 line-clamp-2">${api.desc}</p>
-                    
-                    <div class="flex gap-2 mb-4">
-                        <span class="text-[11px] bg-slate-100 text-slate-500 px-2 py-1 rounded">付费</span>
-                        <span class="text-[11px] bg-orange-50 text-orange-600 font-bold px-2 py-1 rounded">${api.price === '免费' ? '免费' : '$' + api.price + '/次'}</span>
-                        <span class="text-[11px] bg-blue-50 text-blue-600 px-2 py-1 rounded">${api.method}</span>
-                    </div>
-                    
-                    <div class="flex justify-between items-center pt-3 border-t border-slate-50">
-                        <span class="text-[12px] text-slate-400">开发者 API</span>
-                        <span class="text-[13px] text-blue-600 font-bold">查看文档 ↗</span>
-                    </div>
-                </a>
-            `).join('');
-        }
-
-        function filterCategory(cat, el) {
+        function setCategory(cat, el) {
             document.querySelectorAll('.pill-btn').forEach(btn => btn.classList.remove('active'));
             el.classList.add('active');
             currentCategory = cat;
@@ -124,7 +96,92 @@
             renderApis();
         }
 
-        // 初始化
+        function renderApis() {
+            const list = document.getElementById('api-list');
+            let filtered = [...apisData];
+
+            // 1. 分类过滤
+            if (currentCategory !== '全部') {
+                filtered = filtered.filter(a => a.category === currentCategory);
+            }
+
+            // 2. 付费类型过滤
+            const payType = document.getElementById('pay-type-select').value;
+            if (payType === 'paid') {
+                filtered = filtered.filter(a => a.price !== '免费');
+            } else if (payType === 'free') {
+                filtered = filtered.filter(a => a.price === '免费');
+            }
+
+            // 3. 排序
+            const sortType = document.getElementById('sort-select').value;
+            if (sortType === 'price-asc') {
+                filtered.sort((a, b) => {
+                    let priceA = a.price === '免费' ? 0 : parseFloat(a.price);
+                    let priceB = b.price === '免费' ? 0 : parseFloat(b.price);
+                    return priceA - priceB;
+                });
+            } else if (sortType === 'price-desc') {
+                filtered.sort((a, b) => {
+                    let priceA = a.price === '免费' ? 0 : parseFloat(a.price);
+                    let priceB = b.price === '免费' ? 0 : parseFloat(b.price);
+                    return priceB - priceA;
+                });
+            }
+
+            // 更新总数
+            document.getElementById('total-count').innerText = filtered.length;
+
+            // 渲染空状态
+            if (filtered.length === 0) {
+                list.innerHTML = '<div class="text-center py-12 text-slate-400 text-[14px]">没有符合条件的接口</div>';
+                return;
+            }
+
+            // 渲染卡片
+            list.innerHTML = filtered.map(api => `
+                <a href="/api-detail.html?id=${api.id}" class="block card p-5 active:bg-slate-50 transition relative">
+                    <!-- 顶部：图标 + 分类 + ID -->
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="w-12 h-12 rounded-xl relative overflow-hidden shrink-0 shadow-sm border border-slate-100">
+                            <img src="https://picsum.photos/seed/${api.id}/100/100" class="absolute inset-0 w-full h-full object-cover opacity-90">
+                            <div class="absolute inset-0 flex items-center justify-center bg-white/40 backdrop-blur-sm text-blue-600">
+                                <svg class="w-6 h-6 drop-shadow-md" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[12px] text-slate-500 font-bold">${api.category}</p>
+                            <p class="text-[11px] text-slate-400 font-mono mt-1">ID: ${api.id}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- 标题与热门标签 -->
+                    <h3 class="text-[16px] font-bold text-slate-800 mb-1 flex items-center gap-2">
+                        ${api.title}
+                        ${api.isHot ? '<span class="text-[10px] bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded border border-orange-200">热门</span>' : ''}
+                        ${api.status === '维护' ? '<span class="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded border border-slate-200">维护</span>' : ''}
+                    </h3>
+                    
+                    <!-- 描述 -->
+                    <p class="text-[13px] text-slate-500 leading-relaxed mb-4 line-clamp-2">${api.desc}</p>
+                    
+                    <!-- 价格与请求方式 -->
+                    <div class="flex gap-2 mb-4">
+                        <span class="text-[11px] bg-slate-100 text-slate-500 px-2 py-1 rounded">${api.price === '免费' ? '免费' : '付费'}</span>
+                        <span class="text-[11px] ${api.price === '免费' ? 'bg-green-50 text-green-600' : 'bg-orange-50 text-orange-600'} font-bold px-2 py-1 rounded">${api.price === '免费' ? '免费' : '$' + api.price + '/次'}</span>
+                        <span class="text-[11px] bg-blue-50 text-blue-600 px-2 py-1 rounded">${api.method}</span>
+                    </div>
+                    
+                    <!-- 底部按钮区 -->
+                    <div class="flex justify-between items-center pt-3 border-t border-slate-50">
+                        <span class="text-[12px] text-slate-400">开发者 API</span>
+                        <span class="text-[13px] text-blue-600 font-bold flex items-center gap-1">查看文档并测试 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></span>
+                    </div>
+                </a>
+            `).join('');
+        }
+
+        // 初始化渲染
         renderApis();
     </script>
 </body>

@@ -70,7 +70,7 @@
             </div>
             <div class="card p-4 cursor-pointer active:bg-slate-50" onclick="window.location.href='/commission.html'">
                 <p class="text-[12px] text-slate-500 mb-1">佣金金额 (元)</p>
-                <p class="text-[20px] font-bold text-green-500">¥ 45.50</p>
+                <p class="text-[20px] font-bold text-green-500" id="invite-commission">¥ 45.50</p>
             </div>
             <div class="card p-4 cursor-pointer active:bg-slate-50" onclick="window.location.href='/commission.html'">
                 <p class="text-[12px] text-slate-500 mb-1">已提现 (元)</p>
@@ -292,7 +292,9 @@
         // 初始化
         document.addEventListener('DOMContentLoaded', () => {
             renderList('details');
+            document.getElementById("invite-commission").innerText = "¥ " + (localStorage.getItem("user_commission") || "45.50");
         });
     </script>
+<script src="/ai-widget.js"></script>
 </body>
 </html>

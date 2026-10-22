@@ -27,7 +27,7 @@
             <a href="/profile.html" class="text-slate-600 text-xl font-bold px-2">←</a>
             <h1 class="text-[17px] font-bold text-slate-800">订单详情</h1>
         </div>
-        <button onclick="window.location.reload()" class="text-blue-600 text-[13px] font-bold px-2">刷新</button>
+        <button onclick="window.location.reload()" class="text-blue-600 text-[13px] font-bold px-2">刷新状态</button>
     </header>
 
     <main class="px-4 py-4 max-w-lg mx-auto">
@@ -45,7 +45,7 @@
                     <span class="info-label">订单号</span>
                     <div class="flex items-center gap-2">
                         <span class="info-value font-mono text-[12px]" id="o-no">...</span>
-                        <button onclick="copyText('o-no')" class="text-blue-500 bg-blue-50 px-2 py-1 rounded text-[11px] font-bold">复制</button>
+                        <button onclick="copyText('o-no')" class="text-blue-500 bg-blue-50 px-2 py-1 rounded text-[11px] font-bold active:bg-blue-100">复制</button>
                     </div>
                 </div>
                 <div class="info-row border-t border-slate-50 pt-3 mt-3">
@@ -97,29 +97,42 @@
             </div>
         </div>
 
-        <!-- 核心发货区：节点专属 -->
+        <!-- ================= 全能提取中心 (不区别对待) ================= -->
         <div class="card border-blue-200">
             <div class="card-header bg-blue-50">
-                <div class="card-title text-blue-700">节点提取</div>
-                <button onclick="copySubUrl()" class="bg-blue-600 text-white px-3 py-1.5 rounded text-[12px] font-bold active:opacity-80">一键复制订阅</button>
+                <div class="card-title text-blue-700">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                    发货提取中心
+                </div>
+                <button onclick="copyDeliverText()" class="bg-blue-600 text-white px-3 py-1.5 rounded text-[12px] font-bold active:opacity-80">一键复制全部文本</button>
             </div>
-            <div class="card-body bg-blue-50/30 flex flex-col items-center py-6">
+            <div class="card-body bg-blue-50/30 flex flex-col items-center py-5">
                 
-                <!-- 二维码展示区 -->
-                <div class="bg-white p-3 rounded-2xl shadow-sm border border-blue-100 mb-4 relative">
-                    <img id="node-qrcode" src="" class="w-44 h-44" alt="Loading...">
-                    <p class="text-center text-[11px] text-slate-400 mt-2">扫码导入节点</p>
+                <!-- 1. 文本卡密/链接区 -->
+                <div class="w-full mb-5">
+                    <p class="text-[13px] text-slate-600 font-bold mb-1.5">文本内容 / 卡密 / 链接</p>
+                    <textarea id="deliver-text" readonly class="w-full bg-white border border-blue-100 rounded-xl p-3 text-[13px] font-mono text-slate-700 leading-relaxed resize-none h-24 focus:outline-none shadow-sm select-all"></textarea>
                 </div>
 
-                <!-- 下载按钮 -->
-                <div class="w-full flex gap-3 mt-2">
-                    <a id="btn-download-node" href="#" download="socks5_node.txt" class="flex-1 py-3 bg-white border-2 border-blue-600 text-blue-600 text-[14px] font-bold rounded-xl text-center active:bg-blue-50 transition shadow-sm">
-                        下载配置文件
+                <!-- 2. 二维码扫码区 -->
+                <div class="w-full mb-5 border-t border-blue-100 pt-5 flex flex-col items-center">
+                    <p class="text-[13px] text-slate-600 font-bold mb-2">手机扫码直接导入</p>
+                    <div class="bg-white p-2 rounded-2xl shadow-sm border border-blue-100">
+                        <img id="node-qrcode" src="" class="w-40 h-40" alt="二维码加载中...">
+                    </div>
+                </div>
+
+                <!-- 3. 文件下载区 -->
+                <div class="w-full border-t border-blue-100 pt-5">
+                    <p class="text-[13px] text-slate-600 font-bold mb-2">下载到本地</p>
+                    <a id="btn-download-node" href="#" download="socks5_config.txt" class="w-full block py-3 bg-white border-2 border-blue-600 text-blue-600 text-[14px] font-bold rounded-xl text-center active:bg-blue-50 transition shadow-sm">
+                        下载配置文件 / 卡密
                     </a>
                 </div>
 
-                <p id="node-url-text" class="text-[11px] text-slate-400 mt-4 break-all text-center px-4"></p>
-                <p class="text-[12px] text-slate-500 mt-2">使用说明：点击上方按钮下载文件，或复制链接导入 Clash / v2ray 等客户端。</p>
+                <div class="mt-4 text-[11px] text-slate-400 text-center px-4 leading-relaxed">
+                    提示：您可以通过上方任一方式提取您的商品。<br>扫码支持主流 APP 直接识别，文件下载后可本地保存。
+                </div>
             </div>
         </div>
 
@@ -131,21 +144,23 @@
 
     <script>
         const urlParams = new URLSearchParams(window.location.search);
-        const pId = urlParams.get('id') || 'node1';
+        const pId = urlParams.get('id') || '3965';
         const orderNo = urlParams.get('order_no') || 'UNKNOWN_' + Date.now();
         const qty = parseInt(urlParams.get('qty')) || 1;
         
+        // 模拟数据库
         const productDB = {
             'node1': { title: 'MTP 高速代理节点 | 支持流媒体 | 极速稳定', price: 15.00, currency: 'CNY' },
-            '3965': { title: 'Telegram飞机号', price: 8.72, currency: 'CNY' },
+            '3965': { title: 'Telegram飞机号 | +1美国电话注册', price: 8.72, currency: 'CNY' },
             'sms1': { title: '全球接码服务', price: 0.15, currency: 'USDT' }
         };
 
         document.addEventListener('DOMContentLoaded', () => {
-            const product = productDB[pId] || productDB['node1'];
+            const product = productDB[pId] || productDB['3965'];
             const symbol = product.currency === 'USDT' ? '$' : '¥';
             const total = (product.price * qty).toFixed(2);
 
+            // 填充订单信息
             document.getElementById('o-title').innerText = product.title;
             document.getElementById('o-no').innerText = orderNo;
             document.getElementById('o-time').innerText = new Date().toLocaleString();
@@ -153,18 +168,28 @@
             document.getElementById('o-qty').innerText = qty;
             document.getElementById('o-total').innerText = `${symbol} ${total}`;
 
-            // 生成专属节点订阅链接 (使用订单号作为token)
-            const mockSubUrl = `https://web.lynli.me/api/v1/sub/${orderNo}`;
-            document.getElementById('node-url-text').innerText = mockSubUrl;
-
-            // 生成二维码
-            document.getElementById('node-qrcode').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(mockSubUrl)}`;
-
-            // 配置下载文件的链接和内容 (这里生成一段虚拟的 Clash 配置)
-            const fakeYamlContent = `proxies:\n  - name: "SOCKS5_NODE_${orderNo}"\n    type: ss\n    server: server.lynli.me\n    port: 8388\n    cipher: aes-256-gcm\n    password: "your_password_${orderNo}"`;
+            // ================= 核心发货内容生成 =================
+            // 无论是节点还是账号，统一生成一条长文本内容
+            let deliverContent = '';
             
-            // 将文本内容转换为 Blob 供下载
-            const blob = new Blob([fakeYamlContent], { type: 'text/yaml' });
+            if (pId === 'node1') {
+                // 节点的话，生成订阅链接
+                deliverContent = `您的专属节点订阅链接如下：\nhttps://web.lynli.me/api/v1/sub/${orderNo}\n\n请复制链接导入 Clash/v2ray。`;
+            } else {
+                // 普通账号，生成卡密格式
+                deliverContent = `+19705593874----\nhttps://tgapi.tgsms.vip/ffe3d7af-08fe-4939-bd4a-d68de4649fbf/GetHTML\n\n这是您的账号卡密，请勿泄露。`;
+            }
+
+            // 1. 渲染到文本框
+            document.getElementById('deliver-text').value = deliverContent;
+
+            // 2. 生成二维码 (提取内容，或者生成专属链接)
+            // 这里模拟把一段 JSON 或者链接生成二维码
+            const qrData = `https://web.lynli.me/api/v1/sub/${orderNo}`; 
+            document.getElementById('node-qrcode').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrData)}`;
+
+            // 3. 生成下载文件 (Blob)
+            const blob = new Blob([deliverContent], { type: 'text/plain' });
             const downloadUrl = URL.createObjectURL(blob);
             document.getElementById('btn-download-node').href = downloadUrl;
         });
@@ -174,9 +199,9 @@
             if(navigator.clipboard) navigator.clipboard.writeText(text).then(() => alert('已复制'));
         }
 
-        function copySubUrl() {
-            const url = document.getElementById('node-url-text').innerText;
-            if(navigator.clipboard) navigator.clipboard.writeText(url).then(() => alert('订阅链接已复制，可直接导入APP'));
+        function copyDeliverText() {
+            const text = document.getElementById('deliver-text').value;
+            if(navigator.clipboard) navigator.clipboard.writeText(text).then(() => alert('发货内容已全部复制'));
         }
     </script>
 </body>

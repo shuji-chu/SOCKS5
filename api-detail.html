@@ -30,20 +30,16 @@
     </header>
 
     <main class="max-w-lg mx-auto">
-        <!-- 面包屑 -->
         <div class="px-4 py-3 text-[12px] text-slate-400 flex items-center gap-1">
             <a href="/api-market.html" class="hover:text-blue-500">API Market</a>
             <span>/</span>
             <span class="text-slate-600" id="breadcrumb-category">加载中...</span>
         </div>
 
-        <!-- 头部信息卡 -->
         <div class="px-4 mb-4">
             <div class="card p-5">
                 <div class="flex items-start gap-3 mb-3">
-                    <!-- 动态图标 -->
                     <div id="api-icon-container" class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border border-slate-100"></div>
-                    
                     <div class="flex-1 pt-1">
                         <h1 class="text-[20px] font-extrabold text-slate-900 leading-tight mb-2" id="api-name">加载中...</h1>
                         <div class="flex flex-wrap gap-2 mt-1">
@@ -57,7 +53,6 @@
                 
                 <p class="text-[14px] text-slate-600 leading-relaxed mb-4" id="api-desc">...</p>
                 
-                <!-- ID与价格 -->
                 <div class="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl mb-4 border border-slate-100">
                     <div>
                         <p class="text-[12px] text-slate-400 mb-1">接口 ID</p>
@@ -69,15 +64,13 @@
                     </div>
                 </div>
 
-                <!-- 申请按钮 -->
                 <div class="flex gap-3 mt-2">
                     <a href="/user-api.html" class="flex-1 py-2.5 bg-blue-600 text-white font-bold rounded-lg text-[14px] text-center active:opacity-80">申请 Key / 充值</a>
-                    <a href="javascript:void(0)" onclick="alert('请查看下方 API 文档')" class="flex-1 py-2.5 bg-slate-100 text-slate-600 font-bold rounded-lg text-[14px] text-center border border-slate-200 active:bg-slate-200">查看开发指南</a>
+                    <a href="javascript:void(0)" onclick="switchDetailTab('docs', document.querySelectorAll('.tab-btn')[1])" class="flex-1 py-2.5 bg-slate-100 text-slate-600 font-bold rounded-lg text-[14px] text-center border border-slate-200 active:bg-slate-200">查看开发指南</a>
                 </div>
             </div>
         </div>
 
-        <!-- 接口使用信息 -->
         <div class="px-4 mb-4">
             <div class="card p-4">
                 <h3 class="text-[15px] font-bold text-slate-800 mb-3 flex items-center gap-2">
@@ -107,83 +100,48 @@
             </div>
         </div>
 
-        <!-- 相关推荐 -->
         <div class="mb-4">
             <h3 class="text-[15px] font-bold text-slate-800 mb-2 px-4">相关推荐</h3>
             <div class="flex overflow-x-auto no-scrollbar gap-3 px-4 pb-2" id="related-apis"></div>
         </div>
 
-        <!-- 详细介绍 Tab 区 -->
         <div class="px-4 mb-6">
             <div class="card overflow-hidden">
                 <div class="flex border-b border-slate-100 bg-slate-50/50">
-                    <div class="tab-btn active" onclick="switchDetailTab('intro')">介绍</div>
-                    <div class="tab-btn" onclick="switchDetailTab('docs')">API 文档</div>
-                    <div class="tab-btn" onclick="switchDetailTab('scenes')">应用场景</div>
+                    <div class="tab-btn active" onclick="switchDetailTab('intro', this)">介绍</div>
+                    <div class="tab-btn" onclick="switchDetailTab('docs', this)">API 文档</div>
+                    <div class="tab-btn" onclick="switchDetailTab('scenes', this)">应用场景</div>
                 </div>
                 
                 <div class="p-5">
-                    <!-- 介绍 -->
                     <div id="tab-intro" class="block">
                         <div class="space-y-4 text-[13px] text-slate-600 leading-relaxed">
-                            <p><b>核验准：</b>围绕具体业务场景提供结构化结果，适合接入业务审核、查询和风控流程。</p>
-                            <p><b>结果清：</b>请求参数、返回字段、错误码和示例集中展示，前后端联调时可以快速定位问题。</p>
-                            <p><b>接入易：</b>基于标准 POST 请求和 JSON 返回格式，使用专属 API Key 即可调用。</p>
-                            
-                            <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 mt-4">
-                                <h4 class="font-bold text-blue-800 mb-2">服务保障</h4>
-                                <ul class="space-y-2 text-blue-700">
-                                    <li>• <b>服务全程可追踪：</b>调用记录、消费记录和余额变化集中展示。</li>
-                                    <li>• <b>标准文档支持：</b>请求地址、参数说明、返回示例和错误码统一整理。</li>
-                                    <li>• <b>统一网关接入：</b>业务侧只需要维护固定接入地址和专属 Key。</li>
-                                </ul>
-                            </div>
+                            <p><b>数据精准：</b>直连权威数据源，确保查询结果真实、合规、可用。</p>
+                            <p><b>极速响应：</b>毫秒级返回结构化 JSON 数据，支持高并发业务场景。</p>
+                            <p><b>接入便捷：</b>统一网关，标准 POST 请求，使用专属 API Key 即可快速集成。</p>
                         </div>
                     </div>
 
-                    <!-- API 文档 -->
+                    <!-- API 文档 (动态生成) -->
                     <div id="tab-docs" class="hidden">
                         <h4 class="font-bold text-slate-800 mb-1">请求地址</h4>
-                        <p class="text-[12px] text-slate-500 font-mono mb-4">POST https://web.lynli.me/api/v1/query</p>
+                        <p class="text-[12px] text-slate-500 font-mono mb-4" id="api-endpoint">POST https://web.lynli.me/api/v1/query</p>
                         
                         <h4 class="font-bold text-slate-800 mb-1">请求参数</h4>
                         <div class="border border-slate-200 rounded-lg overflow-hidden mb-4">
-                            <table class="api-table">
-                                <tr><th>参数名</th><th>必填</th><th>说明</th></tr>
-                                <tr><td>api_id</td><td>是</td><td>接口ID</td></tr>
-                                <tr><td>name</td><td>是</td><td>姓名/参数1</td></tr>
-                                <tr><td>query_data</td><td>是</td><td>手机号/身份证等查询内容</td></tr>
-                                <tr><td>key</td><td>是</td><td>您的专属 API Key</td></tr>
+                            <table class="api-table" id="api-params-table">
+                                <!-- 动态渲染 -->
                             </table>
                         </div>
 
                         <h4 class="font-bold text-slate-800 mb-1">返回示例</h4>
-                        <div class="code-block" id="json-example">{
-  "code": 200,
-  "msg": "success",
-  "data": {
-    "status": "1",
-    "desc": "验证一致",
-    "cost": 0.00
-  }
-}</div>
+                        <div class="code-block" id="json-example"></div>
                     </div>
 
-                    <!-- 应用场景 -->
+                    <!-- 应用场景 (动态生成) -->
                     <div id="tab-scenes" class="hidden">
-                        <div class="space-y-4">
-                            <div class="flex gap-3">
-                                <span class="text-[18px] font-bold text-blue-300">01</span>
-                                <p class="text-[13px] text-slate-600 leading-relaxed">可接入注册、下单、审核、查询等业务流程，提供实时 API 能力。</p>
-                            </div>
-                            <div class="flex gap-3 border-t border-slate-100 pt-3">
-                                <span class="text-[18px] font-bold text-blue-300">02</span>
-                                <p class="text-[13px] text-slate-600 leading-relaxed">后台系统、运营工具和风控平台可直接调用接口获得结构化结果。</p>
-                            </div>
-                            <div class="flex gap-3 border-t border-slate-100 pt-3">
-                                <span class="text-[18px] font-bold text-blue-300">03</span>
-                                <p class="text-[13px] text-slate-600 leading-relaxed">适合需要快速上线 API 能力、减少自建成本的业务场景。</p>
-                            </div>
+                        <div class="space-y-4" id="scenes-list">
+                            <!-- 动态渲染 -->
                         </div>
                     </div>
                 </div>
@@ -195,8 +153,6 @@
     <script src="/notice.js"></script>
     <script src="/ai-widget.js"></script>
     <script>
-        let currentApi = null;
-
         const categoryIcons = {
             '手机号码': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>',
             '实名认证': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>',
@@ -219,9 +175,9 @@
             '默认': 'text-slate-600 bg-slate-50'
         };
 
-        function switchDetailTab(tab) {
+        function switchDetailTab(tab, el) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
+            if(el) el.classList.add('active');
             document.getElementById('tab-intro').classList.add('hidden');
             document.getElementById('tab-docs').classList.add('hidden');
             document.getElementById('tab-scenes').classList.add('hidden');
@@ -231,15 +187,12 @@
         document.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             const apiId = parseInt(urlParams.get('id')) || 1;
-
-            // 查找数据，找不到默认给第一个
-            currentApi = apisData.find(a => a.id === apiId) || apisData[0];
+            const currentApi = apisData.find(a => a.id === apiId) || apisData[0];
 
             const iconPath = categoryIcons[currentApi.category] || categoryIcons['默认'];
             const colorClass = categoryColors[currentApi.category] || categoryColors['默认'];
             const isFree = currentApi.price === '免费';
 
-            // 渲染头部
             document.getElementById('breadcrumb-category').innerText = currentApi.category;
             document.getElementById('api-name').innerText = currentApi.title;
             document.getElementById('api-desc').innerText = currentApi.desc;
@@ -247,31 +200,99 @@
             document.getElementById('api-id').innerText = currentApi.id;
             document.getElementById('api-method').innerText = currentApi.method;
             
-            // 渲染图标和颜色
             document.getElementById('api-icon-container').className = `w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border border-slate-100 ${colorClass}`;
             document.getElementById('api-icon-container').innerHTML = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">${iconPath}</svg>`;
 
-            // 渲染价格
             document.getElementById('api-price').innerHTML = isFree 
                 ? '<span class="text-green-500 font-bold">免费</span>' 
                 : `$${currentApi.price}<span class="text-[12px] font-sans font-normal text-slate-400">/次</span>`;
 
-            // 更新 API 文档里的 JSON 示例
-            document.getElementById('json-example').innerHTML = `{
-  "code": 200,
-  "msg": "success",
-  "data": {
-    "status": "1",
-    "desc": "验证一致",
-    "cost": ${isFree ? 0 : currentApi.price}
-  }
-}`;
-
-            // 模拟真实的使用统计（根据ID生成，看起来像真数据）
             document.getElementById('stat-apps').innerText = (currentApi.id * 3 + 5) + ' 个';
             document.getElementById('stat-calls').innerText = (currentApi.id * 113 + 24) + ' 次';
 
-            // 渲染相关推荐（抓取同分类的其他接口，不够就从全部里补）
+            // ================= 智能动态生成 API 文档 =================
+            document.getElementById('api-endpoint').innerText = `POST https://web.lynli.me/api/v1/query/${currentApi.id}`;
+            
+            const paramTable = document.getElementById('api-params-table');
+            const jsonBlock = document.getElementById('json-example');
+            
+            let paramsHtml = `<tr><th>参数名</th><th>必填</th><th>说明</th></tr>
+                <tr><td>api_id</td><td>是</td><td>接口ID (${currentApi.id})</td></tr>
+                <tr><td>key</td><td>是</td><td>您的专属 API Key</td></tr>`;
+            
+            let jsonStr = `{\n  "code": 200,\n  "msg": "success",\n  "api_name": "${currentApi.title}",\n  "data": {\n`;
+
+            if (currentApi.category === '交通与车辆') {
+                paramsHtml += `<tr><td>plate_no</td><td>是</td><td>车牌号或车架号VIN</td></tr>`;
+                jsonStr += `    "plate_no": "粤B12345",\n    "car_info": "品牌型号匹配",\n    "result": 1\n`;
+            } else if (currentApi.category === '手机号码' || currentApi.category === '实名认证') {
+                paramsHtml += `<tr><td>name</td><td>是</td><td>真实姓名</td></tr><tr><td>id_card / phone</td><td>是</td><td>身份证号或手机号</td></tr>`;
+                jsonStr += `    "name": "张三",\n    "verify_status": 1,\n    "desc": "验证一致"\n`;
+            } else if (currentApi.category === '企业工商') {
+                paramsHtml += `<tr><td>keyword</td><td>是</td><td>企业名称或法人名字</td></tr>`;
+                jsonStr += `    "company_name": "某某科技有限公司",\n    "legal_person": "李四",\n    "status": "存续"\n`;
+            } else if (currentApi.category === '网站域名') {
+                paramsHtml += `<tr><td>domain</td><td>是</td><td>需要查询的域名</td></tr>`;
+                jsonStr += `    "domain": "example.com",\n    "icp_no": "粤ICP备xxxx号",\n    "status": "正常"\n`;
+            } else {
+                paramsHtml += `<tr><td>query_data</td><td>是</td><td>需查询的具体内容</td></tr>`;
+                jsonStr += `    "query_data": "test",\n    "result": "查询成功"\n`;
+            }
+
+            jsonStr += `    ,"cost": ${isFree ? 0 : currentApi.price}\n  }\n}`;
+
+            paramTable.innerHTML = paramsHtml;
+            jsonBlock.innerText = jsonStr;
+
+            // ================= 智能动态生成应用场景 =================
+            const scenesList = document.getElementById('scenes-list');
+            let scenes = [];
+            
+            if (currentApi.category === '交通与车辆') {
+                scenes = [
+                    '二手车交易平台调用核验车辆真实信息与违章记录。',
+                    '车险定损系统接入，快速查询车辆过户与出险历史。',
+                    '物流车队管理系统自动校验名下车辆状态。',
+                    '汽车金融风控环节，核实人车关系真伪。'
+                ];
+            } else if (currentApi.category === '手机号码') {
+                scenes = [
+                    '用户注册环节拦截虚假号码，拦截羊毛党。',
+                    '金融借贷平台进行实名认证与紧急联系人核验。',
+                    '电商风控系统识别高危/沉默号码，降低营销成本。',
+                    '后台运营系统批量清洗客户数据，提高转化率。'
+                ];
+            } else if (currentApi.category === '企业工商' || currentApi.category === '金融风险') {
+                scenes = [
+                    'B2B供应链平台审核入驻企业资质与经营状态。',
+                    '投资尽调环节，全面挖掘企业关联图谱与涉诉风险。',
+                    '企业HR背调系统，一键核验候选人真实履历。',
+                    '助贷机构审批环节，识别空壳企业与失信被执行人。'
+                ];
+            } else if (currentApi.category === '网站域名') {
+                scenes = [
+                    '域名抢注监控，实时查询WHOIS与备案状态。',
+                    '站长工具统计网站权重与百度收录量。',
+                    '企业内网安全监控，及时发现山寨/钓鱼域名。',
+                    'CDN/云服务商拦截未备案的违规网站。'
+                ];
+            } else {
+                scenes = [
+                    `${currentApi.title}可接入注册、下单、审核、查询等业务流程。`,
+                    `后台系统、运营工具和风控平台可直接调用接口获得结构化结果。`,
+                    `适合需要快速上线 API 能力、减少自建成本的业务场景。`,
+                    `可与用户中心的调用记录和余额管理配合，便于排查问题。`
+                ];
+            }
+
+            scenesList.innerHTML = scenes.map((text, i) => `
+                <div class="flex gap-3 ${i !== 0 ? 'border-t border-slate-100 pt-3' : ''}">
+                    <span class="text-[18px] font-bold text-blue-300">0${i+1}</span>
+                    <p class="text-[13px] text-slate-600 leading-relaxed">${text}</p>
+                </div>
+            `).join('');
+
+            // 渲染相关推荐
             const relatedList = document.getElementById('related-apis');
             let related = apisData.filter(a => a.category === currentApi.category && a.id !== currentApi.id).slice(0, 4);
             if(related.length < 4) {

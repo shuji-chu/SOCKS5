@@ -191,6 +191,62 @@
         </div>
     </main>
 
+    
+    <div id="api-drawer-overlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[9999] hidden" onclick="closeApiDrawer(event)">
+        <div id="api-drawer-panel" class="fixed right-0 top-0 bottom-0 w-[80%] max-w-[300px] bg-white shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col" onclick="event.stopPropagation()">
+            <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <h3 class="text-[16px] font-bold text-slate-800">开发者 API 文档</h3>
+                <button onclick="closeApiDrawer()" class="text-slate-400 p-1"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+            </div>
+            <div class="p-4 flex-1 overflow-y-auto space-y-2">
+                <a href="/doc.html" class="block p-4 bg-white border border-slate-200 rounded-xl active:bg-slate-50">
+                    <p class="text-[14px] font-bold text-slate-800">基础接口 (余额/商品)</p>
+                    <p class="text-[12px] text-slate-500 mt-1">查询账户余额与所有上架商品</p>
+                </a>
+                <a href="/doc-account.html" class="block p-4 bg-white border border-slate-200 rounded-xl active:bg-slate-50">
+                    <p class="text-[14px] font-bold text-slate-800">账号接口 (静态卡密)</p>
+                    <p class="text-[12px] text-slate-500 mt-1">TG / 邮箱等账号自动分发</p>
+                </a>
+                <a href="/doc-node.html" class="block p-4 bg-white border border-slate-200 rounded-xl active:bg-slate-50">
+                    <p class="text-[14px] font-bold text-slate-800">节点接口 (订阅管理)</p>
+                    <p class="text-[12px] text-slate-500 mt-1">Clash / v2ray 节点订阅下发</p>
+                </a>
+                <a href="/doc-sms.html" class="block p-4 bg-white border border-slate-200 rounded-xl active:bg-slate-50">
+                    <p class="text-[14px] font-bold text-slate-800">接码接口 (验证码)</p>
+                    <p class="text-[12px] text-slate-500 mt-1">动态接码 / 长租号码 / 关键词监听</p>
+                </a>
+                <a href="/doc-query.html" class="block p-4 bg-white border border-slate-200 rounded-xl active:bg-slate-50">
+                    <p class="text-[14px] font-bold text-slate-800">查询接口 (二/三要素)</p>
+                    <p class="text-[12px] text-slate-500 mt-1">60+ 网关数据核验</p>
+                </a>
+                <a href="/doc-pay.html" class="block p-4 bg-white border border-slate-200 rounded-xl active:bg-slate-50">
+                    <p class="text-[14px] font-bold text-slate-800">支付接口 (聚合代收)</p>
+                    <p class="text-[12px] text-slate-500 mt-1">易支付代收与回调</p>
+                </a>
+                <a href="/doc-email.html" class="block p-4 bg-white border border-slate-200 rounded-xl active:bg-slate-50">
+                    <p class="text-[14px] font-bold text-slate-800">邮箱网关 (发信)</p>
+                    <p class="text-[12px] text-slate-500 mt-1">SMTP 高送达率 API</p>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function openApiDrawer() {
+            const overlay = document.getElementById('api-drawer-overlay');
+            const panel = document.getElementById('api-drawer-panel');
+            overlay.classList.remove('hidden');
+            setTimeout(() => panel.classList.remove('translate-x-full'), 10);
+        }
+        function closeApiDrawer(e) {
+            if(e && e.target !== e.currentTarget) return;
+            const overlay = document.getElementById('api-drawer-overlay');
+            const panel = document.getElementById('api-drawer-panel');
+            panel.classList.add('translate-x-full');
+            setTimeout(() => overlay.classList.add('hidden'), 300);
+        }
+    </script>
+
     <script src="/ai-widget.js"></script>
 </body>
 </html>

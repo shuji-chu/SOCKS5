@@ -11,11 +11,12 @@
         body { background-color: #f8fafc; color: #1e293b; padding-bottom: 20px; }
         .card { background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; margin-bottom: 16px; }
         
-        /* 平台切换 Tabs */
         .platform-tab { padding: 8px 16px; font-size: 14px; font-weight: bold; color: #64748b; border-radius: 8px; white-space: nowrap; transition: all 0.2s; cursor: pointer; }
         .platform-tab.active { background: #2563eb; color: #fff; }
+
+        .sub-tab { flex: 1; padding: 8px 0; text-align: center; font-size: 13px; font-weight: bold; color: #64748b; border-bottom: 2px solid transparent; cursor: pointer; }
+        .sub-tab.active { color: #2563eb; border-bottom-color: #2563eb; }
         
-        /* 手风琴样式 */
         .accordion-btn { width: 100%; text-align: left; padding: 16px; font-size: 15px; font-weight: bold; color: #1e293b; display: flex; justify-content: space-between; align-items: center; background: #fff; border-bottom: 1px solid #f1f5f9; }
         .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; background: #f8fafc; }
         .accordion-content.active { max-height: 5000px; transition: max-height 0.4s ease-in; }
@@ -27,11 +28,9 @@
         .alert-box { background: #fffbeb; border: 1px solid #fde68a; color: #b45309; font-size: 13px; padding: 12px; border-radius: 8px; line-height: 1.6; }
         .danger-box { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; font-size: 13px; padding: 12px; border-radius: 8px; line-height: 1.6; }
         
-        /* 卡密拆解高亮 */
         .highlight-text { background: #e0e7ff; color: #4338ca; font-family: monospace; font-weight: bold; padding: 0 4px; border-radius: 4px; }
         .cookie-box { background: #f1f5f9; padding: 8px; border-radius: 6px; font-family: monospace; font-size: 11px; word-break: break-all; color: #475569; border: 1px solid #e2e8f0; margin-top: 4px;}
         
-        /* AI 代码块 */
         .ai-prompt-box { background: #1e293b; color: #e2e8f0; padding: 16px; border-radius: 8px; font-family: monospace; font-size: 12px; position: relative; margin-top: 12px; }
         .copy-btn { position: absolute; top: 8px; right: 8px; background: #3b82f6; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; border: none; font-family: sans-serif; font-weight: bold;}
     </style>
@@ -46,13 +45,12 @@
 
     <main class="px-4 py-4 max-w-lg mx-auto">
         <div class="danger-box mb-4">
-            ⚠️ <b>防诈骗提醒：</b>符合售后政策的补号、换号均无需额外付费！请勿通过第三方小程序、私人账户或陌生链接付款，谨防假冒客服诈骗。
+            ⚠️ <b>防诈骗提醒：</b>符合售后政策的补号、换号均无需额外付费！请勿通过第三方小程序、私人账户或陌生链接付款。
         </div>
 
-        <!-- 平台切换 Tab -->
         <div class="flex overflow-x-auto no-scrollbar gap-2 mb-4 border-b border-slate-200 pb-2">
             <div class="platform-tab" onclick="switchPlatform('telegram', this)">Telegram</div>
-            <div class="platform-tab" onclick="switchPlatform('facebook', this)">Facebook</div>
+            <div class="platform-tab active" onclick="switchPlatform('facebook', this)">Facebook</div>
             <div class="platform-tab" onclick="switchPlatform('twitter', this)">Twitter / X</div>
             <div class="platform-tab" onclick="switchPlatform('tiktok', this)">TikTok</div>
         </div>
@@ -62,16 +60,22 @@
             <p class="text-[12px] text-slate-500 mt-1" id="main-subtitle">首次使用请仔细阅读对应平台的使用教程</p>
         </div>
 
-        <!-- 教程内容动态渲染区 -->
+        <!-- Facebook 专属的内层 Tab 切换 -->
+        <div id="fb-tabs" class="flex border-b border-slate-200 mb-4 hidden">
+            <div class="sub-tab active" onclick="switchFbTab('mobile', this)">手机端 2FA 登录</div>
+            <div class="sub-tab" onclick="switchFbTab('cookie', this)">电脑端 Cookie 登录</div>
+        </div>
+
         <div id="tutorial-content"></div>
     </main>
 
     <script>
-        // ================= 核心数据配置区 =================
+        // 核心数据：涵盖 Telegram 和 Facebook 的两套登录方案
         const tutorialData = {
             'telegram': {
                 title: 'Telegram 登录问题解决指南',
-                subtitle: '首次使用请仔细阅读对应平台的使用教程，避免操作失误',
+                subtitle: '首次使用请仔细阅读对应平台的使用教程',
+                hasSubTab: false,
                 sections: [
                     {
                         title: '一、Telegram 登录问题解决方法',
@@ -95,59 +99,28 @@
                                         <p class="text-[13px] text-slate-600 leading-relaxed mb-2">如果一直收不到验证码，可以尝试：切换 Wi-Fi 和手机流量、重启设备、检查垃圾邮件。避免频繁更换设备。</p>
                                     </div>
                                 </div>
-                                <div class="flex gap-3">
-                                    <div class="step-num">3</div>
-                                    <div>
-                                        <h4 class="text-[14px] font-bold text-slate-800 mb-1">尝试其他兼容客户端</h4>
-                                        <p class="text-[13px] text-slate-600 leading-relaxed">iPhone 用户可以尝试 <b>Nicegram</b> 或 <b>iMe Messenger</b>。Android 用户可以尝试 <b>Telegram X</b>。不同客户端的验证方式可能不同。</p>
-                                    </div>
-                                </div>
-                            </div>
-                        `
-                    },
-                    {
-                        title: '二、Telegram 提示短信费用怎么办？',
-                        content: `
-                            <div class="p-4 space-y-5">
-                                <div>
-                                    <h4 class="text-[14px] font-bold text-slate-800 mb-1">方法一：通过 App Store 付款</h4>
-                                    <p class="text-[13px] text-slate-600 leading-relaxed">如果官方登录页面提供 Telegram Premium 购买入口，可以尝试通过 App Store 完成付款，再返回 Telegram 继续登录。</p>
-                                </div>
-                                <div>
-                                    <h4 class="text-[14px] font-bold text-slate-800 mb-1">方法二：使用 Apple 礼品卡</h4>
-                                    <p class="text-[13px] text-slate-600 leading-relaxed mb-2">如果没有合适的付款方式，可以先确认自己的 Apple 账号地区，再考虑购买对应地区的 Apple Gift Card。</p>
-                                </div>
-                                <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
-                                    <h4 class="text-[14px] font-bold text-blue-800 mb-1">方法三：开通 Telegram Premium</h4>
-                                    <p class="text-[13px] text-blue-700 leading-relaxed mb-3">如果手机端仍然提示需要付费验证，可以考虑为同一个 Telegram 账号开通 Premium，再尝试手机登录。</p>
-                                    <a href="/index.html" class="block text-center w-full py-2.5 bg-blue-600 text-white font-bold rounded-lg text-[14px]">前往查看 Telegram Premium 套餐</a>
-                                </div>
-                                <div class="alert-box">
-                                    ⚠️ <b>注意：</b>开通 Premium 不保证所有账号都能解除短信验证限制。如果只是要求邮箱验证码，也不需要盲目购买会员。
-                                </div>
                             </div>
                         `
                     }
                 ]
             },
             'facebook': {
-                title: 'Facebook 手机端登录教程',
-                subtitle: '卡密解析 · 2FA 验证 · 登录步骤',
-                sections: [
+                title: 'Facebook 登录教程',
+                subtitle: '卡密解析 · 2FA 验证 / Cookie 登录',
+                hasSubTab: true,
+                mobileSections: [
                     {
                         title: '登录前：先看懂卡密',
                         content: `
                             <div class="p-4">
-                                <p class="text-[13px] text-slate-600 leading-relaxed mb-3">Facebook 商品发货后，卡密中可能包含 <b>UID、密码、2FA、Cookie、Token、邮箱、邮箱密码</b> 以及其他附加信息。</p>
-                                
+                                <p class="text-[13px] text-slate-600 leading-relaxed mb-3">Facebook 商品发货后，卡密中可能包含 <b>UID、密码、2FA、Cookie、Token、绑定邮箱、邮箱密码</b> 以及其他附加信息。不同商品包含的字段可能不同。</p>
                                 <div class="bg-white p-3 rounded border border-slate-200 mb-4">
                                     <p class="text-[12px] font-bold text-slate-800 mb-1">卡密示例：</p>
-                                    <p class="font-mono text-[11px] text-slate-500 break-all leading-relaxed">61582002028701|@#12kjnabscD|QJZT3NGU74Y7HNCWP4ZB5M22MYGZ7ES6|c_user=61582002028701;xs=29:N4aPDZI5o-CuaA:2:1776153536...;datr=39jmaGXDXDwHlYCAavPH-1kj;|EAAAAUaZA8jlABRGG84t2Q3mEVmPCSe9...|8jre0jdghlelri4@hotmail.com|yf2qtt</p>
+                                    <p class="font-mono text-[11px] text-slate-500 break-all leading-relaxed">61582002028701|@#12kjnabscD|QJZT3NGU74Y7HNCWP4ZB5M22MYGZ7ES6|c_user=...|EAAAA...|8jre0jdghlelri4@hotmail.com|yf2q</p>
                                 </div>
-
                                 <div class="space-y-3">
                                     <div>
-                                        <p class="text-[13px] font-bold text-slate-700">登录账号 (UID)</p>
+                                        <p class="text-[13px] font-bold text-slate-700">登录账号 / UID</p>
                                         <p class="highlight-text text-[13px]">61582002028701</p>
                                     </div>
                                     <div>
@@ -158,62 +131,32 @@
                                         <p class="text-[13px] font-bold text-slate-700">2FA 密钥 (部分商品才有)</p>
                                         <p class="highlight-text text-[13px]">QJZT3NGU74Y7HNCWP4ZB5M22MYGZ7ES6</p>
                                     </div>
-                                    <div>
-                                        <p class="text-[13px] font-bold text-slate-700">Cookie</p>
-                                        <div class="cookie-box">c_user=...; xs=...; fr=...; datr=...;</div>
-                                    </div>
-                                    <div>
-                                        <p class="text-[13px] font-bold text-slate-700">Token</p>
-                                        <p class="highlight-text text-[13px]">EAAAAUaZA8jlABRGG84t2Q3mEVmPCSe9...</p>
-                                    </div>
-                                    <div>
-                                        <p class="text-[13px] font-bold text-slate-700">绑定邮箱 / 邮箱密码</p>
-                                        <p class="highlight-text text-[13px]">8jre0jdghlelri4@hotmail.com</p>
-                                        <p class="highlight-text text-[13px]">yf2qtt</p>
-                                    </div>
                                 </div>
-
                                 <div class="alert-box mt-4">
-                                    ⚠️ <b>注意：</b>不要直接按照 <b>|、:、;、——</b> 的数量拆卡密。Cookie 自己也可能包含这些符号，所以要根据字段内容判断。
+                                    ⚠️ <b>注意：</b>不要直接按照分隔符数量拆卡密。Cookie 自身也会包含 ;、=、| 等字符，需要结合内容特征判断。
                                 </div>
                             </div>
                         `
                     },
                     {
-                        title: '看不懂？让 AI 帮你解析',
+                        title: '看不懂卡密？让 AI 帮你解析',
                         content: `
                             <div class="p-4">
-                                <p class="text-[13px] text-slate-600 leading-relaxed mb-3">直接把完整卡密复制给 AI (如 ChatGPT, 智谱清言)，再附上下面这段指令即可完美拆解。</p>
-                                
+                                <p class="text-[13px] text-slate-600 leading-relaxed mb-3">直接把完整卡密复制给 AI，再附上下面这段指令即可完美拆解。</p>
                                 <div class="ai-prompt-box">
                                     <button class="copy-btn" onclick="copyAIPrompt(this)">复制指令</button>
                                     <div id="ai-prompt-text" class="text-[11px] leading-relaxed text-slate-300">
 请帮我解析下面这条 Facebook 商品卡密，不要修改、补全或猜测不存在的信息。
-
-卡密中可能包含 UID、Facebook 密码、2FA、Cookie、Token、邮箱、邮箱密码以及其他附加信息。
-
-请根据内容特征判断，不要只按照分隔符数量或固定位置判断。
-
+卡密中可能包含 UID、密码、2FA、Cookie、Token、邮箱、邮箱密码及其他附加信息。
 判断规则：
 · UID 通常是最前面的一串数字；
 · UID 后面通常是 Facebook 登录密码；
-· 2FA 如果存在，一般是一段约 32 位的大写字母数字组合；
-· Cookie 常见包含 c_user=、xs=、fr=、datr= 等字段，Cookie 内部可能包含 |、;、=；
-· EAAG...、EAAAA...、eyJ... 等长字符串可优先判断是否为 Token；
+· 2FA 一般是一段约 32 位的大写字母和数字组合；
+· Cookie 常见包含 c_user=、xs=、fr=、datr= 等字段，内部可能包含分隔符；
+· EAAG...、EAAAA...、eyJ... 等长字符串可判断为 Token；
 · 带 @ 的内容判断为邮箱；
-· 邮箱旁边的短字符串可判断是否属于邮箱密码；
-· unlimitmail_key 等内容可放入“其他附加信息”；
-· 无法确定的字段请直接写“无法确定”，不要猜测。
-
-请按照以下格式输出：
-UID：
-Facebook密码：
-2FA：
-Cookie：
-Token：
-邮箱：
-邮箱密码：
-其他附加信息：
+· 无法确定请直接写“无法确定”。
+请按照格式输出：UID、密码、2FA、Cookie、Token、邮箱、邮箱密码、其他附加信息。
 
 我的完整卡密：
 【粘贴完整卡密】
@@ -223,67 +166,144 @@ Token：
                         `
                     },
                     {
-                        title: 'Facebook 手机端登录步骤',
+                        title: '手机端 2FA 登录步骤',
                         content: `
-                            <div class="p-4 space-y-4">
+                            <div class="p-4 space-y-5">
                                 <div class="flex gap-3">
                                     <div class="step-num">1</div>
                                     <div>
                                         <h4 class="text-[14px] font-bold text-slate-800 mb-1">输入账号密码</h4>
-                                        <p class="text-[13px] text-slate-600 leading-relaxed">打开 Facebook 登录页面，将卡密中的 UID / 登录账号 和 Facebook 密码 填写进去。</p>
+                                        <p class="text-[13px] text-slate-600 leading-relaxed">打开 Facebook 登录页面，将卡密中的 UID 和密码输入。</p>
                                     </div>
                                 </div>
-                                <div class="flex gap-3">
+                                <div class="flex gap-3 border-t border-slate-100 pt-4">
                                     <div class="step-num">2</div>
                                     <div>
                                         <h4 class="text-[14px] font-bold text-slate-800 mb-1">选择身份验证方式</h4>
-                                        <p class="text-[13px] text-slate-600 leading-relaxed">如果直接出现身份验证应用 / 6位验证码，并且你的卡密中带 2FA，可以直接进入下一步。如果出现其他设备确认、短信验证等方式，可以点击「试试其他方式」查看。</p>
+                                        <p class="text-[13px] text-slate-600 leading-relaxed">如果出现要求其他设备确认的界面，请点击 <b>「试试其他方式」</b>，再选择身份验证应用或其他可用的验证方式。</p>
                                     </div>
                                 </div>
-                                <div class="flex gap-3">
+                                <div class="flex gap-3 border-t border-slate-100 pt-4">
                                     <div class="step-num">3</div>
                                     <div>
                                         <h4 class="text-[14px] font-bold text-slate-800 mb-1">获取 2FA 验证码</h4>
-                                        <p class="text-[13px] text-slate-600 leading-relaxed mb-2">如果卡密中包含 2FA 密钥，可以打开 2FA 工具生成当前 6 位动态验证码。</p>
+                                        <p class="text-[13px] text-slate-600 leading-relaxed mb-2">如果卡密中包含 2FA 密钥，可以打开 2FA 工具获取当前的 6 位动态验证码。</p>
                                         <a href="https://2fa.vip/index.html" target="_blank" class="link-btn">🔗 2FA 工具网页版</a>
-                                        <p class="text-[12px] text-slate-400 mt-2">将卡密中的 2FA 密钥填入工具，获取验证码后返回 Facebook 输入。</p>
                                     </div>
                                 </div>
-                                <div class="flex gap-3">
+                                <div class="flex gap-3 border-t border-slate-100 pt-4">
                                     <div class="step-num">4</div>
                                     <div>
                                         <h4 class="text-[14px] font-bold text-slate-800 mb-1">登录成功</h4>
-                                        <p class="text-[13px] text-slate-600 leading-relaxed">完成验证并正常进入 Facebook 首页或账号页面，即代表登录成功。</p>
+                                        <p class="text-[13px] text-slate-600 leading-relaxed">完成验证进入首页即成功。如果弹出要求确认真人使用的界面，<b>并不代表账号被封禁</b>，点击 Dismiss 即可。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `
+                    }
+                ],
+                cookieSections: [
+                    {
+                        title: '电脑端 Cookie 登录教程',
+                        content: `
+                            <div class="p-4">
+                                <div class="alert-box mb-4">
+                                    本教程主要使用 Cookie 登录方式，所以需要先从卡密中找到该账号对应的 <b>完整 Cookie 内容</b>。
+                                </div>
+                                <div class="space-y-4">
+                                    <div class="flex gap-3">
+                                        <div class="step-num">1</div>
+                                        <div>
+                                            <h4 class="text-[14px] font-bold text-slate-800 mb-1">使用 Google Chrome 浏览器</h4>
+                                            <p class="text-[13px] text-slate-600 leading-relaxed mb-2">Facebook Cookie 登录建议使用电脑端 Google Chrome 浏览器。</p>
+                                            <a href="https://www.google.cn/chrome/" target="_blank" class="link-btn">🌐 Chrome 下载地址</a>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-3 border-t border-slate-100 pt-4">
+                                        <div class="step-num">2</div>
+                                        <div>
+                                            <h4 class="text-[14px] font-bold text-slate-800 mb-1">安装 Cookie Editor 插件</h4>
+                                            <p class="text-[13px] text-slate-600 leading-relaxed mb-2">进入 Chrome 应用商店安装 Cookie Editor 插件。</p>
+                                            <a href="https://chromewebstore.google.com/detail/cookie-editor/hlkenndednhfkekhgcdicdfddnkalmdm" target="_blank" class="link-btn">🔗 Cookie Editor 插件</a>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-3 border-t border-slate-100 pt-4">
+                                        <div class="step-num">3</div>
+                                        <div>
+                                            <h4 class="text-[14px] font-bold text-slate-800 mb-1">清理当前 Facebook 页面 Cookie</h4>
+                                            <p class="text-[13px] text-slate-600 leading-relaxed">打开 Facebook 页面并点击插件。如果浏览器有其他 FB 账号，请先将当前页面的 Cookie 全部清理，避免冲突。</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-3 border-t border-slate-100 pt-4">
+                                        <div class="step-num">4</div>
+                                        <div>
+                                            <h4 class="text-[14px] font-bold text-slate-800 mb-1">导入完整 Cookie 内容</h4>
+                                            <p class="text-[13px] text-slate-600 leading-relaxed">复制卡密中的<b>完整 Cookie</b>。在 Cookie Editor 选择 Import，粘贴并确认导入。<br>（切勿只复制 c_user 或 xs，必须导入完整内容）</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-3 border-t border-slate-100 pt-4">
+                                        <div class="step-num">5</div>
+                                        <div>
+                                            <h4 class="text-[14px] font-bold text-slate-800 mb-1">刷新页面完成登录</h4>
+                                            <p class="text-[13px] text-slate-600 leading-relaxed">导入完成后，刷新当前 Facebook 页面，正常进入首页即代表登录成功。</p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         `
                     }
                 ]
-            },
-            'twitter': { title: 'Twitter / X 教程', subtitle: '正在整理中...', sections: [] },
-            'tiktok': { title: 'TikTok 教程', subtitle: '正在整理中...', sections: [] }
+            }
         };
 
+        let currentFbMode = 'mobile';
+
         function switchPlatform(platform, el) {
-            // 更新 Tab 样式
             document.querySelectorAll('.platform-tab').forEach(btn => btn.classList.remove('active'));
-            if(el) el.classList.add('active');
+            el.classList.add('active');
 
             const data = tutorialData[platform];
-            const container = document.getElementById('tutorial-content');
-            
             document.getElementById('main-title').innerText = data.title;
             document.getElementById('main-subtitle').innerText = data.subtitle;
 
-            if (!data || !data.sections || data.sections.length === 0) {
-                container.innerHTML = `<div class="text-center py-10 text-slate-400">教程正在整理中，敬请期待</div>`;
+            const fbTabs = document.getElementById('fb-tabs');
+            if (data.hasSubTab) {
+                fbTabs.classList.remove('hidden');
+                currentFbMode = 'mobile';
+                document.querySelectorAll('.sub-tab')[0].classList.add('active');
+                document.querySelectorAll('.sub-tab')[1].classList.remove('active');
+                renderFbContent('mobile');
+            } else {
+                fbTabs.classList.add('hidden');
+                renderSections(data.sections);
+            }
+        }
+
+        function switchFbTab(mode, el) {
+            currentFbMode = mode;
+            document.querySelectorAll('.sub-tab').forEach(btn => btn.classList.remove('active'));
+            el.classList.add('active');
+            renderFbContent(mode);
+        }
+
+        function renderFbContent(mode) {
+            const data = tutorialData['facebook'];
+            if (mode === 'mobile') {
+                renderSections(data.mobileSections);
+            } else {
+                renderSections(data.cookieSections);
+            }
+        }
+
+        function renderSections(sections) {
+            const container = document.getElementById('tutorial-content');
+            if (!sections || sections.length === 0) {
+                container.innerHTML = `<div class="text-center py-10 text-slate-400">教程正在整理中</div>`;
                 return;
             }
 
             let html = '';
-
-            data.sections.forEach((sec, index) => {
+            sections.forEach((sec, index) => {
                 html += `
                     <div class="card overflow-hidden">
                         <button class="accordion-btn" onclick="toggleAccordion('acc-${index}', this)">
@@ -299,8 +319,7 @@ Token：
 
             container.innerHTML = html;
             
-            // 默认展开第一个
-            if(data.sections.length > 0) {
+            if(sections.length > 0) {
                 const firstBtn = document.querySelector('.accordion-btn');
                 if(firstBtn) toggleAccordion('acc-0', firstBtn);
             }
@@ -320,7 +339,6 @@ Token：
             }
         }
 
-        // 复制 AI 指令功能
         function copyAIPrompt(btn) {
             const text = document.getElementById('ai-prompt-text').innerText;
             if(navigator.clipboard) {
@@ -335,10 +353,13 @@ Token：
             }
         }
 
-        // 初始化默认加载 Telegram
         document.addEventListener('DOMContentLoaded', () => {
             const activeTab = document.querySelector('.platform-tab.active') || document.querySelector('.platform-tab');
-            if(activeTab) switchPlatform('telegram', activeTab);
+            if(activeTab) {
+                // 默认让 telegram 激活，或者根据当前 active 执行
+                const platform = activeTab.innerText.toLowerCase().includes('telegram') ? 'telegram' : 'facebook';
+                switchPlatform(platform, activeTab);
+            }
         });
     </script>
     <script src="/notice-marquee.js"></script>

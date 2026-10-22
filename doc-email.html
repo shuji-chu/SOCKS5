@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>邮箱网关文档 - SOCKS5</title>
+    <title>邮箱推送文档 - SOCKS5</title>
     <link rel="icon" href="/logo.jpg" type="image/jpeg">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -24,96 +24,100 @@
         .api-table th { text-align: left; padding: 10px 12px; background: #f1f5f9; color: #475569; font-weight: bold; border-bottom: 1px solid #e2e8f0; }
         .api-table td { padding: 12px; border-bottom: 1px solid #e2e8f0; color: #1e293b; background: #fff; line-height: 1.5; }
         .api-table td:first-child { font-family: 'Courier New', Courier, monospace; color: #2563eb; font-weight: bold; }
+        
+        .highlight-box { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 16px; margin-bottom: 20px; color: #1e40af; font-size: 13px; line-height: 1.6; }
     </style>
 </head>
 <body>
     <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center gap-3 sticky top-0 z-50">
         <a href="/guide.html" class="text-slate-600 text-xl font-bold px-2">←</a>
-        <h1 class="text-[17px] font-bold text-slate-800">邮箱网关 API</h1>
+        <h1 class="text-[17px] font-bold text-slate-800">邮箱推送 API</h1>
     </header>
 
     <main class="px-4 py-6 pb-24 max-w-2xl mx-auto">
         <!-- Hero 区域 -->
         <div class="mb-8">
-            <h2 class="text-[26px] font-extrabold text-slate-800 mb-2 tracking-tight">企业级邮件推送网关</h2>
-            <p class="text-[14px] text-slate-500 mb-5 leading-relaxed">支持绑定自定义域名、全托管代发，助您瞬间触达全球客户，直达收件箱不进垃圾邮件。</p>
+            <h2 class="text-[26px] font-extrabold text-slate-800 mb-2 tracking-tight">全托管邮件推送服务</h2>
+            <p class="text-[14px] text-slate-500 mb-5 leading-relaxed">无需折腾复杂的协议与服务器配置。绑定域名，提交内容，剩下的交给我们。</p>
             <div class="flex flex-wrap gap-2">
-                <span class="bg-blue-50 text-blue-600 text-[12px] font-bold px-3 py-1 rounded-full">全自动解析绑定</span>
-                <span class="bg-blue-50 text-blue-600 text-[12px] font-bold px-3 py-1 rounded-full">高可用 SMTP 池</span>
-                <span class="bg-blue-50 text-blue-600 text-[12px] font-bold px-3 py-1 rounded-full">自定义发件前缀</span>
+                <span class="bg-green-50 text-green-600 text-[12px] font-bold px-3 py-1 rounded-full">零配置一键接入</span>
+                <span class="bg-green-50 text-green-600 text-[12px] font-bold px-3 py-1 rounded-full">自动核实绑定</span>
+                <span class="bg-green-50 text-green-600 text-[12px] font-bold px-3 py-1 rounded-full">99% 极高送达率</span>
             </div>
         </div>
 
         <!-- 导航锚点 -->
         <div class="flex overflow-x-auto no-scrollbar gap-6 border-b border-slate-200 pb-3 mb-8 text-[13px] text-slate-500">
             <a href="#step1" class="nav-item active flex items-center whitespace-nowrap"><span class="nav-dot"></span>快速接入</a>
-            <a href="#step2" class="nav-item flex items-center whitespace-nowrap"><span class="nav-dot"></span>核心概念</a>
-            <a href="#step3" class="nav-item flex items-center whitespace-nowrap"><span class="nav-dot"></span>发信接口</a>
-            <a href="#step4" class="nav-item flex items-center whitespace-nowrap"><span class="nav-dot"></span>充值计费</a>
-            <a href="#step5" class="nav-item flex items-center whitespace-nowrap"><span class="nav-dot"></span>调试排查</a>
+            <a href="#step2" class="nav-item flex items-center whitespace-nowrap"><span class="nav-dot"></span>零配置绑定</a>
+            <a href="#step3" class="nav-item flex items-center whitespace-nowrap"><span class="nav-dot"></span>推送接口</a>
+            <a href="#step4" class="nav-item flex items-center whitespace-nowrap"><span class="nav-dot"></span>计费说明</a>
         </div>
 
         <!-- 01 快速接入 -->
         <div id="step1" class="mb-12 scroll-mt-20">
             <div class="flex items-center gap-3 mb-4">
                 <div class="num-box">01</div>
-                <h3 class="text-[18px] font-bold text-slate-800">快速接入流程</h3>
+                <h3 class="text-[18px] font-bold text-slate-800">极致简单的接入流程</h3>
             </div>
-            <p class="text-[13px] text-slate-500 mb-4">三步完成配置，即刻开始海量发信。</p>
+            <p class="text-[13px] text-slate-500 mb-4">告别繁琐的代码，您只需要提供两样东西：域名和内容。</p>
             
             <div class="space-y-3">
                 <div class="card p-4 flex gap-4 items-start">
                     <div class="text-[12px] font-bold text-blue-500 bg-blue-50 px-2 py-1 rounded">01</div>
                     <div>
-                        <h4 class="text-[14px] font-bold text-slate-800 mb-1">获取网关 Key</h4>
-                        <p class="text-[13px] text-slate-500">在控制台申请 `sk_email_` 开头的专属密钥。</p>
+                        <h4 class="text-[14px] font-bold text-slate-800 mb-1">提交您的域名或网站/APP</h4>
+                        <p class="text-[13px] text-slate-500">在控制台填入您的品牌域名（或 APP 官网地址），系统将自动识别并配置。</p>
                     </div>
                 </div>
                 <div class="card p-4 flex gap-4 items-start">
                     <div class="text-[12px] font-bold text-blue-500 bg-blue-50 px-2 py-1 rounded">02</div>
                     <div>
-                        <h4 class="text-[14px] font-bold text-slate-800 mb-1">提交域名核实（可选）</h4>
-                        <p class="text-[13px] text-slate-500">在控制台绑定您的域名。您只需配置 CNAME，系统核实无误后自动绑定生效。</p>
+                        <h4 class="text-[14px] font-bold text-slate-800 mb-1">系统全自动核实</h4>
+                        <p class="text-[13px] text-slate-500">后台自动验证您的归属权，核实通过后，自动为您完成所有底层发信协议的绑定推送。</p>
                     </div>
                 </div>
                 <div class="card p-4 flex gap-4 items-start">
                     <div class="text-[12px] font-bold text-blue-500 bg-blue-50 px-2 py-1 rounded">03</div>
                     <div>
-                        <h4 class="text-[14px] font-bold text-slate-800 mb-1">开始调用 API 代发</h4>
-                        <p class="text-[13px] text-slate-500">调用发信接口，传入您自定义的前缀（如 `noreply`），平台将为您全托管发送。</p>
+                        <h4 class="text-[14px] font-bold text-slate-800 mb-1">调用 API 发送内容</h4>
+                        <p class="text-[13px] text-slate-500">传入收件人和邮件标题/正文，我们以您的专属前缀瞬间代发。</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 02 核心概念 -->
+        <!-- 02 零配置绑定 -->
         <div id="step2" class="mb-12 scroll-mt-20">
             <div class="flex items-center gap-3 mb-4">
                 <div class="num-box">02</div>
-                <h3 class="text-[18px] font-bold text-slate-800">核心概念与代发机制</h3>
+                <h3 class="text-[18px] font-bold text-slate-800">零配置自动绑定机制</h3>
             </div>
             
+            <div class="highlight-box">
+                💡 <b>把复杂留给我们，把简单留给您。</b><br><br>
+                您不需要了解任何 SMTP 协议、无需配置 SPF / DKIM / DMARC 记录。<br>
+                只要您提交了域名或业务信息，我们的系统会自动进行所有权核实。<br>
+                核实完毕后，<b>自动完成绑定并推送发信配置</b>，您直接调用接口即可。
+            </div>
+
             <div class="grid grid-cols-1 gap-3">
                 <div class="card p-5">
-                    <h4 class="text-[14px] font-bold text-slate-800 mb-2">1. 专属域名绑定 & 自动核实</h4>
-                    <p class="text-[13px] text-slate-600 leading-relaxed">您可以将您的品牌域名（如 `@yourdomain.com`）绑定到本平台。系统会给出解析记录，<b>APP 或网站确认归属后，自动绑定发送</b>，无需人工干预。</p>
+                    <h4 class="text-[14px] font-bold text-slate-800 mb-2">支持自定义发件前缀</h4>
+                    <p class="text-[13px] text-slate-600 leading-relaxed">发信时，您可以自由编辑前缀，例如用 `noreply@您的域名.com` 发送通知，或用 `vip@您的域名.com` 发送营销。</p>
                 </div>
                 <div class="card p-5">
-                    <h4 class="text-[14px] font-bold text-slate-800 mb-2">2. 全托管代发 (无需自建)</h4>
-                    <p class="text-[13px] text-slate-600 leading-relaxed">您不需要懂任何邮件服务器配置（SPF/DKIM 等）。只要绑定域名，我们底层的高可用 SMTP 池会全权代理发送，极大提升送达率。</p>
-                </div>
-                <div class="card p-5">
-                    <h4 class="text-[14px] font-bold text-slate-800 mb-2">3. 自定义前缀编辑</h4>
-                    <p class="text-[13px] text-slate-600 leading-relaxed">支持 API 动态传入 `from_name` 和 `from_prefix`。例如，您可以自定义发出 `admin@yourdomain.com` 或 `vip@yourdomain.com`。</p>
+                    <h4 class="text-[14px] font-bold text-slate-800 mb-2">适用于网站 / APP / 系统通知</h4>
+                    <p class="text-[13px] text-slate-600 leading-relaxed">无论您是发注册验证码、密码找回、还是批量营销邮件，底层的高可用 SMTP 池都会保障送达率，不进垃圾箱。</p>
                 </div>
             </div>
         </div>
 
-        <!-- 03 发信接口 -->
+        <!-- 03 推送接口 -->
         <div id="step3" class="mb-12 scroll-mt-20">
             <div class="flex items-center gap-3 mb-4">
                 <div class="num-box">03</div>
-                <h3 class="text-[18px] font-bold text-slate-800">发送邮件接口</h3>
+                <h3 class="text-[18px] font-bold text-slate-800">单发/批量推送接口</h3>
             </div>
             
             <div class="card p-5">
@@ -121,16 +125,16 @@
                     <span class="bg-green-50 text-green-600 px-2 py-1 rounded text-[11px] font-bold border border-green-200 mr-2">POST</span>
                     <span class="font-mono text-[14px] font-bold text-slate-800">/email/send</span>
                 </div>
-                <p class="text-[12px] text-slate-500 mb-4">请求地址：<code>https://web.lynli.me/api/v1/email/send</code><br>提交格式：<code>application/json</code></p>
+                <p class="text-[12px] text-slate-500 mb-4">请求地址：<code>https://web.lynli.me/api/v1/email/send</code></p>
 
                 <p class="text-[13px] font-bold text-slate-700 mb-2">请求参数：</p>
                 <table class="api-table">
                     <tr><th>参数名</th><th>必填</th><th>说明</th></tr>
-                    <tr><td>to</td><td>是</td><td>收件人邮箱地址</td></tr>
+                    <tr><td>to</td><td>是</td><td>收件人邮箱</td></tr>
                     <tr><td>subject</td><td>是</td><td>邮件主题</td></tr>
-                    <tr><td>html</td><td>是</td><td>HTML 格式的邮件内容</td></tr>
-                    <tr><td>from_prefix</td><td>否</td><td>自定义前缀 (如 noreply, admin)，不传则使用默认</td></tr>
-                    <tr><td>from_name</td><td>否</td><td>发件人显示名称 (如 SOCKS5 官方)</td></tr>
+                    <tr><td>html</td><td>是</td><td>邮件内容 (支持 HTML)</td></tr>
+                    <tr><td>prefix</td><td>否</td><td>自定义前缀，如 <code>noreply</code> (不传则自动用默认)</td></tr>
+                    <tr><td>domain</td><td>否</td><td>指定发件域名 (用于多域名用户)</td></tr>
                 </table>
 
                 <p class="text-[13px] font-bold text-slate-700 mb-2 mt-4">cURL 示例：</p>
@@ -140,71 +144,42 @@
 -H "Authorization: Bearer sk_email_xxxxxx" \
 -H "Content-Type: application/json" \
 -d '{
-  "to": "customer@gmail.com",
-  "subject": "您的验证码",
-  "html": "<h1>您的验证码是 8888</h1>",
-  "from_prefix": "security",
-  "from_name": "安全中心"
+  "to": "user@example.com",
+  "subject": "您的注册验证码",
+  "html": "<p>验证码: <b>888888</b>，5分钟内有效。</p>",
+  "prefix": "noreply"
 }'</div>
                 </div>
 
-                <p class="text-[13px] font-bold text-slate-700 mb-2 mt-4">返回示例：</p>
+                <p class="text-[13px] font-bold text-slate-700 mb-2 mt-4">成功返回：</p>
                 <div class="code-wrapper">
                     <div class="copy-btn" onclick="copyCode(this)">复制</div>
                     <div class="code-block">{
   "code": 200,
-  "msg": "发送任务已提交",
+  "msg": "已成功推送到发信队列",
   "data": {
-    "message_id": "msg_99887766",
-    "status": "queued"
+    "message_id": "msg_99887766"
   }
 }</div>
                 </div>
             </div>
         </div>
 
-        <!-- 04 充值计费 -->
-        <div id="step4" class="mb-12 scroll-mt-20">
+        <!-- 04 计费说明 -->
+        <div id="step4" class="mb-10 scroll-mt-20">
             <div class="flex items-center gap-3 mb-4">
                 <div class="num-box">04</div>
-                <h3 class="text-[18px] font-bold text-slate-800">计费规则</h3>
+                <h3 class="text-[18px] font-bold text-slate-800">计费模式</h3>
             </div>
             
             <div class="card p-5 space-y-4 text-[13px] text-slate-600">
                 <div>
-                    <h4 class="text-[14px] font-bold text-slate-800 mb-1">发送计费</h4>
-                    <p>采用<b>按量计费</b>模式，发送成功才扣除额度。余额可直接用于平台内充值。</p>
+                    <h4 class="text-[14px] font-bold text-slate-800 mb-1">按量计费 (发送成功才扣费)</h4>
+                    <p>发信时产生费用，若发送失败或退信，系统将自动返还额度。</p>
                 </div>
                 <div class="border-t border-slate-100 pt-3">
-                    <h4 class="text-[14px] font-bold text-slate-800 mb-1">域名绑定月租</h4>
-                    <p>为防止恶意发信，绑定专属自定义域名需缴纳固定的月租费（如 50元/月）。绑定后赠送测试额度。</p>
-                </div>
-                <div class="border-t border-slate-100 pt-3">
-                    <h4 class="text-[14px] font-bold text-slate-800 mb-1">高可用通道保障</h4>
-                    <p>平台底层采用多 IP 轮询与海外优质 SMTP 池，保障极高的送达率。遇到退信不扣费。</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- 05 调试排查 -->
-        <div id="step5" class="mb-10 scroll-mt-20">
-            <div class="flex items-center gap-3 mb-4">
-                <div class="num-box">05</div>
-                <h3 class="text-[18px] font-bold text-slate-800">调试排查</h3>
-            </div>
-            
-            <div class="space-y-3">
-                <div class="card p-4">
-                    <h4 class="text-[14px] font-bold text-slate-800 mb-1 text-red-500">域名未核实通过</h4>
-                    <p class="text-[13px] text-slate-600">请检查您域名的 TXT / CNAME 解析记录是否正确配置。核实过程通常需要 5-10 分钟生效。</p>
-                </div>
-                <div class="card p-4">
-                    <h4 class="text-[14px] font-bold text-slate-800 mb-1 text-red-500">发件权限受限</h4>
-                    <p class="text-[13px] text-slate-600">可能是账户余额不足，或者触发了防滥发风控（如单日发送量突增，收件人退信率过高）。</p>
-                </div>
-                <div class="card p-4">
-                    <h4 class="text-[14px] font-bold text-slate-800 mb-1 text-amber-500">进入垃圾箱</h4>
-                    <p class="text-[13px] text-slate-600">建议邮件内容尽量规避敏感营销词汇，提供退订链接。也可以联系客服申请切换到高信誉 IP 池通道。</p>
+                    <h4 class="text-[14px] font-bold text-slate-800 mb-1">域名绑定月租费</h4>
+                    <p>为确保通道不被恶意滥用，绑定独立域名需按年/月缴纳基础维护费，同时赠送额外发信额度。</p>
                 </div>
             </div>
         </div>

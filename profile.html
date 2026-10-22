@@ -13,6 +13,20 @@
         .btn-press { transition: transform 0.1s, background-color 0.2s; }
         .btn-press:active { transform: scale(0.97); background-color: #f1f5f9; }
         
+        /* 底部抽屉动画 */
+        .drawer-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.5); backdrop-filter: blur(4px); z-index: 9999; display: none; opacity: 0; transition: opacity 0.3s; }
+        .drawer-overlay.active { display: block; opacity: 1; }
+        .drawer-panel { position: fixed; bottom: -100%; left: 0; right: 0; background: #fff; border-radius: 20px 20px 0 0; z-index: 10000; transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding-bottom: env(safe-area-inset-bottom); }
+        .drawer-panel.active { bottom: 0; }
+
+        /* 居中弹窗 */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.5); backdrop-filter: blur(4px); z-index: 10001; display: none; align-items: center; justify-content: center; padding: 0 16px; }
+        .modal-overlay.active { display: flex; }
+        .modal-box { background: #fff; width: 100%; max-width: 340px; border-radius: 16px; padding: 20px; transform: scale(0.95); transition: transform 0.2s; opacity: 0; text-align: left; }
+        .modal-overlay.active .modal-box { transform: scale(1); opacity: 1; }
+        .input-flat { width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; font-size: 14px; outline: none; transition: border 0.2s; margin-bottom: 12px; }
+        .input-flat:focus { border-color: #3b82f6; background: #fff; }
+
         /* 底部 Tab 专属样式 */
         .bottom-tab { position: fixed; bottom: 0; width: 100%; background: #ffffff; border-top: 1px solid #f1f5f9; display: flex; height: 56px; padding-bottom: env(safe-area-inset-bottom); z-index: 50; }
         .tab-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: #94a3b8; text-decoration: none; }
@@ -25,13 +39,12 @@
         <h1 class="text-[20px] font-bold text-slate-800">我的账户</h1>
         <div class="relative">
             <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
-            <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
         </div>
     </header>
 
     <main class="px-4 py-4 space-y-4 max-w-lg mx-auto">
-        <!-- 用户信息卡片 -->
-        <div class="card p-5 flex items-center gap-4 cursor-pointer btn-press">
+        <!-- 用户信息卡片 (点击唤起抽屉) -->
+        <div onclick="openUserDrawer()" class="card p-5 flex items-center gap-4 cursor-pointer btn-press">
             <div id="profile-avatar-container" class="w-[60px] h-[60px] rounded-full bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200 shrink-0">
                 <span class="text-blue-500 font-bold text-2xl">B</span>
             </div>
@@ -40,7 +53,7 @@
                     <h2 class="text-[18px] font-bold text-slate-800" id="profile-nickname">boss</h2>
                     <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                 </div>
-                <p class="text-[13px] text-slate-500 mb-0.5">用户ID: 10001</p>
+                <p class="text-[13px] text-slate-500 mb-0.5">用户ID: <span id="profile-id">10001</span></p>
                 <p class="text-[13px] text-slate-500">邮箱: <span id="profile-email">加载中...</span></p>
             </div>
             <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
@@ -92,50 +105,33 @@
             </a>
         </div>
 
-        <!-- 菜单列表 (加回了“使用说明”) -->
+        <!-- 菜单列表 -->
         <div class="card overflow-hidden">
             <a href="/guide.html" class="flex items-center justify-between p-4 border-b border-slate-100 active:bg-slate-50 btn-press block">
                 <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-lg bg-slate-100 text-slate-500 flex items-center justify-center">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    </div>
-                    <div>
-                        <p class="text-[15px] font-bold text-slate-800">使用说明</p>
-                        <p class="text-[12px] text-slate-500 mt-0.5">查看购物流程与常见问题</p>
-                    </div>
+                    <div class="w-8 h-8 rounded-lg bg-slate-100 text-slate-500 flex items-center justify-center"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
+                    <div><p class="text-[15px] font-bold text-slate-800">使用说明</p><p class="text-[12px] text-slate-500 mt-0.5">查看购物流程与常见问题</p></div>
                 </div>
                 <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
             </a>
-
-            <a href="/console.html" class="flex items-center justify-between p-4 border-b border-slate-100 active:bg-slate-50 block">
+            <a href="/console.html" class="flex items-center justify-between p-4 border-b border-slate-100 active:bg-slate-50 btn-press block">
                 <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
-                    </div>
-                    <div>
-                        <p class="text-[15px] font-bold text-slate-800">开发者控制台</p>
-                        <p class="text-[12px] text-slate-500 mt-0.5">获取密钥与查看API对接文档</p>
-                    </div>
+                    <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg></div>
+                    <div><p class="text-[15px] font-bold text-slate-800">开发者控制台</p><p class="text-[12px] text-slate-500 mt-0.5">获取密钥与查看API对接文档</p></div>
                 </div>
                 <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
             </a>
-
-            <a href="/invite.html" class="flex items-center justify-between p-4 active:bg-slate-50 block">
+            <a href="/invite.html" class="flex items-center justify-between p-4 active:bg-slate-50 btn-press block">
                 <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-lg bg-orange-50 text-orange-500 flex items-center justify-center">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                    </div>
-                    <div>
-                        <p class="text-[15px] font-bold text-slate-800">邀请好友</p>
-                        <p class="text-[12px] text-slate-500 mt-0.5">分享专属链接，赚取高额佣金</p>
-                    </div>
+                    <div class="w-8 h-8 rounded-lg bg-orange-50 text-orange-500 flex items-center justify-center"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg></div>
+                    <div><p class="text-[15px] font-bold text-slate-800">邀请好友</p><p class="text-[12px] text-slate-500 mt-0.5">分享专属链接，赚取高额佣金</p></div>
                 </div>
                 <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
             </a>
         </div>
     </main>
 
-    <!-- 完美的底部 Tab -->
+    <!-- 底部 Tab -->
     <div class="bottom-tab">
         <a href="/index.html" class="tab-item">
             <svg class="w-[22px] h-[22px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
@@ -147,22 +143,66 @@
         </a>
     </div>
 
+    <!-- 隐藏的上传文件 input -->
+    <input type="file" id="avatar-upload" accept="image/*" class="hidden" onchange="handleAvatarUpload(event)">
+
+    <!-- 用户操作底部抽屉 -->
+    <div id="user-drawer-overlay" class="drawer-overlay" onclick="closeUserDrawer(event)"></div>
+    <div id="user-drawer" class="drawer-panel">
+        <div class="p-4 border-b border-slate-100 flex justify-between items-center">
+            <h3 class="text-[16px] font-bold text-slate-800">账户设置</h3>
+            <button onclick="closeUserDrawer()" class="text-slate-400 p-1"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+        </div>
+        <div class="px-4 py-2">
+            <!-- 修改头像 -->
+            <div onclick="document.getElementById('avatar-upload').click()" class="flex items-center gap-3 py-3 border-b border-slate-50 active:bg-slate-50 cursor-pointer">
+                <div class="w-8 h-8 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg></div>
+                <span class="text-[15px] text-slate-700 font-medium">修改头像</span>
+            </div>
+            <!-- 修改昵称 -->
+            <div onclick="openNicknameModal()" class="flex items-center gap-3 py-3 border-b border-slate-50 active:bg-slate-50 cursor-pointer">
+                <div class="w-8 h-8 rounded-full bg-amber-50 text-amber-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg></div>
+                <span class="text-[15px] text-slate-700 font-medium">修改昵称</span>
+            </div>
+            <!-- 修改密码 -->
+            <div onclick="openPasswordModal()" class="flex items-center gap-3 py-3 border-b border-slate-50 active:bg-slate-50 cursor-pointer">
+                <div class="w-8 h-8 rounded-full bg-indigo-50 text-indigo-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg></div>
+                <span class="text-[15px] text-slate-700 font-medium">修改密码</span>
+            </div>
+            <!-- 退出登录 -->
+            <div onclick="openLogoutModal()" class="flex items-center gap-3 py-3 active:bg-red-50 cursor-pointer mt-2">
+                <div class="w-8 h-8 rounded-full bg-red-50 text-red-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg></div>
+                <span class="text-[15px] text-red-600 font-bold">退出登录</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 通用居中弹窗 -->
+    <div id="custom-modal" class="modal-overlay">
+        <div class="modal-box text-center">
+            <h3 class="text-[17px] font-bold text-slate-800 mb-3" id="modal-title">提示</h3>
+            <div class="text-[14px] text-slate-600 mb-5 text-left" id="modal-desc"></div>
+            <div class="flex gap-3" id="modal-btns"></div>
+        </div>
+    </div>
+
     <script>
+        // 初始化加载数据
         document.addEventListener('DOMContentLoaded', () => {
             const role = localStorage.getItem('user_role');
             const email = localStorage.getItem('user_email');
-            
-            // 如果没有身份信息，踢回登录页（注释掉以便你先测试页面）
-            /*
-            if (!role || !email) {
-                window.location.href = '/login.html';
-                return;
-            }
-            */
+            const nickname = localStorage.getItem('user_nickname') || 'boss';
+            const avatar = localStorage.getItem('user_avatar');
 
-            // 显示邮箱
             if (email) {
                 document.getElementById('profile-email').innerText = email;
+                document.getElementById('profile-nickname').innerText = nickname;
+            }
+
+            // 加载头像
+            const avatarContainer = document.getElementById('profile-avatar-container');
+            if (avatar) {
+                avatarContainer.innerHTML = `<img src="${avatar}" class="w-full h-full object-cover">`;
             }
 
             // 老板专属入口显隐
@@ -171,6 +211,98 @@
                 if (btn) btn.style.display = 'flex';
             }
         });
+
+        // 底部抽屉控制
+        function openUserDrawer() {
+            document.getElementById('user-drawer-overlay').classList.add('active');
+            document.getElementById('user-drawer').classList.add('active');
+        }
+        function closeUserDrawer(e) {
+            if(e && e.target !== e.currentTarget) return;
+            document.getElementById('user-drawer-overlay').classList.remove('active');
+            document.getElementById('user-drawer').classList.remove('active');
+        }
+
+        // 全局弹窗控制
+        function showCustomAlert(title, desc, btnsHtml) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-desc').innerHTML = desc;
+            document.getElementById('modal-btns').innerHTML = btnsHtml;
+            document.getElementById('custom-modal').classList.add('active');
+        }
+        function closeCustomAlert() {
+            document.getElementById('custom-modal').classList.remove('active');
+        }
+
+        // 1. 头像上传
+        function handleAvatarUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64Image = e.target.result;
+                localStorage.setItem('user_avatar', base64Image);
+                document.getElementById('profile-avatar-container').innerHTML = `<img src="${base64Image}" class="w-full h-full object-cover">`;
+                closeUserDrawer();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // 2. 修改昵称
+        function openNicknameModal() {
+            closeUserDrawer();
+            const currentName = document.getElementById('profile-nickname').innerText;
+            const content = `
+                <input type="text" id="new-nickname-input" value="${currentName}" class="input-flat" placeholder="请输入新昵称">
+            `;
+            const btns = `
+                <button onclick="closeCustomAlert()" class="flex-1 py-2.5 bg-slate-100 text-slate-600 font-bold rounded-xl text-[15px] active:bg-slate-200">取消</button>
+                <button onclick="saveNickname()" class="flex-1 py-2.5 bg-blue-600 text-white font-bold rounded-xl text-[15px] active:opacity-80">保存</button>
+            `;
+            showCustomAlert('修改昵称', content, btns);
+        }
+        function saveNickname() {
+            const newName = document.getElementById('new-nickname-input').value.trim();
+            if (!newName) return;
+            localStorage.setItem('user_nickname', newName);
+            document.getElementById('profile-nickname').innerText = newName;
+            closeCustomAlert();
+        }
+
+        // 3. 修改密码
+        function openPasswordModal() {
+            closeUserDrawer();
+            const content = `
+                <div class="space-y-3">
+                    <input type="password" id="old-password" class="input-flat" placeholder="请输入旧密码">
+                    <input type="password" id="new-password" class="input-flat" placeholder="请输入新密码">
+                    <div class="flex gap-2">
+                        <input type="text" id="email-code" class="input-flat flex-1 mb-0" placeholder="邮箱验证码">
+                        <button class="px-3 py-2 bg-blue-50 text-blue-600 text-[13px] font-bold rounded-lg border border-blue-100 whitespace-nowrap">获取验证码</button>
+                    </div>
+                </div>
+            `;
+            const btns = `
+                <button onclick="closeCustomAlert()" class="flex-1 py-2.5 bg-slate-100 text-slate-600 font-bold rounded-xl text-[15px] active:bg-slate-200">取消</button>
+                <button onclick="closeCustomAlert()" class="flex-1 py-2.5 bg-blue-600 text-white font-bold rounded-xl text-[15px] active:opacity-80">确认修改</button>
+            `;
+            showCustomAlert('修改密码', content, btns);
+        }
+
+        // 4. 退出登录
+        function openLogoutModal() {
+            closeUserDrawer();
+            const content = `<p class="text-center text-slate-600">确定要退出当前账号吗？</p>`;
+            const btns = `
+                <button onclick="closeCustomAlert()" class="flex-1 py-2.5 bg-slate-100 text-slate-600 font-bold rounded-xl text-[15px] active:bg-slate-200">取消</button>
+                <button onclick="doLogout()" class="flex-1 py-2.5 bg-red-500 text-white font-bold rounded-xl text-[15px] active:opacity-80">确认退出</button>
+            `;
+            showCustomAlert('退出登录', content, btns);
+        }
+        function doLogout() {
+            localStorage.clear();
+            window.location.href = '/login.html';
+        }
     </script>
 </body>
 </html>

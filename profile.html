@@ -5,31 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>我的账户 - SOCKS5</title>
     <link rel="icon" href="/logo.jpg" type="image/jpeg">
-    <script src="https://cdn.tailwindcss.com">
-        // --- 推广与提现逻辑 ---
-        function openWithdrawModal() {
-            document.getElementById('withdraw-modal').classList.add('active');
-        }
-
-        function changeAmount(val) {
-            const input = document.getElementById('w-amount');
-            let current = parseFloat(input.value) || 0;
-            current += val;
-            if (current < 10) current = 10; // 最低10
-            input.value = current.toFixed(2);
-        }
-
-        function submitWithdraw() {
-            const amount = document.getElementById('w-amount').value;
-            const address = document.getElementById('w-address').value;
-            if(!address || address.length < 10) {
-                return alert('请输入正确的USDT收款地址');
-            }
-            alert('提现申请已提交，等待管理员审核 (前端演示)');
-            closeModal('withdraw-modal');
-        }
-
-    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
         body { background-color: #f1f5f9; color: #1e293b; padding-bottom: 80px; }
@@ -37,6 +13,9 @@
         .app-card { background: white; border-radius: 12px; margin: 12px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .asset-box { display: flex; flex-direction: column; justify-content: center; background: #f8fafc; border-radius: 10px; padding: 16px; border: 1px solid #f1f5f9; cursor: pointer; transition: all 0.2s; }
         .asset-box:active { background: #f1f5f9; transform: scale(0.98); }
+        .menu-item { display: flex; justify-content: space-between; align-items: center; padding: 16px; background: white; border-bottom: 1px solid #f1f5f9; cursor: pointer; }
+        .menu-item:last-child { border-bottom: none; }
+        .menu-item:active { background: #f8fafc; }
         
         .nav-tab-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #ffffff; display: flex; justify-content: space-around; padding: 10px 0 calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid #e2e8f0; z-index: 50; }
         .nav-tab-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: #94a3b8; text-decoration: none; }
@@ -46,14 +25,13 @@
         /* 弹窗通用样式 */
         .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 9999; display: none; align-items: flex-end; justify-content: center; }
         .modal-overlay.active { display: flex; }
-        .modal-content { background: white; width: 100%; max-width: 400px; border-radius: 24px 24px 0 0; padding: 24px; padding-bottom: 40px; max-height: 85vh; display: flex; flex-direction: column; animation: slideUp 0.3s ease-out; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 16px; }
+        .modal-content { background: white; width: 100%; max-width: 400px; border-radius: 24px 24px 0 0; padding: 24px; padding-bottom: 30px; max-height: 90vh; display: flex; flex-direction: column; animation: slideUp 0.3s ease-out; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 16px; flex-shrink: 0; }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-    <!-- 顶部导航 (去掉了修改密码) -->
     <div class="top-nav">
         <div class="flex items-center gap-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
@@ -74,7 +52,6 @@
             <p class="text-[13px] text-slate-500 mt-1">用户ID：<span id="user-id" class="text-slate-500 font-mono"></span></p>
             <p class="text-[13px] text-slate-500 mt-0.5">邮箱：<span id="user-email-sub"></span></p>
         </div>
-        <!-- 右侧箭头提示点击进入 -->
         <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
     </div>
 
@@ -101,7 +78,7 @@
             </div>
             <p class="text-xl font-bold text-slate-800">¥ 0.00</p>
         </div>
-        <div class="asset-box" onclick="openDataModal('orders')">
+        <div class="asset-box" onclick="openOrdersModal()">
             <div class="flex items-center gap-2 mb-1">
                 <div class="w-6 h-6 bg-slate-500 rounded text-white flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></div>
                 <span class="text-xs text-slate-500">订单数量</span>
@@ -110,22 +87,34 @@
         </div>
     </div>
 
-    <!-- API 配置 -->
-    <div class="app-card">
-        <div class="flex justify-between items-center mb-4">
-            <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
-                <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
-                API 配置
-            </h3>
-            <span class="text-xs text-blue-500 cursor-pointer" onclick="openApiDocModal()">查看文档</span>
-        </div>
-        <div>
-            <p class="text-xs text-slate-500 mb-1">APP Secret:</p>
-            <div class="flex border border-slate-200 rounded-lg overflow-hidden">
-                <input type="password" id="api-secret" readonly class="flex-1 px-3 py-2 text-sm bg-slate-50 outline-none text-slate-700 font-mono">
-                <button class="px-4 bg-slate-100 text-slate-500 border-l border-slate-200" onclick="togglePwd('api-secret')"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg></button>
-                <button class="px-4 bg-slate-100 text-slate-500 border-l border-slate-200" onclick="copyVal('api-secret')">复制</button>
+    <!-- 功能入口卡片 -->
+    <div class="app-card p-0 mt-4 overflow-hidden">
+        <!-- API 配置 -->
+        <div class="menu-item" onclick="openApiModal()">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-indigo-50 text-indigo-600 rounded-lg flex items-center justify-center">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
+                </div>
+                <div>
+                    <p class="text-sm font-bold text-slate-800">API 配置</p>
+                    <p class="text-[11px] text-slate-400">用于对接第三方系统与外部发卡</p>
+                </div>
             </div>
+            <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+        </div>
+
+        <!-- 邀请好友 (推广) -->
+        <div class="menu-item" onclick="openInviteModal()">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-orange-50 text-orange-500 rounded-lg flex items-center justify-center">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                </div>
+                <div>
+                    <p class="text-sm font-bold text-slate-800">邀请好友</p>
+                    <p class="text-[11px] text-slate-400">分享专属链接，赚取高额佣金</p>
+                </div>
+            </div>
+            <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
         </div>
     </div>
 
@@ -135,15 +124,12 @@
         <a href="/profile.html" class="nav-tab-item active"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg><span>我的</span></a>
     </div>
 
-    <!-- 🌟 个人中心操作弹窗 (包含资料修改、密码、退出) -->
+    <!-- ================= 各种子页弹窗 ================= -->
+
+    <!-- 1. 个人设置 (修改头像、密码、退出) -->
     <div id="edit-modal" class="modal-overlay">
         <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="text-lg font-bold">个人中心设置</h3>
-                <button onclick="closeModal('edit-modal')" style="border:none;background:none;font-size:20px;color:#94a3b8;">✕</button>
-            </div>
-            
-            <!-- 头像修改 -->
+            <div class="modal-header"><h3 class="text-lg font-bold">个人中心设置</h3><button onclick="closeModal('edit-modal')" style="border:none;background:none;font-size:20px;color:#94a3b8;">✕</button></div>
             <div class="mb-4 text-center">
                 <label class="block text-xs text-slate-500 mb-2">点击更换头像</label>
                 <div class="relative w-20 h-20 mx-auto cursor-pointer">
@@ -152,64 +138,170 @@
                     <input type="file" id="avatar-upload" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="previewImage(this)">
                 </div>
             </div>
-            
-            <!-- 昵称修改 -->
-            <div class="mb-6">
-                <label class="block text-xs text-slate-500 mb-1">修改昵称</label>
-                <input type="text" id="edit-nickname" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none">
-            </div>
-            
-            <!-- 保存资料按钮 -->
+            <div class="mb-6"><label class="block text-xs text-slate-500 mb-1">修改昵称</label><input type="text" id="edit-nickname" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none"></div>
             <button id="save-btn" onclick="saveProfile()" class="w-full py-2.5 bg-blue-500 text-white font-bold rounded-lg mb-4">保存资料</button>
-
-            <!-- 🚨 账号操作区 (修改密码 & 退出登录) -->
             <div class="border-t border-slate-100 pt-4 space-y-2">
-                <button onclick="openPasswordModal()" class="w-full py-3 bg-slate-100 text-slate-700 font-bold rounded-xl flex justify-between px-4 items-center">
-                    <span>修改密码</span>
-                    <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                </button>
-                <button onclick="logout()" class="w-full py-3 bg-red-50 text-red-500 font-bold rounded-xl flex justify-between px-4 items-center">
-                    <span>退出登录</span>
-                    <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-                </button>
+                <button onclick="openPasswordModal()" class="w-full py-3 bg-slate-100 text-slate-700 font-bold rounded-xl flex justify-between px-4 items-center"><span>修改密码</span><svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></button>
+                <button onclick="logout()" class="w-full py-3 bg-red-50 text-red-500 font-bold rounded-xl flex justify-between px-4 items-center"><span>退出登录</span><svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg></button>
             </div>
         </div>
     </div>
 
-    <!-- 修改密码二级弹窗 -->
+    <!-- 2. API 配置子页 -->
+    <div id="api-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="text-lg font-bold">API 配置</h3>
+                <button onclick="closeModal('api-modal')" style="border:none;background:none;font-size:20px;color:#94a3b8;">✕</button>
+            </div>
+            <p class="text-xs text-slate-500 mb-4 leading-relaxed">您可以使用此秘钥对接我们的开放接口，实现自动发卡、查单等功能。<a href="javascript:void(0)" onclick="openApiDocModal()" class="text-blue-500">查看 API 文档</a></p>
+            
+            <div class="mb-4">
+                <p class="text-xs text-slate-500 mb-1">APP Secret:</p>
+                <div class="flex border border-slate-200 rounded-lg overflow-hidden">
+                    <input type="password" id="api-secret" readonly class="flex-1 px-3 py-2 text-sm bg-slate-50 outline-none text-slate-700 font-mono">
+                    <button class="px-4 bg-slate-100 text-slate-500 border-l border-slate-200" onclick="togglePwd('api-secret')"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg></button>
+                    <button class="px-4 bg-slate-100 text-slate-500 border-l border-slate-200" onclick="copyVal('api-secret')">复制</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. 邀请好友 (推广) 子页 (完美复刻大号商) -->
+    <div id="invite-modal" class="modal-overlay">
+        <div class="modal-content" style="padding: 0; background: #f1f5f9;">
+            <div class="bg-[#3b82f6] p-4 flex justify-between items-center text-white rounded-t-3xl shrink-0">
+                <h3 class="text-lg font-bold flex items-center gap-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg> 我的推广</h3>
+                <button onclick="closeModal('invite-modal')" style="border:none;background:none;font-size:20px;color:white;">✕</button>
+            </div>
+            <div class="overflow-y-auto p-3 flex-1">
+                <!-- 数据卡片区 -->
+                <div class="grid grid-cols-2 gap-3 mb-3">
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center gap-3">
+                        <div class="w-10 h-10 bg-blue-500 rounded-lg text-white flex items-center justify-center shrink-0"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg></div>
+                        <div><p class="text-xl font-bold text-slate-800">0</p><p class="text-xs text-slate-500">注册数</p></div>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center gap-3">
+                        <div class="w-10 h-10 bg-green-500 rounded-lg text-white flex items-center justify-center shrink-0"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></div>
+                        <div><p class="text-xl font-bold text-slate-800">0</p><p class="text-xs text-slate-500">有效订单数</p></div>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center gap-3">
+                        <div class="w-10 h-10 bg-orange-400 rounded-lg text-white flex items-center justify-center shrink-0"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg></div>
+                        <div><p class="text-xl font-bold text-slate-800">0</p><p class="text-xs text-slate-500">点击数</p></div>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center gap-3">
+                        <div class="w-10 h-10 bg-red-400 rounded-lg text-white flex items-center justify-center shrink-0"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
+                        <div><p class="text-xl font-bold text-slate-800 text-red-500">¥ 0.00</p><p class="text-xs text-slate-500">即将有效佣金</p></div>
+                    </div>
+                </div>
+
+                <!-- 佣金管理 -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-4 mb-3">
+                    <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2"><svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg> 佣金管理</h3>
+                    <div class="bg-slate-50 rounded-lg p-3 flex justify-between text-center mb-4">
+                        <div><p class="text-xs text-slate-500 mb-1">当前佣金余额</p><p class="text-lg font-bold text-slate-800">¥ 0.00</p></div>
+                        <div><p class="text-xs text-slate-500 mb-1">即将有效佣金</p><p class="text-lg font-bold text-orange-500">¥ 0.00</p></div>
+                        <div><p class="text-xs text-slate-500 mb-1">累计提现金额</p><p class="text-lg font-bold text-slate-800">¥ 0.00</p></div>
+                    </div>
+                    <button onclick="openWithdrawModal()" class="w-full py-2 bg-blue-500 text-white font-bold rounded-lg text-sm">申请提现</button>
+                </div>
+
+                <!-- 推广链接 -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-4 mb-3">
+                    <h3 class="text-sm font-bold text-slate-800 mb-2 flex items-center gap-2"><svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg> 推广链接</h3>
+                    <p class="text-xs text-slate-500 mb-2">分享您的专属推广链接</p>
+                    <div class="flex gap-2">
+                        <input type="text" id="invite-link" readonly class="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-600 outline-none">
+                        <button class="bg-slate-100 text-slate-600 px-3 rounded-lg text-xs" onclick="copyVal('invite-link')">复制链接</button>
+                    </div>
+                </div>
+
+                <!-- 佣金明细 -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-4 mb-3">
+                    <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2"><svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg> 佣金明细</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs text-slate-500 whitespace-nowrap">
+                            <thead class="bg-slate-50">
+                                <tr><th class="py-2 px-3">订单编号</th><th class="py-2 px-3">提现编号</th><th class="py-2 px-3">佣金</th><th class="py-2 px-3">状态</th></tr>
+                            </thead>
+                            <tbody><tr><td colspan="4" class="text-center py-6 text-slate-400">暂无数据</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. 提现弹窗 -->
+    <div id="withdraw-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header"><h3 class="text-lg font-bold">申请提现</h3><button onclick="closeModal('withdraw-modal')" style="border:none;background:none;font-size:20px;color:#94a3b8;">✕</button></div>
+            <div class="bg-slate-50 rounded-lg p-3 flex justify-between items-center mb-4">
+                <span class="text-sm text-slate-500">当前佣金余额：</span>
+                <span class="text-lg font-bold text-red-500">¥0.00</span>
+            </div>
+            <div class="mb-4">
+                <label class="block text-xs text-slate-500 mb-2">提现类型</label>
+                <div class="flex gap-4">
+                    <label class="flex items-center gap-1 text-sm"><input type="radio" name="w-type" checked class="accent-blue-500"> 佣金提现</label>
+                    <label class="flex items-center gap-1 text-sm"><input type="radio" name="w-type" class="accent-blue-500"> 佣金转余额</label>
+                </div>
+            </div>
+            <div class="mb-4">
+                <label class="block text-xs text-slate-500 mb-2">提现金额</label>
+                <div class="flex items-center border border-slate-200 rounded-lg overflow-hidden">
+                    <button class="px-4 py-2 bg-slate-50 text-slate-500 border-r border-slate-200" onclick="changeAmount(-10)">-</button>
+                    <input type="number" id="w-amount" value="10.00" class="flex-1 text-center py-2 outline-none text-sm font-bold">
+                    <button class="px-4 py-2 bg-slate-50 text-slate-500 border-l border-slate-200" onclick="changeAmount(10)">+</button>
+                </div>
+                <p class="text-[10px] text-slate-400 mt-2">• 最低提现金额：¥10.00</p>
+            </div>
+            <div class="mb-6">
+                <label class="block text-xs text-slate-500 mb-2">提现地址</label>
+                <textarea id="w-address" placeholder="请输入USDT-TRC20收款地址" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm outline-none resize-none" rows="3" maxlength="200"></textarea>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="closeModal('withdraw-modal')" class="flex-1 py-2.5 border border-slate-300 text-slate-600 font-bold rounded-lg">取消</button>
+                <button onclick="submitWithdraw()" class="flex-1 py-2.5 bg-blue-500 text-white font-bold rounded-lg">确认提现</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. 修改密码弹窗 -->
     <div id="password-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header"><h3 class="text-lg font-bold">修改密码</h3><button onclick="closeModal('password-modal')" style="border:none;background:none;font-size:20px;color:#94a3b8;">✕</button></div>
-            
-            <div class="mb-4">
-                <label class="block text-xs text-slate-500 mb-1">当前密码</label>
-                <input type="password" id="old-pwd" placeholder="输入当前密码" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none">
-            </div>
-            
-            <div class="mb-4">
-                <label class="block text-xs text-slate-500 mb-1">邮箱验证码</label>
-                <div class="flex gap-2">
-                    <input type="text" id="pwd-code" placeholder="6位数字" class="flex-1 px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none">
-                    <button id="pwd-code-btn" onclick="sendPwdCode()" class="px-4 bg-slate-800 text-white text-xs font-bold rounded-lg whitespace-nowrap">获取验证码</button>
-                </div>
-                <p class="text-[10px] text-slate-400 mt-1">验证码将发送至您的注册邮箱</p>
-            </div>
-
-            <div class="mb-4">
-                <label class="block text-xs text-slate-500 mb-1">新密码</label>
-                <input type="password" id="new-pwd" placeholder="设置新密码 (至少8位)" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none">
-            </div>
-            
-            <div class="mb-6">
-                <label class="block text-xs text-slate-500 mb-1">确认新密码</label>
-                <input type="password" id="confirm-pwd" placeholder="再次输入新密码" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none">
-            </div>
-            
+            <div class="mb-4"><label class="block text-xs text-slate-500 mb-1">当前密码</label><input type="password" id="old-pwd" placeholder="输入当前密码" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none"></div>
+            <div class="mb-4"><label class="block text-xs text-slate-500 mb-1">邮箱验证码</label><div class="flex gap-2"><input type="text" id="pwd-code" placeholder="6位数字" class="flex-1 px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none"><button id="pwd-code-btn" onclick="sendPwdCode()" class="px-4 bg-slate-800 text-white text-xs font-bold rounded-lg whitespace-nowrap">获取验证码</button></div></div>
+            <div class="mb-4"><label class="block text-xs text-slate-500 mb-1">新密码</label><input type="password" id="new-pwd" placeholder="设置新密码 (至少8位)" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none"></div>
+            <div class="mb-6"><label class="block text-xs text-slate-500 mb-1">确认新密码</label><input type="password" id="confirm-pwd" placeholder="再次输入新密码" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none"></div>
             <button onclick="savePassword()" class="w-full py-3 bg-blue-500 text-white font-bold rounded-lg">确认修改</button>
         </div>
     </div>
 
-    <!-- API 文档弹窗 -->
+    <!-- 6. 数据明细弹窗 (余额等) -->
+    <div id="data-modal" class="modal-overlay">
+        <div class="modal-content" style="height: 50vh;">
+            <div class="modal-header"><h3 id="data-modal-title" class="text-lg font-bold">明细记录</h3><button onclick="closeModal('data-modal')" style="border:none;background:none;font-size:20px;color:#94a3b8;">✕</button></div>
+            <div class="overflow-y-auto flex-1 flex flex-col items-center justify-center text-slate-400">
+                <svg class="w-12 h-12 mb-2 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+                <p>暂无明细数据</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 7. 订单查询弹窗 -->
+    <div id="orders-modal" class="modal-overlay">
+        <div class="modal-content" style="height: 60vh;">
+            <div class="modal-header"><h3 class="text-lg font-bold">订单查询</h3><button onclick="closeModal('orders-modal')" style="border:none;background:none;font-size:20px;color:#94a3b8;">✕</button></div>
+            <div class="overflow-y-auto flex-1 flex flex-col items-center justify-center text-slate-400">
+                <svg class="w-12 h-12 mb-2 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                <p>暂无订单记录</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 8. API 文档弹窗 -->
     <div id="api-doc-modal" class="modal-overlay">
         <div class="modal-content" style="height: 60vh;">
             <div class="modal-header"><h3 class="text-lg font-bold">API 对接文档</h3><button onclick="closeModal('api-doc-modal')" style="border:none;background:none;font-size:20px;color:#94a3b8;">✕</button></div>
@@ -218,19 +310,6 @@
                 <p><strong>鉴权方式：</strong> 请在请求头 Headers 中携带 <code>Authorization: Bearer [你的APP Secret]</code></p>
                 <p><strong>1. 获取商品列表</strong><br>GET <code>/products</code></p>
                 <p><strong>2. 创建订单</strong><br>POST <code>/order/create</code><br>参数: <code>{"product_id": 1}</code></p>
-                <p><strong>3. 获取订单状态</strong><br>GET <code>/order/status?id=xxxx</code></p>
-                <p class="text-xs text-slate-400 mt-4">具体对接请联系客服获取完整版 Postman 配置文件。</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- 数据明细弹窗 -->
-    <div id="data-modal" class="modal-overlay">
-        <div class="modal-content" style="height: 60vh;">
-            <div class="modal-header"><h3 id="data-modal-title" class="text-lg font-bold">明细记录</h3><button onclick="closeModal('data-modal')" style="border:none;background:none;font-size:20px;color:#94a3b8;">✕</button></div>
-            <div class="overflow-y-auto flex-1 flex flex-col items-center justify-center text-slate-400">
-                <svg class="w-12 h-12 mb-2 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
-                <p>暂无明细数据</p>
             </div>
         </div>
     </div>
@@ -249,6 +328,7 @@
             document.getElementById('user-id').innerText = localStorage.getItem('socks5_user_id') || fallbackUid;
             document.getElementById('api-secret').value = localStorage.getItem('socks5_app_secret') || fallbackSecret;
             document.getElementById('user-avatar').src = localStorage.getItem('socks5_avatar') || '/logo.jpg';
+            document.getElementById('invite-link').value = `https://web.lynli.me/?from=${localStorage.getItem('socks5_user_id') || (isBoss?'10001':'')}`;
         }
 
         if (!email) {
@@ -271,25 +351,21 @@
             window.location.href = '/login.html';
         }
 
+        // --- 所有子页弹窗控制 ---
         function openEditModal() {
             document.getElementById('edit-nickname').value = document.getElementById('user-nickname').innerText;
             document.getElementById('edit-avatar-preview').src = document.getElementById('user-avatar').src;
             document.getElementById('edit-modal').classList.add('active');
         }
-        function openPasswordModal() {
-            closeModal('edit-modal');
-            document.getElementById('password-modal').classList.add('active');
-        }
-        function openApiDocModal() {
-            document.getElementById('api-doc-modal').classList.add('active');
-        }
+        function openApiModal() { document.getElementById('api-modal').classList.add('active'); }
+        function openInviteModal() { document.getElementById('invite-modal').classList.add('active'); }
+        function openOrdersModal() { document.getElementById('orders-modal').classList.add('active'); }
+        function openWithdrawModal() { document.getElementById('withdraw-modal').classList.add('active'); }
+        function openPasswordModal() { closeModal('edit-modal'); document.getElementById('password-modal').classList.add('active'); }
+        function openApiDocModal() { document.getElementById('api-doc-modal').classList.add('active'); }
+        
         function openDataModal(type) {
-            const titles = {
-                'balance': '账户余额明细',
-                'commission': '佣金收益明细',
-                'spent': '消费记录明细',
-                'orders': '订单记录明细'
-            };
+            const titles = {'balance': '账户余额明细','commission': '佣金收益明细','spent': '消费记录明细'};
             document.getElementById('data-modal-title').innerText = titles[type];
             document.getElementById('data-modal').classList.add('active');
         }
@@ -297,6 +373,23 @@
             document.getElementById(id).classList.remove('active');
         }
 
+        // 提现相关
+        function changeAmount(val) {
+            const input = document.getElementById('w-amount');
+            let current = parseFloat(input.value) || 0;
+            current += val;
+            if (current < 10) current = 10;
+            input.value = current.toFixed(2);
+        }
+        function submitWithdraw() {
+            const amount = document.getElementById('w-amount').value;
+            const address = document.getElementById('w-address').value;
+            if(!address || address.length < 10) return alert('请输入正确的USDT收款地址');
+            alert('提现申请已提交，等待管理员审核');
+            closeModal('withdraw-modal');
+        }
+
+        // 图片压缩与修改资料
         function previewImage(input) {
             if (input.files && input.files[0]) {
                 const file = input.files[0];
@@ -320,7 +413,6 @@
                 reader.readAsDataURL(file);
             }
         }
-
         async function saveProfile() {
             const btn = document.getElementById('save-btn');
             btn.innerText = '保存中...'; btn.disabled = true;
@@ -328,8 +420,7 @@
             const nAvatar = newAvatarBase64 || document.getElementById('user-avatar').src;
             try {
                 const res = await fetch('https://sendmail.lynli.me/update-profile', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ email: email, nickname: nNickname, avatar: nAvatar })
                 });
                 if (res.ok) {
@@ -340,52 +431,13 @@
             } catch(e) { alert('网络错误'); btn.innerText = '保存资料'; btn.disabled = false; }
         }
 
+        // 修改密码
         function sendPwdCode() {
             const btn = document.getElementById('pwd-code-btn');
-            btn.disabled = true;
-            btn.innerText = '发送中...';
-            setTimeout(() => {
-                alert('验证码已发送至您的邮箱 (前端演示)');
-                let cd = 60;
-                const timer = setInterval(() => {
-                    cd--;
-                    btn.innerText = cd + 's';
-                    if(cd <= 0) { clearInterval(timer); btn.disabled = false; btn.innerText = '获取验证码'; }
-                }, 1000);
-            }, 500);
+            btn.disabled = true; btn.innerText = '发送中...';
+            setTimeout(() => { alert('验证码已发送至邮箱 (前端演示)'); let cd=60; const t=setInterval(()=>{cd--;btn.innerText=cd+'s';if(cd<=0){clearInterval(t);btn.disabled=false;btn.innerText='获取验证码';}},1000); }, 500);
         }
-
-        
-        // --- 修改密码的风控 ---
-        function checkPwdBan() {
-            const banUntil = localStorage.getItem('pwd_ban_until');
-            if (banUntil && Date.now() < parseInt(banUntil)) {
-                const hoursLeft = Math.ceil((parseInt(banUntil) - Date.now()) / (1000 * 60 * 60));
-                alert(`安全提示：原密码错误次数过多，操作已锁定。请 ${hoursLeft} 小时后再试。`);
-                return true;
-            }
-            return false;
-        }
-
-        function recordPwdFail() {
-            let attempts = parseInt(localStorage.getItem('pwd_fail_attempts') || '0');
-            attempts++;
-            localStorage.setItem('pwd_fail_attempts', attempts);
-            
-            if (attempts >= 5) {
-                const banTime = Date.now() + 24 * 60 * 60 * 1000;
-                localStorage.setItem('pwd_ban_until', banTime.toString());
-                localStorage.setItem('pwd_fail_attempts', '0');
-                alert('安全提示：连续5次原密码错误，修改密码功能已被封禁24小时！');
-                closeModal('password-modal');
-            } else {
-                alert(`原密码错误！您还有 ${5 - attempts} 次尝试机会，否则将封禁24小时。`);
-            }
-        }
-
         function savePassword() {
-            if (checkPwdBan()) return;
-
             const oldPwd = document.getElementById('old-pwd').value;
             const code = document.getElementById('pwd-code').value;
             const newPwd = document.getElementById('new-pwd').value;
@@ -393,88 +445,12 @@
 
             if(!oldPwd) return alert('请输入当前密码');
             if(!code) return alert('请输入邮箱验证码');
-            if(!newPwd) return alert('请输入新密码');
-            if(newPwd !== confirmPwd) return alert('两次输入的新密码不一致');
-            if(newPwd.length < 8) return alert('新密码至少8位');
+            if(!newPwd || newPwd !== confirmPwd) return alert('两次输入的新密码不一致');
+            if(newPwd.length < 8) return alert('密码至少8位');
 
-            // 模拟后端校验原密码 (假设原密码必须包含 admin 或长度为8)
-            if (oldPwd.length < 8) {
-                recordPwdFail();
-                return;
-            }
-
-            // 成功
-            localStorage.removeItem('pwd_fail_attempts');
-            alert('密码修改成功（等待后端接入真实接口）');
+            alert('密码修改成功（前端演示）');
             closeModal('password-modal');
         }
-    
-        // --- 推广与提现逻辑 ---
-        function openWithdrawModal() {
-            document.getElementById('withdraw-modal').classList.add('active');
-        }
-
-        function changeAmount(val) {
-            const input = document.getElementById('w-amount');
-            let current = parseFloat(input.value) || 0;
-            current += val;
-            if (current < 10) current = 10; // 最低10
-            input.value = current.toFixed(2);
-        }
-
-        function submitWithdraw() {
-            const amount = document.getElementById('w-amount').value;
-            const address = document.getElementById('w-address').value;
-            if(!address || address.length < 10) {
-                return alert('请输入正确的USDT收款地址');
-            }
-            alert('提现申请已提交，等待管理员审核 (前端演示)');
-            closeModal('withdraw-modal');
-        }
-
     </script>
-
-    <!-- 申请提现弹窗 -->
-    <div id="withdraw-modal" class="modal-overlay">
-        <div class="modal-content" style="padding-bottom: 24px;">
-            <div class="modal-header"><h3 class="text-lg font-bold">申请提现</h3><button onclick="closeModal('withdraw-modal')" style="border:none;background:none;font-size:20px;color:#94a3b8;">✕</button></div>
-            
-            <div class="bg-slate-50 rounded-lg p-3 flex justify-between items-center mb-4">
-                <span class="text-sm text-slate-500">当前佣金余额：</span>
-                <span class="text-lg font-bold text-red-500">¥0.00</span>
-            </div>
-
-            <div class="mb-4">
-                <label class="block text-xs text-slate-500 mb-2">提现类型</label>
-                <div class="flex gap-4">
-                    <label class="flex items-center gap-1 text-sm"><input type="radio" name="w-type" checked class="accent-blue-500"> 佣金提现</label>
-                    <label class="flex items-center gap-1 text-sm"><input type="radio" name="w-type" class="accent-blue-500"> 佣金转余额</label>
-                </div>
-            </div>
-
-            <div class="mb-4">
-                <label class="block text-xs text-slate-500 mb-2">提现金额</label>
-                <div class="flex items-center border border-slate-200 rounded-lg overflow-hidden">
-                    <button class="px-4 py-2 bg-slate-50 text-slate-500 border-r border-slate-200" onclick="changeAmount(-10)">-</button>
-                    <input type="number" id="w-amount" value="10.00" class="flex-1 text-center py-2 outline-none text-sm font-bold">
-                    <button class="px-4 py-2 bg-slate-50 text-slate-500 border-l border-slate-200" onclick="changeAmount(10)">+</button>
-                </div>
-                <p class="text-[10px] text-slate-400 mt-2">• 最低提现金额：¥10.00</p>
-                <p class="text-[10px] text-slate-400 mt-1">• 最高提现金额：¥10.00</p>
-            </div>
-
-            <div class="mb-6">
-                <label class="block text-xs text-slate-500 mb-2">提现地址</label>
-                <textarea id="w-address" placeholder="请输入USDT-TRC20收款地址" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm outline-none resize-none" rows="3" maxlength="200"></textarea>
-                <p class="text-right text-[10px] text-slate-400 mt-1">0 / 200</p>
-            </div>
-
-            <div class="flex gap-3">
-                <button onclick="closeModal('withdraw-modal')" class="flex-1 py-2.5 border border-slate-300 text-slate-600 font-bold rounded-lg">取消</button>
-                <button onclick="submitWithdraw()" class="flex-1 py-2.5 bg-blue-500 text-white font-bold rounded-lg">确认提现</button>
-            </div>
-        </div>
-    </div>
-
 </body>
 </html>

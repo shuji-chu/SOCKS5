@@ -10,8 +10,9 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: #f8fafc; color: #1e293b; padding-bottom: 20px; }
         .card { background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; }
-        .pill-btn { padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: bold; white-space: nowrap; background: #f1f5f9; color: #64748b; transition: all 0.2s; }
+        .pill-btn { padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: bold; white-space: nowrap; background: #f1f5f9; color: #64748b; transition: all 0.2s; cursor: pointer; }
         .pill-btn.active { background: #2563eb; color: #ffffff; box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2); }
+        .filter-select { appearance: none; background-color: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; font-size: 13px; color: #475569; outline: none; font-weight: 500;}
     </style>
 </head>
 <body>
@@ -23,45 +24,113 @@
     </header>
 
     <main class="max-w-lg mx-auto">
-        <div class="flex overflow-x-auto no-scrollbar gap-2 px-4 py-4 sticky top-[57px] bg-slate-50 z-40">
-            <div class="pill-btn active">全部接口</div>
+        <!-- 顶部介绍 -->
+        <div class="px-4 pt-4 pb-2">
+            <h2 class="text-[22px] font-extrabold text-slate-800 mb-1">探索 API 接口</h2>
+            <p class="text-[13px] text-slate-500">按业务场景查找能力，让接入更简单。</p>
+        </div>
+
+        <!-- 横向滑动分类 -->
+        <div class="flex overflow-x-auto no-scrollbar gap-2 px-4 py-3 sticky top-[57px] bg-slate-50 z-40">
+            <div class="pill-btn active">全部</div>
             <div class="pill-btn">实名认证</div>
             <div class="pill-btn">生活服务</div>
+            <div class="pill-btn">手机号码</div>
+            <div class="pill-btn">企业工商</div>
+            <div class="pill-btn">交通与车辆</div>
         </div>
 
-        <div class="px-4 pb-12 space-y-3">
-            <!-- 卡片 1 -->
-            <a href="/api-detail.html?id=1" class="block card p-5 active:bg-slate-50 relative">
-                <div class="absolute top-5 right-5 text-[12px] text-slate-400">手机号码</div>
-                <h3 class="text-[16px] font-bold text-slate-800 mb-1">手机号二要素认证</h3>
-                <p class="text-[13px] text-slate-500 mb-3 line-clamp-2">运营商二要素检验，通过姓名+手机号进行信息比对，毫秒级返回。</p>
-                <div class="flex gap-2 mb-3">
-                    <span class="text-[11px] bg-orange-50 text-orange-600 font-bold px-2 py-1 rounded">$0.045/次</span>
-                    <span class="text-[11px] bg-blue-50 text-blue-600 px-2 py-1 rounded">POST</span>
-                </div>
-                <div class="flex justify-between items-center pt-3 border-t border-slate-50">
-                    <span class="text-[12px] text-slate-400">开发者 API</span>
-                    <span class="text-[13px] text-blue-600 font-bold">查看详情 →</span>
-                </div>
-            </a>
+        <!-- 列表标题 -->
+        <div class="px-4 mb-2">
+            <h3 class="text-[18px] font-bold text-slate-800 mb-1">全部接口</h3>
+            <p class="text-[12px] text-slate-500">当前展示 <span class="text-blue-600 font-bold">65</span> 个接口，点击卡片查看接口 ID、参数说明和调用地址。</p>
+        </div>
 
-            <!-- 卡片 2 -->
-            <a href="/api-detail.html?id=2" class="block card p-5 active:bg-slate-50 relative">
-                <div class="absolute top-5 right-5 text-[12px] text-slate-400">实名认证</div>
-                <h3 class="text-[16px] font-bold text-slate-800 mb-1">身份证实名核验</h3>
-                <p class="text-[13px] text-slate-500 mb-3 line-clamp-2">输入姓名与身份证号，校验是否一致，直连权威库。</p>
-                <div class="flex gap-2 mb-3">
-                    <span class="text-[11px] bg-orange-50 text-orange-600 font-bold px-2 py-1 rounded">$0.120/次</span>
-                    <span class="text-[11px] bg-blue-50 text-blue-600 px-2 py-1 rounded">GET</span>
-                </div>
-                <div class="flex justify-between items-center pt-3 border-t border-slate-50">
-                    <span class="text-[12px] text-slate-400">开发者 API</span>
-                    <span class="text-[13px] text-blue-600 font-bold">查看详情 →</span>
-                </div>
-            </a>
+        <!-- 筛选工具条 -->
+        <div class="px-4 flex gap-3 mb-4">
+            <select class="filter-select flex-1">
+                <option>排序：综合</option>
+            </select>
+            <select class="filter-select flex-1">
+                <option>付费类型：全部</option>
+            </select>
+        </div>
+
+        <!-- 接口列表 -->
+        <div id="api-list" class="px-4 pb-6 space-y-4"></div>
+
+        <!-- 分页 -->
+        <div class="flex flex-wrap items-center justify-center gap-2 px-4 pb-12 mt-4">
+            <button class="px-3 py-1.5 bg-white border border-slate-200 text-slate-500 text-[13px] rounded-lg">上一页</button>
+            <button class="px-3 py-1.5 bg-blue-600 text-white text-[13px] rounded-lg">1</button>
+            <button class="px-3 py-1.5 bg-white border border-slate-200 text-slate-600 text-[13px] rounded-lg">2</button>
+            <button class="px-3 py-1.5 bg-white border border-slate-200 text-slate-600 text-[13px] rounded-lg">3</button>
+            <button class="px-3 py-1.5 bg-white border border-slate-200 text-slate-600 text-[13px] rounded-lg">4</button>
+            <button class="px-3 py-1.5 bg-white border border-slate-200 text-slate-500 text-[13px] rounded-lg">下一页</button>
+            <div class="flex items-center gap-1 text-[13px] text-slate-500 ml-2">
+                到第 <input type="text" class="w-8 h-7 border border-slate-200 rounded text-center outline-none" value="1"> 页
+                <button class="px-2 py-1 bg-white border border-slate-200 rounded text-slate-600">确定</button>
+            </div>
         </div>
     </main>
+
     <script src="/notice.js"></script>
     <script src="/ai-widget.js"></script>
+    <script>
+        // 完整收录的 18 个接口数据
+        const apisData = [
+            { id: 1, category: '手机号码', title: '手机号二要素认证', isHot: true, desc: '运营商二要素检验，通过姓名+手机号进行信息比对，运营商数据库实时校验姓名和手机号码是否匹配，结果更精准可信，权威合规，毫秒级响应，零缓存，校验验证可靠。', price: '0.04545714', method: 'POST', iconColor: 'bg-red-50 text-red-500', iconPath: 'M13 10V3L4 14h7v7l9-11h-7z' },
+            { id: 2, category: '手机号码', title: '全网手机号三要素验证', isHot: true, desc: '全网运营商三要素检验-手机号+姓名+证件号实名验证', price: '0.03734286', method: 'POST', iconColor: 'bg-red-50 text-red-500', iconPath: 'M13 10V3L4 14h7v7l9-11h-7z' },
+            { id: 3, category: '实名认证', title: '银行卡二三四要素检验', isHot: true, desc: '银行卡2.3.4要素实名验证，输入姓名和银行卡号，通过银联渠道实时校验该两项是否一致，支持所有带银联标识的银行卡，高准确性-验证结果实时返回，准确率达99%。', price: '0.05157143', method: 'POST', iconColor: 'bg-blue-50 text-blue-500', iconPath: 'M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2' },
+            { id: 4, category: '实名认证', title: '身份证实名检验', isHot: true, desc: '身份证二要素核验-身份证实名验证-身份证检验接口', price: '0.00554286', method: 'POST', iconColor: 'bg-blue-50 text-blue-500', iconPath: 'M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2' },
+            { id: 5, category: '交通与车辆', title: '名下ETC车辆查询', isHot: true, desc: '根据证件号码查询名下ETC车辆详情。', price: '0.37714286', method: 'POST', iconColor: 'bg-indigo-50 text-indigo-500', iconPath: 'M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4' },
+            { id: 6, category: '生活服务', title: '婚姻状态', isHot: true, desc: '查询个人婚姻状态及婚姻登记日期', price: '0.51571429', method: 'POST', iconColor: 'bg-teal-50 text-teal-500', iconPath: 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z' },
+            { id: 7, category: '手机号码', title: '银行卡归属地查询', isHot: true, desc: '银行卡归属地查询-银行卡解析，通过银行卡号查询银行卡归属地、银行卡基本信息、卡种、卡类型、银行名称、银行英文缩写、总行的联行号、电话等基本信息，支持国内外所有银行的查询。', price: '0.00142857', method: 'POST', iconColor: 'bg-red-50 text-red-500', iconPath: 'M13 10V3L4 14h7v7l9-11h-7z' },
+            { id: 8, category: '手机号码', title: '手机号在网状态查询', isHot: true, desc: '输入手机号码查询手机号在网状态返回包括空号,实号,停机,库无,沉默号,风险号等状态，可查询实时状态，准确率99.99%', price: '0.00115714', method: 'POST', iconColor: 'bg-red-50 text-red-500', iconPath: 'M13 10V3L4 14h7v7l9-11h-7z' },
+            { id: 9, category: '交通与车辆', title: '车牌解析车辆信息', isHot: true, desc: '车牌解析车辆多项信息（所查信息包括：车辆品牌、车辆型号、发动机型号、车辆类型、车架号VIN、使用性质、初登日期、汽车排量、汽车马力、功率、轴数、轴距等基础信息） 提示、新上牌没超过半年、车牌发生过户但交强险没过户，或者过户信息未更新，这种情况的是过户前的信息（比如去年12月的车今年9月份过户，但交强险未过户，需要等到今年的12月重新购买交强险采集到数据进行更新。）介意者请不要查询，查询成功后概不退款。', price: '0.12285714', method: 'POST', iconColor: 'bg-indigo-50 text-indigo-500', iconPath: 'M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4' },
+            { id: 10, category: '交通与车辆', title: '名下车辆总数查询', isHot: true, desc: '个人根据证件号码查询名下车辆数量。 公司根据统一社会信用代码查询名下车辆数量。 数据源于：名下交强险或商业险 车保单总数，精准无误！ Ps：才购买的二手车可能上一任车主购买的保险还未到期！', price: '1.01588571', method: 'POST', iconColor: 'bg-indigo-50 text-indigo-500', iconPath: 'M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4' },
+            { id: 11, category: '交通与车辆', title: '车牌号查车五项信息+使用性质', isHot: true, desc: '车牌号查询车五项信息(车架号、VIN码、车辆种类、车辆品牌、车辆初登日期）+使用性质', price: '0.12000000', method: 'POST', iconColor: 'bg-indigo-50 text-indigo-500', iconPath: 'M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4' },
+            { id: 12, category: '交通与车辆', title: 'vin车架号解析车辆信息', isHot: true, desc: '车架号/VIN码在线解析车辆相关信息接口', price: '0.01172857', method: 'POST', iconColor: 'bg-indigo-50 text-indigo-500', iconPath: 'M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4' },
+            { id: 13, category: '手机号码', title: '手机号使用时长查询', isHot: true, desc: '手机号在网时长查询，通过运营商权威渠道查验手机号码入网时长详细信息，支持三大运营商。通过手机号使用时长可以判断手机号是否是新号、或判断是否经常换手机号。', price: '0.07347143', method: 'POST', iconColor: 'bg-red-50 text-red-500', iconPath: 'M13 10V3L4 14h7v7l9-11h-7z' },
+            { id: 14, category: '手机号码', title: '手机话费余额查询', isHot: true, desc: '手机话费余额查询，话费余额综合查询（包含携号转网）', price: '0.02382857', method: 'POST', iconColor: 'bg-red-50 text-red-500', iconPath: 'M13 10V3L4 14h7v7l9-11h-7z' },
+            { id: 15, category: '企业工商', title: '企业任职记录', isHot: true, desc: '企业任职记录，查询关联企业，一键实时查询名下企业，精准追溯任职经历。全面掌握您的商业身份图谱。', price: '0.25974286', method: 'POST', iconColor: 'bg-amber-50 text-amber-500', iconPath: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4' },
+            { id: 16, category: '实名认证', title: '人脸实名认证', isHot: true, desc: '【直连官方，数据稳定可靠，实时查询】与公安库身份证头像进行权威比对核验，输入姓名、身份证号码和一张人脸照片，与公安库身份证头像进行权威比对，返回比对分值与检验结果。', price: '0.03974286', method: 'POST', iconColor: 'bg-blue-50 text-blue-500', iconPath: 'M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2' },
+            { id: 17, category: '实名认证', title: '限高消费人员查询', isHot: true, desc: '查询是否存在限制高消费的情况，返回包括但不限于案号、立案日期、关联对象、限令正文等信息！若想要精准查询某个人,请传入正确的姓名+身份证号！', price: '0.02571429', method: 'POST', iconColor: 'bg-blue-50 text-blue-500', iconPath: 'M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2' },
+            { id: 18, category: '企业工商', title: '企业工商信息标准版', isHot: true, desc: '根据公司名全称、注册号、社会统一信用代码中任意一项查询企业工商信息。主要信息包括：注册号，注册资金，登记机关，注册地址，核准时间，经营范围，成立时间，经营状态，法人，实收注册资金，曾用名，统一社会信用代码、联系方式等', price: '0.03857143', method: 'POST', iconColor: 'bg-amber-50 text-amber-500', iconPath: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4' }
+        ];
+
+        function renderApis() {
+            const list = document.getElementById('api-list');
+            list.innerHTML = apisData.map(api => `
+                <a href="/api-detail.html?id=${api.id}" class="block card p-5 active:bg-slate-50 transition relative">
+                    <div class="absolute top-5 right-5 text-[12px] text-slate-400">${api.category}</div>
+                    
+                    <div class="w-10 h-10 rounded-xl ${api.iconColor} flex items-center justify-center mb-3">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${api.iconPath}"></path></svg>
+                    </div>
+                    
+                    <h3 class="text-[16px] font-bold text-slate-800 mb-1 flex items-center gap-2">
+                        ${api.title}
+                        ${api.isHot ? '<span class="text-[10px] bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded border border-orange-200">热门</span>' : ''}
+                    </h3>
+                    <p class="text-[13px] text-slate-500 leading-relaxed mb-4 line-clamp-2">${api.desc}</p>
+                    
+                    <div class="flex gap-2 mb-4">
+                        <span class="text-[11px] bg-slate-100 text-slate-500 px-2 py-1 rounded">付费</span>
+                        <span class="text-[11px] bg-orange-50 text-orange-600 font-bold px-2 py-1 rounded">$${api.price}/次</span>
+                        <span class="text-[11px] bg-blue-50 text-blue-600 px-2 py-1 rounded">${api.method}</span>
+                    </div>
+                    
+                    <div class="flex justify-between items-center pt-3 border-t border-slate-50">
+                        <span class="text-[12px] text-slate-400">开发者 API</span>
+                        <span class="text-[13px] text-blue-600 font-bold">查看文档 ↗</span>
+                    </div>
+                </a>
+            `).join('');
+        }
+
+        // 初始渲染
+        renderApis();
+    </script>
 </body>
 </html>

@@ -4,138 +4,57 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>登录 - SOCKS5</title>
-    <!-- 解决浏览器历史记录里没有图标的问题 -->
     <link rel="icon" href="/logo.jpg" type="image/jpeg">
-    <link rel="shortcut icon" href="/logo.jpg" type="image/jpeg">
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
-        body { background-color: #f8fafc; color: #1e293b; min-height: 100vh; display: flex; flex-direction: column; padding: 24px; justify-content: center; position: relative; }
-        .header { text-align: center; margin-bottom: 32px; }
-        .header img { width: 64px; height: 64px; border-radius: 20px; margin-bottom: 16px; object-fit: cover; }
-        .header h2 { font-size: 22px; font-weight: 700; }
-        .card { background: #ffffff; padding: 24px; border-radius: 24px; box-shadow: 0 4px 20px -2px rgba(0,0,0,0.05); width: 100%; max-width: 380px; margin: 0 auto; }
-        .input-group { margin-bottom: 16px; }
-        .input-group input { width: 100%; padding: 14px 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; font-size: 15px; outline: none; }
-        .options { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; font-size: 13px; color: #64748b; }
-        .options label { display: flex; align-items: center; gap: 6px; }
-        .options input[type="checkbox"] { width: 16px; height: 16px; accent-color: #2563eb; }
-        .btn-primary { width: 100%; padding: 14px; background: #2563eb; color: white; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; }
-        .link-text { text-align: center; margin-top: 24px; }
-        .link-text a { font-size: 14px; color: #2563eb; text-decoration: none; font-weight: 500; }
-        
-        /* 底部区域 */
-        .footer { position: absolute; bottom: 24px; left: 0; right: 0; text-align: center; display: flex; flex-direction: column; gap: 8px; font-size: 12px; color: #94a3b8; }
-        .footer-links { display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .footer-links button { background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 12px; }
-        
-        /* 弹窗 */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 9999; display: none; align-items: flex-end; justify-content: center; }
-        .modal-overlay.active { display: flex; }
-        .modal-content { background: white; width: 100%; max-width: 400px; border-radius: 24px 24px 0 0; padding: 24px; padding-bottom: 40px; max-height: 80vh; display: flex; flex-direction: column; animation: slideUp 0.3s ease-out; }
-        .modal-header { display: flex; justify-content: space-between; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 16px; }
-        .modal-body { font-size: 13px; color: #475569; line-height: 1.6; overflow-y: auto; }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #f8fafc; display: flex; align-items: center; justify-content: center; height: 100vh; padding: 20px; }
+        .card { background: #fff; border-radius: 16px; padding: 30px 20px; width: 100%; max-width: 340px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); }
+        .input-flat { width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; font-size: 14px; outline: none; transition: border 0.2s; }
+        .input-flat:focus { border-color: #3b82f6; background: #fff; }
     </style>
 </head>
 <body>
-    <div class="header"><img src="/logo.jpg"><h2>欢迎回来</h2><p>登录以继续使用 SOCKS5 服务</p></div>
-    <div class="card">
-        <form id="login-form">
-            <div class="input-group"><input type="email" id="email" required placeholder="工作邮箱"></div>
-            <div class="input-group"><input type="password" id="password" required placeholder="密码"></div>
-            <div class="options">
-                <label><input type="checkbox" checked> 记住密码</label>
-                <a href="javascript:void(0)" onclick="openModal('forget')">忘记密码？</a>
+    <div class="card text-center">
+        <h1 class="text-[22px] font-bold text-slate-800 mb-2">欢迎回来</h1>
+        <p class="text-[13px] text-slate-500 mb-8">登录您的 SOCKS5 账号</p>
+        
+        <div class="space-y-4 mb-6 text-left">
+            <div>
+                <label class="text-[12px] text-slate-500 mb-1 block">邮箱</label>
+                <input type="text" id="login-email" class="input-flat" placeholder="boss@lynli.me 或 其他邮箱">
             </div>
-            <button type="submit" class="btn-primary">安全登录</button>
-        </form>
-        <div class="link-text"><a href="/register.html">没有账号？立即注册</a></div>
-    </div>
-    
-    <div class="footer">
-        <div>客服邮箱：boss@lynli.me</div>
-        <div class="footer-links">
-            <button onclick="openModal('terms')">《用户协议》</button>
-            <span>|</span>
-            <button onclick="openModal('privacy')">《隐私政策》</button>
+            <div>
+                <label class="text-[12px] text-slate-500 mb-1 block">密码</label>
+                <input type="password" id="login-pass" class="input-flat" placeholder="请输入密码">
+            </div>
         </div>
+
+        <button onclick="doLogin()" class="w-full py-3.5 bg-blue-600 text-white font-bold rounded-xl text-[15px] active:opacity-80 transition shadow-sm">登录</button>
     </div>
 
-    <div id="info-modal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-header"><h3 id="modal-title" style="font-size:18px;font-weight:700;">标题</h3><button onclick="closeModal()" style="border:none;background:none;font-size:20px;color:#94a3b8;">✕</button></div>
-            <div class="modal-body" id="modal-body-content"></div>
-        </div>
-    </div>
     <script>
-        // --- 安全风控：5次错误封禁24小时 ---
-        function checkBan() {
-            const banUntil = localStorage.getItem('login_ban_until');
-            if (banUntil && Date.now() < parseInt(banUntil)) {
-                const hoursLeft = Math.ceil((parseInt(banUntil) - Date.now()) / (1000 * 60 * 60));
-                alert(`安全提示：密码错误次数过多，账号已锁定。请 ${hoursLeft} 小时后再试。`);
-                return true; // 被封锁
-            }
-            return false;
-        }
-
-        function recordFail() {
-            let attempts = parseInt(localStorage.getItem('login_fail_attempts') || '0');
-            attempts++;
-            localStorage.setItem('login_fail_attempts', attempts);
+        function doLogin() {
+            const email = document.getElementById('login-email').value;
+            const pass = document.getElementById('login-pass').value;
             
-            if (attempts >= 5) {
-                // 封禁24小时
-                const banTime = Date.now() + 24 * 60 * 60 * 1000;
-                localStorage.setItem('login_ban_until', banTime.toString());
-                localStorage.setItem('login_fail_attempts', '0');
-                alert('安全提示：您已连续5次密码错误，账号已被封禁24小时！');
-                location.reload();
+            if(!email || !pass) { alert('请输入账号和密码'); return; }
+
+            // 真实模拟后端权限下发
+            if (email === 'boss@lynli.me') {
+                // 老板登录
+                localStorage.setItem('user_id', '10001');
+                localStorage.setItem('user_email', email);
+                localStorage.setItem('user_role', 'boss'); // 分配 boss 权限
+                window.location.href = '/profile.html';
             } else {
-                alert(`密码错误！您还有 ${5 - attempts} 次尝试机会，否则将封禁24小时。`);
+                // 普通用户登录
+                localStorage.setItem('user_id', '10002');
+                localStorage.setItem('user_email', email);
+                localStorage.setItem('user_role', 'user'); // 分配普通 user 权限
+                window.location.href = '/profile.html';
             }
         }
-
-        function resetFail() {
-            localStorage.removeItem('login_fail_attempts');
-        }
-
-        // 如果已经有 Token，直接免密进主页
-        if (localStorage.getItem('socks5_token')) { window.location.href = '/index.html'; }
-        
-        // 登录直接跳转
-        document.getElementById('login-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            if (checkBan()) return; // 检查是否被封
-
-            // 模拟后端密码校验 (前端演示用)
-            const pwd = document.getElementById('password').value;
-            
-            // 假设正确密码是 12345678，这里方便测试
-            if (pwd === '12345678' || pwd.length >= 8) {
-                resetFail();
-                localStorage.setItem('socks5_email', document.getElementById('email').value);
-                localStorage.setItem('socks5_token', 'direct_' + Date.now());
-                window.location.href = '/index.html';
-            } else {
-                recordFail();
-            }
-        });
-        
-        const modalContent = {
-            'privacy': { title: '隐私政策', text: '我们深知个人信息对您的重要性，并会尽全力保护您的个人信息安全可靠。未经您的同意，我们绝不会向任何第三方提供您的个人信息。' },
-            'terms': { title: '用户协议', text: '欢迎使用 SOCKS5 服务。本协议是您与 SOCKS5 之间关于您使用本服务所订立的协议。您在使用本服务时，必须遵守相关法律法规。' },
-            'forget': { title: '忘记密码', text: '请发送邮件至客服邮箱 boss@lynli.me 进行密码重置。' }
-        };
-        
-        function openModal(type) {
-            const data = modalContent[type]; if(!data) return;
-            document.getElementById('modal-title').innerText = data.title;
-            document.getElementById('modal-body-content').innerText = data.text;
-            document.getElementById('info-modal').classList.add('active');
-        }
-        function closeModal() { document.getElementById('info-modal').classList.remove('active'); }
     </script>
-<script src="/ai-widget.js"></script>
 </body>
 </html>

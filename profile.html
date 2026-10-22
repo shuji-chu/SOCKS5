@@ -53,7 +53,7 @@
                     <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                 </div>
                 <p class="text-[13px] text-slate-500 mb-0.5">用户ID: 10001</p>
-                <p class="text-[13px] text-slate-500">邮箱: boss@lynli.me</p>
+                <p class="text-[13px] text-slate-500">邮箱: <span id="profile-email">加载中...</span></p>
             </div>
             <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
         </div>
@@ -371,5 +371,30 @@
         }
     </script>
 <script src="/ai-widget.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 获取真实系统角色，如果没有角色说明没登录，踢回登录页
+            const role = localStorage.getItem('user_role');
+            const email = localStorage.getItem('user_email');
+            
+                window.location.href = '/login.html';
+                return;
+            }
+
+            // 将用户的邮箱展示在页面上
+            const emailEl = document.getElementById('profile-email');
+            if(emailEl) emailEl.innerText = '邮箱: ' + email;
+
+            // 核心隔离逻辑：仅当角色为 boss 时，显示后台入口
+            if (role === 'boss') {
+                const btn = document.getElementById('admin-entry-btn');
+                if (btn) btn.style.display = 'flex';
+            }
+            
+            // 清理测试用的历史缓存，防止老缓存干扰
+            localStorage.removeItem('admin_token');
+        });
+    </script>
 </body>
 </html>

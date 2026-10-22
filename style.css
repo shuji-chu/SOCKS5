@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
-body { font-family: 'Inter', -apple-system, sans-serif; background-color: #f8fafc; color: #1e293b; -webkit-overflow-scrolling: touch; overscroll-behavior-y: none; }
+body { font-family: 'Inter', -apple-system, sans-serif; background-color: #f8fafc; color: #1e293b; -webkit-overflow-scrolling: touch; }
 .app-header { background: #ffffff; padding: 16px 20px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 50; }
 .app-logo { width: 28px; height: 28px; border-radius: 8px; object-fit: cover; }
 .app-title { font-size: 18px; font-weight: 700; margin: 0; color: #0f172a; }
@@ -13,6 +13,3 @@ body { font-family: 'Inter', -apple-system, sans-serif; background-color: #f8faf
 .btn-primary:active { transform: scale(0.98); background-color: #1d4ed8; }
 .content-wrap { padding: 16px 16px; padding-bottom: 100px; }
 .back-btn { display: inline-flex; align-items: center; color: #475569; text-decoration: none; font-weight: 500; font-size: 15px; }
-
-/* 强制覆盖高度，使用 dvh 防止移动端地址栏拉伸抖动 */
-.min-h-screen { min-height: 100vh; min-height: 100dvh; }

@@ -9,11 +9,27 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: #ffffff; color: #1e293b; }
-        .code-block { background: #1e293b; color: #e2e8f0; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 12px; overflow-x: auto; line-height: 1.6; margin-bottom: 12px; white-space: pre-wrap; }
-        .tag-get { background: #eff6ff; color: #2563eb; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-right: 6px; border: 1px solid #bfdbfe; }
-        .tag-post { background: #f0fdf4; color: #16a34a; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-right: 6px; border: 1px solid #bbf7d0; }
-        .table-th { font-size: 12px; font-weight: bold; color: #64748b; padding: 8px 0; border-bottom: 1px solid #e2e8f0; text-align: left; }
-        .table-td { font-size: 13px; color: #1e293b; padding: 10px 0; border-bottom: 1px solid #f1f5f9; }
+        
+        /* 手风琴动画 */
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-in-out; }
+        .accordion-content.active { max-height: 3000px; }
+        .rotate-180 { transform: rotate(180deg); }
+        
+        /* 黑色代码块 */
+        .code-wrapper { position: relative; margin: 12px 0 20px 0; }
+        .code-block { background: #1e293b; color: #e2e8f0; padding: 16px; border-radius: 10px; font-family: 'Courier New', Courier, monospace; font-size: 13px; overflow-y: auto; max-height: 300px; line-height: 1.6; white-space: pre-wrap; word-wrap: break-word; }
+        .copy-btn { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.1); color: #cbd5e1; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-family: sans-serif; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 4px; }
+        .copy-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
+        
+        /* 标签 */
+        .tag-get { background: #eff6ff; color: #2563eb; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-right: 8px; border: 1px solid #bfdbfe; }
+        .tag-post { background: #f0fdf4; color: #16a34a; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-right: 8px; border: 1px solid #bbf7d0; }
+        
+        /* 表格 */
+        .api-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 13px; }
+        .api-table th { text-align: left; padding: 8px 12px; background: #f8fafc; color: #64748b; font-weight: bold; border-bottom: 1px solid #e2e8f0; }
+        .api-table td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; color: #1e293b; }
+        .api-table td:first-child { font-family: monospace; color: #2563eb; }
     </style>
 </head>
 <body>
@@ -26,57 +42,57 @@
         <!-- 基础信息 -->
         <div class="mb-8">
             <h2 class="text-[24px] font-extrabold text-slate-800 mb-2">API 接入指南</h2>
-            <p class="text-[14px] text-slate-500 mb-4">对接 SOCKS5 开放平台，获取卡密、节点、接码及支付能力。</p>
+            <p class="text-[14px] text-slate-500 mb-4 leading-relaxed">对接 SOCKS5 开放平台，获取卡密、节点、接码及支付能力。所有接口均采用 HTTPS 协议，数据格式为 JSON。</p>
             
-            <div class="bg-slate-50 rounded-xl p-4 border border-slate-100 mb-4">
-                <p class="text-[13px] text-slate-600 mb-2"><b>接口网关：</b><code class="bg-white px-1.5 py-0.5 border border-slate-200 rounded text-blue-600 font-mono">https://web.lynli.me/api/v1</code></p>
-                <p class="text-[13px] text-slate-600"><b>鉴权方式：</b>所有请求头必须携带 <code class="bg-white px-1.5 py-0.5 border border-slate-200 rounded text-blue-600 font-mono">Authorization: Bearer YOUR_API_KEY</code></p>
-            </div>
-
-            <h3 class="text-[15px] font-bold text-slate-800 mb-2 border-l-4 border-blue-500 pl-2">通用错误码</h3>
-            <div class="text-[13px] text-slate-600 space-y-1 bg-white rounded border border-slate-100 p-3">
-                <p><b>200</b> - 请求成功</p>
-                <p><b>401</b> - API Key 无效或失效（请前往控制台核对）</p>
-                <p><b>402</b> - 余额不足，请充值</p>
-                <p><b>403</b> - 接口权限未开通或 IP 不在白名单</p>
-                <p><b>429</b> - 请求过于频繁（触发限流）</p>
+            <div class="bg-slate-50 rounded-xl p-4 border border-slate-100 mb-6">
+                <p class="text-[13px] text-slate-600 mb-3"><b>接口网关：</b><code class="bg-white px-1.5 py-0.5 border border-slate-200 rounded text-blue-600 font-mono">https://web.lynli.me/api/v1</code></p>
+                <p class="text-[13px] text-slate-600"><b>鉴权方式：</b>所有请求头必须携带您的专属密钥：<br><code class="bg-white px-1.5 py-0.5 border border-slate-200 rounded text-blue-600 font-mono mt-2 inline-block">Authorization: Bearer YOUR_API_KEY</code></p>
             </div>
         </div>
 
-        <!-- 分割线 -->
-        <hr class="border-slate-100 mb-8">
-
-        <!-- 1. 账号接口文档 (#tg) -->
-        <div id="tg" class="scroll-mt-20">
-            <div class="flex items-center gap-2 mb-3">
-                <h2 class="text-[20px] font-bold text-slate-800">1. 账号接口</h2>
-                <span class="bg-blue-50 text-blue-600 text-[10px] px-2 py-0.5 rounded font-bold border border-blue-100">静态卡密分发</span>
-            </div>
-            <p class="text-[14px] text-slate-600 mb-4 leading-relaxed">通过 API 自动购买 TG、Gmail 等成品账号。支付成功后，系统会直接返回卡密内容（如：账号----密码----辅助邮箱）。</p>
-
-            <!-- 购买卡密接口 -->
-            <div class="mb-6">
-                <div class="flex items-center mb-2">
-                    <span class="tag-post">POST</span>
-                    <span class="font-mono text-[14px] font-bold text-slate-800">/account/buy</span>
+        <!-- ================= 1. 账号接口 ================= -->
+        <div class="mb-4 bg-white rounded-xl border border-slate-200 overflow-hidden">
+            <button onclick="toggleAccordion('acc-tg', 'icon-tg')" class="w-full px-5 py-4 flex justify-between items-center bg-white active:bg-slate-50 transition">
+                <div class="flex items-center gap-3">
+                    <span class="text-[18px] font-bold text-slate-800">1. 账号接口</span>
+                    <span class="bg-blue-50 text-blue-600 text-[10px] px-2 py-0.5 rounded font-bold border border-blue-100">静态卡密</span>
                 </div>
-                
-                <p class="text-[13px] font-bold text-slate-700 mb-2">请求参数 (JSON Body)：</p>
-                <div class="border-t border-slate-100 mb-4">
-                    <table class="w-full">
-                        <tr><td class="table-td w-24 font-mono text-blue-600">product_id</td><td class="table-td"><b>必填 (int)</b> - 商品 ID，可在控制台商品列表查看</td></tr>
-                        <tr><td class="table-td font-mono text-blue-600">quantity</td><td class="table-td"><b>必填 (int)</b> - 购买数量（需库存充足）</td></tr>
-                    </table>
-                </div>
+                <svg id="icon-tg" class="w-5 h-5 text-slate-400 transition-transform duration-300 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </button>
+            <div id="acc-tg" class="accordion-content active bg-white border-t border-slate-100">
+                <div class="p-5">
+                    <p class="text-[14px] text-slate-600 mb-5 leading-relaxed">通过 API 自动购买 TG、Gmail 等成品账号。支付成功后，系统会直接返回卡密内容（如：账号----密码----辅助邮箱）。</p>
 
-                <p class="text-[13px] font-bold text-slate-700 mb-2">请求示例 (cURL)：</p>
-                <div class="code-block">curl -X POST "https://web.lynli.me/api/v1/account/buy" \
+                    <!-- 购买接口 -->
+                    <div class="mb-8">
+                        <div class="flex items-center mb-3">
+                            <span class="tag-post">POST</span>
+                            <span class="font-mono text-[15px] font-bold text-slate-800">/account/buy</span>
+                        </div>
+                        
+                        <p class="text-[13px] font-bold text-slate-700 mb-2">请求参数 (JSON Body)：</p>
+                        <table class="api-table">
+                            <tr><th>参数名</th><th>类型</th><th>必填</th><th>描述</th></tr>
+                            <tr><td>product_id</td><td>int</td><td>是</td><td>商品 ID，可在商品详情页或控制台获取</td></tr>
+                            <tr><td>quantity</td><td>int</td><td>是</td><td>购买数量（需小于等于实时库存）</td></tr>
+                        </table>
+
+                        <p class="text-[13px] font-bold text-slate-700 mb-2">请求示例 (cURL)：</p>
+                        <div class="code-wrapper">
+                            <div class="copy-btn" onclick="copyCode(this)">复制</div>
+                            <div class="code-block">curl -X POST "https://web.lynli.me/api/v1/account/buy" \
 -H "Authorization: Bearer sk_tg_xxxxxx" \
 -H "Content-Type: application/json" \
--d '{"product_id": 3965, "quantity": 1}'</div>
+-d '{
+  "product_id": 3965,
+  "quantity": 1
+}'</div>
+                        </div>
 
-                <p class="text-[13px] font-bold text-slate-700 mb-2">成功返回示例：</p>
-                <div class="code-block">{
+                        <p class="text-[13px] font-bold text-slate-700 mb-2">成功返回示例：</p>
+                        <div class="code-wrapper">
+                            <div class="copy-btn" onclick="copyCode(this)">复制</div>
+                            <div class="code-block">{
   "code": 200,
   "msg": "购买成功",
   "data": {
@@ -87,16 +103,26 @@
     ]
   }
 }</div>
-            </div>
+                        </div>
+                    </div>
 
-            <!-- 查询库存接口 -->
-            <div class="mb-6 border-t border-slate-100 pt-6">
-                <div class="flex items-center mb-2">
-                    <span class="tag-get">GET</span>
-                    <span class="font-mono text-[14px] font-bold text-slate-800">/account/stock?product_id=3965</span>
-                </div>
-                <p class="text-[13px] text-slate-500 mb-3">查询指定商品的实时库存数量，防止超卖。</p>
-                <div class="code-block">{
+                    <!-- 查库存接口 -->
+                    <div class="border-t border-slate-100 pt-6">
+                        <div class="flex items-center mb-3">
+                            <span class="tag-get">GET</span>
+                            <span class="font-mono text-[15px] font-bold text-slate-800">/account/stock</span>
+                        </div>
+                        <p class="text-[13px] text-slate-500 mb-3">查询指定商品的实时库存数量，防止下游超卖。</p>
+                        
+                        <table class="api-table">
+                            <tr><th>参数名</th><th>类型</th><th>必填</th><th>描述</th></tr>
+                            <tr><td>product_id</td><td>int</td><td>是</td><td>查询的商品 ID</td></tr>
+                        </table>
+
+                        <p class="text-[13px] font-bold text-slate-700 mb-2">成功返回示例：</p>
+                        <div class="code-wrapper">
+                            <div class="copy-btn" onclick="copyCode(this)">复制</div>
+                            <div class="code-block">{
   "code": 200,
   "data": {
     "product_id": 3965,
@@ -104,26 +130,137 @@
     "price": 8.72
   }
 }</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- 预留其他接口占位 -->
-        <div class="mt-12 pt-8 border-t border-slate-100">
-            <div id="jd" class="py-6"><h2 class="text-[20px] font-bold text-slate-800">2. 节点接口 <span class="text-[12px] font-normal text-slate-400 ml-2">(即将开放)</span></h2></div>
-            <div id="sms" class="py-6"><h2 class="text-[20px] font-bold text-slate-800">3. 接码接口 <span class="text-[12px] font-normal text-slate-400 ml-2">(即将开放)</span></h2></div>
-            <div id="cx" class="py-6"><h2 class="text-[20px] font-bold text-slate-800">4. 查询接口 <span class="text-[12px] font-normal text-slate-400 ml-2">(即将开放)</span></h2></div>
-            <div id="zf" class="py-6"><h2 class="text-[20px] font-bold text-slate-800">5. 支付接口 <span class="text-[12px] font-normal text-slate-400 ml-2">(即将开放)</span></h2></div>
-            <div id="email" class="py-6"><h2 class="text-[20px] font-bold text-slate-800">6. 邮箱网关 <span class="text-[12px] font-normal text-slate-400 ml-2">(即将开放)</span></h2></div>
+        <!-- ================= 2. 节点接口 (占位) ================= -->
+        <div class="mb-4 bg-white rounded-xl border border-slate-200 overflow-hidden">
+            <button onclick="toggleAccordion('acc-jd', 'icon-jd')" class="w-full px-5 py-4 flex justify-between items-center bg-white active:bg-slate-50 transition">
+                <div class="flex items-center gap-3">
+                    <span class="text-[18px] font-bold text-slate-800">2. 节点接口</span>
+                    <span class="bg-amber-50 text-amber-600 text-[10px] px-2 py-0.5 rounded font-bold border border-amber-100">动态 IP / 订阅</span>
+                </div>
+                <svg id="icon-jd" class="w-5 h-5 text-slate-400 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </button>
+            <div id="acc-jd" class="accordion-content bg-white border-t border-slate-100">
+                <div class="p-5">
+                    <p class="text-[14px] text-slate-600">节点接口文档正在紧张编写中，下一段即为你补全动态代理、静态 IP 提取以及订阅拉取的详细 API。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= 3. 接码接口 (占位) ================= -->
+        <div class="mb-4 bg-white rounded-xl border border-slate-200 overflow-hidden">
+            <button onclick="toggleAccordion('acc-sms', 'icon-sms')" class="w-full px-5 py-4 flex justify-between items-center bg-white active:bg-slate-50 transition">
+                <div class="flex items-center gap-3">
+                    <span class="text-[18px] font-bold text-slate-800">3. 接码接口</span>
+                    <span class="bg-green-50 text-green-600 text-[10px] px-2 py-0.5 rounded font-bold border border-green-100">取号 / 监听</span>
+                </div>
+                <svg id="icon-sms" class="w-5 h-5 text-slate-400 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </button>
+            <div id="acc-sms" class="accordion-content bg-white border-t border-slate-100">
+                <div class="p-5"><p class="text-[14px] text-slate-600">接码接口文档即将上线...</p></div>
+            </div>
+        </div>
+
+        <!-- ================= 4. 查询接口 (占位) ================= -->
+        <div class="mb-4 bg-white rounded-xl border border-slate-200 overflow-hidden">
+            <button onclick="toggleAccordion('acc-cx', 'icon-cx')" class="w-full px-5 py-4 flex justify-between items-center bg-white active:bg-slate-50 transition">
+                <div class="flex items-center gap-3">
+                    <span class="text-[18px] font-bold text-slate-800">4. 查询接口</span>
+                    <span class="bg-indigo-50 text-indigo-600 text-[10px] px-2 py-0.5 rounded font-bold border border-indigo-100">数据核验</span>
+                </div>
+                <svg id="icon-cx" class="w-5 h-5 text-slate-400 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </button>
+            <div id="acc-cx" class="accordion-content bg-white border-t border-slate-100">
+                <div class="p-5"><p class="text-[14px] text-slate-600">查询接口文档即将上线...</p></div>
+            </div>
+        </div>
+
+        <!-- ================= 5. 支付接口 (占位) ================= -->
+        <div class="mb-4 bg-white rounded-xl border border-slate-200 overflow-hidden">
+            <button onclick="toggleAccordion('acc-zf', 'icon-zf')" class="w-full px-5 py-4 flex justify-between items-center bg-white active:bg-slate-50 transition">
+                <div class="flex items-center gap-3">
+                    <span class="text-[18px] font-bold text-slate-800">5. 支付接口</span>
+                    <span class="bg-red-50 text-red-600 text-[10px] px-2 py-0.5 rounded font-bold border border-red-100">聚合代收</span>
+                </div>
+                <svg id="icon-zf" class="w-5 h-5 text-slate-400 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </button>
+            <div id="acc-zf" class="accordion-content bg-white border-t border-slate-100">
+                <div class="p-5"><p class="text-[14px] text-slate-600">支付接口文档即将上线...</p></div>
+            </div>
+        </div>
+
+        <!-- ================= 6. 邮箱网关 (占位) ================= -->
+        <div class="mb-4 bg-white rounded-xl border border-slate-200 overflow-hidden">
+            <button onclick="toggleAccordion('acc-email', 'icon-email')" class="w-full px-5 py-4 flex justify-between items-center bg-white active:bg-slate-50 transition">
+                <div class="flex items-center gap-3">
+                    <span class="text-[18px] font-bold text-slate-800">6. 邮箱网关</span>
+                    <span class="bg-purple-50 text-purple-600 text-[10px] px-2 py-0.5 rounded font-bold border border-purple-100">SMTP 发信</span>
+                </div>
+                <svg id="icon-email" class="w-5 h-5 text-slate-400 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </button>
+            <div id="acc-email" class="accordion-content bg-white border-t border-slate-100">
+                <div class="p-5"><p class="text-[14px] text-slate-600">邮箱网关文档即将上线...</p></div>
+            </div>
         </div>
     </main>
 
     <script src="/ai-widget.js"></script>
     <script>
-        // 自动滚动到锚点
+        // 手风琴逻辑
+        function toggleAccordion(contentId, iconId) {
+            const content = document.getElementById(contentId);
+            const icon = document.getElementById(iconId);
+            if (content.classList.contains('active')) {
+                content.classList.remove('active');
+                content.style.maxHeight = null;
+                icon.classList.remove('rotate-180');
+            } else {
+                content.classList.add('active');
+                content.style.maxHeight = content.scrollHeight + "px";
+                icon.classList.add('rotate-180');
+            }
+        }
+
+        // 一键复制代码
+        function copyCode(btn) {
+            const codeBlock = btn.nextElementSibling;
+            const textToCopy = codeBlock.innerText;
+            
+            if(navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    const originalText = btn.innerText;
+                    btn.innerText = '已复制!';
+                    btn.style.color = '#10b981';
+                    setTimeout(() => { btn.innerText = originalText; btn.style.color = '#cbd5e1'; }, 2000);
+                });
+            } else {
+                const textArea = document.createElement("textarea");
+                textArea.value = textToCopy;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try { document.execCommand('copy'); btn.innerText = '已复制!'; setTimeout(() => btn.innerText = '复制', 2000); } catch (err) {}
+                document.body.removeChild(textArea);
+            }
+        }
+
+        // 自动展开锚点对应的折叠面板
         document.addEventListener('DOMContentLoaded', () => {
             if(window.location.hash) {
-                const target = document.querySelector(window.location.hash);
-                if(target) setTimeout(() => target.scrollIntoView({ behavior: 'smooth' }), 100);
+                const hash = window.location.hash.replace('#', '');
+                const accId = 'acc-' + hash;
+                const iconId = 'icon-' + hash;
+                const content = document.getElementById(accId);
+                if(content) {
+                    setTimeout(() => {
+                        toggleAccordion(accId, iconId);
+                        content.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 100);
+                }
             }
         });
     </script>

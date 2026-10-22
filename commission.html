@@ -15,10 +15,13 @@
         
         .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 0 16px; }
         .modal-overlay.active { display: flex; }
-        .modal-box { background: #fff; width: 100%; max-width: 340px; border-radius: 16px; padding: 20px; transform: scale(0.95); transition: transform 0.2s; opacity: 0; text-align: left; }
+        .modal-box { background: #fff; width: 100%; max-width: 360px; border-radius: 16px; padding: 24px 20px; transform: scale(0.95); transition: transform 0.2s; opacity: 0; text-align: left; }
         .modal-overlay.active .modal-box { transform: scale(1); opacity: 1; }
-        .input-flat { width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; font-size: 14px; outline: none; transition: border 0.2s; margin-bottom: 12px; }
+        .input-flat { width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; font-size: 14px; outline: none; transition: border 0.2s; }
         .input-flat:focus { border-color: #3b82f6; background: #fff; }
+
+        #toast { visibility: hidden; min-width: 200px; background-color: #334155; color: #fff; text-align: center; border-radius: 8px; padding: 10px 16px; position: fixed; z-index: 10000; left: 50%; top: 10%; transform: translateX(-50%); font-size: 14px; opacity: 0; transition: opacity 0.3s; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        #toast.show { visibility: visible; opacity: 1; }
     </style>
 </head>
 <body class="pb-12">
@@ -31,7 +34,7 @@
         <!-- 数据汇总 -->
         <div class="card p-6 text-center mb-6">
             <p class="text-[13px] text-slate-500 mb-2">当前可提现佣金 (USDT)</p>
-            <p class="text-[36px] font-bold text-slate-800 mb-6">$ 45.50</p>
+            <p class="text-[36px] font-bold text-slate-800 mb-6" id="available-balance">$ 45.50</p>
             
             <div class="flex justify-between px-4 mb-6">
                 <div class="text-center">
@@ -45,7 +48,7 @@
             </div>
 
             <button onclick="openWithdrawModal()" class="w-full py-3 bg-blue-600 text-white font-bold rounded-xl text-[15px] active:opacity-80 shadow-sm">申请提现</button>
-            <p class="text-[11px] text-slate-400 mt-3 text-center">最低提现额度 15 USDT，每次提现需验证</p>
+            <p class="text-[11px] text-slate-400 mt-3 text-center">最低提现额度 15 USDT，每次提现需重新验证</p>
         </div>
 
         <!-- 推广链接 -->
@@ -57,26 +60,45 @@
             <p class="text-[12px] text-slate-500 mb-3">分享您的专属链接，下级永久绑定，享受 15% 返佣。</p>
             <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 flex justify-between items-center">
                 <span class="text-[12px] font-mono text-slate-600 truncate flex-1">web.lynli.me/reg?ref=10001</span>
-                <button onclick="showToast('复制成功')" class="text-blue-600 text-[12px] font-bold ml-2">复制</button>
+                <button onclick="showToast('链接已复制到剪贴板')" class="text-blue-600 text-[12px] font-bold ml-2">复制</button>
             </div>
         </div>
     </main>
 
     <!-- 提现弹窗 -->
     <div id="withdraw-modal" class="modal-overlay">
-        <div class="modal-box text-center">
-            <h3 class="text-[17px] font-bold text-slate-800 mb-4">提现佣金</h3>
-            <div class="text-left">
-                <label class="text-[12px] text-slate-500 mb-1 block">提现金额 (USDT)</label>
-                <input type="number" id="wd-amount" class="input-flat" placeholder="最低 15 USDT" value="15">
+        <div class="modal-box">
+            <h3 class="text-[18px] font-bold text-slate-800 mb-1 text-center">佣金提现</h3>
+            <p class="text-[12px] text-slate-500 text-center mb-5">当前可用余额：<span class="text-green-600 font-bold text-[14px]">$ 45.50 USDT</span></p>
+            
+            <div class="space-y-4 mb-5">
+                <div>
+                    <label class="text-[13px] text-slate-700 font-bold mb-1.5 block">提现金额 (USDT)</label>
+                    <input type="number" id="wd-amount" class="input-flat" placeholder="最低 15 USDT" value="15">
+                </div>
                 
-                <label class="text-[12px] text-slate-500 mb-1 block">USDT 收款地址 (TRC20)</label>
-                <input type="text" id="wd-address" class="input-flat" placeholder="每次提现需重新填写地址">
-                <p class="text-[11px] text-red-500 mb-2">提示：请务必核对地址，链上转账不可逆！</p>
+                <div>
+                    <label class="text-[13px] text-slate-700 font-bold mb-1.5 block">USDT 收款地址 (TRC20)</label>
+                    <input type="text" id="wd-address" class="input-flat" placeholder="每次提现需重新填写以保障资金安全">
+                </div>
             </div>
-            <div class="flex gap-3 mt-4">
-                <button onclick="closeWithdrawModal()" class="flex-1 py-2.5 bg-slate-100 text-slate-600 font-bold rounded-xl text-[15px]">取消</button>
-                <button onclick="submitWithdraw()" class="flex-1 py-2.5 bg-blue-600 text-white font-bold rounded-xl text-[15px]">确认提现</button>
+
+            <!-- 商务级提示文案 -->
+            <div class="bg-slate-50 border border-slate-100 rounded-lg p-3 mb-5 space-y-2">
+                <p class="text-[11px] text-slate-500 leading-relaxed">
+                    <span class="font-bold text-red-500">【财务安全声明】</span>为保障资金合规与安全，请务必确认收款地址准确无误。基于区块链网络特性，提现指令一旦广播上链，资产流转将不可逆转。
+                </p>
+                <p class="text-[11px] text-slate-500 leading-relaxed">
+                    <span class="font-bold text-slate-700">【审核与时效】</span>提现申请需经过风控合规校验，提交后将由财务专员进行人工复核打款，预计在 24 小时内处理完毕。
+                </p>
+                <p class="text-[11px] text-slate-500 leading-relaxed">
+                    <span class="font-bold text-slate-700">【反洗钱提示】</span>请确保接收账户为本人实名所有，严禁利用本平台进行任何非法资金流转行为。
+                </p>
+            </div>
+
+            <div class="flex gap-3">
+                <button onclick="closeWithdrawModal()" class="flex-1 py-3 bg-slate-100 text-slate-600 font-bold rounded-xl text-[15px] active:bg-slate-200">取消</button>
+                <button onclick="submitWithdraw()" class="flex-1 py-3 bg-blue-600 text-white font-bold rounded-xl text-[15px] active:opacity-80">确认提现</button>
             </div>
         </div>
     </div>
@@ -86,7 +108,8 @@
     <script>
         function openWithdrawModal() {
             document.getElementById('withdraw-modal').classList.add('active');
-            document.getElementById('wd-address').value = ''; // 每次打开清空地址
+            // 每次打开清空地址，强制重填
+            document.getElementById('wd-address').value = '';
         }
         function closeWithdrawModal() {
             document.getElementById('withdraw-modal').classList.remove('active');
@@ -96,19 +119,20 @@
             const address = document.getElementById('wd-address').value.trim();
             
             if (!amount || amount < 15) { showToast('最低提现 15 USDT'); return; }
-            if (!address || address.length < 20) { showToast('请输入正确的 USDT 地址'); return; }
+            if (!address || address.length < 20) { showToast('请输入正确的 TRC20 收款地址'); return; }
 
             closeWithdrawModal();
             setTimeout(() => {
-                // 模拟提交成功弹窗
-                alert('提现申请已提交，正在等待人工打款，请留意公告通知。');
-                window.location.href = '/invite.html';
+                showToast('✅ 提现申请已提交，等待财务打款');
+                setTimeout(() => {
+                    window.location.href = '/invite.html';
+                }, 1500);
             }, 300);
         }
         function showToast(msg) {
             const toast = document.getElementById('toast');
             toast.innerText = msg; toast.className = 'show';
-            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 2500);
+            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
         }
     </script>
 </body>

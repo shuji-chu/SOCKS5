@@ -3,425 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>登录教程 - SOCKS5</title>
+    <title>登录教程中心 - SOCKS5</title>
     <link rel="icon" href="/logo.jpg" type="image/jpeg">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: #f8fafc; color: #1e293b; padding-bottom: 20px; }
-        .card { background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; margin-bottom: 16px; }
-        
-        .platform-tab { padding: 8px 16px; font-size: 14px; font-weight: bold; color: #64748b; border-radius: 8px; white-space: nowrap; transition: all 0.2s; cursor: pointer; }
-        .platform-tab.active { background: #2563eb; color: #fff; }
-
-        .sub-tab { flex: 1; padding: 8px 0; text-align: center; font-size: 13px; font-weight: bold; color: #64748b; border-bottom: 2px solid transparent; cursor: pointer; white-space: nowrap; }
-        .sub-tab.active { color: #2563eb; border-bottom-color: #2563eb; }
-        
-        .accordion-btn { width: 100%; text-align: left; padding: 16px; font-size: 15px; font-weight: bold; color: #1e293b; display: flex; justify-content: space-between; align-items: center; background: #fff; border-bottom: 1px solid #f1f5f9; }
-        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; background: #f8fafc; }
-        .accordion-content.active { max-height: 8000px; transition: max-height 0.4s ease-in; }
-        .rotate-180 { transform: rotate(180deg); }
-
-        .step-num { width: 24px; height: 24px; border-radius: 50%; background: #eff6ff; color: #2563eb; font-size: 13px; font-weight: bold; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .link-btn { display: inline-block; background: #eff6ff; color: #2563eb; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: bold; text-decoration: none; border: 1px solid #bfdbfe; }
-        
-        .alert-box { background: #fffbeb; border: 1px solid #fde68a; color: #b45309; font-size: 13px; padding: 12px; border-radius: 8px; line-height: 1.6; }
-        .danger-box { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; font-size: 13px; padding: 12px; border-radius: 8px; line-height: 1.6; }
-        
-        .highlight-text { background: #e0e7ff; color: #4338ca; font-family: monospace; font-weight: bold; padding: 0 4px; border-radius: 4px; }
+        .platform-btn { display: flex; align-items: center; justify-content: space-between; padding: 16px; background: #fff; border-radius: 12px; margin-bottom: 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); border: 1px solid #f1f5f9; transition: all 0.2s; cursor: pointer; }
+        .platform-btn:active { transform: scale(0.98); background: #f8fafc; }
     </style>
 </head>
 <body>
     <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
         <div class="flex items-center gap-3">
-            <button onclick="window.history.back()" class="text-slate-600 text-xl font-bold px-2">←</button>
-            <h1 class="text-[17px] font-bold text-slate-800">登录教程</h1>
+            <a href="/profile.html" class="text-slate-600 text-xl font-bold px-2">←</a>
+            <h1 class="text-[17px] font-bold text-slate-800">登录教程中心</h1>
         </div>
     </header>
 
     <main class="px-4 py-4 max-w-lg mx-auto">
-        <div class="danger-box mb-4">
-            ⚠️ <b>防诈骗提醒：</b>符合售后政策的补号、换号均无需额外付费！请勿通过第三方小程序、私人账户或陌生链接付款。
+        <div class="mb-6">
+            <h2 class="text-[22px] font-bold text-slate-800 mb-2">请选择平台查看教程</h2>
+            <p class="text-[13px] text-slate-500">首次使用请仔细阅读对应平台的使用教程，避免操作失误。</p>
         </div>
 
-        <div class="flex overflow-x-auto no-scrollbar gap-2 mb-4 border-b border-slate-200 pb-2">
-            <div class="platform-tab" onclick="switchPlatform('telegram', this)">Telegram</div>
-            <div class="platform-tab active" onclick="switchPlatform('facebook', this)">Facebook</div>
-            <div class="platform-tab" onclick="window.location.href='/tutorial-twitter.html'">Twitter / X</div>
-        </div>
+        <div class="space-y-3">
+            <a href="/tutorial-telegram.html" class="platform-btn">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center font-bold text-[16px]">TG</div>
+                    <span class="text-[15px] font-bold text-slate-800">Telegram 教程</span>
+                </div>
+                <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </a>
 
-        <div class="mb-4">
-            <h2 class="text-[20px] font-bold text-slate-800" id="main-title">加载中...</h2>
-            <p class="text-[12px] text-slate-500 mt-1" id="main-subtitle">首次使用请仔细阅读对应平台的使用教程</p>
-        </div>
+            <a href="/tutorial-twitter.html" class="platform-btn">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-slate-100 text-slate-800 flex items-center justify-center font-bold text-[16px]">X</div>
+                    <span class="text-[15px] font-bold text-slate-800">Twitter / X 教程</span>
+                </div>
+                <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </a>
 
-        <div id="fb-tabs" class="flex border-b border-slate-200 mb-4 hidden overflow-x-auto no-scrollbar whitespace-nowrap">
-            <div class="sub-tab active" onclick="switchFbTab('mobile', this)">手机 2FA 登录</div>
-            <div class="sub-tab" onclick="switchFbTab('cookie', this)">电脑 Cookie 登录</div>
-            <div class="sub-tab" onclick="switchFbTab('unlock', this)">账号解锁教程</div>
-            <div class="sub-tab" onclick="switchFbTab('terms', this)">账号类目详解</div>
-        </div>
+            <a href="/tutorial-facebook.html" class="platform-btn">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-[16px]">f</div>
+                    <span class="text-[15px] font-bold text-slate-800">Facebook 教程</span>
+                </div>
+                <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </a>
 
-        <div id="tutorial-content"></div>
+            <a href="/tutorial-instagram.html" class="platform-btn">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-pink-50 text-pink-500 flex items-center justify-center font-bold text-[16px]">IG</div>
+                    <span class="text-[15px] font-bold text-slate-800">Instagram 教程</span>
+                </div>
+                <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </a>
+
+            <a href="/tutorial-tiktok.html" class="platform-btn">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-black text-white flex items-center justify-center font-bold text-[16px]">TT</div>
+                    <span class="text-[15px] font-bold text-slate-800">TikTok 教程</span>
+                </div>
+                <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </a>
+
+            <a href="/tutorial-threads.html" class="platform-btn">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-slate-800 text-white flex items-center justify-center font-bold text-[16px]">@</div>
+                    <span class="text-[15px] font-bold text-slate-800">Threads (脆) 教程</span>
+                </div>
+                <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </a>
+
+            <a href="/tutorial-google.html" class="platform-btn">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-red-50 text-red-500 flex items-center justify-center font-bold text-[16px]">G</div>
+                    <span class="text-[15px] font-bold text-slate-800">Google 谷歌教程</span>
+                </div>
+                <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </a>
+
+            <a href="/tutorial-apple.html" class="platform-btn">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-slate-100 text-slate-800 flex items-center justify-center font-bold text-[16px]"></div>
+                    <span class="text-[15px] font-bold text-slate-800">苹果 Apple ID 教程</span>
+                </div>
+                <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </a>
+
+            <a href="/tutorial-discord.html" class="platform-btn">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-indigo-50 text-indigo-500 flex items-center justify-center font-bold text-[16px]">D</div>
+                    <span class="text-[15px] font-bold text-slate-800">Discord 教程</span>
+                </div>
+                <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </a>
+
+            <a href="/tutorial-linkedin.html" class="platform-btn">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-[16px]">in</div>
+                    <span class="text-[15px] font-bold text-slate-800">LinkedIn 教程</span>
+                </div>
+                <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </a>
+
+            <a href="/tutorial-reddit.html" class="platform-btn">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-orange-50 text-orange-500 flex items-center justify-center font-bold text-[16px]">R</div>
+                    <span class="text-[15px] font-bold text-slate-800">Reddit 教程</span>
+                </div>
+                <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </a>
+        </div>
     </main>
-
-    <script>
-        const tutorialData = {
-            'telegram': {
-                title: 'Telegram 登录问题解决指南',
-                subtitle: '首次使用请仔细阅读对应平台的使用教程',
-                hasSubTab: false,
-                sections: [{ title: '教程准备中...', content: '<p class="p-4 text-slate-500">请稍后</p>' }]
-            },
-            'facebook': {
-                title: 'Facebook 登录与类目指南',
-                subtitle: '卡密解析 · 登录方法 · 账号黑话大全',
-                hasSubTab: true,
-                mobileSections: [
-                    {
-                        title: '手机端 2FA 登录说明',
-                        content: `
-                            <div class="p-4 space-y-4">
-                                <p class="text-[13px] text-slate-600 leading-relaxed">如果你购买的是带有 <b>2FA 链接或密钥</b> 的商品，请按以下步骤操作：</p>
-                                <div class="flex gap-3">
-                                    <div class="step-num">1</div>
-                                    <div>
-                                        <h4 class="text-[14px] font-bold text-slate-800 mb-1">输入账号密码</h4>
-                                        <p class="text-[13px] text-slate-600 leading-relaxed">打开 Facebook 客户端，输入卡密中的账号和密码。</p>
-                                    </div>
-                                </div>
-                                <div class="flex gap-3 border-t border-slate-100 pt-4">
-                                    <div class="step-num">2</div>
-                                    <div>
-                                        <h4 class="text-[14px] font-bold text-slate-800 mb-1">获取 2FA 验证码</h4>
-                                        <p class="text-[13px] text-slate-600 leading-relaxed mb-2">如果卡密中包含 2FA 链接，直接点击该链接即可获取 6 位动态验证码。</p>
-                                        <p class="text-[13px] text-slate-600 leading-relaxed">如果只有 2FA 密钥，请打开 <a href="https://2fa.vip/index.html" target="_blank" class="text-blue-500 underline">2FA 工具</a>，输入密钥获取验证码。</p>
-                                    </div>
-                                </div>
-                            </div>
-                        `
-                    }
-                ],
-                cookieSections: [
-                    {
-                        title: '登录前：看懂最新卡密格式',
-                        content: `
-                            <div class="p-4">
-                                <p class="text-[13px] text-slate-600 leading-relaxed mb-3">最新版卡密包含诸多字段，<b>本教程只需用到 Cookie，且必须复制全部 Cookie！</b></p>
-                                
-                                <div class="bg-white p-3 rounded border border-slate-200 mb-4">
-                                    <p class="text-[12px] font-bold text-slate-800 mb-1">卡密示例：</p>
-                                    <p class="font-mono text-[11px] text-slate-500 break-all leading-relaxed">61585874986880----lI3E0#9y8d@3Z----https://2fa.web-ai.top/?key=xxx----6285138441863----hllisahqtq3@rambler.ru----9703761EqYhS3Z----RU----[Cookie数据]</p>
-                                </div>
-
-                                <div class="space-y-3 bg-slate-50 p-3 rounded-lg border border-slate-100">
-                                    <p class="text-[13px] font-bold text-slate-700 mb-2">卡密拆解：</p>
-                                    <p class="text-[13px] text-slate-600"><b>账号：</b>61585874986880</p>
-                                    <p class="text-[13px] text-slate-600"><b>密码：</b>lI3E0#9y8d@3Z</p>
-                                    <p class="text-[13px] text-slate-600"><b>2FA 链接：</b>https://2fa.web-ai.top/?key=...</p>
-                                    <p class="text-[13px] text-slate-600"><b>手机号：</b>6285138441863</p>
-                                    <p class="text-[13px] text-slate-600"><b>邮箱账号：</b>hllisahqtq3@rambler.ru</p>
-                                    <p class="text-[13px] text-slate-600"><b>邮箱密码：</b>9703761EqYhS3Z</p>
-                                    <p class="text-[13px] text-slate-600"><b>国家代码：</b>RU</p>
-                                    <p class="text-[13px] text-red-500 font-bold mt-2"><b>Cookie：</b>[JSON 格式的 Cookie 数据]</p>
-                                </div>
-                            </div>
-                        `
-                    },
-                    {
-                        title: '电脑端 Cookie 登录 4 步走',
-                        content: `
-                            <div class="p-4 space-y-5">
-                                <div class="flex gap-3">
-                                    <div class="step-num">1</div>
-                                    <div>
-                                        <h4 class="text-[14px] font-bold text-slate-800 mb-1">安装 Cookie Editor 插件</h4>
-                                        <p class="text-[13px] text-slate-600 leading-relaxed mb-2">建议使用电脑端 Chrome 浏览器，并安装插件。</p>
-                                        <div class="flex gap-2 flex-wrap">
-                                            <a href="https://www.google.cn/chrome/" target="_blank" class="link-btn">🌐 Chrome 下载</a>
-                                            <a href="https://chromewebstore.google.com/detail/cookie-editor/hlkenndednhfkekhgcdicdfddnkalmdm" target="_blank" class="link-btn">🔗 Cookie 插件</a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="flex gap-3 border-t border-slate-100 pt-4">
-                                    <div class="step-num">2</div>
-                                    <div>
-                                        <h4 class="text-[14px] font-bold text-slate-800 mb-1">清理旧数据</h4>
-                                        <p class="text-[13px] text-slate-600 leading-relaxed">打开 Facebook 网页，将当前页面的 Cookie <b>全部清理</b>。</p>
-                                    </div>
-                                </div>
-                                <div class="flex gap-3 border-t border-slate-100 pt-4">
-                                    <div class="step-num">3</div>
-                                    <div>
-                                        <h4 class="text-[14px] font-bold text-slate-800 mb-1">导入完整 Cookie</h4>
-                                        <p class="text-[13px] text-slate-600 leading-relaxed">复制卡密中那一长串的 <b>[JSON格式的Cookie]</b>。在插件里选择 Import，粘贴并保存。</p>
-                                    </div>
-                                </div>
-                                <div class="flex gap-3 border-t border-slate-100 pt-4">
-                                    <div class="step-num">4</div>
-                                    <div>
-                                        <h4 class="text-[14px] font-bold text-slate-800 mb-1">刷新页面</h4>
-                                        <p class="text-[13px] text-slate-600 leading-relaxed">刷新 Facebook 页面，直接进入首页即为成功。</p>
-                                    </div>
-                                </div>
-                            </div>
-                        `
-                    }
-                ],
-                unlockSections: [
-                    {
-                        title: '账号被锁？开始解锁申诉',
-                        content: `
-                            <div class="p-4 space-y-5">
-                                <p class="text-[13px] text-slate-600 leading-relaxed">如果你的账号出现被锁定的提示，不要慌，按以下步骤申诉：</p>
-                                <div class="flex gap-3">
-                                    <div class="step-num">1</div>
-                                    <div>
-                                        <h4 class="text-[14px] font-bold text-slate-800 mb-1">点击开始解锁</h4>
-                                        <p class="text-[13px] text-slate-600 leading-relaxed">出现锁定提示时，点击页面上的“开始解锁”。</p>
-                                    </div>
-                                </div>
-                                <div class="flex gap-3 border-t border-slate-100 pt-4">
-                                    <div class="step-num">2</div>
-                                    <div>
-                                        <h4 class="text-[14px] font-bold text-slate-800 mb-1">点击继续</h4>
-                                        <p class="text-[13px] text-slate-600 leading-relaxed">点击“继续”，进入下一步。</p>
-                                    </div>
-                                </div>
-                                <div class="flex gap-3 border-t border-slate-100 pt-4">
-                                    <div class="step-num">3</div>
-                                    <div>
-                                        <h4 class="text-[14px] font-bold text-slate-800 mb-1">确认邮箱，获取验证码</h4>
-                                        <p class="text-[13px] text-slate-600 leading-relaxed">确认卡密中的邮箱无误，点击“获取验证码”。</p>
-                                    </div>
-                                </div>
-                                <div class="flex gap-3 border-t border-slate-100 pt-4">
-                                    <div class="step-num">4</div>
-                                    <div>
-                                        <h4 class="text-[14px] font-bold text-slate-800 mb-1">登录邮箱获取验证码</h4>
-                                        <p class="text-[13px] text-slate-600 leading-relaxed mb-2">去登录卡密中的邮箱获取验证码。</p>
-                                        <div class="alert-box text-[12px]">
-                                            <b>注意：</b>如果提示“手机号频繁”，换一个手机号即可。最后一步可以跳过，也可以填自己的邮箱。
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="flex gap-3 border-t border-slate-100 pt-4">
-                                    <div class="step-num">5</div>
-                                    <div>
-                                        <h4 class="text-[14px] font-bold text-slate-800 mb-1">填入验证码，解锁完成</h4>
-                                        <p class="text-[13px] text-slate-600 leading-relaxed">把从邮箱获取的验证码填入第三步的页面，即可解锁成功。</p>
-                                    </div>
-                                </div>
-                            </div>
-                        `
-                    }
-                ],
-                termsSections: [
-                    {
-                        title: '一、个人号类目',
-                        content: `
-                            <div class="p-4 text-[13px] text-slate-600 leading-relaxed space-y-4">
-                                <p><b>二解号（956）：</b>广告投放权限挂了一次，然后申诉回来的个人账号（956 是指二解号的简称）</p>
-                                <p><b>三解号（902）：</b>广告投放权限挂了二次，然后申诉回来的个人账号（902 是指三解号的简称）</p>
-                                <p><b>耐用号：</b>注册时间较长的个人账号</p>
-                                <p><b>小黑号：</b>活跃度很低，好友数量在 0-30 左右，没有加双重验证，格式一般是账号+密码+cookie</p>
-                                <p><b>大黑号：</b>活跃度较高，好友数量在 30 以上，没有加双重验证，格式一般是账号+密码+cookie</p>
-                                <p><b>专业号：</b>带有公共主页的个人账号</p>
-                                <p><b>小白号：</b>刚注册不久的个人账号，里面什么资源和内容都没有</p>
-                                <p><b>老白号：</b>注册时间在 2-3 个月左右的账号</p>
-                                <p><b>商城号：</b>带有 Marketplace 的账号，可以直接在 Marketplace 下单，无需跳转第三方</p>
-                                <p><b>申诉号：</b>可以使用于申诉公共主页等其他资产的个人账号</p>
-                                <p><b>有缘号：</b>使用于交友聊天的账号</p>
-                                <p><b>CC号：</b>带 Facebook 官方客服的账号，可以联系官方客服申诉资产或咨询支付限额等问题</p>
-                                <p><b>本土号：</b>指定国家的账号，信息内容和注册地址都是当地的个人账号</p>
-                                <p><b>账单号：</b>个人号里面的个人户是带支付记录的</p>
-                                <p><b>余额户：</b>个人号里面的个人户是带有一定余额</p>
-                                <p><b>预充值号：</b>个人号里面的个人户是可以进行充值的</p>
-                                <p><b>鱼号：</b>格式只有 cookie，没有账号密码，通过某种技术钓鱼获取</p>
-                            </div>
-                        `
-                    },
-                    {
-                        title: '二、公共主页类目',
-                        content: `
-                            <div class="p-4 text-[13px] text-slate-600 leading-relaxed space-y-4">
-                                <p><b>新主页：</b>注册时间比较短，一般在一年以内，粉丝数量在 0-99 随机，一般都是没有粉丝或者很少</p>
-                                <p><b>老主页：</b>注册时间在 1 年以上的，粉丝数量在 0-99 随机</p>
-                                <p><b>百粉主页：</b>注册时间在 1 年以上的，粉丝数量在 100-999 之间</p>
-                                <p><b>千粉主页：</b>注册时间在 1 年以上的，粉丝数量在 1000-9999 之间</p>
-                                <p><b>万粉主页：</b>注册时间在 1 年以上的，粉丝数量在 10000 以上</p>
-                                <p><b>五星主页：</b>评分是满分，五星是最高评分，一般都是做实体生意或者有产品的网店生意</p>
-                                <p><b>申诉主页：</b>挂了一次，然后申诉回来的主页</p>
-                                <p><b>蓝V主页：</b>主页认证了企业或者个人的身份，有一个打钩的蓝色 V 图标</p>
-                                <p><b>速推主页：</b>直播的时候可以速推，可以花钱推广在线直播</p>
-                            </div>
-                        `
-                    },
-                    {
-                        title: '三、广告账号类目',
-                        content: `
-                            <div class="p-4 text-[13px] text-slate-600 leading-relaxed space-y-4">
-                                <div>
-                                    <p class="font-bold text-slate-800 mb-2">1. 个人户</p>
-                                    <p>普通个人户限额 25-50</p>
-                                    <p>普通个人户限额 250</p>
-                                    <p>普通个人户限额 1500</p>
-                                    <p>普通个人户不限额</p>
-                                    <p>账单户限额 25-50</p>
-                                    <p>账单户限额 250</p>
-                                    <p>账单户限额 1500</p>
-                                    <p>账单户不限额</p>
-                                    <p>余额户：广告账户是预充值模式，广告账户带一定余额</p>
-                                </div>
-                                <div>
-                                    <p class="font-bold text-slate-800 mb-2 mt-4">2. 国内户（目前分为两种）</p>
-                                    <p><b>电商户：</b>日限额 450 刀，限制主页、限制域名，跑广告只能使用下户提交的主页进行投放，域名也需要使用下户提交的域名。</p>
-                                    <p><b>游戏户：</b>日限额 1000 刀，不限域名、限制主页，游戏户的日限额可以联系 Facebook 进行解限。</p>
-                                    <p><b>国内三不限：</b>不限域名、不限主页、不限额，需要使用经销商 BM（PABM）绑定广告账户，通过国内的主体申请下来。</p>
-                                </div>
-                                <div>
-                                    <p class="font-bold text-slate-800 mb-2 mt-4">3. BM 户</p>
-                                    <p class="mb-2">广告账户由 BM 创建而来，额度有限额 250、1500、不限额这种，有的 BM 有限制创建广告数量：</p>
-                                    <p><b>BM1：</b>限额 250/1500/不限额，BM 可创建广告数量 1 个</p>
-                                    <p><b>BM5：</b>限额 250/1500，BM 可创建广告数量 5 个</p>
-                                    <p><b>BM10：</b>限额 250/1500，BM 可创建广告数量 10 个</p>
-                                    <p><b>BM100：</b>限额 250/1500，BM 可创建广告数量 100 个</p>
-                                    <p><b>BM2500：</b>限额 250/1500，BM 可创建广告数量 2500 个</p>
-                                    <p class="mt-1">以此类推。市面上的玩法就是拿那种空的不限额 BM5，往这个 BM 去拉账单号，变成不限额的。</p>
-                                </div>
-                                <div>
-                                    <p class="font-bold text-slate-800 mb-2 mt-4">4. 海外户</p>
-                                    <p>海外户是海外代理商通过使用当地的企业主体申请下来的广告账户（不限域名、不限消耗、不限主页），处理问题时效会相对较久一点，需要和外国佬倒时差处理问题。</p>
-                                </div>
-                            </div>
-                        `
-                    },
-                    {
-                        title: '四、BM 类目',
-                        content: `
-                            <div class="p-4 text-[13px] text-slate-600 leading-relaxed space-y-4">
-                                <p><b>新 BM：</b>创建时间比较短，一般在一年以内</p>
-                                <p><b>老 BM：</b>创建时间比较长，时间一般都是一年以上</p>
-                                <p><b>企业认证 BM：</b>BM 的企业信息认证了主体的</p>
-                                <p><b>经销商 BM（PABM）：</b>由国内主体通过一代申请下来的</p>
-                                <p><b>像素 BM：</b>可共享像素 BM</p>
-                                
-                                <p class="font-bold text-slate-800 mt-6 mb-2">各账号类型定义详解</p>
-                                
-                                <div>
-                                    <p class="font-bold text-slate-700 mb-1">1. BM 户</p>
-                                    <p>① BM1、3、5、10...：指 BM（商务管理中心），数字代表 BM 可创建的广告账户数量上限，目前比较多的有 2500 个，以前还有上限 70000 个账户的 BM。</p>
-                                    <p>② BM250、350、500、1500...：指 BM 中的广告账户额度，初次建立的 BM 广告账户大多为 $50。</p>
-                                    <p>③ BM 半限额、不限额：半限额指日限额 $250 或 $350 等，不限额大多数能花到 $5000。</p>
-                                    <p>④ 不死 BM：经过特殊方法使 BM 受限，但广告功能正常使用，属于 bug，但目前方法已失效。</p>
-                                    <p>⑤ 企业认证 BM：指通过企业认证后的 BM，权重相对高些，在 BM 设置中的"安全中心"可以开始认证。</p>
-                                </div>
-                                <div class="mt-4">
-                                    <p class="font-bold text-slate-700 mb-1">2. 代理商账号、代理户、企业户</p>
-                                    <p>国内户：通过国内代理开的账户，需要提交公司信息。</p>
-                                </div>
-                            </div>
-                        `
-                    }
-                ]
-            }
-        };
-
-        function switchPlatform(platform, el) {
-            document.querySelectorAll('.platform-tab').forEach(btn => btn.classList.remove('active'));
-            el.classList.add('active');
-
-            const data = tutorialData[platform];
-            document.getElementById('main-title').innerText = data.title;
-            document.getElementById('main-subtitle').innerText = data.subtitle;
-
-            const fbTabs = document.getElementById('fb-tabs');
-            if (data.hasSubTab) {
-                fbTabs.classList.remove('hidden');
-                document.querySelectorAll('.sub-tab')[0].classList.add('active');
-                document.querySelectorAll('.sub-tab')[1].classList.remove('active');
-                document.querySelectorAll('.sub-tab')[2].classList.remove('active');
-                document.querySelectorAll('.sub-tab')[3].classList.remove('active');
-                renderFbContent('mobile');
-            } else {
-                fbTabs.classList.add('hidden');
-                renderSections(data.sections);
-            }
-        }
-
-        function switchFbTab(mode, el) {
-            document.querySelectorAll('.sub-tab').forEach(btn => btn.classList.remove('active'));
-            el.classList.add('active');
-            renderFbContent(mode);
-        }
-
-        function renderFbContent(mode) {
-            const data = tutorialData['facebook'];
-            if (mode === 'mobile') {
-                renderSections(data.mobileSections);
-            } else if (mode === 'cookie') {
-                renderSections(data.cookieSections);
-            } else if (mode === 'unlock') {
-                renderSections(data.unlockSections);
-            } else if (mode === 'terms') {
-                renderSections(data.termsSections);
-            }
-        }
-
-        function renderSections(sections) {
-            const container = document.getElementById('tutorial-content');
-            if (!sections || sections.length === 0) {
-                container.innerHTML = `<div class="text-center py-10 text-slate-400">教程正在整理中</div>`;
-                return;
-            }
-
-            let html = '';
-            sections.forEach((sec, index) => {
-                html += `
-                    <div class="card overflow-hidden">
-                        <button class="accordion-btn" onclick="toggleAccordion('acc-${index}', this)">
-                            ${sec.title}
-                            <svg class="w-4 h-4 text-slate-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                        </button>
-                        <div id="acc-${index}" class="accordion-content border-t border-slate-100">
-                            ${sec.content}
-                        </div>
-                    </div>
-                `;
-            });
-
-            container.innerHTML = html;
-            
-            if(sections.length > 0) {
-                const firstBtn = document.querySelector('.accordion-btn');
-                if(firstBtn) toggleAccordion('acc-0', firstBtn);
-            }
-        }
-
-        function toggleAccordion(id, btn) {
-            const content = document.getElementById(id);
-            const icon = btn.querySelector('svg');
-            if (content.classList.contains('active')) {
-                content.classList.remove('active');
-                content.style.maxHeight = null;
-                icon.classList.remove('rotate-180');
-            } else {
-                content.classList.add('active');
-                content.style.maxHeight = content.scrollHeight + 'px';
-                icon.classList.add('rotate-180');
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const activeTab = document.querySelector('.platform-tab.active') || document.querySelector('.platform-tab');
-            if(activeTab) {
-                const platform = activeTab.innerText.toLowerCase().includes('telegram') ? 'telegram' : 'facebook';
-                switchPlatform(platform, activeTab);
-            }
-        });
-    </script>
-    
+    <script src="/notice.js"></script>
     <script src="/ai-widget.js"></script>
-<script src="/notice.js"></script>
 </body>
 </html>

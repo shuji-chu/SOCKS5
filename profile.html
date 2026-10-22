@@ -12,6 +12,12 @@
         .card { background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; }
         .btn-press { transition: transform 0.1s, background-color 0.2s; }
         .btn-press:active { transform: scale(0.97); background-color: #f1f5f9; }
+        
+        /* 底部 Tab 专属样式 */
+        .bottom-tab { position: fixed; bottom: 0; width: 100%; background: #ffffff; border-top: 1px solid #f1f5f9; display: flex; height: 56px; padding-bottom: env(safe-area-inset-bottom); z-index: 50; }
+        .tab-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: #94a3b8; text-decoration: none; }
+        .tab-item.active { color: #2563eb; }
+        .tab-text { font-size: 10px; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -19,10 +25,12 @@
         <h1 class="text-[20px] font-bold text-slate-800">我的账户</h1>
         <div class="relative">
             <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+            <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
         </div>
     </header>
 
     <main class="px-4 py-4 space-y-4 max-w-lg mx-auto">
+        <!-- 用户信息卡片 -->
         <div class="card p-5 flex items-center gap-4 cursor-pointer btn-press">
             <div id="profile-avatar-container" class="w-[60px] h-[60px] rounded-full bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200 shrink-0">
                 <span class="text-blue-500 font-bold text-2xl">B</span>
@@ -30,10 +38,12 @@
             <div class="flex-1">
                 <div class="flex items-center gap-2 mb-1">
                     <h2 class="text-[18px] font-bold text-slate-800" id="profile-nickname">boss</h2>
+                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                 </div>
                 <p class="text-[13px] text-slate-500 mb-0.5">用户ID: 10001</p>
                 <p class="text-[13px] text-slate-500">邮箱: <span id="profile-email">加载中...</span></p>
             </div>
+            <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
         </div>
 
         <!-- 老板专属管理后台入口 -->
@@ -50,40 +60,91 @@
             <svg class="w-5 h-5 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
         </a>
 
+        <!-- 四宫格数据 -->
         <div class="grid grid-cols-2 gap-3">
             <div class="card p-4 cursor-pointer btn-press">
-                <div class="flex items-center gap-2 mb-3"><div class="w-7 h-7 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg></div><span class="text-[13px] text-slate-500 font-medium">账户余额</span></div>
+                <div class="flex items-center gap-2 mb-3">
+                    <div class="w-7 h-7 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg></div>
+                    <span class="text-[13px] text-slate-500 font-medium">账户余额</span>
+                </div>
                 <p class="text-[22px] font-bold text-slate-800">¥ 120.00</p>
             </div>
             <div class="card p-4 cursor-pointer btn-press">
-                <div class="flex items-center gap-2 mb-3"><div class="w-7 h-7 rounded-lg bg-amber-50 text-amber-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div><span class="text-[13px] text-slate-500 font-medium">佣金余额</span></div>
+                <div class="flex items-center gap-2 mb-3">
+                    <div class="w-7 h-7 rounded-lg bg-amber-50 text-amber-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
+                    <span class="text-[13px] text-slate-500 font-medium">佣金余额</span>
+                </div>
                 <p class="text-[22px] font-bold text-slate-800" id="profile-commission">¥ 45.50</p>
             </div>
             <a href="/console.html#bill-tab" class="card p-4 cursor-pointer btn-press block">
-                <div class="flex items-center gap-2 mb-3"><div class="w-7 h-7 rounded-lg bg-green-50 text-green-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></div><span class="text-[13px] text-slate-500 font-medium">收支明细</span></div>
-                <p class="text-[15px] font-bold text-blue-500 flex items-center gap-1">查看流水 →</p>
+                <div class="flex items-center gap-2 mb-3">
+                    <div class="w-7 h-7 rounded-lg bg-green-50 text-green-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></div>
+                    <span class="text-[13px] text-slate-500 font-medium">收支明细</span>
+                </div>
+                <p class="text-[15px] font-bold text-blue-500 flex items-center gap-1">查看流水 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></p>
             </a>
             <a href="/console.html#request-tab" class="card p-4 cursor-pointer btn-press block">
-                <div class="flex items-center gap-2 mb-3"><div class="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg></div><span class="text-[13px] text-slate-500 font-medium">消费记录</span></div>
-                <p class="text-[15px] font-bold text-blue-500 flex items-center gap-1">查看记录 →</p>
+                <div class="flex items-center gap-2 mb-3">
+                    <div class="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg></div>
+                    <span class="text-[13px] text-slate-500 font-medium">消费记录</span>
+                </div>
+                <p class="text-[15px] font-bold text-blue-500 flex items-center gap-1">查看记录 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></p>
             </a>
         </div>
-        
+
+        <!-- 菜单列表 (加回了“使用说明”) -->
         <div class="card overflow-hidden">
-            <a href="/console.html" class="flex items-center justify-between p-4 border-b border-slate-100 active:bg-slate-50 block">
-                <div class="flex items-center gap-3"><div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg></div><div><p class="text-[15px] font-bold text-slate-800">开发者控制台</p></div></div>
+            <a href="/guide.html" class="flex items-center justify-between p-4 border-b border-slate-100 active:bg-slate-50 btn-press block">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-slate-100 text-slate-500 flex items-center justify-center">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <div>
+                        <p class="text-[15px] font-bold text-slate-800">使用说明</p>
+                        <p class="text-[12px] text-slate-500 mt-0.5">查看购物流程与常见问题</p>
+                    </div>
+                </div>
                 <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
             </a>
+
+            <a href="/console.html" class="flex items-center justify-between p-4 border-b border-slate-100 active:bg-slate-50 block">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
+                    </div>
+                    <div>
+                        <p class="text-[15px] font-bold text-slate-800">开发者控制台</p>
+                        <p class="text-[12px] text-slate-500 mt-0.5">获取密钥与查看API对接文档</p>
+                    </div>
+                </div>
+                <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </a>
+
             <a href="/invite.html" class="flex items-center justify-between p-4 active:bg-slate-50 block">
-                <div class="flex items-center gap-3"><div class="w-8 h-8 rounded-lg bg-orange-50 text-orange-500 flex items-center justify-center"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg></div><div><p class="text-[15px] font-bold text-slate-800">邀请好友</p></div></div>
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-orange-50 text-orange-500 flex items-center justify-center">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    </div>
+                    <div>
+                        <p class="text-[15px] font-bold text-slate-800">邀请好友</p>
+                        <p class="text-[12px] text-slate-500 mt-0.5">分享专属链接，赚取高额佣金</p>
+                    </div>
+                </div>
                 <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
             </a>
         </div>
     </main>
 
-    <div class="fixed bottom-0 w-full bg-white border-t border-slate-200 flex justify-around h-[56px] pb-safe z-50">
-        <a href="/index.html" class="flex flex-col items-center justify-center w-full h-full text-slate-400"><span class="text-[10px] font-medium mt-1">首页</span></a>
-        <a href="/profile.html" class="flex flex-col items-center justify-center w-full h-full text-blue-500"><span class="text-[10px] font-medium mt-1">我的</span></a>
+    <!-- 完美的底部 Tab -->
+    <div class="bottom-tab">
+        <a href="/index.html" class="tab-item">
+            <svg class="w-[22px] h-[22px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+            <span class="tab-text">首页</span>
+        </a>
+        <a href="/profile.html" class="tab-item active">
+            <svg class="w-[22px] h-[22px]" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
+            <span class="tab-text">我的</span>
+        </a>
     </div>
 
     <script>
@@ -91,13 +152,20 @@
             const role = localStorage.getItem('user_role');
             const email = localStorage.getItem('user_email');
             
+            // 如果没有身份信息，踢回登录页（注释掉以便你先测试页面）
+            /*
             if (!role || !email) {
                 window.location.href = '/login.html';
                 return;
             }
+            */
 
-            document.getElementById('profile-email').innerText = email;
+            // 显示邮箱
+            if (email) {
+                document.getElementById('profile-email').innerText = email;
+            }
 
+            // 老板专属入口显隐
             if (role === 'boss') {
                 const btn = document.getElementById('admin-entry-btn');
                 if (btn) btn.style.display = 'flex';

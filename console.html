@@ -12,7 +12,7 @@
         .card { background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
-        .accordion-content.active { max-height: 1500px; transition: max-height 0.4s ease-in; }
+        .accordion-content.active { max-height: 2000px; transition: max-height 0.4s ease-in; }
         .rotate-180 { transform: rotate(180deg); }
         
         .status-btn { display: inline-flex; align-items: center; justify-content: center; padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
@@ -93,7 +93,15 @@
             <div id="accordion-2" class="accordion-content active bg-white">
                 <div class="px-5 pb-5 pt-2 border-t border-slate-100">
                     
-                    <!-- 动态专属 Key 列表 -->
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-[13px] font-bold text-slate-700">您的专属 API 密钥</span>
+                        <button onclick="toggleKeyMask()" class="text-[12px] text-slate-400 flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                            切换可见
+                        </button>
+                    </div>
+
+                    <!-- 动态专属 Key 列表 (全量展示) -->
                     <div id="key-list" class="space-y-4 mb-5"></div>
 
                     <!-- 全局 IP 白名单 -->
@@ -156,7 +164,7 @@
 
         // 状态管理
         let apiStatus = JSON.parse(localStorage.getItem('api_status')) || {
-            account: 0, node: 0, sms: 2, query: 0, pay: 0 // 默认接码接口为启用中，供演示
+            account: 0, node: 1, sms: 2, query: 0, pay: 0 
         };
         
         let apiKeys = JSON.parse(localStorage.getItem('api_keys')) || {};
@@ -172,7 +180,7 @@
             return 'sk_' + result;
         }
 
-        // 【核心逻辑】初始化：不管状态如何，先给5个接口把Key生成好！
+        // 初始化：不管状态如何，先给5个接口把Key生成好！
         function initKeys() {
             apis.forEach(api => {
                 if (!apiKeys[api.id]) {
@@ -203,39 +211,54 @@
             });
         }
 
-        // 渲染专属Key（只渲染状态为2的）
+        // 【修改版】渲染所有专属Key，根据状态显示不同样式
         function renderKeys() {
             const keyContainer = document.getElementById('key-list');
             keyContainer.innerHTML = '';
-            let hasActive = false;
 
             apis.forEach(api => {
-                if (apiStatus[api.id] === 2) {
-                    hasActive = true;
-                    const displayKey = isMasked ? 'sk_************************' : apiKeys[api.id];
-                    
-                    keyContainer.innerHTML += `
-                        <div class="bg-slate-50 border border-slate-200 rounded-lg p-3">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="text-[13px] font-bold text-slate-700">${api.name} 专属 Key</span>
-                                <button onclick="resetKey('${api.id}')" class="text-[12px] text-blue-600 font-medium active:opacity-60 flex items-center gap-1">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> 重置
-                                </button>
-                            </div>
-                            <div class="flex items-center bg-white border border-slate-200 rounded px-2 py-1.5">
-                                <span class="font-mono text-[13px] text-slate-700 flex-1 truncate" id="key-${api.id}">${displayKey}</span>
-                                <button onclick="toggleKeyMask()" class="text-slate-400 hover:text-slate-600 px-1 ml-1">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                }
-            });
+                const status = apiStatus[api.id] !== undefined ? apiStatus[api.id] : 0;
+                const displayKey = isMasked ? 'sk_************************' : apiKeys[api.id];
+                
+                let cardClass = "bg-slate-50 border border-slate-200";
+                let titleClass = "text-slate-700";
+                let keyTextClass = "text-slate-700";
+                let badgeHtml = "";
+                let resetBtnClass = "text-blue-600 active:opacity-60";
 
-            if (!hasActive) {
-                keyContainer.innerHTML = '<div class="text-center py-6 text-[13px] text-slate-400 border border-dashed border-slate-200 rounded-lg">暂无已启用的接口，请先在上方申请权限</div>';
-            }
+                if (status === 2) {
+                    badgeHtml = `<span class="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded ml-2 border border-green-200">已启用</span>`;
+                } else if (status === 1) {
+                    cardClass = "bg-slate-50 border border-slate-200 opacity-80";
+                    titleClass = "text-slate-500";
+                    keyTextClass = "text-slate-400";
+                    badgeHtml = `<span class="text-[10px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded ml-2 border border-amber-200">审核中</span>`;
+                    resetBtnClass = "text-slate-400 active:opacity-60";
+                } else {
+                    cardClass = "bg-slate-50 border border-slate-200 opacity-60";
+                    titleClass = "text-slate-500";
+                    keyTextClass = "text-slate-400";
+                    badgeHtml = `<span class="text-[10px] bg-slate-200 text-slate-500 px-1.5 py-0.5 rounded ml-2 border border-slate-300">未申请</span>`;
+                    resetBtnClass = "text-slate-400 active:opacity-60";
+                }
+
+                keyContainer.innerHTML += `
+                    <div class="${cardClass} rounded-lg p-3">
+                        <div class="flex justify-between items-center mb-2">
+                            <div class="flex items-center">
+                                <span class="text-[13px] font-bold ${titleClass}">${api.name} Key</span>
+                                ${badgeHtml}
+                            </div>
+                            <button onclick="resetKey('${api.id}')" class="${resetBtnClass} text-[12px] font-medium flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> 重置
+                            </button>
+                        </div>
+                        <div class="flex items-center bg-white border border-slate-200 rounded px-2 py-1.5">
+                            <span class="font-mono text-[13px] ${keyTextClass} flex-1 truncate">${displayKey}</span>
+                        </div>
+                    </div>
+                `;
+            });
         }
 
         // 重置 Key
@@ -244,7 +267,10 @@
             localStorage.setItem('api_keys', JSON.stringify(apiKeys));
             renderKeys();
             const apiName = apis.find(a => a.id === id).name;
-            showCustomAlert('重置成功', `【${apiName}】的专属 API Key 已重新生成，原 Key 已立即失效。`);
+            const status = apiStatus[id];
+            let tip = '原 Key 已立即失效。';
+            if (status !== 2) tip = '当前接口未启用，请在接口权限审核通过后使用此新 Key。';
+            showCustomAlert('重置成功', `【${apiName}】的专属 API Key 已重新生成，${tip}`);
         }
 
         function toggleKeyMask() {
@@ -268,10 +294,10 @@
 
         function confirmApply() {
             if (currentApplyId) {
-                // 申请后状态变更为 审核中(1)
-                apiStatus[currentApplyId] = 1;
+                apiStatus[currentApplyId] = 1; // 变更为审核中
                 localStorage.setItem('api_status', JSON.stringify(apiStatus));
                 renderApis();
+                renderKeys(); // 同步更新 Key 区域的状态角标
                 
                 document.getElementById('modal-title').innerText = '提交成功';
                 document.getElementById('modal-desc').innerHTML = '申请已提交，请等待管理员审核。审核通过后即可正式启用调用。';
@@ -326,7 +352,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            initKeys(); // 核心：先全量生成五个Key
+            initKeys();
             renderApis();
             renderKeys();
         });

@@ -8,14 +8,28 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: #f8fafc; color: #1e293b; }
+        body { background-color: #f8fafc; color: #1e293b; padding-bottom: 20px; }
         .card { background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; margin-bottom: 16px; }
-        .tab-btn { padding: 8px 16px; font-size: 14px; font-weight: bold; color: #64748b; border-radius: 8px; white-space: nowrap; transition: all 0.2s; }
-        .tab-btn.active { background: #2563eb; color: #fff; }
+        
+        /* 平台切换 Tabs */
+        .platform-tab { padding: 8px 16px; font-size: 14px; font-weight: bold; color: #64748b; border-radius: 8px; white-space: nowrap; transition: all 0.2s; cursor: pointer; }
+        .platform-tab.active { background: #2563eb; color: #fff; }
+        
+        /* 手风琴样式 */
+        .accordion-btn { width: 100%; text-align: left; padding: 16px; font-size: 15px; font-weight: bold; color: #1e293b; display: flex; justify-content: space-between; align-items: center; background: #fff; border-bottom: 1px solid #f1f5f9; }
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; background: #f8fafc; }
+        .accordion-content.active { max-height: 3000px; transition: max-height 0.4s ease-in; }
+        .rotate-180 { transform: rotate(180deg); }
+
         .step-num { width: 24px; height: 24px; border-radius: 50%; background: #eff6ff; color: #2563eb; font-size: 13px; font-weight: bold; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .link-btn { display: inline-block; background: #eff6ff; color: #2563eb; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: bold; text-decoration: none; margin-top: 8px; border: 1px solid #bfdbfe; }
         
         .alert-box { background: #fffbeb; border: 1px solid #fde68a; color: #b45309; font-size: 13px; padding: 12px; border-radius: 8px; line-height: 1.6; }
-        .code-box { background: #1e293b; color: #e2e8f0; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 12px; word-break: break-all; margin: 8px 0; }
+        .danger-box { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; font-size: 13px; padding: 12px; border-radius: 8px; line-height: 1.6; }
+        
+        /* 客户端列表 */
+        .client-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; padding: 12px; background: #fff; border-radius: 8px; border: 1px solid #f1f5f9; margin-top: 8px;}
+        .client-item { font-size: 12px; color: #475569; display: flex; justify-content: space-between; align-items: center;}
     </style>
 </head>
 <body>
@@ -27,18 +41,22 @@
     </header>
 
     <main class="px-4 py-4 max-w-lg mx-auto">
-        <!-- 顶部滚动公告 -->
-        <div class="alert-box mb-4">
-            ⚠️ <b>防诈骗提醒：</b>符合售后政策的补号、换号均无需额外付费！请勿通过第三方小程序、私人账户或陌生链接付款。目前所有支付渠道均不作为客服沟通入口，请直接通过平台在线客服联系处理，谨防假冒客服诈骗。
+        <!-- 顶部滚动公告已在全局注入，这里保留防诈骗提醒 -->
+        <div class="danger-box mb-4">
+            ⚠️ <b>防诈骗提醒：</b>符合售后政策的补号、换号均无需额外付费！请勿通过第三方小程序、私人账户或陌生链接付款，谨防假冒客服诈骗。
         </div>
 
         <!-- 平台切换 Tab -->
-        <div class="flex overflow-x-auto no-scrollbar gap-2 mb-6 border-b border-slate-200 pb-2">
-            <div class="tab-btn active" onclick="switchPlatform('telegram')">Telegram</div>
-            <div class="tab-btn" onclick="switchPlatform('twitter')">Twitter / X</div>
-            <div class="tab-btn" onclick="switchPlatform('facebook')">Facebook</div>
-            <div class="tab-btn" onclick="switchPlatform('tiktok')">TikTok</div>
-            <div class="tab-btn" onclick="switchPlatform('gmail')">Google 谷歌</div>
+        <div class="flex overflow-x-auto no-scrollbar gap-2 mb-4 border-b border-slate-200 pb-2">
+            <div class="platform-tab active" onclick="switchPlatform('telegram')">Telegram</div>
+            <div class="platform-tab" onclick="switchPlatform('twitter')">Twitter / X</div>
+            <div class="platform-tab" onclick="switchPlatform('facebook')">Facebook</div>
+            <div class="platform-tab" onclick="switchPlatform('tiktok')">TikTok</div>
+        </div>
+
+        <div class="mb-4">
+            <h2 class="text-[20px] font-bold text-slate-800" id="main-title">Telegram 登录教程</h2>
+            <p class="text-[12px] text-slate-500 mt-1">首次使用请仔细阅读对应平台的使用教程，避免操作失误</p>
         </div>
 
         <!-- 教程内容动态渲染区 -->
@@ -47,95 +65,224 @@
 
     <script>
         // ================= 核心数据配置区 =================
-        // 以后所有的新平台教程，直接往这里加对象就行，页面自动渲染。
         const tutorialData = {
             'telegram': {
-                title: 'Telegram 登录教程',
-                notice: '目前部分手机端用户登录 Telegram 时，可能会出现 <b>邮箱验证</b>、<b>短信验证费用（SMS Fee）</b>等额外验证要求。此类情况属于官方登录验证机制，并非账号密码错误或发货异常，不在售后范围内。',
-                formatIntro: '购买 Telegram 账号后，系统会发货 <b>手机号码</b> 和对应的 <b>API 接码链接</b>。常见发货格式：',
-                formatExample: '237678471862 | https://tgapi.uk/9a5b5d2f.../GetHTML?proxy_id=us\n237678471862-----https://tgapi.uk/9a5b5d2f.../GetHTML?proxy_id=us',
-                steps: [
-                    { title: '确认手机号码和国家区号', desc: '发货手机号码中已经包含国家区号，登录时请注意正确区分。例如发货号码：27605077772，27 为国家区号，605077772 为电话号码。登录时根据客户端选择对应国家区号，再填写剩余手机号码即可。' },
-                    { title: '打开 Telegram，输入手机号码', desc: '打开客户端或网页版，选择使用手机号码登录。输入购买账号后获得的手机号码，点击下一步。建议首次登录时保持网络和设备稳定，不要短时间内频繁切换设备或 IP。' },
-                    { title: '打开 API 链接获取设备验证码', desc: '输入手机号码后，Telegram 会要求输入设备验证码。这时返回购买账号后的发货信息，找到 API 接码链接。复制完整链接粘贴到浏览器打开，即可查看验证码。（只复制链接本身，不要带上分隔符）' },
-                    { title: '输入验证码和二步验证密码 (2FA)', desc: '在 API 页面中找到设备验证码填入 Telegram。如果接下来要求输入二步验证密码（2FA），同样在 API 页面中查看并填入。' }
-                ],
-                apiTips: [
-                    'API 接码链接具有一定时效性，并不是永久有效，请不要长期只依赖 API 链接保存账号信息。',
-                    '成功登录账号后，请务必自行记录并保存好账号的二步验证密码（2FA）。',
-                    '如果后续 API 链接已经失效，而你又没有保存 2FA 密码，再次登录时可能无法找到原来的密码。',
-                    '如果自行修改了 2FA 密码，原来的 API 接码链接可能无法继续正常接码。',
-                    '请勿将 API 接码链接、验证码或 2FA 密码发送给其他人，避免账号被他人登录。'
+                title: 'Telegram 登录问题解决指南',
+                intro: '如果登录 Telegram 时遇到邮箱验证、短信费用提示或一直收不到验证码，可以参考下面的方法。不同账号的验证流程可能不同，请根据实际提示操作。',
+                sections: [
+                    {
+                        title: '一、Telegram 登录问题解决方法',
+                        content: `
+                            <div class="p-4 space-y-4">
+                                <!-- 步骤 1 -->
+                                <div class="flex gap-3">
+                                    <div class="step-num">1</div>
+                                    <div>
+                                        <h4 class="text-[14px] font-bold text-slate-800 mb-1">先尝试电脑端登录</h4>
+                                        <p class="text-[13px] text-slate-600 leading-relaxed">使用 Telegram 官方 Web 端或电脑桌面客户端登录。如果账号已经在其他设备登录，可以先检查 Telegram 内是否收到了验证码消息。</p>
+                                        <div class="flex gap-2">
+                                            <a href="https://web.telegram.org/" target="_blank" class="link-btn">🌐 Telegram Web</a>
+                                            <a href="https://desktop.telegram.org/" target="_blank" class="link-btn">💻 电脑客户端</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- 步骤 2 -->
+                                <div class="flex gap-3">
+                                    <div class="step-num">2</div>
+                                    <div>
+                                        <h4 class="text-[14px] font-bold text-slate-800 mb-1">更换网络或检查邮箱</h4>
+                                        <p class="text-[13px] text-slate-600 leading-relaxed mb-2">如果一直收不到验证码，可以尝试：</p>
+                                        <ul class="text-[13px] text-slate-500 space-y-1 list-disc list-inside mb-2">
+                                            <li>切换 Wi-Fi 和手机流量。</li>
+                                            <li>重启设备后重新登录。</li>
+                                            <li>检查邮箱收件箱和垃圾邮件。</li>
+                                            <li>避免频繁更换设备、网络或反复请求验证码。</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <!-- 步骤 3 -->
+                                <div class="flex gap-3">
+                                    <div class="step-num">3</div>
+                                    <div>
+                                        <h4 class="text-[14px] font-bold text-slate-800 mb-1">iPhone 可以尝试其他兼容客户端</h4>
+                                        <p class="text-[13px] text-slate-600 leading-relaxed">如果最新版 Telegram 一直出现邮箱验证、短信费用或验证码异常，可以直接在苹果商店搜索下载。有美区 Apple ID 的用户，建议使用 Nicegram：没有美区 ID 的话，可以尝试 iMe Messenger。</p>
+                                        <a href="https://apps.apple.com/us/app/nicegram-ai-chat-for-telegram/id1608870673" target="_blank" class="link-btn">苹果 Nicegram 下载链接 (已核验安全✅)</a>
+                                    </div>
+                                </div>
+                                <!-- 步骤 4 -->
+                                <div class="flex gap-3">
+                                    <div class="step-num">4</div>
+                                    <div>
+                                        <h4 class="text-[14px] font-bold text-slate-800 mb-1">Android 可以尝试 Telegram X</h4>
+                                        <p class="text-[13px] text-slate-600 leading-relaxed">安卓手机如果一直无法正常登录，可以尝试谷歌商店搜索 Telegram X 或其他兼容客户端。不同客户端的验证方式可能不同，但不保证一定能解决短信费用问题。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `
+                    },
+                    {
+                        title: '二、Telegram 提示短信费用怎么办？',
+                        content: `
+                            <div class="p-4 space-y-5">
+                                <div>
+                                    <h4 class="text-[14px] font-bold text-slate-800 mb-1">方法一：通过 App Store 付款</h4>
+                                    <p class="text-[13px] text-slate-600 leading-relaxed">如果填写邮箱后，页面仍然提示短信费用，并且官方登录页面提供 Telegram Premium 购买入口，可以尝试通过 App Store 完成付款，再返回 Telegram 继续登录。</p>
+                                </div>
+                                <div>
+                                    <h4 class="text-[14px] font-bold text-slate-800 mb-1">方法二：使用 Apple 礼品卡</h4>
+                                    <p class="text-[13px] text-slate-600 leading-relaxed mb-2">如果没有合适的付款方式，可以先确认自己的 Apple 账号地区，再考虑购买对应地区的 Apple Gift Card。</p>
+                                    <ul class="text-[13px] text-slate-500 space-y-1 list-disc list-inside">
+                                        <li>礼品卡必须与 Apple 账号的商店地区匹配。</li>
+                                        <li>先确认实际需要支付的金额，2 美元的礼品卡就足够了。</li>
+                                        <li>礼品卡只是付款方式之一，不保证一定能解决登录问题。</li>
+                                    </ul>
+                                </div>
+                                <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                                    <h4 class="text-[14px] font-bold text-blue-800 mb-1">方法三：开通 Telegram Premium (平台实测推荐)</h4>
+                                    <p class="text-[13px] text-blue-700 leading-relaxed mb-3">如果你已经在电脑端登录，但手机端仍然提示需要付费验证，可以考虑为同一个 Telegram 账号开通 Premium，再尝试手机登录。如果本来就打算长期使用 Telegram，不如比较一下三个月 Premium 的价格。</p>
+                                    <a href="/index.html" class="block text-center w-full py-2.5 bg-blue-600 text-white font-bold rounded-lg text-[14px]">前往查看 Telegram Premium 套餐</a>
+                                </div>
+                                <div class="alert-box">
+                                    ⚠️ <b>注意：</b>开通 Premium 不保证所有账号都能解除短信验证限制。如果只是要求邮箱验证码，并没有出现付费提示，也不需要盲目购买会员。请以当前登录页面的实际要求为准。
+                                </div>
+                            </div>
+                        `
+                    },
+                    {
+                        title: '三、第三方 Telegram 客户端合集',
+                        content: `
+                            <div class="p-4">
+                                <p class="text-[13px] text-slate-600 leading-relaxed mb-2">如果官方客户端无法正常登录，也可以参考以下兼容客户端名单。 <br><b>标记说明：</b> ✅ 开源　❌ 闭源 (下载前请确认项目状态、权限及来源)</p>
+                                
+                                <h5 class="font-bold text-slate-800 text-[13px] mt-4 mb-2"># Android</h5>
+                                <div class="client-list">
+                                    <div class="client-item"><span>Telegram X</span> <span>✅</span></div>
+                                    <div class="client-item"><span>Nagram</span> <span>✅</span></div>
+                                    <div class="client-item"><span>Nnngram</span> <span>✅</span></div>
+                                    <div class="client-item"><span>Nekogram</span> <span>✅</span></div>
+                                    <div class="client-item"><span>NekogramX</span> <span>✅</span></div>
+                                    <div class="client-item"><span>Nullgram</span> <span>✅</span></div>
+                                    <div class="client-item"><span>AyuGram</span> <span>✅</span></div>
+                                    <div class="client-item"><span>Cherrygram</span> <span>✅</span></div>
+                                    <div class="client-item"><span>exteraGram</span> <span>✅</span></div>
+                                    <div class="client-item"><span>Forkgram</span> <span>✅</span></div>
+                                    <div class="client-item"><span>Telegraher</span> <span>✅</span></div>
+                                    <div class="client-item"><span>OctoGram</span> <span>✅</span></div>
+                                    <div class="client-item"><span>Mercurygram</span> <span>✅</span></div>
+                                    <div class="client-item"><span>moeGramX</span> <span>✅</span></div>
+                                    <div class="client-item"><span>Plus</span> <span>❌</span></div>
+                                    <div class="client-item"><span>Turrit</span> <span>❌</span></div>
+                                    <div class="client-item"><span>MDGram</span> <span>❌</span></div>
+                                    <div class="client-item"><span>Ninjagram</span> <span>❌</span></div>
+                                    <div class="client-item"><span>BGram</span> <span>❌</span></div>
+                                    <div class="client-item"><span>iMe</span> <span>❌</span></div>
+                                    <div class="client-item"><span>Graph Messenger</span> <span>❌</span></div>
+                                    <div class="client-item"><span>Nicegram</span> <span>❌</span></div>
+                                    <div class="client-item"><span>RitMGram</span> <span>❌</span></div>
+                                    <div class="client-item"><span>HuIugram</span> <span>❌</span></div>
+                                    <div class="client-item"><span>Aka</span> <span>❌</span></div>
+                                </div>
+
+                                <h5 class="font-bold text-slate-800 text-[13px] mt-4 mb-2"># iOS</h5>
+                                <div class="client-list">
+                                    <div class="client-item"><span>Swiftgram</span> <span>✅</span></div>
+                                    <div class="client-item"><span>Nicegram</span> <span>❌</span></div>
+                                    <div class="client-item"><span>iMe</span> <span>❌</span></div>
+                                    <div class="client-item"><span>Revgram</span> <span>❌</span></div>
+                                    <div class="client-item"><span>Turrit</span> <span>❌</span></div>
+                                    <div class="client-item"><span>Aka</span> <span>❌</span></div>
+                                </div>
+
+                                <h5 class="font-bold text-slate-800 text-[13px] mt-4 mb-2"># Windows</h5>
+                                <div class="client-list">
+                                    <div class="client-item"><span>64Gram</span> <span>✅</span></div>
+                                    <div class="client-item"><span>Unigram</span> <span>✅</span></div>
+                                    <div class="client-item"><span>AyuGram</span> <span>✅</span></div>
+                                    <div class="client-item"><span>Forkgram</span> <span>✅</span></div>
+                                    <div class="client-item"><span>Kotatogram</span> <span>✅</span></div>
+                                    <div class="client-item"><span>materialgram</span> <span>✅</span></div>
+                                    <div class="client-item"><span>iMe</span> <span>❌</span></div>
+                                </div>
+
+                                <h5 class="font-bold text-slate-800 text-[13px] mt-4 mb-2"># macOS / Linux / WearOS</h5>
+                                <div class="client-list">
+                                    <div class="client-item"><span>64Gram (mac)</span> <span>✅</span></div>
+                                    <div class="client-item"><span>Kotatogram (mac)</span> <span>✅</span></div>
+                                    <div class="client-item"><span>materialgram (mac/Linux)</span> <span>✅</span></div>
+                                    <div class="client-item"><span>HandyGram (Wear)</span> <span>✅</span></div>
+                                </div>
+                            </div>
+                        `
+                    },
+                    {
+                        title: '四、原整理推荐与安全提醒',
+                        content: `
+                            <div class="p-4">
+                                <div class="alert-box mb-4">
+                                    ⚠️ <b>安全提醒：</b>不要向任何人泄露 Telegram 登录验证码、邮箱验证码或两步验证密码。遇到可疑的付款页面，请先核实来源。Telegram 官网认准：<a href="https://telegram.org/" target="_blank" class="text-blue-600 underline">https://telegram.org/</a>
+                                </div>
+                                <div class="bg-slate-100 p-4 rounded-lg text-[13px] text-slate-600 leading-relaxed">
+                                    <b>💡 最后建议：</b><br>
+                                    优先尝试官方客户端、已登录设备和正常验证流程。如果明确提示需要 Premium，再比较付款方案，不要盲目购买礼品卡或重复付费。
+                                </div>
+                            </div>
+                        `
+                    }
                 ]
-            },
-            'twitter': {
-                title: 'Twitter / X 登录教程',
-                notice: '正在整理中，稍后更新...',
-                formatIntro: '正在整理中...',
-                formatExample: '',
-                steps: [],
-                apiTips: []
             }
-            // ... 可以继续添加 facebook, tiktok 等
         };
 
         function switchPlatform(platform) {
             // 更新 Tab 样式
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.platform-tab').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
 
             const data = tutorialData[platform];
             const container = document.getElementById('tutorial-content');
+            document.getElementById('main-title').innerText = data.title;
 
-            if (!data || data.steps.length === 0) {
+            if (!data || !data.sections) {
                 container.innerHTML = `<div class="text-center py-10 text-slate-400">教程正在整理中，敬请期待</div>`;
                 return;
             }
 
-            let html = `
-                <h2 class="text-[20px] font-bold text-slate-800 mb-4">${data.title}</h2>
-                
-                <div class="card p-4 mb-4">
-                    <div class="text-[13px] text-amber-600 font-bold mb-2">登录前必看</div>
-                    <div class="text-[13px] text-slate-600 leading-relaxed">${data.notice}</div>
-                </div>
+            let html = `<p class="text-[13px] text-slate-600 leading-relaxed mb-4">${data.intro}</p>`;
 
-                <div class="card p-4 mb-4">
-                    <div class="text-[13px] font-bold text-slate-800 mb-2">发货格式说明</div>
-                    <p class="text-[13px] text-slate-600 mb-2">${data.formatIntro}</p>
-                    ${data.formatExample ? `<div class="code-box">${data.formatExample}</div>` : ''}
-                </div>
-                
-                <h3 class="text-[16px] font-bold text-slate-800 mb-3 mt-6">图文教程步骤</h3>
-            `;
-
-            data.steps.forEach((step, index) => {
+            data.sections.forEach((sec, index) => {
                 html += `
-                    <div class="card p-4 mb-3 flex gap-3">
-                        <div class="step-num">${index + 1}</div>
-                        <div>
-                            <h4 class="text-[14px] font-bold text-slate-800 mb-1">${step.title}</h4>
-                            <p class="text-[13px] text-slate-600 leading-relaxed">${step.desc}</p>
+                    <div class="card overflow-hidden">
+                        <button class="accordion-btn" onclick="toggleAccordion('acc-${index}', this)">
+                            ${sec.title}
+                            <svg class="w-4 h-4 text-slate-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <div id="acc-${index}" class="accordion-content border-t border-slate-100">
+                            ${sec.content}
                         </div>
                     </div>
                 `;
             });
 
-            if (data.apiTips.length > 0) {
-                html += `
-                    <div class="card p-4 mt-6 border-red-100 bg-red-50/30">
-                        <div class="text-[14px] font-bold text-red-600 mb-2 flex items-center gap-1">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                            API 接码链接重要说明
-                        </div>
-                        <ul class="text-[13px] text-slate-600 space-y-2 list-decimal list-inside leading-relaxed">
-                            ${data.apiTips.map(tip => `<li>${tip}</li>`).join('')}
-                        </ul>
-                    </div>
-                `;
-            }
-
             container.innerHTML = html;
+            
+            // 默认展开第一个
+            if(data.sections.length > 0) {
+                const firstBtn = document.querySelector('.accordion-btn');
+                if(firstBtn) toggleAccordion('acc-0', firstBtn);
+            }
+        }
+
+        function toggleAccordion(id, btn) {
+            const content = document.getElementById(id);
+            const icon = btn.querySelector('svg');
+            if (content.classList.contains('active')) {
+                content.classList.remove('active');
+                content.style.maxHeight = null;
+                icon.classList.remove('rotate-180');
+            } else {
+                content.classList.add('active');
+                content.style.maxHeight = content.scrollHeight + 'px';
+                icon.classList.add('rotate-180');
+            }
         }
 
         // 初始化默认加载 Telegram
@@ -143,7 +290,7 @@
             switchPlatform('telegram');
         });
     </script>
+    <script src="/notice-marquee.js"></script>
     <script src="/ai-widget.js"></script>
-<script src="/notice-marquee.js"></script>
 </body>
 </html>

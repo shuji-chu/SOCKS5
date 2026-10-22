@@ -13,11 +13,16 @@
         .input-flat { width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 16px; font-size: 14px; outline: none; transition: border 0.2s; }
         .input-flat:focus { border-color: #3b82f6; background: #fff; }
         
-        /* 磨砂弹窗 */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.4); backdrop-filter: blur(4px); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 0 20px; }
+        /* 磨砂弹窗通用 */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.5); backdrop-filter: blur(4px); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 0 16px; }
         .modal-overlay.active { display: flex; }
-        .modal-box { background: #fff; border-radius: 16px; padding: 24px; width: 100%; max-width: 300px; text-align: center; transform: scale(0.95); transition: transform 0.2s; opacity: 0; }
+        .modal-box { background: #fff; border-radius: 16px; padding: 24px; width: 100%; max-width: 340px; transform: scale(0.95); transition: transform 0.2s; opacity: 0; text-align: left; }
         .modal-overlay.active .modal-box { transform: scale(1); opacity: 1; }
+
+        /* 协议长文本样式 */
+        .legal-content { max-height: 50vh; overflow-y: auto; font-size: 13px; color: #475569; line-height: 1.7; padding-right: 4px; }
+        .legal-content h4 { color: #1e293b; font-weight: bold; margin: 12px 0 4px 0; font-size: 14px; }
+        .legal-content p { margin-bottom: 8px; }
     </style>
 </head>
 <body>
@@ -68,31 +73,37 @@
 
         <button onclick="doAuth()" id="btn-submit" class="w-full py-3.5 bg-blue-600 text-white font-bold rounded-xl text-[16px] active:opacity-80 transition shadow-md shadow-blue-500/20 mb-6">立即登录</button>
 
-        <!-- 底部第三方与协议 -->
-        <div class="relative flex items-center justify-center mb-6">
-            <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-100"></div></div>
-            <div class="relative bg-white px-3 text-[12px] text-slate-400">其他登录方式</div>
+        <!-- 底部合规协议 (删除了第三方登录) -->
+        <div class="mt-8 text-center">
+            <p class="text-[11px] text-slate-400">
+                登录或注册即表示同意 
+                <span onclick="openLegal('agreement')" class="text-blue-600 font-bold cursor-pointer active:opacity-60">用户协议</span> 
+                与 
+                <span onclick="openLegal('privacy')" class="text-blue-600 font-bold cursor-pointer active:opacity-60">隐私政策</span>
+            </p>
         </div>
-
-        <div class="flex justify-center gap-4 mb-8">
-            <div class="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 active:bg-slate-50"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.418 22 12c0-5.523-4.477-10-10-10z"></path></svg></div>
-            <div class="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 active:bg-slate-50"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path></svg></div>
-        </div>
-
-        <p class="text-[11px] text-slate-400">登录或注册即表示同意 <a href="#" class="text-slate-600 font-bold">用户协议</a> 与 <a href="#" class="text-slate-600 font-bold">隐私政策</a></p>
     </div>
 
-    <!-- 自定义提示弹窗 -->
+    <!-- 报错提示弹窗 -->
     <div id="error-modal" class="modal-overlay">
-        <div class="modal-box">
+        <div class="modal-box text-center">
             <h3 class="text-[17px] font-bold text-slate-800 mb-2" id="error-title">提示</h3>
             <p class="text-[14px] text-slate-500 mb-6" id="error-msg">请输入账号和密码。</p>
-            <button onclick="closeModal()" class="w-full py-2.5 bg-blue-600 text-white font-bold rounded-xl active:opacity-80 transition-colors">我知道了</button>
+            <button onclick="closeModal('error-modal')" class="w-full py-2.5 bg-blue-600 text-white font-bold rounded-xl active:opacity-80 transition-colors">我知道了</button>
+        </div>
+    </div>
+
+    <!-- 协议与隐私弹窗 -->
+    <div id="legal-modal" class="modal-overlay">
+        <div class="modal-box">
+            <h3 class="text-[17px] font-bold text-slate-800 mb-3 text-center" id="legal-title">用户协议</h3>
+            <div class="legal-content" id="legal-body"></div>
+            <button onclick="closeModal('legal-modal')" class="mt-5 w-full py-2.5 bg-slate-100 text-slate-600 font-bold rounded-xl active:bg-slate-200 transition-colors">我已阅读并知晓</button>
         </div>
     </div>
 
     <script>
-        let currentMode = 'login'; // 'login' or 'register'
+        let currentMode = 'login';
 
         function switchTab(mode) {
             currentMode = mode;
@@ -145,13 +156,11 @@
             if (currentMode === 'register') {
                 const code = document.getElementById('auth-code').value;
                 if(!code) { showError('请输入验证码'); return; }
-                // 模拟注册成功，直接登录
-                localStorage.setItem('user_id', '1000' + Math.floor(Math.random()*100)); // 随机生成ID
+                localStorage.setItem('user_id', '1000' + Math.floor(Math.random()*100));
                 localStorage.setItem('user_email', email);
                 localStorage.setItem('user_role', 'user');
                 window.location.href = '/profile.html';
             } else {
-                // 登录逻辑
                 if (email === 'boss@lynli.me') {
                     localStorage.setItem('user_id', '10001');
                     localStorage.setItem('user_email', email);
@@ -169,8 +178,79 @@
             document.getElementById('error-msg').innerText = msg;
             document.getElementById('error-modal').classList.add('active');
         }
-        function closeModal() {
-            document.getElementById('error-modal').classList.remove('active');
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        // ================= 长文本协议内容 =================
+        const legalData = {
+            agreement: {
+                title: '用户服务协议',
+                content: `
+                    <h4>一、总则</h4>
+                    <p>1.1 本协议是您与 SOCKS5 平台（以下简称“本平台”）之间就注册、登录及使用本平台各项服务所订立的协议。</p>
+                    <p>1.2 您在注册或使用本平台服务前，应认真阅读本协议全部内容。您点击“同意”或实际使用本平台服务，即视为您已充分理解并同意本协议的全部条款。</p>
+                    
+                    <h4>二、账号注册与安全</h4>
+                    <p>2.1 您在注册时应提供真实、准确、完整的个人或企业信息，并在信息变更时及时更新。</p>
+                    <p>2.2 您的账号所有权归本平台所有，您仅享有使用权。未经本平台同意，禁止以任何形式赠与、借用、出租、转让或售卖账号。</p>
+                    <p>2.3 您应妥善保管账号及密码，因您保管不善造成的任何损失或法律责任，由您自行承担。如发现账号被非法使用，请立即通知本平台。</p>
+
+                    <h4>三、服务内容与规范</h4>
+                    <p>3.1 本平台提供包括但不限于数字资产分发、数据接口调用、代理网络服务等。具体服务以平台实际提供为准。</p>
+                    <p>3.2 您承诺在使用本平台服务时，严格遵守所在国家/地区的法律法规，不得利用本平台从事任何违法违规活动，包括但不限于：电信诈骗、洗钱、黑客攻击、侵犯他人隐私、恶意爬虫等。</p>
+                    <p>3.3 若您违反上述规定，本平台有权立即封禁您的账号、收回相关资源（如域名、节点），并保留移交司法机关的权利，且不予退款。</p>
+
+                    <h4>四、知识产权</h4>
+                    <p>4.1 本平台所有的产品、技术、软件、程序、页面设计等知识产权均归本平台所有。</p>
+                    <p>4.2 未经本平台书面许可，任何人不得擅自复制、修改、传播或用于商业用途。</p>
+
+                    <h4>五、免责声明</h4>
+                    <p>5.1 因不可抗力、黑客攻击、网络故障、政策调整等非本平台可控原因导致的服务中断或数据丢失，本平台不承担任何法律责任。</p>
+                    <p>5.2 本平台不对您使用第三方服务（如支付通道、上游接码商）产生的纠纷承担责任。</p>
+
+                    <h4>六、协议修改与终止</h4>
+                    <p>6.1 本平台有权根据业务发展需要不时修改本协议，修改后的协议将在平台上公布。</p>
+                    <p>6.2 若您不同意修改后的协议，应立即停止使用本平台服务。继续使用则视为接受修改后的协议。</p>
+                `
+            },
+            privacy: {
+                title: '隐私政策',
+                content: `
+                    <h4>一、引言</h4>
+                    <p>SOCKS5 平台（以下简称“我们”）深知个人信息对您的重要性，并会尽全力保护您的个人信息安全可靠。我们致力于维持您对我们的信任，恪守以下原则保护您的个人信息：权责一致原则、目的明确原则、选择同意原则、最少够用原则、确保安全原则、主体参与原则、公开透明原则等。</p>
+                    
+                    <h4>二、我们如何收集和使用您的信息</h4>
+                    <p>2.1 <b>账号信息：</b>当您注册时，我们会收集您的邮箱地址、密码（加密存储）、注册IP等，用于创建账号及保障账号安全。</p>
+                    <p>2.2 <b>业务日志：</b>当您使用 API 接口、节点代理或接码服务时，我们会记录您的调用时间、请求参数、返回状态及 IP 地址。这些数据用于计费、故障排查及防欺诈风控。</p>
+                    <p>2.3 <b>资金流水：</b>当您进行充值或提现时，我们会记录您的交易订单号、金额及第三方支付渠道返回的流水号，以保障资金安全及核对。</p>
+
+                    <h4>三、我们如何共享、转让、公开披露您的信息</h4>
+                    <p>3.1 <b>共享：</b>我们不会向任何第三方共享您的个人信息，除非获得您的明确同意，或为完成支付必须向支付机构传递必要信息。</p>
+                    <p>3.2 <b>披露：</b>根据法律法规规定，或应行政、司法机关的合法要求，我们将依法提供您的相关信息。</p>
+
+                    <h4>四、我们如何保护您的信息</h4>
+                    <p>4.1 我们采用符合业界标准的安全防护措施，包括建立严格的内部数据访问权限、使用 HTTPS 加密传输协议、密码单向哈希加盐存储等。</p>
+                    <p>4.2 尽管有上述安全措施，但请注意在信息网络上不存在“完善的安全措施”。我们将尽力确保您的信息安全性。</p>
+
+                    <h4>五、您的权利</h4>
+                    <p>5.1 您有权随时访问、修改您在平台的个人资料。</p>
+                    <p>5.2 您有权要求注销账号。注销后，我们将删除您的个人信息，但法律法规要求保留的交易记录、反洗钱数据除外。</p>
+
+                    <h4>六、未成年人保护</h4>
+                    <p>本平台服务仅面向 18 周岁以上的成年人。若您为未成年人，请在监护人的陪同下阅读本政策，并确保在取得监护人同意后使用本平台服务。</p>
+
+                    <h4>七、联系我们</h4>
+                    <p>如您对本隐私政策有任何疑问、意见或建议，请通过官方 TG 客服或邮箱 boss@lynli.me 与我们联系。</p>
+                `
+            }
+        };
+
+        function openLegal(type) {
+            const data = legalData[type];
+            document.getElementById('legal-title').innerText = data.title;
+            document.getElementById('legal-body').innerHTML = data.content;
+            document.getElementById('legal-modal').classList.add('active');
         }
     </script>
 </body>

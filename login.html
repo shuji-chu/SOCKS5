@@ -8,57 +8,46 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
         body { background-color: #f8fafc; color: #1e293b; min-height: 100vh; display: flex; flex-direction: column; padding: 24px; }
         
-        .header { text-align: center; margin-top: 40px; margin-bottom: 32px; }
+        .header { text-align: center; margin-top: 30px; margin-bottom: 32px; }
         .header img { width: 64px; height: 64px; border-radius: 20px; margin-bottom: 16px; object-fit: cover; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
         .header h2 { font-size: 22px; font-weight: 700; color: #0f172a; letter-spacing: -0.5px; }
         .header p { font-size: 13px; color: #64748b; margin-top: 6px; }
 
-        .card { background: #ffffff; padding: 24px; border-radius: 32px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02), 0 2px 4px -1px rgba(0,0,0,0.02); border: 1px solid #f1f5f9; width: 100%; max-width: 380px; margin: 0 auto; }
+        .card { background: #ffffff; padding: 24px; border-radius: 24px; box-shadow: 0 4px 20px -2px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; width: 100%; max-width: 380px; margin: 0 auto; }
         
-        .input-group { margin-bottom: 14px; }
-        .input-group input { width: 100%; padding: 14px 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; font-size: 15px; outline: none; transition: all 0.2s; color: #1e293b; }
-        .input-group input:focus { border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.2); }
+        .input-group { margin-bottom: 16px; }
+        .input-group input { width: 100%; padding: 14px 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; font-size: 15px; outline: none; transition: all 0.2s; color: #1e293b; }
+        .input-group input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
         
-        .btn-primary { width: 100%; padding: 14px; background: #2563eb; color: white; border: none; border-radius: 16px; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 8px; transition: all 0.2s; }
+        .options { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; font-size: 13px; color: #64748b; }
+        .options label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+        .options input[type="checkbox"] { width: 16px; height: 16px; accent-color: #2563eb; }
+        .options a { color: #2563eb; text-decoration: none; }
+
+        .btn-primary { width: 100%; padding: 14px; background: #2563eb; color: white; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
         .btn-primary:active { background: #1d4ed8; transform: scale(0.98); }
         
-        .link-text { text-align: center; margin-top: 20px; }
-        .link-text a { font-size: 13px; color: #2563eb; text-decoration: none; font-weight: 500; }
+        .link-text { text-align: center; margin-top: 24px; }
+        .link-text a { font-size: 14px; color: #2563eb; text-decoration: none; font-weight: 500; }
 
         .footer { text-align: center; margin-top: auto; padding-top: 40px; margin-bottom: 16px; }
         .footer img { width: 28px; height: 28px; border-radius: 8px; margin-bottom: 12px; opacity: 0.4; filter: grayscale(100%); object-fit: cover; }
-        .footer p.brand { font-size: 10px; font-weight: 600; color: #94a3b8; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px; }
-        .footer-links { display: flex; align-items: center; justify-content: center; gap: 12px; font-size: 11px; color: #94a3b8; }
-        .footer-links button { background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 11px; }
-        .footer-links button:hover { color: #475569; }
+        .footer p.brand { font-size: 10px; font-weight: 600; color: #94a3b8; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 16px; }
+        .footer-links { display: flex; align-items: center; justify-content: center; gap: 12px; font-size: 12px; color: #94a3b8; }
+        .footer-links button { background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 12px; }
 
-        /* 自定义 Toast 提示 */
-        #custom-toast { position: fixed; top: 40px; left: 50%; transform: translateX(-50%) translateY(-20px); background: rgba(30, 41, 59, 0.95); color: white; padding: 12px 20px; border-radius: 16px; display: flex; align-items: center; gap: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 9999; opacity: 0; pointer-events: none; transition: all 0.3s; }
-        #custom-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-        #custom-toast img { width: 24px; height: 24px; border-radius: 6px; object-fit: cover; }
-        .toast-text-box p:first-child { font-size: 11px; color: #94a3b8; font-weight: 500; }
-        .toast-text-box p:last-child { font-size: 13px; font-weight: 500; margin-top: 2px; }
-
-        /* 协议弹窗 */
+        /* 弹窗 */
         .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 9999; display: none; align-items: flex-end; justify-content: center; }
         .modal-overlay.active { display: flex; }
         .modal-content { background: white; width: 100%; max-width: 400px; border-radius: 24px 24px 0 0; padding: 24px; padding-bottom: 40px; max-height: 80vh; display: flex; flex-direction: column; animation: slideUp 0.3s ease-out; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 16px; }
         .modal-header h3 { font-size: 18px; font-weight: 700; color: #1e293b; }
         .modal-close { background: none; border: none; font-size: 20px; color: #94a3b8; cursor: pointer; padding: 4px; }
-        .modal-body { font-size: 13px; color: #475569; line-height: 1.6; overflow-y: auto; }
+        .modal-body { font-size: 14px; color: #475569; line-height: 1.6; overflow-y: auto; }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     </style>
 </head>
 <body>
-
-    <div id="custom-toast">
-        <img src="/logo.jpg">
-        <div class="toast-text-box">
-            <p>SOCKS5 提醒</p>
-            <p id="toast-msg">提示内容</p>
-        </div>
-    </div>
 
     <div class="header">
         <img src="/logo.jpg">
@@ -74,6 +63,12 @@
             <div class="input-group">
                 <input type="password" id="password" required placeholder="密码">
             </div>
+            
+            <div class="options">
+                <label><input type="checkbox" id="remember-me"> 记住密码</label>
+                <a href="javascript:void(0)" onclick="alert('请联系官方客服重置密码')">忘记密码？</a>
+            </div>
+
             <button type="submit" class="btn-primary">安全登录</button>
         </form>
         
@@ -105,31 +100,44 @@
     </div>
 
     <script>
+        // 页面加载时，检查是否记住了密码
+        window.onload = function() {
+            const savedEmail = localStorage.getItem('remembered_email');
+            const savedPwd = localStorage.getItem('remembered_pwd');
+            if (savedEmail && savedPwd) {
+                document.getElementById('email').value = savedEmail;
+                document.getElementById('password').value = savedPwd;
+                document.getElementById('remember-me').checked = true;
+            }
+        };
+
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+            const remember = document.getElementById('remember-me').checked;
+
             try {
                 const res = await fetch('https://api.lynli.me/s5api/api/v1/passport/auth/login', {
                     method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ email, password })
                 });
                 const data = await res.json();
                 if (res.ok) {
+                    // 处理记住密码逻辑
+                    if (remember) {
+                        localStorage.setItem('remembered_email', email);
+                        localStorage.setItem('remembered_pwd', password);
+                    } else {
+                        localStorage.removeItem('remembered_email');
+                        localStorage.removeItem('remembered_pwd');
+                    }
+                    
                     localStorage.setItem('socks5_email', email);
                     localStorage.setItem('socks5_token', data.data?.token || data.token || '');
                     window.location.href = '/index.html';
-                } else { showToast(data.message || '登录失败'); }
-            } catch (err) { showToast('网络错误，请稍后再试'); }
+                } else { alert(data.message || '登录失败'); }
+            } catch (err) { alert('网络错误'); }
         });
-
-        let toastTimer;
-        function showToast(msg) {
-            const toast = document.getElementById('custom-toast');
-            document.getElementById('toast-msg').innerText = msg;
-            toast.classList.add('show');
-            clearTimeout(toastTimer);
-            toastTimer = setTimeout(() => { toast.classList.remove('show'); }, 2500);
-        }
 
         const modalContent = {
             'privacy': { title: '隐私政策', text: '我们深知个人信息对您的重要性，并会尽全力保护您的个人信息安全可靠...' },

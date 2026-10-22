@@ -49,8 +49,9 @@
         <div class="flex overflow-x-auto no-scrollbar gap-6 border-b border-slate-200 pb-3 mb-8 text-[13px] text-slate-500">
             <a href="#step1" class="nav-item active flex items-center whitespace-nowrap"><span class="nav-dot"></span>统一下单</a>
             <a href="#step2" class="nav-item flex items-center whitespace-nowrap"><span class="nav-dot"></span>订单查询</a>
-            <a href="#step3" class="nav-item flex items-center whitespace-nowrap"><span class="nav-dot"></span>支付回调通知</a>
-            <a href="#step4" class="nav-item flex items-center whitespace-nowrap"><span class="nav-dot"></span>签名规则</a>
+            <a href="#step3" class="nav-item flex items-center whitespace-nowrap"><span class="nav-dot"></span>关闭订单</a>
+            <a href="#step4" class="nav-item flex items-center whitespace-nowrap"><span class="nav-dot"></span>支付回调</a>
+            <a href="#step5" class="nav-item flex items-center whitespace-nowrap"><span class="nav-dot"></span>签名规则</a>
         </div>
 
         <!-- 01 统一下单 -->
@@ -81,7 +82,7 @@
                     <tr><td>param</td><td>否</td><td>业务扩展参数，支付后原样返回</td></tr>
                     <tr><td>clientip</td><td>否</td><td>用户 IP，不传则使用请求 IP</td></tr>
                     <tr><td>timestamp</td><td>是</td><td>10 位秒级时间戳</td></tr>
-                    <tr><td>sign</td><td>是</td><td>RSA 签名（见下文）</td></tr>
+                    <tr><td>sign</td><td>是</td><td>RSA 签名（见下方说明）</td></tr>
                     <tr><td>sign_type</td><td>是</td><td>固定传 RSA</td></tr>
                 </table>
 
@@ -144,44 +145,73 @@
             </div>
         </div>
 
-        <!-- 03 支付回调通知 -->
+        <!-- 03 关闭订单 -->
         <div id="step3" class="mb-12 scroll-mt-20">
             <div class="flex items-center gap-3 mb-4">
                 <div class="num-box">03</div>
-                <h3 class="text-[18px] font-bold text-slate-800">支付结果通知</h3>
+                <h3 class="text-[18px] font-bold text-slate-800">关闭订单接口</h3>
             </div>
-            <p class="text-[13px] text-slate-500 mb-4">当订单支付成功，平台会以 POST 请求向您的 <code>notify_url</code> 发送通知。</p>
             
             <div class="card p-5">
-                <div class="bg-amber-50 border border-amber-100 rounded-lg p-3 text-[13px] text-amber-700 mb-4">
-                    ⚠️ <b>处理规则：</b><br>
-                    1. 商户系统收到通知后，必须进行验签，并核对订单金额和状态。<br>
-                    2. 业务处理成功后，必须返回纯文本 <code>success</code>（不区分大小写），否则平台将判定通知失败并重复发送（最多 5 次）。
+                <div class="flex items-center mb-3">
+                    <span class="bg-green-50 text-green-600 px-2 py-1 rounded text-[11px] font-bold border border-green-200 mr-2">POST</span>
+                    <span class="font-mono text-[14px] font-bold text-slate-800">/api/pay/close</span>
                 </div>
-                <p class="text-[13px] font-bold text-slate-700 mb-2">通知报文示例：</p>
-                <div class="code-wrapper">
-                    <div class="copy-btn" onclick="copyCode(this)">复制</div>
-                    <div class="code-block">{
-  "pid": "1001",
-  "trade_no": "202606130001000001",
-  "out_trade_no": "M202606130001",
-  "type": "alipay",
-  "name": "商品名称",
-  "money": "1.00",
-  "trade_status": "TRADE_SUCCESS",
-  "param": "",
-  "timestamp": "1781270400",
-  "sign": "...",
-  "sign_type": "RSA"
-}</div>
+                <p class="text-[12px] text-slate-500 mb-4">请求地址：<code>https://web.lynli.me/api/pay/close</code></p>
+
+                <p class="text-[13px] font-bold text-slate-700 mb-2">请求参数：</p>
+                <table class="api-table">
+                    <tr><th>参数名</th><th>必填</th><th>说明</th></tr>
+                    <tr><td>pid</td><td>是</td><td>商户 ID</td></tr>
+                    <tr><td>timestamp</td><td>是</td><td>10 位秒级时间戳，请求有效期约 5 分钟</td></tr>
+                    <tr><td>sign</td><td>是</td><td>RSA 签名</td></tr>
+                    <tr><td>sign_type</td><td>是</td><td>固定传 RSA</td></tr>
+                    <tr><td>trade_no</td><td>二选一</td><td>平台订单号</td></tr>
+                    <tr><td>out_trade_no</td><td>二选一</td><td>商户订单号</td></tr>
+                </table>
+                <p class="text-[12px] text-amber-600 bg-amber-50 p-2 rounded mt-2 border border-amber-100">说明：仅未支付订单可关闭。</p>
+            </div>
+        </div>
+
+        <!-- 04 支付结果通知 -->
+        <div id="step4" class="mb-12 scroll-mt-20">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="num-box">04</div>
+                <h3 class="text-[18px] font-bold text-slate-800">支付结果通知</h3>
+            </div>
+            <p class="text-[13px] text-slate-500 mb-4">订单支付成功后，平台会向商户传入的 <code>notify_url</code> 发起 GET 通知。</p>
+            
+            <div class="card p-5">
+                <div class="bg-blue-50 border border-blue-100 rounded-lg p-3 text-[13px] text-blue-700 mb-4">
+                    💡 <b>通知签名说明：</b><br>
+                    通知签名跟随下单接口：V2接口使用 <b>RSA</b>；V1兼容接口使用 <b>MD5</b>。
+                </div>
+
+                <p class="text-[13px] font-bold text-slate-700 mb-2">通知参数：</p>
+                <table class="api-table">
+                    <tr><th>字段名</th><th>说明</th></tr>
+                    <tr><td>pid</td><td>商户 ID</td></tr>
+                    <tr><td>trade_no</td><td>平台订单号</td></tr>
+                    <tr><td>out_trade_no</td><td>商户订单号</td></tr>
+                    <tr><td>type</td><td>支付方式</td></tr>
+                    <tr><td>name</td><td>商品名称</td></tr>
+                    <tr><td>money</td><td>订单金额</td></tr>
+                    <tr><td>trade_status</td><td>支付成功固定为 TRADE_SUCCESS</td></tr>
+                    <tr><td>param</td><td>业务扩展参数</td></tr>
+                    <tr><td>sign/sign_type</td><td>V2为RSA验签参数；V1为MD5验签参数</td></tr>
+                    <tr><td>timestamp</td><td>仅V2 RSA通知携带</td></tr>
+                </table>
+
+                <div class="bg-amber-50 border border-amber-100 rounded-lg p-3 text-[13px] text-amber-700 mt-4">
+                    ⚠️ <b>处理规则：</b>商户系统验签成功并确认订单状态后，必须返回纯文本 <code>success</code>，否则平台将判定通知失败并重复发送。
                 </div>
             </div>
         </div>
 
-        <!-- 04 签名规则 -->
-        <div id="step4" class="mb-10 scroll-mt-20">
+        <!-- 05 签名规则 -->
+        <div id="step5" class="mb-10 scroll-mt-20">
             <div class="flex items-center gap-3 mb-4">
-                <div class="num-box">04</div>
+                <div class="num-box">05</div>
                 <h3 class="text-[18px] font-bold text-slate-800">RSA 签名规则 (V2)</h3>
             </div>
             

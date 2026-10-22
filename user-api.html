@@ -22,8 +22,18 @@
         .btn-press:active { transform: scale(0.97); }
         #toast { visibility: hidden; min-width: 200px; background-color: #334155; color: #fff; text-align: center; border-radius: 8px; padding: 10px 16px; position: fixed; z-index: 10000; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 13px; opacity: 0; transition: opacity 0.3s; }
         #toast.show { visibility: visible; opacity: 1; }
-        .skeleton { background: #e2e8f0; border-radius: 4px; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
+
+        /* 侧边抽屉样式 */
+        .drawer-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.5); backdrop-filter: blur(2px); z-index: 9999; display: none; opacity: 0; transition: opacity 0.3s; }
+        .drawer-overlay.active { display: block; opacity: 1; }
+        .drawer-panel { position: fixed; top: 0; right: -100%; width: 80%; max-width: 320px; height: 100vh; background: #fff; z-index: 10000; transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: -2px 0 10px rgba(0,0,0,0.05); overflow-y: auto; }
+        .drawer-panel.active { right: 0; }
+
+        /* 简单柱状图 */
+        .bar-chart { display: flex; align-items: flex-end; justify-content: space-between; height: 80px; margin-top: 16px; }
+        .bar-col { display: flex; flex-direction: column; align-items: center; width: 12%; }
+        .bar-fill { width: 100%; background: #bfdbfe; border-radius: 4px 4px 0 0; transition: height 0.3s; min-height: 4px; }
+        .bar-label { font-size: 10px; color: #94a3b8; margin-top: 8px; }
     </style>
 </head>
 <body class="pb-12">
@@ -32,27 +42,29 @@
             <a href="/console.html" class="text-slate-600 text-xl font-bold px-2">←</a>
             <h1 class="text-[17px] font-bold text-slate-800">账号与秘钥</h1>
         </div>
-        <button onclick="logout()" class="text-[13px] text-red-500 font-bold px-2 active:opacity-60">退出登录</button>
+        <div class="flex items-center gap-2">
+            <!-- 数据抽屉触发器 -->
+            <button onclick="openDataDrawer()" class="flex items-center gap-1 bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg active:bg-blue-100 transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                <span class="text-[13px] font-bold">数据</span>
+            </button>
+        </div>
     </header>
 
     <main class="px-4 py-4 space-y-4 max-w-lg mx-auto">
         <!-- 账户信息区 -->
         <div class="card p-5">
             <div class="flex items-center gap-4 mb-4">
-                <!-- 头像和昵称目前先用静态，等有接口了再注入 -->
                 <div id="user-avatar" class="w-[48px] h-[48px] rounded-full bg-blue-50 text-blue-500 flex items-center justify-center font-bold text-xl">B</div>
                 <div>
-                    <h2 class="text-[18px] font-bold text-slate-800" id="user-name">加载中...</h2>
-                    <p class="text-[12px] text-slate-500 mt-0.5">ID: <span id="user-id">-</span> | 余额: <span id="user-balance">¥ 0.00</span></p>
+                    <h2 class="text-[18px] font-bold text-slate-800" id="user-name">boss</h2>
+                    <p class="text-[12px] text-slate-500 mt-0.5">ID: <span id="user-id">10001</span> | 余额: <span id="user-balance">¥ 120.00</span></p>
                 </div>
             </div>
             
             <!-- 接口权限列表 -->
             <h3 class="text-[13px] font-bold text-slate-700 mb-2">接口权限开通状态</h3>
-            <div id="api-list" class="space-y-1">
-                <div class="h-10 skeleton w-full"></div>
-                <div class="h-10 skeleton w-full"></div>
-            </div>
+            <div id="api-list" class="space-y-1"></div>
         </div>
 
         <!-- 秘钥与白名单 -->
@@ -63,9 +75,7 @@
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>切换可见
                 </button>
             </div>
-            <div id="key-list" class="space-y-3 mb-6">
-                <div class="h-12 skeleton w-full"></div>
-            </div>
+            <div id="key-list" class="space-y-3 mb-6"></div>
 
             <div class="border-t border-slate-100 pt-4">
                 <label class="block text-[13px] font-bold text-slate-700 mb-1">全局 IP 白名单</label>
@@ -76,14 +86,70 @@
         </div>
     </main>
 
+    <!-- 侧边数据抽屉 -->
+    <div id="data-drawer-overlay" class="drawer-overlay" onclick="closeDataDrawer(event)"></div>
+    <div id="data-drawer-panel" class="drawer-panel">
+        <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50 sticky top-0 z-10">
+            <h2 class="text-[16px] font-bold text-slate-800">调用数据概览</h2>
+            <button onclick="closeDataDrawer()" class="text-slate-400 p-1"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+        </div>
+        
+        <div class="p-4 space-y-5">
+            <!-- 核心数据看板 -->
+            <div class="grid grid-cols-2 gap-3">
+                <div class="bg-blue-50 rounded-lg p-3 border border-blue-100">
+                    <p class="text-[11px] text-blue-500 mb-1">今日总调用</p>
+                    <p class="text-[20px] font-bold text-blue-700">1,248 <span class="text-[11px] font-normal">次</span></p>
+                </div>
+                <div class="bg-green-50 rounded-lg p-3 border border-green-100">
+                    <p class="text-[11px] text-green-600 mb-1">成功率</p>
+                    <p class="text-[20px] font-bold text-green-700">99.8%</p>
+                </div>
+            </div>
+
+            <!-- 近7天调用趋势 (模拟柱状图) -->
+            <div class="bg-white border border-slate-100 rounded-lg p-3">
+                <p class="text-[13px] font-bold text-slate-700 mb-1">近 7 天调用趋势</p>
+                <div class="bar-chart">
+                    <div class="bar-col"><div class="bar-fill" style="height: 30%;"></div><div class="bar-label">10-16</div></div>
+                    <div class="bar-col"><div class="bar-fill" style="height: 50%;"></div><div class="bar-label">10-17</div></div>
+                    <div class="bar-col"><div class="bar-fill" style="height: 20%;"></div><div class="bar-label">10-18</div></div>
+                    <div class="bar-col"><div class="bar-fill" style="height: 80%;"></div><div class="bar-label">10-19</div></div>
+                    <div class="bar-col"><div class="bar-fill" style="height: 60%;"></div><div class="bar-label">10-20</div></div>
+                    <div class="bar-col"><div class="bar-fill" style="height: 90%;"></div><div class="bar-label">10-21</div></div>
+                    <div class="bar-col"><div class="bar-fill" style="height: 100%;"></div><div class="bar-label">10-22</div></div>
+                </div>
+            </div>
+
+            <!-- 接口调用分布 -->
+            <div>
+                <h4 class="text-[13px] font-bold text-slate-700 mb-2 border-l-2 border-blue-500 pl-2">接口调用占比</h4>
+                <div class="space-y-3 bg-white p-3 rounded-lg border border-slate-100">
+                    <div>
+                        <div class="flex justify-between text-[12px] mb-1"><span class="text-slate-600">账号接口 (sk_tg_)</span><span class="font-bold">60%</span></div>
+                        <div class="w-full bg-slate-100 h-1.5 rounded-full"><div class="bg-blue-500 h-1.5 rounded-full" style="width: 60%;"></div></div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-[12px] mb-1"><span class="text-slate-600">查询接口 (sk_cx_)</span><span class="font-bold">25%</span></div>
+                        <div class="w-full bg-slate-100 h-1.5 rounded-full"><div class="bg-indigo-500 h-1.5 rounded-full" style="width: 25%;"></div></div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-[12px] mb-1"><span class="text-slate-600">接码接口 (sk_sms_)</span><span class="font-bold">15%</span></div>
+                        <div class="w-full bg-slate-100 h-1.5 rounded-full"><div class="bg-green-500 h-1.5 rounded-full" style="width: 15%;"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 退出登录 -->
+            <div class="pt-6 pb-4">
+                <button onclick="logout()" class="w-full py-2.5 bg-red-50 text-red-600 font-bold rounded-xl text-[14px] border border-red-100 active:bg-red-100 transition">退出当前账号</button>
+            </div>
+        </div>
+    </div>
+
     <div id="toast">提示内容</div>
 
     <script>
-        // ==========================================
-        // 核心配置：对接真实后端的接口地址
-        // ==========================================
-        const API_BASE = 'https://web.lynli.me/api'; // 以后改成你的阿里云接口域名
-        
         const apis = [
             { id: 'account', prefix: 'tg', name: '账号接口' },
             { id: 'node', prefix: 'jd', name: '节点接口' },
@@ -91,61 +157,14 @@
             { id: 'query', prefix: 'cx', name: '查询接口' },
             { id: 'pay', prefix: 'zf', name: '支付接口' }
         ];
-        let apiStatus = {}; // 从后端获取
-        let apiKeys = {};   // 从后端获取
+        let apiStatus = { account: 3, node: 1, sms: 2, query: 1, pay: 3 };
+        let apiKeys = { account: 'sk_tg_7a8b9c0d1e2f', node: 'sk_jd_456', sms: 'sk_sms_789', query: 'sk_cx_000', pay: 'sk_zf_999' };
         let isMasked = false;
         let expandedKeyId = null;
 
-        // ==========================================
-        // 1. 初始化：从后端拉取当前用户数据
-        // ==========================================
-        document.addEventListener('DOMContentLoaded', async () => {
-            // 假设用户登录后，你后端返回的 token 存在了本地
-            const token = localStorage.getItem('user_token') || 'mock_token_for_dev'; 
-            
-            // 如果没有 token，踢回登录页
-            if (!token) {
-                window.location.href = '/login.html';
-                return;
-            }
-
-            try {
-                // [真实接口调用示例] - 获取用户信息与秘钥状态
-                // const res = await fetch(`${API_BASE}/user/info`, { headers: { 'Authorization': `Bearer ${token}` } });
-                // const data = await res.json();
-                
-                // --- 下面是模拟的真实数据，等你接口好了直接换成上面那两行 ---
-                const data = {
-                    user: { name: 'boss', id: '10001', balance: '120.00' },
-                    permissions: { account: 3, node: 1, sms: 2, query: 1, pay: 3 },
-                    keys: { account: 'sk_tg_7a8b9c0d1e2f', pay: 'sk_zf_999' },
-                    whitelist: '127.0.0.1\n8.8.8.8'
-                };
-                // ---------------------------------------------------
-
-                // 渲染数据
-                document.getElementById('user-name').innerText = data.user.name;
-                document.getElementById('user-id').innerText = data.user.id;
-                document.getElementById('user-balance').innerText = '¥ ' + data.user.balance;
-                document.getElementById('ip-whitelist').value = data.whitelist;
-                
-                apiStatus = data.permissions;
-                apiKeys = data.keys;
-
-                renderApis();
-                renderKeys();
-
-            } catch (error) {
-                showToast('获取数据失败，请检查网络');
-            }
-        });
-
-        // ==========================================
-        // 2. 渲染权限列表
-        // ==========================================
         function renderApis() {
             document.getElementById('api-list').innerHTML = apis.map(a => {
-                const status = apiStatus[a.id] || 1;
+                const status = apiStatus[a.id];
                 let btnHtml = '';
                 if (status === 1) btnHtml = `<button class="status-btn status-pending" onclick="applyApi('${a.id}')">申请调用</button>`;
                 else if (status === 2) btnHtml = `<span class="status-btn status-review">⏳ 审核中</span>`;
@@ -160,9 +179,6 @@
             }).join('');
         }
 
-        // ==========================================
-        // 3. 渲染秘钥列表
-        // ==========================================
         function renderKeys() {
             document.getElementById('key-list').innerHTML = apis.map(a => {
                 if (apiStatus[a.id] !== 3) {
@@ -174,7 +190,7 @@
                     `;
                 }
 
-                const displayKey = isMasked ? `sk_${a.prefix}_****************` : (apiKeys[a.id] || '未生成');
+                const displayKey = isMasked ? `sk_${a.prefix}_****************` : apiKeys[a.id];
                 return `
                     <div class="key-card rounded-lg overflow-hidden ${expandedKeyId === a.id ? 'expanded' : ''}">
                         <div onclick="toggleKeyCard('${a.id}')" class="flex justify-between items-center bg-slate-50 px-3 py-2.5 cursor-pointer active:bg-slate-100 transition">
@@ -198,49 +214,29 @@
             }).join('');
         }
 
-        // ==========================================
-        // 4. 交互动作 (对接真实后端)
-        // ==========================================
-        async function applyApi(id) {
-            // [真实接口] await fetch(`${API_BASE}/user/apply`, { method: 'POST', body: JSON.stringify({api_id: id}) ... })
-            apiStatus[id] = 2; // 模拟立即变成审核中
-            renderApis();
-            showToast('已提交申请，请等待审核');
+        // 数据抽屉控制
+        function openDataDrawer() {
+            document.getElementById('data-drawer-overlay').classList.add('active');
+            document.getElementById('data-drawer-panel').classList.add('active');
+        }
+        function closeDataDrawer(e) {
+            if(e && e.target !== e.currentTarget) return;
+            document.getElementById('data-drawer-overlay').classList.remove('active');
+            document.getElementById('data-drawer-panel').classList.remove('active');
         }
 
-        async function resetKey(id) {
-            if(!confirm('重置后旧秘钥将立即失效，确定吗？')) return;
-            // [真实接口] await fetch(`${API_BASE}/user/reset_key`, ...)
-            showToast('秘钥重置成功');
-            // 模拟刷新秘钥
-            apiKeys[id] = 'sk_' + id + '_' + Math.random().toString(36).substring(2, 10);
-            renderKeys();
-        }
-
-        async function saveWhitelist() {
-            const ips = document.getElementById('ip-whitelist').value;
-            // [真实接口] await fetch(`${API_BASE}/user/whitelist`, { method: 'POST', body: JSON.stringify({ips}) ... })
-            showToast('全局 IP 白名单已保存');
-        }
-
-        // ==========================================
-        // 5. UI 辅助逻辑
-        // ==========================================
-        function toggleKeyCard(id) {
-            expandedKeyId = (expandedKeyId === id) ? null : id;
-            renderKeys();
-        }
-        function toggleKeyMask() {
-            isMasked = !isMasked;
-            renderKeys();
-        }
-        function copyKey(key) {
-            if(navigator.clipboard && key) {
-                navigator.clipboard.writeText(key).then(() => { showToast('秘钥已复制'); });
-            }
-        }
+        function applyApi(id) { apiStatus[id] = 2; renderApis(); showToast('已提交申请'); }
+        function resetKey(id) { if(confirm('确定重置秘钥吗？')) { showToast('秘钥重置成功'); } }
+        function saveWhitelist() { showToast('全局 IP 白名单已保存'); }
+        function toggleKeyCard(id) { expandedKeyId = (expandedKeyId === id) ? null : id; renderKeys(); }
+        function toggleKeyMask() { isMasked = !isMasked; renderKeys(); }
+        function copyKey(key) { if(navigator.clipboard) { navigator.clipboard.writeText(key).then(() => { showToast('秘钥已复制'); }); } }
         function showToast(msg) { const t = document.getElementById('toast'); t.innerText = msg; t.className = 'show'; setTimeout(() => t.className = '', 2000); }
         function logout() { localStorage.clear(); window.location.href = '/login.html'; }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderApis(); renderKeys();
+        });
     </script>
 </body>
 </html>

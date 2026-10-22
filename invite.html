@@ -11,7 +11,15 @@
         body { background-color: #f1f5f9; }
         .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 9999; display: none; align-items: flex-end; justify-content: center; }
         .modal-overlay.active { display: flex; }
-        .modal-content { background: white; width: 100%; max-width: 400px; border-radius: 24px 24px 0 0; padding: 24px; padding-bottom: 30px; max-height: 85vh; display: flex; flex-direction: column; animation: slideUp 0.3s ease-out; }
+        .modal-content { 
+            background: white; width: 100%; max-width: 400px; border-radius: 24px 24px 0 0; 
+            padding: 16px 24px calc(24px + env(safe-area-inset-bottom)); 
+            max-height: 85vh; 
+            overflow-y: auto; 
+            -webkit-overflow-scrolling: touch; 
+            animation: slideUp 0.3s ease-out; 
+        }
+        .modal-drag-bar { width: 40px; height: 4px; background: #e2e8f0; border-radius: 2px; margin: 0 auto 16px auto; flex-shrink: 0; }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     </style>
 </head>
@@ -23,7 +31,7 @@
     </div>
 
     <div class="p-3">
-        <!-- 四个卡片 (改为弹窗) -->
+        <!-- 四个数据卡片 (点击弹窗) -->
         <div class="grid grid-cols-2 gap-3 mb-3">
             <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center gap-3 cursor-pointer" onclick="openDetail('注册明细', '暂无注册用户数据')">
                 <div class="w-10 h-10 bg-blue-500 rounded-lg text-white flex items-center justify-center shrink-0"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg></div>
@@ -50,7 +58,7 @@
                 <div><p class="text-xs text-slate-500 mb-1">即将有效佣金</p><p class="text-lg font-bold text-orange-500">¥ 0.00</p></div>
                 <div><p class="text-xs text-slate-500 mb-1">累计提现金额</p><p class="text-lg font-bold text-slate-800">¥ 0.00</p></div>
             </div>
-            <!-- 申请提现改为弹窗卡片 -->
+            <!-- 申请提现改为卡片弹窗 -->
             <button onclick="openWithdrawModal()" class="w-full py-2 bg-blue-500 text-white font-bold rounded-lg text-sm">申请提现</button>
         </div>
 
@@ -64,23 +72,25 @@
         </div>
     </div>
 
-    <!-- 通用明细弹窗 -->
+    <!-- 通用明细弹窗 (带滑动条) -->
     <div id="detail-modal" class="modal-overlay">
         <div class="modal-content">
+            <div class="modal-drag-bar"></div>
             <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
                 <h3 id="detail-title" class="text-lg font-bold text-slate-800">明细</h3>
                 <button onclick="closeDetail()" class="text-slate-400 text-xl font-bold px-2">✕</button>
             </div>
-            <div class="flex-1 flex flex-col items-center justify-center text-slate-400 py-10">
+            <div class="flex flex-col items-center justify-center text-slate-400 py-10">
                 <svg class="w-12 h-12 mb-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
                 <p id="detail-text">暂无数据</p>
             </div>
         </div>
     </div>
 
-    <!-- 提现弹窗 -->
+    <!-- 提现弹窗 (带滑动条) -->
     <div id="withdraw-modal" class="modal-overlay">
         <div class="modal-content">
+            <div class="modal-drag-bar"></div>
             <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
                 <h3 class="text-lg font-bold text-slate-800">申请提现</h3>
                 <button onclick="closeWithdrawModal()" class="text-slate-400 text-xl font-bold px-2">✕</button>

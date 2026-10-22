@@ -15,14 +15,24 @@
         .asset-box:active { background: #f1f5f9; transform: scale(0.98); }
         .menu-item { display: flex; justify-content: space-between; align-items: center; padding: 16px; background: white; border-bottom: 1px solid #f1f5f9; cursor: pointer; text-decoration: none; color: inherit; }
         .menu-item:last-child { border-bottom: none; }
+        .menu-item:active { background: #f8fafc; }
         .nav-tab-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #ffffff; display: flex; justify-content: space-around; padding: 10px 0 calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid #e2e8f0; z-index: 50; }
         .nav-tab-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: #94a3b8; text-decoration: none; }
         .nav-tab-item.active { color: #2563eb; }
         .nav-tab-item svg { width: 24px; height: 24px; margin-bottom: 4px; fill: currentColor; }
         
+        /* 弹窗通用样式 */
         .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 9999; display: none; align-items: flex-end; justify-content: center; }
         .modal-overlay.active { display: flex; }
-        .modal-content { background: white; width: 100%; max-width: 400px; border-radius: 24px 24px 0 0; padding: 24px; padding-bottom: 30px; max-height: 80vh; display: flex; flex-direction: column; animation: slideUp 0.3s ease-out; }
+        .modal-content { 
+            background: white; width: 100%; max-width: 400px; border-radius: 24px 24px 0 0; 
+            padding: 16px 24px calc(24px + env(safe-area-inset-bottom)); 
+            max-height: 85vh; 
+            overflow-y: auto; 
+            -webkit-overflow-scrolling: touch; 
+            animation: slideUp 0.3s ease-out; 
+        }
+        .modal-drag-bar { width: 40px; height: 4px; background: #e2e8f0; border-radius: 2px; margin: 0 auto 16px auto; flex-shrink: 0; }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     </style>
 </head>
@@ -33,7 +43,6 @@
         我的账户
     </div>
 
-    <!-- 个人资料卡片 -->
     <a href="/settings.html" class="app-card flex items-center gap-4 mt-4 hover:bg-slate-50 transition-colors">
         <img id="user-avatar" src="/logo.jpg" class="w-16 h-16 rounded-full object-cover border border-slate-200">
         <div class="flex-1">
@@ -49,7 +58,7 @@
         <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
     </a>
 
-    <!-- 四个资产/数据格子 (改为弹窗) -->
+    <!-- 四个资产/数据格子 (点击弹窗) -->
     <div class="grid grid-cols-2 gap-3 mx-3">
         <div class="asset-box" onclick="openDetail('账户余额明细', '暂无资金变动记录')">
             <div class="flex items-center gap-2 mb-1">
@@ -99,14 +108,15 @@
         </a>
     </div>
 
-    <!-- 明细弹窗 -->
+    <!-- 明细弹窗 (带滑动条) -->
     <div id="detail-modal" class="modal-overlay">
         <div class="modal-content">
+            <div class="modal-drag-bar"></div>
             <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
                 <h3 id="detail-title" class="text-lg font-bold text-slate-800">明细记录</h3>
                 <button onclick="closeDetail()" class="text-slate-400 text-xl font-bold px-2">✕</button>
             </div>
-            <div class="flex-1 flex flex-col items-center justify-center text-slate-400 py-10">
+            <div class="flex flex-col items-center justify-center text-slate-400 py-10">
                 <svg class="w-12 h-12 mb-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
                 <p id="detail-text">暂无数据</p>
             </div>
@@ -128,7 +138,6 @@
         document.getElementById('user-id').innerText = localStorage.getItem('socks5_user_id') || (isBoss ? '10001' : '---');
         document.getElementById('user-avatar').src = localStorage.getItem('socks5_avatar') || '/logo.jpg';
 
-        // 弹窗逻辑
         function openDetail(title, text) {
             document.getElementById('detail-title').innerText = title;
             document.getElementById('detail-text').innerText = text;

@@ -40,7 +40,8 @@
                 <p class="text-[12px] text-slate-500 mt-1">欢迎使用 SOCKS5 聚合支付平台</p>
             </div>
             <div class="flex gap-2">
-                <button onclick="showToast('API 信息已复制')" class="px-3 py-1.5 bg-slate-100 text-slate-600 text-[12px] rounded-lg font-bold active:bg-slate-200">▣ API信息</button>
+                <a href="/merchant-collection.html" class="px-3 py-1.5 bg-blue-50 text-blue-600 text-[12px] rounded-lg font-bold active:bg-blue-100">📦 聚合收款</a>
+                <a href="/merchant-orders.html" class="px-3 py-1.5 bg-slate-100 text-slate-600 text-[12px] rounded-lg font-bold active:bg-slate-200">📋 订单记录</a>
                 <button onclick="showToast('修改资料功能开发中')" class="px-3 py-1.5 bg-slate-100 text-slate-600 text-[12px] rounded-lg font-bold active:bg-slate-200">⚙ 修改资料</button>
             </div>
         </div>
@@ -118,7 +119,7 @@
             <h3 class="text-[15px] font-bold text-blue-800 mb-2">新商户快速开始</h3>
             <p class="text-[12px] text-blue-600/80 mb-4">账号进入后 API 已自动开通，按下面三步即可收款。</p>
             <div class="space-y-3 text-[13px] text-slate-700">
-                <div class="flex gap-2"><span class="w-5 h-5 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-[11px] font-bold shrink-0">1</span>查看商户 ID、MD5 密钥、RSA 密钥</div>
+                <a href="/merchant-api.html" class="flex gap-2 active:opacity-60"><span class="w-5 h-5 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-[11px] font-bold shrink-0">1</span>查看接口说明与签名规则 (RSA密钥)</a>
                 <div class="flex gap-2"><span class="w-5 h-5 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-[11px] font-bold shrink-0">2</span>复制聚合收款链接，或在 TG 机器人直接发送金额</div>
                 <div class="flex gap-2"><span class="w-5 h-5 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-[11px] font-bold shrink-0">3</span>打开开发文档，把接口地址替换成本站地址</div>
             </div>

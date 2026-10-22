@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>聚合收款 - 商户中心</title>
+    <link rel="icon" href="/logo.jpg" type="image/jpeg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #f8fafc; color: #1e293b; }
+        .card { background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; }
+    </style>
+</head>
+<body class="pb-12">
+    <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center gap-3 sticky top-0 z-50">
+        <a href="/merchant.html" class="text-slate-600 text-xl font-bold px-2">←</a>
+        <h1 class="text-[17px] font-bold text-slate-800">聚合收款</h1>
+    </header>
+
+    <main class="px-4 py-6 space-y-6 max-w-lg mx-auto">
+        <div class="text-center mb-6">
+            <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl mx-auto flex items-center justify-center mb-4 shadow-sm border border-blue-100">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+            </div>
+            <h2 class="text-[20px] font-bold text-slate-800 mb-2">你的聚合收款链接</h2>
+            <p class="text-[13px] text-slate-500 leading-relaxed px-4">你可以将收款链接发到别人，点击后可以直接输入金额付款。</p>
+        </div>
+
+        <div class="card p-5">
+            <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 flex items-center justify-between">
+                <span class="text-[13px] font-mono text-slate-600 truncate flex-1" id="pay-link">https://web.lynli.me/pay/10001</span>
+                <button onclick="copyLink()" class="bg-blue-600 text-white text-[12px] font-bold px-4 py-2 rounded-lg ml-3 active:opacity-80">点击复制</button>
+            </div>
+            
+            <div class="mt-6 text-[13px] text-slate-600 space-y-3 bg-blue-50/50 p-4 rounded-lg border border-blue-100/50">
+                <p class="font-bold text-blue-800 mb-1">使用说明：</p>
+                <p>1. 复制上方专属链接，发送给您的客户。</p>
+                <p>2. 客户无需注册，在浏览器打开后输入金额，即可拉起支付宝、微信或 USDT 进行付款。</p>
+                <p>3. 支付成功后，资金会直接结算至您的商户余额中，可在订单记录中查看。</p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function copyLink() {
+            const link = document.getElementById('pay-link').innerText;
+            if(navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(link).then(() => { showToast('收款链接已复制到剪贴板'); });
+            } else {
+                const textArea = document.createElement("textarea");
+                textArea.value = link;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try { document.execCommand('copy'); showToast('收款链接已复制'); } catch (err) {}
+                document.body.removeChild(textArea);
+            }
+        }
+        function showToast(msg) {
+            let toast = document.getElementById('toast');
+            if(!toast) {
+                toast = document.createElement('div');
+                toast.id = 'toast';
+                toast.style.cssText = 'visibility:hidden; min-width:200px; background-color:#334155; color:#fff; text-align:center; border-radius:8px; padding:10px 16px; position:fixed; z-index:10000; left:50%; bottom:30px; transform:translateX(-50%); font-size:13px; opacity:0; transition:opacity 0.3s;';
+                document.body.appendChild(toast);
+            }
+            toast.innerText = msg;
+            toast.style.visibility = 'visible'; toast.style.opacity = '1';
+            setTimeout(() => { toast.style.visibility = 'hidden'; toast.style.opacity = '0'; }, 2500);
+        }
+    </script>
+</body>
+</html>

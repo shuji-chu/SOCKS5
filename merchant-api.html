@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>接口说明与签名 - 商户中心</title>
+    <link rel="icon" href="/logo.jpg" type="image/jpeg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #f8fafc; color: #1e293b; }
+        .card { background: #ffffff; border-radius: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); border: 1px solid #f1f5f9; }
+        .code-block { background: #1e293b; color: #e2e8f0; padding: 16px; border-radius: 10px; font-family: 'Courier New', Courier, monospace; font-size: 13px; overflow-x: auto; line-height: 1.6; white-space: pre-wrap; word-wrap: break-word; margin: 12px 0; }
+    </style>
+</head>
+<body class="pb-12">
+    <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center gap-3 sticky top-0 z-50">
+        <a href="/merchant.html" class="text-slate-600 text-xl font-bold px-2">←</a>
+        <h1 class="text-[17px] font-bold text-slate-800">接口与签名说明</h1>
+    </header>
+
+    <main class="px-4 py-6 space-y-6 max-w-2xl mx-auto">
+        <!-- 接口说明 -->
+        <div class="card p-5">
+            <h2 class="text-[18px] font-bold text-slate-800 mb-4 border-l-4 border-blue-500 pl-2">接口说明及规范</h2>
+            <div class="space-y-3 text-[13px] text-slate-600">
+                <p><b>协议规则：</b></p>
+                <ul class="list-disc list-inside pl-2 space-y-1">
+                    <li>提交数据格式：<code>application/x-www-form-urlencoded</code></li>
+                    <li>返回数据格式：<code>JSON</code></li>
+                    <li>字符编码：<code>UTF-8</code></li>
+                    <li>V2签名算法：<code>SHA256WithRSA</code></li>
+                </ul>
+            </div>
+
+            <h3 class="text-[15px] font-bold text-slate-800 mt-6 mb-3">接入流程</h3>
+            <ol class="list-decimal list-inside text-[13px] text-slate-600 space-y-2">
+                <li>登录商户后台，在个人资料的 API 信息里生成商户 RSA 密钥。</li>
+                <li>保存商户ID、平台公钥、商户私钥。</li>
+                <li>按签名规则生成请求签名，调用支付接口。</li>
+                <li>收到异步通知后验签，业务处理完成后返回纯文本 <code>success</code>。</li>
+            </ol>
+        </div>
+
+        <!-- 签名规则 -->
+        <div class="card p-5">
+            <h2 class="text-[18px] font-bold text-slate-800 mb-4 border-l-4 border-green-500 pl-2">签名规则</h2>
+            
+            <div class="space-y-4 text-[13px] text-slate-600">
+                <div>
+                    <p class="font-bold text-slate-800 mb-1">签名步骤</p>
+                    <p class="leading-relaxed">1. 取所有非空普通参数，排除 <code>sign</code>、<code>sign_type</code> 和数组参数，按参数名 ASCII 升序排序。</p>
+                    <p class="leading-relaxed">2. 排序后拼接为 <code>key=value&key2=value2</code>，使用商户私钥执行 <code>SHA256WithRSA</code> 签名，结果进行 Base64 编码。</p>
+                </div>
+
+                <div class="pt-3 border-t border-slate-100">
+                    <p class="font-bold text-slate-800 mb-1">验签步骤</p>
+                    <p class="leading-relaxed">接口返回、异步通知、同步跳转均使用平台私钥签名。商户系统按同样规则拼接待签名字符串，再用平台公钥验签。</p>
+                </div>
+
+                <div class="pt-3 border-t border-slate-100">
+                    <p class="font-bold text-slate-800 mb-2">待签名串示例</p>
+                    <div class="code-block">money=1.00&name=支付测试&notify_url=https://merchant.example.com/notify_url.php&out_trade_no=202606130001&pid=1001&return_url=https://merchant.example.com/return_url.php&timestamp=1781270400&type=alipay</div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

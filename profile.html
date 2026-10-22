@@ -10,26 +10,8 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: #f8fafc; color: #1e293b; padding-bottom: 80px; }
         .card { background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; }
-        
-        /* 点击下弹互动效果 */
         .btn-press { transition: transform 0.1s, background-color 0.2s; }
         .btn-press:active { transform: scale(0.97); background-color: #f1f5f9; }
-
-        /* 底部抽屉动画 */
-        .drawer-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 9999; display: none; }
-        .drawer-overlay.active { display: block; }
-        .drawer-panel { position: fixed; bottom: -100%; left: 0; right: 0; background: #fff; border-radius: 20px 20px 0 0; z-index: 10000; transition: bottom 0.3s ease-in-out; padding-bottom: env(safe-area-inset-bottom); }
-        .drawer-panel.active { bottom: 0; }
-
-        /* 全局居中弹窗 */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 10001; display: none; align-items: center; justify-content: center; padding: 0 16px; }
-        .modal-overlay.active { display: flex; }
-        .modal-box { background: #fff; width: 100%; max-width: 340px; border-radius: 16px; padding: 20px; transform: scale(0.95); transition: transform 0.2s; opacity: 0; text-align: left; }
-        .modal-overlay.active .modal-box { transform: scale(1); opacity: 1; }
-
-        /* 输入框通用样式 */
-        .input-flat { width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; font-size: 14px; outline: none; transition: border 0.2s; }
-        .input-flat:focus { border-color: #3b82f6; background: #fff; }
     </style>
 </head>
 <body>
@@ -37,68 +19,25 @@
         <h1 class="text-[20px] font-bold text-slate-800">我的账户</h1>
         <div class="relative">
             <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
-            <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
         </div>
     </header>
 
     <main class="px-4 py-4 space-y-4 max-w-lg mx-auto">
-        <!-- 用户信息卡片 (点击唤起底部抽屉) -->
-        <div onclick="openUserDrawer()" class="card p-5 flex items-center gap-4 cursor-pointer btn-press">
+        <div class="card p-5 flex items-center gap-4 cursor-pointer btn-press">
             <div id="profile-avatar-container" class="w-[60px] h-[60px] rounded-full bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200 shrink-0">
                 <span class="text-blue-500 font-bold text-2xl">B</span>
             </div>
             <div class="flex-1">
                 <div class="flex items-center gap-2 mb-1">
                     <h2 class="text-[18px] font-bold text-slate-800" id="profile-nickname">boss</h2>
-                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                 </div>
                 <p class="text-[13px] text-slate-500 mb-0.5">用户ID: 10001</p>
                 <p class="text-[13px] text-slate-500">邮箱: <span id="profile-email">加载中...</span></p>
             </div>
-            <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
         </div>
 
-        <!-- 四宫格数据 -->
-        <div class="grid grid-cols-2 gap-3">
-            <!-- 账户余额 -->
-            <div onclick="void(0)" class="card p-4 cursor-pointer btn-press">
-                <div class="flex items-center gap-2 mb-3">
-                    <div class="w-7 h-7 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg></div>
-                    <span class="text-[13px] text-slate-500 font-medium">账户余额</span>
-                </div>
-                <p class="text-[22px] font-bold text-slate-800">¥ 120.00</p>
-            </div>
-
-            <!-- 佣金余额 -->
-            <div onclick="void(0)" class="card p-4 cursor-pointer btn-press">
-                <div class="flex items-center gap-2 mb-3">
-                    <div class="w-7 h-7 rounded-lg bg-amber-50 text-amber-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
-                    <span class="text-[13px] text-slate-500 font-medium">佣金余额</span>
-                </div>
-                <p class="text-[22px] font-bold text-slate-800" id="profile-commission">¥ 0.00</p>
-            </div>
-
-            <!-- 收支明细跳转 -->
-            <a href="/console.html#bill-tab" class="card p-4 cursor-pointer btn-press block">
-                <div class="flex items-center gap-2 mb-3">
-                    <div class="w-7 h-7 rounded-lg bg-green-50 text-green-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></div>
-                    <span class="text-[13px] text-slate-500 font-medium">收支明细</span>
-                </div>
-                <p class="text-[15px] font-bold text-blue-500 flex items-center gap-1">查看流水 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></p>
-            </a>
-
-            <!-- 消费记录跳转 -->
-            <a href="/console.html#request-tab" class="card p-4 cursor-pointer btn-press block">
-                <div class="flex items-center gap-2 mb-3">
-                    <div class="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg></div>
-                    <span class="text-[13px] text-slate-500 font-medium">消费记录</span>
-                </div>
-                <p class="text-[15px] font-bold text-blue-500 flex items-center gap-1">查看记录 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></p>
-            </a>
-        </div>
-
-
-        <a href="/admin-login.html" class="card p-4 flex justify-between items-center bg-gradient-to-r from-red-50 to-orange-50 border-red-100 active:scale-95 transition-transform mb-4 block">
+        <!-- 老板专属管理后台入口 -->
+        <a href="/admin-login.html" id="admin-entry-btn" style="display: none;" class="card p-4 flex justify-between items-center bg-gradient-to-r from-red-50 to-orange-50 border-red-100 active:scale-95 transition-transform mb-4 block">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center shadow-sm">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
@@ -111,289 +50,58 @@
             <svg class="w-5 h-5 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
         </a>
 
+        <div class="grid grid-cols-2 gap-3">
+            <div class="card p-4 cursor-pointer btn-press">
+                <div class="flex items-center gap-2 mb-3"><div class="w-7 h-7 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg></div><span class="text-[13px] text-slate-500 font-medium">账户余额</span></div>
+                <p class="text-[22px] font-bold text-slate-800">¥ 120.00</p>
+            </div>
+            <div class="card p-4 cursor-pointer btn-press">
+                <div class="flex items-center gap-2 mb-3"><div class="w-7 h-7 rounded-lg bg-amber-50 text-amber-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div><span class="text-[13px] text-slate-500 font-medium">佣金余额</span></div>
+                <p class="text-[22px] font-bold text-slate-800" id="profile-commission">¥ 45.50</p>
+            </div>
+            <a href="/console.html#bill-tab" class="card p-4 cursor-pointer btn-press block">
+                <div class="flex items-center gap-2 mb-3"><div class="w-7 h-7 rounded-lg bg-green-50 text-green-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></div><span class="text-[13px] text-slate-500 font-medium">收支明细</span></div>
+                <p class="text-[15px] font-bold text-blue-500 flex items-center gap-1">查看流水 →</p>
+            </a>
+            <a href="/console.html#request-tab" class="card p-4 cursor-pointer btn-press block">
+                <div class="flex items-center gap-2 mb-3"><div class="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg></div><span class="text-[13px] text-slate-500 font-medium">消费记录</span></div>
+                <p class="text-[15px] font-bold text-blue-500 flex items-center gap-1">查看记录 →</p>
+            </a>
+        </div>
+        
         <div class="card overflow-hidden">
-            <a href="/guide.html" class="flex items-center justify-between p-4 border-b border-slate-100 active:bg-slate-50 btn-press block">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-lg bg-slate-100 text-slate-500 flex items-center justify-center"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
-                    <div><p class="text-[15px] font-bold text-slate-800">使用说明</p><p class="text-[12px] text-slate-500 mt-0.5">查看购物流程与常见问题</p></div>
-                </div>
+            <a href="/console.html" class="flex items-center justify-between p-4 border-b border-slate-100 active:bg-slate-50 block">
+                <div class="flex items-center gap-3"><div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg></div><div><p class="text-[15px] font-bold text-slate-800">开发者控制台</p></div></div>
                 <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
             </a>
-
-            <a href="/console.html" class="flex items-center justify-between p-4 border-b border-slate-100 active:bg-slate-50 btn-press block">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg></div>
-                    <div><p class="text-[15px] font-bold text-slate-800">开发者控制台</p><p class="text-[12px] text-slate-500 mt-0.5">获取密钥与查看API对接文档</p></div>
-                </div>
-                <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-            </a>
-
-            <a href="/invite.html" class="flex items-center justify-between p-4 active:bg-slate-50 btn-press cursor-pointer">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-lg bg-orange-50 text-orange-500 flex items-center justify-center"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg></div>
-                    <div><p class="text-[15px] font-bold text-slate-800">邀请好友</p><p class="text-[12px] text-slate-500 mt-0.5">分享专属链接，赚取高额佣金</p></div>
-                </div>
+            <a href="/invite.html" class="flex items-center justify-between p-4 active:bg-slate-50 block">
+                <div class="flex items-center gap-3"><div class="w-8 h-8 rounded-lg bg-orange-50 text-orange-500 flex items-center justify-center"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg></div><div><p class="text-[15px] font-bold text-slate-800">邀请好友</p></div></div>
                 <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
             </a>
         </div>
     </main>
 
-    <!-- 底部导航 -->
     <div class="fixed bottom-0 w-full bg-white border-t border-slate-200 flex justify-around h-[56px] pb-safe z-50">
-        <a href="/index.html" class="flex flex-col items-center justify-center w-full h-full text-slate-400">
-            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
-            <span class="text-[10px] font-medium">首页</span>
-        </a>
-        <a href="/profile.html" class="flex flex-col items-center justify-center w-full h-full text-blue-500">
-            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
-            <span class="text-[10px] font-medium">我的</span>
-        </a>
-    </div>
-
-    <!-- 隐藏的上传文件 input -->
-    <input type="file" id="avatar-upload" accept="image/*" class="hidden" onchange="handleAvatarUpload(event)">
-
-    <!-- 用户操作底部抽屉 -->
-    <div id="user-drawer-overlay" class="drawer-overlay" onclick="closeUserDrawer()"></div>
-    <div id="user-drawer" class="drawer-panel">
-        <div class="p-4 border-b border-slate-100 flex justify-between items-center">
-            <h3 class="text-[16px] font-bold text-slate-800">账户设置</h3>
-            <button onclick="closeUserDrawer()" class="text-slate-400 p-1"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
-        </div>
-        <div class="px-4 py-2">
-            <div onclick="document.getElementById('avatar-upload').click()" class="flex items-center gap-3 py-3 border-b border-slate-50 active:bg-slate-50 cursor-pointer">
-                <div class="w-8 h-8 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg></div>
-                <span class="text-[15px] text-slate-700 font-medium">修改头像</span>
-            </div>
-            <div onclick="openNicknameModal()" class="flex items-center gap-3 py-3 border-b border-slate-50 active:bg-slate-50 cursor-pointer">
-                <div class="w-8 h-8 rounded-full bg-amber-50 text-amber-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg></div>
-                <span class="text-[15px] text-slate-700 font-medium">修改昵称</span>
-            </div>
-            <div onclick="openPasswordModal()" class="flex items-center gap-3 py-3 border-b border-slate-50 active:bg-slate-50 cursor-pointer">
-                <div class="w-8 h-8 rounded-full bg-indigo-50 text-indigo-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg></div>
-                <span class="text-[15px] text-slate-700 font-medium">修改密码</span>
-            </div>
-            <div onclick="openLogoutModal()" class="flex items-center gap-3 py-3 active:bg-red-50 cursor-pointer mt-2">
-                <div class="w-8 h-8 rounded-full bg-red-50 text-red-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg></div>
-                <span class="text-[15px] text-red-600 font-bold">退出登录</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- 通用弹窗组件 (磨砂玻璃) -->
-    <div id="custom-modal" class="modal-overlay">
-        <div class="modal-box text-center">
-            <h3 class="text-[17px] font-bold text-slate-800 mb-3" id="modal-title">提示</h3>
-            <div class="text-[14px] text-slate-600 mb-5 text-left" id="modal-desc"></div>
-            <div class="flex gap-3" id="modal-btns"></div>
-        </div>
+        <a href="/index.html" class="flex flex-col items-center justify-center w-full h-full text-slate-400"><span class="text-[10px] font-medium mt-1">首页</span></a>
+        <a href="/profile.html" class="flex flex-col items-center justify-center w-full h-full text-blue-500"><span class="text-[10px] font-medium mt-1">我的</span></a>
     </div>
 
     <script>
-        // 初始化加载数据
         document.addEventListener('DOMContentLoaded', () => {
-            loadProfileData();
-            document.getElementById("profile-commission").innerText = "¥ " + (localStorage.getItem("user_commission") || "45.50");
-        });
-
-        function loadProfileData() {
-            const userAvatar = localStorage.getItem('user_avatar');
-            const avatarContainer = document.getElementById('profile-avatar-container');
-            if (userAvatar) {
-                avatarContainer.innerHTML = `<img src="${userAvatar}" class="w-full h-full object-cover">`;
-            } else {
-                avatarContainer.innerHTML = `<span class="text-blue-500 font-bold text-2xl">B</span>`;
-            }
-
-            const nickname = localStorage.getItem('user_nickname');
-            if (nickname) {
-                document.getElementById('profile-nickname').innerText = nickname;
-            }
-        }
-
-        // 底部抽屉控制
-        function openUserDrawer() {
-            document.getElementById('user-drawer-overlay').classList.add('active');
-            document.getElementById('user-drawer').classList.add('active');
-        }
-        function closeUserDrawer() {
-            document.getElementById('user-drawer-overlay').classList.remove('active');
-            document.getElementById('user-drawer').classList.remove('active');
-        }
-
-        // 全局自定义弹窗控制
-        function showCustomAlert(title, desc, btnsHtml) {
-            const modal = document.getElementById('custom-modal');
-            document.getElementById('modal-title').innerText = title;
-            document.getElementById('modal-desc').innerHTML = desc;
-            document.getElementById('modal-btns').innerHTML = btnsHtml;
-            modal.classList.add('active');
-        }
-        function closeCustomAlert() {
-            document.getElementById('custom-modal').classList.remove('active');
-        }
-
-        // 1. 头像上传
-        function handleAvatarUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const base64Image = e.target.result;
-                localStorage.setItem('user_avatar', base64Image);
-                loadProfileData();
-            document.getElementById("profile-commission").innerText = "¥ " + (localStorage.getItem("user_commission") || "45.50");
-                closeUserDrawer();
-            };
-            reader.readAsDataURL(file);
-        }
-
-        // 2. 修改昵称
-        function openNicknameModal() {
-            closeUserDrawer();
-            const currentName = document.getElementById('profile-nickname').innerText;
-            const content = `
-                <input type="text" id="new-nickname-input" value="${currentName}" class="input-flat mb-2" placeholder="请输入新昵称">
-                <p class="text-[12px] text-slate-400">昵称长度需在 2-12 个字符之间。</p>
-            `;
-            const btns = `
-                <button onclick="closeCustomAlert()" class="flex-1 py-2.5 bg-slate-100 text-slate-600 font-bold rounded-xl text-[15px] active:bg-slate-200">取消</button>
-                <button onclick="saveNickname()" class="flex-1 py-2.5 bg-blue-600 text-white font-bold rounded-xl text-[15px] active:opacity-80">保存</button>
-            `;
-            showCustomAlert('修改昵称', content, btns);
-        }
-        function saveNickname() {
-            const newName = document.getElementById('new-nickname-input').value.trim();
-            if (!newName) {
-                showToast('昵称不能为空');
-                return;
-            }
-            localStorage.setItem('user_nickname', newName);
-            loadProfileData();
-            document.getElementById("profile-commission").innerText = "¥ " + (localStorage.getItem("user_commission") || "45.50");
-            closeCustomAlert();
-        }
-
-        // 3. 修改密码 (旧密码 + 新密码 + 邮箱验证码)
-        function openPasswordModal() {
-            closeUserDrawer();
-            const content = `
-                <div class="space-y-3 mb-2">
-                    <input type="password" id="old-password" class="input-flat" placeholder="请输入旧密码">
-                    <input type="password" id="new-password" class="input-flat" placeholder="请输入新密码">
-                    <div class="flex gap-2">
-                        <input type="text" id="email-code" class="input-flat flex-1" placeholder="邮箱验证码">
-                        <button id="get-code-btn" onclick="sendEmailCode()" class="px-3 py-2 bg-blue-50 text-blue-600 text-[13px] font-bold rounded-lg border border-blue-100 whitespace-nowrap active:bg-blue-100">获取验证码</button>
-                    </div>
-                </div>
-            `;
-            const btns = `
-                <button onclick="closeCustomAlert()" class="flex-1 py-2.5 bg-slate-100 text-slate-600 font-bold rounded-xl text-[15px] active:bg-slate-200">取消</button>
-                <button onclick="submitPasswordChange()" class="flex-1 py-2.5 bg-blue-600 text-white font-bold rounded-xl text-[15px] active:opacity-80">确认修改</button>
-            `;
-            showCustomAlert('修改密码', content, btns);
-        }
-
-        let countdown = 0;
-        function sendEmailCode() {
-            if (countdown > 0) return;
-            const btn = document.getElementById('get-code-btn');
-            // 模拟发送请求
-            countdown = 60;
-            btn.disabled = true;
-            btn.classList.replace('text-blue-600', 'text-slate-400');
-            btn.classList.replace('bg-blue-50', 'bg-slate-100');
-            
-            const timer = setInterval(() => {
-                if (countdown <= 0) {
-                    clearInterval(timer);
-                    btn.innerText = '获取验证码';
-                    btn.disabled = false;
-                    btn.classList.replace('text-slate-400', 'text-blue-600');
-                    btn.classList.replace('bg-slate-100', 'bg-blue-50');
-                } else {
-                    btn.innerText = `${countdown}s 后重发`;
-                    countdown--;
-                }
-            }, 1000);
-        }
-
-        function submitPasswordChange() {
-            const oldPwd = document.getElementById('old-password').value;
-            const newPwd = document.getElementById('new-password').value;
-            const code = document.getElementById('email-code').value;
-
-            if (!oldPwd || !newPwd || !code) {
-                showToast('请填写完整信息');
-                return;
-            }
-            // 模拟验证逻辑 (真实环境由后端校验)
-            closeCustomAlert();
-            setTimeout(() => {
-                showToast('密码修改成功，请重新登录');
-                setTimeout(() => { window.location.href = '/login.html'; }, 1500);
-            }, 300);
-        }
-
-        // 4. 退出登录
-        function openLogoutModal() {
-            closeUserDrawer();
-            const content = `<p class="text-center text-slate-600">确定要退出当前账号吗？</p>`;
-            const btns = `
-                <button onclick="closeCustomAlert()" class="flex-1 py-2.5 bg-slate-100 text-slate-600 font-bold rounded-xl text-[15px] active:bg-slate-200">取消</button>
-                <button onclick="doLogout()" class="flex-1 py-2.5 bg-red-500 text-white font-bold rounded-xl text-[15px] active:opacity-80">确认退出</button>
-            `;
-            showCustomAlert('退出登录', content, btns);
-        }
-        function doLogout() {
-            localStorage.removeItem('socks5_token');
-            window.location.href = '/login.html';
-        }
-
-        // Toast 轻提示
-        function showToast(msg) {
-            // 如果页面没有toast元素则动态创建一个
-            let toast = document.getElementById('toast');
-            if(!toast) {
-                toast = document.createElement('div');
-                toast.id = 'toast';
-                toast.style.cssText = 'visibility:hidden; min-width:200px; background-color:#334155; color:#fff; text-align:center; border-radius:8px; padding:10px 16px; position:fixed; z-index:10000; left:50%; bottom:30px; transform:translateX(-50%); font-size:13px; opacity:0; transition:opacity 0.3s;';
-                document.body.appendChild(toast);
-            }
-            toast.innerText = msg;
-            toast.style.visibility = 'visible';
-            toast.style.opacity = '1';
-            setTimeout(() => { 
-                toast.style.visibility = 'hidden';
-                toast.style.opacity = '0';
-            }, 2500);
-        }
-    </script>
-<script src="/ai-widget.js"></script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // 获取真实系统角色，如果没有角色说明没登录，踢回登录页
             const role = localStorage.getItem('user_role');
             const email = localStorage.getItem('user_email');
             
+            if (!role || !email) {
                 window.location.href = '/login.html';
                 return;
             }
 
-            // 将用户的邮箱展示在页面上
-            const emailEl = document.getElementById('profile-email');
-            if(emailEl) emailEl.innerText = '邮箱: ' + email;
+            document.getElementById('profile-email').innerText = email;
 
-            // 核心隔离逻辑：仅当角色为 boss 时，显示后台入口
             if (role === 'boss') {
                 const btn = document.getElementById('admin-entry-btn');
                 if (btn) btn.style.display = 'flex';
             }
-            
-            // 清理测试用的历史缓存，防止老缓存干扰
-            localStorage.removeItem('admin_token');
         });
     </script>
 </body>

@@ -18,42 +18,34 @@
     <div class="card text-center">
         <h1 class="text-[22px] font-bold text-slate-800 mb-2">欢迎回来</h1>
         <p class="text-[13px] text-slate-500 mb-8">登录您的 SOCKS5 账号</p>
-        
         <div class="space-y-4 mb-6 text-left">
             <div>
                 <label class="text-[12px] text-slate-500 mb-1 block">邮箱</label>
-                <input type="text" id="login-email" class="input-flat" placeholder="boss@lynli.me 或 其他邮箱">
+                <input type="text" id="login-email" class="input-flat" placeholder="boss@lynli.me 或 其他邮箱" value="boss@lynli.me">
             </div>
             <div>
                 <label class="text-[12px] text-slate-500 mb-1 block">密码</label>
-                <input type="password" id="login-pass" class="input-flat" placeholder="请输入密码">
+                <input type="password" id="login-pass" class="input-flat" placeholder="请输入密码" value="123456">
             </div>
         </div>
-
         <button onclick="doLogin()" class="w-full py-3.5 bg-blue-600 text-white font-bold rounded-xl text-[15px] active:opacity-80 transition shadow-sm">登录</button>
     </div>
-
     <script>
         function doLogin() {
             const email = document.getElementById('login-email').value;
             const pass = document.getElementById('login-pass').value;
-            
             if(!email || !pass) { alert('请输入账号和密码'); return; }
 
-            // 真实模拟后端权限下发
             if (email === 'boss@lynli.me') {
-                // 老板登录
                 localStorage.setItem('user_id', '10001');
                 localStorage.setItem('user_email', email);
-                localStorage.setItem('user_role', 'boss'); // 分配 boss 权限
-                window.location.href = '/profile.html';
+                localStorage.setItem('user_role', 'boss');
             } else {
-                // 普通用户登录
                 localStorage.setItem('user_id', '10002');
                 localStorage.setItem('user_email', email);
-                localStorage.setItem('user_role', 'user'); // 分配普通 user 权限
-                window.location.href = '/profile.html';
+                localStorage.setItem('user_role', 'user');
             }
+            window.location.href = '/profile.html';
         }
     </script>
 </body>

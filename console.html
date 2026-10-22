@@ -11,9 +11,9 @@
         body { background-color: #f8fafc; color: #1e293b; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
-        .accordion-content.active { max-height: 2000px; transition: max-height 0.4s ease-in; }
+        .accordion-content.active { max-height: 2500px; transition: max-height 0.4s ease-in; }
         .rotate-180 { transform: rotate(180deg); }
-        .status-btn { display: inline-flex; align-items: center; justify-content: center; padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .status-btn { display: inline-flex; align-items: center; justify-content: center; padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
         .status-pending { background: #eff6ff; color: #2563eb; }
         .status-review { background: #fffbeb; color: #d97706; cursor: default; }
         .status-active { background: #ecfdf5; color: #059669; cursor: default; }
@@ -21,13 +21,14 @@
         .key-body { display: none; }
         .key-card.expanded .key-body { display: block; }
         .key-card.expanded .arrow-icon { transform: rotate(180deg); }
-        .modal-body { max-height: 55vh; overflow-y: auto; text-align: left; }
-        .modal-body p { margin-bottom: 10px; line-height: 1.6; font-size: 13px; color: #475569; }
-        .modal-body h4 { font-weight: bold; color: #1e293b; margin-top: 16px; margin-bottom: 6px; font-size: 14px; }
         #toast { visibility: hidden; min-width: 200px; background-color: #334155; color: #fff; text-align: center; border-radius: 8px; padding: 10px 16px; position: fixed; z-index: 10000; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 13px; opacity: 0; transition: opacity 0.3s; }
         #toast.show { visibility: visible; opacity: 1; }
         .btn-press { transition: transform 0.1s, background-color 0.2s; }
         .btn-press:active { transform: scale(0.97); background-color: #f1f5f9; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 0 16px; }
+        .modal-overlay.active { display: flex; }
+        .modal-box { background: #fff; width: 100%; max-width: 340px; border-radius: 16px; padding: 20px; text-align: left; }
+        .input-flat { width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; font-size: 14px; outline: none; margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -37,12 +38,10 @@
     </header>
 
     <main class="pb-12">
-        <!-- 1. 顶部账户信息 -->
+        <!-- 头部 -->
         <div class="bg-white px-5 py-6 flex items-center justify-between">
             <div class="flex items-center gap-4">
-                <div id="user-avatar-container" class="w-[52px] h-[52px] rounded-full bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200 shrink-0">
-                    <span class="text-blue-500 font-bold text-xl">B</span>
-                </div>
+                <div id="user-avatar-container" class="w-[52px] h-[52px] rounded-full bg-slate-100 flex items-center justify-center border border-slate-200 overflow-hidden"><span class="text-blue-500 font-bold text-xl">B</span></div>
                 <div>
                     <h2 class="text-[19px] font-bold text-slate-800">boss</h2>
                     <p class="text-[12px] text-slate-400 mt-0.5">ID: 10001</p>
@@ -54,134 +53,134 @@
             </div>
         </div>
 
-        <!-- 2. 账户详情 (折叠) -->
+        <!-- 账户详情 (折叠) -->
         <div class="bg-white mt-2">
-            <button onclick="toggleAccordion('accordion-1', 'icon-1')" class="w-full px-5 py-4 flex justify-between items-center bg-white active:bg-slate-50 transition border-b border-slate-100">
-                <span class="font-bold text-slate-800 text-[14px] flex items-center gap-2">
-                    <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                    账户详情
-                </span>
-                <svg id="icon-1" class="w-4 h-4 text-slate-400 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            <button onclick="toggleAccordion('accordion-1', 'icon-1')" class="w-full px-5 py-4 flex justify-between items-center border-b border-slate-100">
+                <span class="font-bold text-slate-800 text-[14px]">账户详情</span>
+                <svg id="icon-1" class="w-4 h-4 text-slate-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
             </button>
             <div id="accordion-1" class="accordion-content bg-white">
                 <div class="px-5 pb-5 pt-1 border-b border-slate-100">
                     <div id="api-list" class="space-y-1"></div>
-                    <button onclick="showCustomAlert('提示', '已退出登录')" class="mt-4 w-full py-2.5 bg-slate-50 text-slate-600 font-bold rounded-lg text-[14px] active:bg-slate-200 transition">退出登录</button>
+                    <button onclick="showCustomAlert('提示', '已退出登录')" class="mt-4 w-full py-2.5 bg-slate-50 text-slate-600 font-bold rounded-lg text-[14px]">退出登录</button>
                 </div>
             </div>
         </div>
 
-        <!-- 3. 账户工作台 -->
+        <!-- 工作台 -->
         <div class="bg-white mt-2 pt-5 pb-6">
-            <div class="px-5 mb-4">
-                <h3 class="text-[16px] font-bold text-slate-800 mb-1">账户工作台</h3>
-                <p class="text-[12px] text-slate-500">当前账户 boss，可查看 Key、充值、收支明细和消费记录。</p>
-            </div>
-            
+            <div class="px-5 mb-4"><h3 class="text-[16px] font-bold text-slate-800">账户工作台</h3></div>
             <div class="grid grid-cols-2 gap-3 px-5">
-                <div onclick="void(0)" class="bg-white rounded-xl p-4 border border-slate-100 shadow-sm cursor-pointer btn-press">
-                    <div class="flex justify-between items-start mb-2">
-                        <p class="text-[13px] text-slate-500 font-medium">今日消费</p>
-                        <div class="w-7 h-7 rounded-lg bg-red-50 text-red-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
-                    </div>
-                    <p class="text-[22px] font-bold text-slate-800">¥ 0.00</p>
-                </div>
-                <div onclick="void(0)" class="bg-white rounded-xl p-4 border border-slate-100 shadow-sm cursor-pointer btn-press">
-                    <div class="flex justify-between items-start mb-2">
-                        <p class="text-[13px] text-slate-500 font-medium">今日充值</p>
-                        <div class="w-7 h-7 rounded-lg bg-green-50 text-green-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg></div>
-                    </div>
-                    <p class="text-[22px] font-bold text-slate-800">¥ 0.00</p>
-                </div>
-                <div onclick="void(0)" class="bg-white rounded-xl p-4 border border-slate-100 shadow-sm cursor-pointer btn-press">
-                    <div class="flex justify-between items-start mb-2">
-                        <p class="text-[13px] text-slate-500 font-medium">调用资格</p>
-                        <div class="w-7 h-7 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg></div>
-                    </div>
-                    <p class="text-[18px] font-bold mt-1" id="dash-call-status">计算中...</p>
-                </div>
-                <div onclick="void(0)" class="bg-white rounded-xl p-4 border border-slate-100 shadow-sm cursor-pointer btn-press">
-                    <div class="flex justify-between items-start mb-2">
-                        <p class="text-[13px] text-slate-500 font-medium">专属 Key</p>
-                        <div class="w-7 h-7 rounded-lg bg-amber-50 text-amber-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg></div>
-                    </div>
-                    <p class="text-[18px] font-bold mt-1" id="dash-key-status">计算中...</p>
-                </div>
+                <div class="bg-white rounded-xl p-4 border border-slate-100 shadow-sm cursor-pointer btn-press"><p class="text-[13px] text-slate-500">今日消费</p><p class="text-[22px] font-bold text-slate-800">¥ 0.00</p></div>
+                <div class="bg-white rounded-xl p-4 border border-slate-100 shadow-sm cursor-pointer btn-press"><p class="text-[13px] text-slate-500">今日充值</p><p class="text-[22px] font-bold text-slate-800">¥ 0.00</p></div>
+                <div class="bg-white rounded-xl p-4 border border-slate-100 shadow-sm"><p class="text-[13px] text-slate-500">调用资格</p><p class="text-[18px] font-bold mt-1 text-green-600" id="dash-call-status">可以调用</p></div>
+                <div class="bg-white rounded-xl p-4 border border-slate-100 shadow-sm"><p class="text-[13px] text-slate-500">专属 Key</p><p class="text-[18px] font-bold mt-1 text-green-600" id="dash-key-status">启用中</p></div>
             </div>
-            
             <div class="grid grid-cols-2 gap-3 px-5 mt-4">
-                <button onclick="openRechargeModal()" class="py-2.5 bg-blue-600 text-white font-bold rounded-xl text-[14px] active:opacity-80 transition shadow-sm flex items-center justify-center gap-1">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg> 在线充值
-                </button>
-                <a href="/guide.html" class="py-2.5 bg-slate-50 text-slate-600 font-bold rounded-xl text-[14px] active:bg-slate-100 transition border border-slate-200 flex items-center justify-center gap-1">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg> 开发文档
-                </a>
+                <button onclick="openRechargeModal()" class="py-2.5 bg-blue-600 text-white font-bold rounded-xl text-[14px]">+ 在线充值</button>
+                <a href="/guide.html" class="py-2.5 bg-slate-50 text-slate-600 font-bold rounded-xl text-[14px] flex items-center justify-center">开发文档</a>
             </div>
         </div>
 
-        <!-- 4. 秘钥与白名单 -->
+        <!-- 秘钥 -->
         <div class="bg-white mt-2">
-            <button onclick="toggleAccordion('accordion-2', 'icon-2')" class="w-full px-5 py-4 flex justify-between items-center bg-white active:bg-slate-50 transition border-b border-slate-100">
-                <span class="font-bold text-slate-800 text-[14px] flex items-center gap-2">
-                    <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
-                    秘钥与白名单
-                </span>
-                <svg id="icon-2" class="w-4 h-4 text-slate-400 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            <button onclick="toggleAccordion('accordion-2', 'icon-2')" class="w-full px-5 py-4 flex justify-between items-center border-b border-slate-100">
+                <span class="font-bold text-slate-800 text-[14px]">秘钥与白名单</span>
+                <svg id="icon-2" class="w-4 h-4 text-slate-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
             </button>
             <div id="accordion-2" class="accordion-content bg-white">
                 <div class="px-5 pb-5 pt-3 border-b border-slate-100">
-                    <div class="flex justify-between items-center mb-3">
-                        <span class="text-[13px] font-bold text-slate-700">您的专属 API 密钥</span>
-                        <button onclick="toggleKeyMask()" class="text-[12px] text-slate-400 flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>切换可见</button>
-                    </div>
                     <div id="key-list" class="space-y-3 mb-5"></div>
-                    <div class="border-t border-slate-100 pt-4">
-                        <label class="block text-[13px] font-bold text-slate-700 mb-1">全局 IP 白名单</label>
-                        <p class="text-[11px] text-slate-400 mb-2">此处设置对所有已启用接口生效，保存即放行</p>
-                        <textarea rows="3" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-[13px] text-slate-700 focus:outline-none focus:border-blue-500 focus:bg-white transition resize-none" placeholder="一行一个 IP，例如：&#10;127.0.0.1"></textarea>
-                    </div>
-                    <button onclick="showToast('全局 IP 白名单已更新')" class="mt-3 w-full py-2.5 bg-slate-100 text-slate-600 font-bold rounded-lg text-[14px] active:bg-slate-200 transition">保存白名单</button>
+                    <textarea rows="3" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-[13px]" placeholder="IP 白名单..."></textarea>
+                    <button onclick="showToast('白名单已更新')" class="mt-3 w-full py-2.5 bg-slate-100 text-slate-600 font-bold rounded-lg text-[14px]">保存白名单</button>
                 </div>
             </div>
         </div>
 
-        <!-- 5. 账单与请求记录 -->
+        <!-- 账单 -->
         <div id="bill-tab-container" class="bg-white mt-2">
-            <div class="flex border-b border-slate-100 bg-slate-50/50">
+            <div class="flex border-b border-slate-100">
                 <button onclick="switchBillTab('bill')" id="tab-btn-bill" class="flex-1 py-3.5 text-[14px] font-bold text-blue-600 border-b-2 border-blue-600 bg-white">收支明细</button>
-                <button onclick="switchBillTab('request')" id="tab-btn-request" class="flex-1 py-3.5 text-[14px] font-bold text-slate-500 border-b-2 border-transparent active:bg-slate-100">消费记录</button>
+                <button onclick="switchBillTab('request')" id="tab-btn-request" class="flex-1 py-3.5 text-[14px] font-bold text-slate-500 border-b-2 border-transparent">消费记录</button>
             </div>
-            
             <div class="bg-white">
-                <div id="bill-list-container" class="w-full text-left"></div>
-                <div id="request-list-container" class="w-full text-left hidden"></div>
+                <div id="bill-list-container" class="text-left p-4">账单数据加载中...</div>
+                <div id="request-list-container" class="text-left p-4 hidden">请求数据加载中...</div>
             </div>
-            
-            <div class="flex justify-between items-center p-4 border-t border-slate-100">
-                <button onclick="changePage(-1)" class="px-4 py-1.5 bg-white border border-slate-200 text-slate-600 text-[13px] rounded-lg active:bg-slate-50">上一页</button>
-                <span class="text-[12px] text-slate-500 font-medium" id="page-info">第 1 页 · 每页 5 条</span>
-                <button onclick="changePage(1)" class="px-4 py-1.5 bg-white border border-slate-200 text-slate-600 text-[13px] rounded-lg active:bg-slate-50">下一页</button>
-            </div>
-        </div>
-
-        <!-- 底部说明 -->
-        <div class="text-center py-8 px-4">
-            <p class="text-[12px] text-slate-400 mb-1">价格与服务状态以接口详情页为准。</p>
-            <p class="text-[12px] text-slate-400 mb-3">请妥善保管 API Key，切勿在公开页面暴露。</p>
         </div>
     </main>
 
-    <!-- 弹窗等基础组件略，为了修复排版，直接写死HTML -->
+    <!-- 弹窗 -->
+    <div id="custom-modal" class="modal-overlay">
+        <div class="modal-box text-center">
+            <h3 class="text-[17px] font-bold text-slate-800 mb-3" id="modal-title">提示</h3>
+            <div class="text-[14px] text-slate-600 mb-5" id="modal-desc"></div>
+            <div class="flex gap-3" id="modal-btns"></div>
+        </div>
+    </div>
     <div id="toast">提示内容</div>
-    
+
     <script>
-        // 基础逻辑占位，确保页面不报错
-        function toggleAccordion(id, icon) { const el = document.getElementById(id); const ic = document.getElementById(icon); if(el.classList.contains('active')){el.classList.remove('active'); ic.classList.remove('rotate-180');} else {el.classList.add('active'); ic.classList.add('rotate-180');} }
+        const apis = [
+            { id: 'account', prefix: 'tg', name: '账号接口' },
+            { id: 'node', prefix: 'jd', name: '节点接口' },
+            { id: 'sms', prefix: 'sms', name: '接码接口' },
+            { id: 'query', prefix: 'cx', name: '查询接口' },
+            { id: 'pay', prefix: 'zf', name: '支付接口' }
+        ];
+        let apiStatus = { account: 1, node: 0, sms: 1, query: 0, pay: 1 };
+        let apiKeys = { account: 'sk_tg_123', node: 'sk_jd_456', sms: 'sk_sms_789', query: 'sk_cx_000', pay: 'sk_zf_999' };
+
+        function renderApis() {
+            document.getElementById('api-list').innerHTML = apis.map(a => `
+                <div class="flex justify-between items-center py-3 border-b border-slate-50">
+                    <p class="text-[14px] font-medium text-slate-800">${a.name}</p>
+                    <button class="status-btn status-pending" onclick="showCustomAlert('申请', '已提交申请，请等待审核')">申请调用</button>
+                </div>
+            `).join('');
+        }
+
+        function renderKeys() {
+            document.getElementById('key-list').innerHTML = apis.map(a => `
+                <div class="p-3 bg-slate-50 border rounded-lg">
+                    <p class="text-[12px] font-bold mb-1">${a.name} Key</p>
+                    <div class="font-mono text-[12px] text-slate-600">${apiKeys[a.id]}</div>
+                </div>
+            `).join('');
+        }
+
+        function toggleAccordion(id, iconId) {
+            const el = document.getElementById(id);
+            const ic = document.getElementById(iconId);
+            if(el.classList.contains('active')){el.classList.remove('active'); el.style.maxHeight = null; ic.classList.remove('rotate-180');}
+            else {el.classList.add('active'); el.style.maxHeight = el.scrollHeight + 'px'; ic.classList.add('rotate-180');}
+        }
+
+        function switchBillTab(tab) {
+            document.getElementById('tab-btn-bill').className = tab === 'bill' ? 'flex-1 py-3.5 text-[14px] font-bold text-blue-600 border-b-2 border-blue-600 bg-white' : 'flex-1 py-3.5 text-[14px] font-bold text-slate-500 border-b-2 border-transparent';
+            document.getElementById('tab-btn-request').className = tab === 'request' ? 'flex-1 py-3.5 text-[14px] font-bold text-blue-600 border-b-2 border-blue-600 bg-white' : 'flex-1 py-3.5 text-[14px] font-bold text-slate-500 border-b-2 border-transparent';
+            document.getElementById('bill-list-container').className = tab === 'bill' ? 'text-left p-4' : 'hidden';
+            document.getElementById('request-list-container').className = tab === 'request' ? 'text-left p-4' : 'hidden';
+        }
+
+        function openRechargeModal() {
+            showCustomAlert('在线充值', '<div class="text-center p-4"><p class="mb-2">请扫码支付</p><div class="w-32 h-32 bg-slate-200 mx-auto rounded"></div></div>');
+        }
+
+        function showCustomAlert(title, desc) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-desc').innerHTML = desc;
+            document.getElementById('modal-btns').innerHTML = '<button onclick="closeModal()" class="w-full py-2 bg-blue-600 text-white font-bold rounded-lg">我知道了</button>';
+            document.getElementById('custom-modal').classList.add('active');
+        }
+        function closeModal() { document.getElementById('custom-modal').classList.remove('active'); }
         function showToast(msg) { const t = document.getElementById('toast'); t.innerText = msg; t.className = 'show'; setTimeout(() => t.className = '', 2000); }
-        function renderApis() { document.getElementById('api-list').innerHTML = '<div class="py-2 text-[13px] text-slate-500">账号接口 (已启用)</div>'; }
-        function renderKeys() { document.getElementById('key-list').innerHTML = '<div class="p-3 bg-slate-50 border border-slate-200 rounded-lg text-[12px] font-mono text-slate-600">sk_tg_xxxxxxxxxxxxxxxx</div>'; }
-        function renderList() { document.getElementById('bill-list-container').innerHTML = '<div class="p-4 text-[13px] text-slate-500 text-center">暂无数据</div>'; }
-        document.addEventListener('DOMContentLoaded', () => { renderApis(); renderKeys(); renderList(); document.getElementById('dash-call-status').innerText = '可以调用'; document.getElementById('dash-call-status').className = 'text-[18px] font-bold mt-1 text-green-600'; document.getElementById('dash-key-status').innerText = '启用中'; document.getElementById('dash-key-status').className = 'text-[18px] font-bold mt-1 text-green-600'; });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderApis(); renderKeys();
+            document.getElementById('bill-list-container').innerHTML = '<div class="p-4 text-center text-slate-400">暂无流水</div>';
+            document.getElementById('request-list-container').innerHTML = '<div class="p-4 text-center text-slate-400">暂无记录</div>';
+        });
     </script>
 </body>
 </html>

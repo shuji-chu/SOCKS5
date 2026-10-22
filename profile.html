@@ -59,19 +59,7 @@
             <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
         </div>
 
-        <!-- 老板专属管理后台入口 -->
-        <a href="/admin-login.html" id="admin-entry-btn" style="display: none;" class="card p-4 flex justify-between items-center bg-gradient-to-r from-red-50 to-orange-50 border-red-100 active:scale-95 transition-transform mb-4 block">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center shadow-sm">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
-                </div>
-                <div>
-                    <h3 class="text-[15px] font-bold text-red-800 flex items-center gap-2">系统管理后台 <span class="text-[9px] bg-red-500 text-white px-1.5 py-0.5 rounded font-normal">老板专属</span></h3>
-                    <p class="text-[12px] text-red-600/80 mt-0.5">全站数据、商品、用户与财务总控</p>
-                </div>
-            </div>
-            <svg class="w-5 h-5 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-        </a>
+        
 
         <!-- 四宫格数据 -->
         <div class="grid grid-cols-2 gap-3">
@@ -205,11 +193,7 @@
                 avatarContainer.innerHTML = `<img src="${avatar}" class="w-full h-full object-cover">`;
             }
 
-            // 老板专属入口显隐
-            if (role === 'boss') {
-                const btn = document.getElementById('admin-entry-btn');
-                if (btn) btn.style.display = 'flex';
-            }
+
         });
 
         // 底部抽屉控制

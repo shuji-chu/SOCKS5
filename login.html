@@ -161,15 +161,10 @@
                 localStorage.setItem('user_role', 'user');
                 window.location.href = '/profile.html';
             } else {
-                if (email === 'boss@lynli.me') {
-                    localStorage.setItem('user_id', '10001');
-                    localStorage.setItem('user_email', email);
-                    localStorage.setItem('user_role', 'boss');
-                } else {
-                    localStorage.setItem('user_id', '10002');
-                    localStorage.setItem('user_email', email);
-                    localStorage.setItem('user_role', 'user');
-                }
+                // 纯前端演示：统一当普通用户处理，真实权限由后端校验
+                localStorage.setItem('user_id', '10002');
+                localStorage.setItem('user_email', email);
+                localStorage.setItem('user_role', 'user');
                 window.location.href = '/profile.html';
             }
         }

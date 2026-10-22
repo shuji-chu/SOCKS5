@@ -8,9 +8,26 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
-        body { background-color: #f1f5f9; color: #1e293b; padding-bottom: 20px;}
+        body { background-color: #f1f5f9; color: #1e293b; padding-bottom: 20px; }
+        
+        /* 弹窗基础样式 */
         .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 9999; display: none; align-items: center; justify-content: center; }
         .modal-overlay.active { display: flex; }
+        
+        /* SSL 弹窗的专属滚动修复 */
+        #ssl-modal { align-items: flex-start; padding-top: 5vh; padding-bottom: 5vh; }
+        .ssl-container { 
+            max-height: 90vh; 
+            overflow-y: auto; 
+            -webkit-overflow-scrolling: touch; /* 开启 iOS 顺滑滚动 */
+            overscroll-behavior: contain; /* 防止滚动穿透 */
+        }
+        
+        /* FAQ 手风琴动画 */
+        .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; background: #f8fafc; }
+        .faq-answer.active { max-height: 200px; }
+        .faq-icon { transition: transform 0.3s ease; }
+        .faq-icon.active { transform: rotate(180deg); }
     </style>
 </head>
 <body>
@@ -58,9 +75,9 @@
         </div>
     </main>
 
-    <!-- SSL 证书申请弹窗 (全屏遮罩) -->
-    <div id="ssl-modal" class="modal-overlay" style="align-items: flex-start; padding-top: 10vh;">
-        <div class="bg-white rounded-2xl w-[92%] max-w-[380px] relative max-h-[80vh] overflow-y-auto">
+    <!-- SSL 证书申请弹窗 (带滚动修复) -->
+    <div id="ssl-modal" class="modal-overlay">
+        <div class="bg-white rounded-2xl w-[92%] max-w-[380px] relative ssl-container">
             <div class="sticky top-0 bg-white px-5 py-4 border-b border-slate-100 flex justify-between items-center z-10">
                 <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
                     <svg class="w-6 h-6 text-green-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
@@ -68,6 +85,7 @@
                 </h3>
                 <button onclick="closeSSLModal()" class="text-slate-400 text-xl px-2">✕</button>
             </div>
+            
             <div class="p-5">
                 <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-5">
                     <label class="block text-sm font-bold text-slate-700 mb-2">选择申请域名</label>
@@ -79,7 +97,7 @@
                         <option>单域名证书 (免费)</option>
                         <option>通配符证书 (付费)</option>
                     </select>
-                    <button onclick="showToast('已提交SSL申请，请等待DNS生效')" class="w-full bg-green-500 text-white font-bold rounded-lg py-3 text-sm shadow-sm flex justify-center items-center gap-2">
+                    <button onclick="showToast('已提交SSL申请，请等待DNS生效')" class="w-full bg-[#4caf50] hover:bg-[#43a047] text-white font-bold rounded-lg py-3 text-sm shadow-sm flex justify-center items-center gap-2 transition-colors">
                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg> 提交申请
                     </button>
                 </div>
@@ -88,15 +106,57 @@
                     <h4 class="font-bold text-slate-800 text-sm">申请历史</h4>
                     <span class="text-xs text-slate-400">共 0 条</span>
                 </div>
-                <div class="border border-slate-100 rounded-xl p-6 text-center text-slate-400 text-sm mb-5">
+                <div class="border border-slate-100 rounded-xl p-6 text-center text-slate-400 text-sm mb-6">
                     暂无证书申请记录。
                 </div>
 
-                <h4 class="font-bold text-slate-800 text-sm mb-3 flex items-center gap-2"><svg class="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg> 常见问题解答</h4>
-                <div class="border border-slate-100 rounded-xl overflow-hidden text-sm text-slate-600">
-                    <div class="p-3 border-b border-slate-100 flex justify-between"><span>同一个域名申请冷却需要多久？</span><span class="text-slate-300">∨</span></div>
-                    <div class="p-3 border-b border-slate-100 flex justify-between"><span>证书申请一般需要多久？</span><span class="text-slate-300">∨</span></div>
-                    <div class="p-3 border-b border-slate-100 flex justify-between"><span>为什么状态显示“等待DNS生效”？</span><span class="text-slate-300">∨</span></div>
+                <!-- FAQ 手风琴区域 -->
+                <h4 class="font-bold text-slate-800 text-sm mb-3 flex items-center gap-2">
+                    <svg class="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg> 
+                    常见问题解答
+                </h4>
+                
+                <div class="border border-slate-100 rounded-xl overflow-hidden text-[13px] text-slate-700 bg-white">
+                    <!-- FAQ 1 -->
+                    <div class="border-b border-slate-100">
+                        <div class="p-4 flex justify-between items-center cursor-pointer select-none" onclick="toggleFaq(this)">
+                            <span class="font-medium">同一个域名申请冷却需要多久？</span>
+                            <svg class="w-4 h-4 text-slate-400 faq-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="p-4 text-slate-500 border-t border-slate-50 leading-relaxed">为防止恶意刷证书，同一域名在申请失败或被吊销后，通常需要等待 1-2 小时才能重新提交申请。</div>
+                        </div>
+                    </div>
+                    <!-- FAQ 2 -->
+                    <div class="border-b border-slate-100">
+                        <div class="p-4 flex justify-between items-center cursor-pointer select-none" onclick="toggleFaq(this)">
+                            <span class="font-medium">证书申请一般需要多久？</span>
+                            <svg class="w-4 h-4 text-slate-400 faq-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="p-4 text-slate-500 border-t border-slate-50 leading-relaxed">单域名证书（DV）通常仅需 1-5 分钟即可签发。若长时间未签发，请检查域名 DNS 解析是否已正确指向。</div>
+                        </div>
+                    </div>
+                    <!-- FAQ 3 -->
+                    <div class="border-b border-slate-100">
+                        <div class="p-4 flex justify-between items-center cursor-pointer select-none" onclick="toggleFaq(this)">
+                            <span class="font-medium">为什么状态显示“等待DNS生效”？</span>
+                            <svg class="w-4 h-4 text-slate-400 faq-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="p-4 text-slate-500 border-t border-slate-50 leading-relaxed">CA 机构在签发证书前，会尝试访问您的域名验证所有权。如果您的 A/CNAME 记录刚添加，全球 DNS 同步需要时间（通常 10 分钟-24 小时），请耐心等待。</div>
+                        </div>
+                    </div>
+                     <!-- FAQ 4 -->
+                     <div class="border-b border-slate-100">
+                        <div class="p-4 flex justify-between items-center cursor-pointer select-none" onclick="toggleFaq(this)">
+                            <span class="font-medium">证书有效期多久，会自动续签吗？</span>
+                            <svg class="w-4 h-4 text-slate-400 faq-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                        <div class="faq-answer">
+                            <div class="p-4 text-slate-500 border-t border-slate-50 leading-relaxed">免费 DV 证书有效期为 90 天。系统会在到期前 30 天自动为您尝试续签，无需手动操作。</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -114,18 +174,15 @@
     </div>
 
     <script>
-        // SSL 弹窗
         function openSSLModal() { document.getElementById('ssl-modal').classList.add('active'); }
         function closeSSLModal() { document.getElementById('ssl-modal').classList.remove('active'); }
 
-        // 添加 DNS 记录逻辑 (强制限制5条)
         function addDNSRecord() {
             const items = document.querySelectorAll('.dns-item');
             if (items.length >= 5) {
                 showGlobalAlert('解析上限', '免费二级域名最多只能添加 5 条解析记录，如需更多请升级或购买付费配额。');
                 return;
             }
-            // 模拟添加一条
             const list = document.getElementById('dns-list');
             const newDiv = document.createElement('div');
             newDiv.className = 'grid grid-cols-3 p-3 text-slate-700 items-center dns-item border-b border-slate-50';
@@ -138,7 +195,6 @@
             showToast('添加成功');
         }
 
-        // 全局提示
         function showGlobalAlert(title, desc) {
             document.getElementById('modal-title').innerText = title;
             document.getElementById('modal-desc').innerText = desc;
@@ -159,6 +215,26 @@
             t.classList.remove('hidden');
             clearTimeout(toastTimer);
             toastTimer = setTimeout(() => t.classList.add('hidden'), 2000);
+        }
+
+        // 手风琴 FAQ 逻辑
+        function toggleFaq(element) {
+            const answer = element.nextElementSibling;
+            const icon = element.querySelector('.faq-icon');
+            
+            // 如果已经打开，就关闭
+            if (answer.classList.contains('active')) {
+                answer.classList.remove('active');
+                icon.classList.remove('active');
+            } else {
+                // 先关闭所有已打开的
+                document.querySelectorAll('.faq-answer').forEach(el => el.classList.remove('active'));
+                document.querySelectorAll('.faq-icon').forEach(el => el.classList.remove('active'));
+                
+                // 打开当前点击的
+                answer.classList.add('active');
+                icon.classList.add('active');
+            }
         }
     </script>
 </body>

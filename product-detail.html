@@ -172,51 +172,7 @@
     <script>
         // ================= 核心数据 =================
         // 模拟从后端获取的商品数据（大号商 1700+ 商品同理，这里只演示两个）
-        const productDB = {
-            '3965': {
-                title: '[货号3965]🛰️Telegram飞机号/电报 | +1美国电话注册 | 成品号 | API接码登录 | 稳定推荐👍👍',
-                price: 8.72,
-                stock: 1934,
-                desc: `
-                    <p><b>卡密格式：</b><span class="bg-slate-100 px-1 py-0.5 rounded text-pink-600">号码|接码链接</span></p>
-                    <p><b>描述：</b>Telegram飞机号/电报，+1美国，成品号。支持任何设备登录（网页/电脑/手机/苹果/Mac等）。</p>
-                    <p><b>汉化包：</b><a href="https://t.me/setlanguage/classic-zh-cn" target="_blank">点击安装</a></p>
-                    <p>本站代开 TG 会员，刷频道订阅者，全网最低价。</p>
-                `,
-                tutorial: `
-                    <p><b>【卡密格式】</b>号码|接码链接</p>
-                    <p><b>1. 输入号码：</b>在客户端中输入手机号（+1为区号），点下一步，千万别返回。</p>
-                    <p><b>2. 获取验证码：</b>不论验证码提示发到哪，均去打开卡密中的【接码链接】。</p>
-                    <p><b>3. 输入验证码：</b>接码有延迟请等待，千万别退出程序。成功后输入验证码及 2FA 密码（在接码网页中）。</p>
-                    <p class="text-red-500">⚠️ 成功登录后请至少保持一个设备在线，不提供二次接码服务。</p>
-                `,
-                warning: `
-                    <p><b>【售后说明】</b>本店所售账号均为未冻结状态，"账号冻结"不在售后范围之内！</p>
-                    <p><b>【风控提醒】</b>由于官方风控极严，推荐使用注册地 IP 登录。未满三天账号存在保护期（无法与非好友对话），满三天解除。</p>
-                    <p><b>【视频教程】</b><br>API接码登录教程：<a href="https://youtu.be/rxxVhC-ul-w" target="_blank">https://youtu.be/rxxVhC-ul-w</a><br>收不到码请下载 Nicegram app 测试。</p>
-                `
-            },
-            '1907': {
-                title: '[库存号] 谷歌 Gmail 白号 | 2019年老号 | 纯手工注册 | 带辅助邮箱',
-                price: 12.35,
-                stock: 120,
-                desc: `
-                    <p><b>卡密格式：</b><span class="bg-slate-100 px-1 py-0.5 rounded text-pink-600">邮箱|密码|辅助邮箱|国家</span></p>
-                    <p><b>描述：</b>Google Gmail 账号，2006-2019年超级老号。确认辅助邮箱登录。</p>
-                    <p><b>登录教程：</b><a href="https://youtu.be/MHvJVGUUtoE" target="_blank">点击观看</a></p>
-                `,
-                tutorial: `
-                    <p><b>【卡密格式】</b>邮箱|密码|辅助邮箱|国家</p>
-                    <p><b>1. 网页/手机登录：</b>输入邮箱和密码登录。</p>
-                    <p><b>2. 辅助邮箱验证：</b>若触发风控，请填入卡密中提供的辅助邮箱进行验证。</p>
-                    <p><b>3. 扫码登录：</b>2025年10月后的新号易出扫码，请用 GMAIL 手机 APP 登录。</p>
-                `,
-                warning: `
-                    <p><b>【防封警告】</b>不保证可用于任何第三方关联业务，请先少量测试。单环境多账号或频繁退登易被风控封号。</p>
-                    <p><b>【时效要求】</b>购买后请立即使用，不宜长期存储。卡密产品售出不退。</p>
-                `
-            }
-        };
+        
 
         // 全局合规声明
         const complianceText = `
@@ -231,19 +187,30 @@
         let currentProduct = null;
         let currentPayType = 'alipay';
 
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             // 从 URL 获取商品 ID
             const urlParams = new URLSearchParams(window.location.search);
-            const productId = urlParams.get('id') || '3965'; // 默认展示 TG 号
-            currentProduct = productDB[productId] || productDB['3965'];
+            const productId = urlParams.get('id') || '3965';
 
-            // 渲染数据
-            document.getElementById('p-title').innerText = currentProduct.title;
-            document.getElementById('p-price').innerText = `¥ ${currentProduct.price.toFixed(2)}`;
-            document.getElementById('p-stock').innerText = currentProduct.stock;
-            document.getElementById('p-desc').innerHTML = currentProduct.desc;
-            
-            updateTotal();
+            try {
+                // 真实企业级做法：从后端或配置读取
+                const res = await fetch('/products.json');
+                const data = await res.json();
+                
+                // 查找对应 ID 的商品，找不到就默认用第一个
+                currentProduct = data.find(p => p.id === productId) || data[0];
+
+                // 渲染数据
+                document.getElementById('p-title').innerText = currentProduct.title;
+                document.getElementById('p-price').innerText = `¥ ${currentProduct.price.toFixed(2)}`;
+                document.getElementById('p-stock').innerText = currentProduct.stock;
+                document.getElementById('p-desc').innerHTML = currentProduct.desc;
+                
+                updateTotal();
+            } catch (e) {
+                console.error('商品加载失败', e);
+                document.getElementById('p-title').innerText = '商品数据加载失败';
+            }
         });
 
         // ================= 购买逻辑 =================

@@ -24,7 +24,6 @@
         .key-card.expanded .key-body { display: block; }
         .key-card.expanded .arrow-icon { transform: rotate(180deg); }
         
-        /* 长文本弹窗滚动 */
         .modal-body { max-height: 55vh; overflow-y: auto; text-align: left; }
         .modal-body p { margin-bottom: 10px; line-height: 1.6; font-size: 13px; color: #475569; }
         .modal-body h4 { font-weight: bold; color: #1e293b; margin-top: 16px; margin-bottom: 6px; font-size: 14px; }
@@ -32,7 +31,6 @@
         #toast { visibility: hidden; min-width: 200px; background-color: #334155; color: #fff; text-align: center; border-radius: 8px; padding: 10px 16px; position: fixed; z-index: 10000; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 13px; opacity: 0; transition: opacity 0.3s; }
         #toast.show { visibility: visible; opacity: 1; }
 
-        /* 点击下弹互动效果 */
         .btn-press { transition: transform 0.1s, background-color 0.2s; }
         .btn-press:active { transform: scale(0.97); background-color: #f1f5f9; }
     </style>
@@ -47,7 +45,6 @@
         <!-- 1. 顶部账户信息 -->
         <div class="bg-white px-5 py-6 flex items-center justify-between">
             <div class="flex items-center gap-4">
-                <!-- 用户自定义头像读取区 -->
                 <div id="user-avatar-container" class="w-[52px] h-[52px] rounded-full bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200 shrink-0">
                     <span class="text-blue-500 font-bold text-xl">B</span>
                 </div>
@@ -56,7 +53,6 @@
                     <p class="text-[12px] text-slate-400 mt-0.5">ID: 10001</p>
                 </div>
             </div>
-            <!-- 余额展示块 -->
             <div class="bg-blue-50 px-4 py-2 rounded-xl text-right min-w-[100px]">
                 <p class="text-[11px] text-blue-500 mb-0.5">当前余额</p>
                 <p class="text-[20px] font-bold text-blue-600">¥ 120.00</p>
@@ -87,9 +83,7 @@
                 <p class="text-[12px] text-slate-500">当前账户 boss，可查看 Key、充值、收支明细和消费记录。</p>
             </div>
             
-            <!-- 四宫格 (纯物理按压反馈，无弹窗) -->
             <div class="grid grid-cols-2 gap-3 px-5">
-                <!-- 今日消费 -->
                 <div onclick="void(0)" class="bg-white rounded-xl p-4 border border-slate-100 shadow-sm cursor-pointer btn-press">
                     <div class="flex justify-between items-start mb-2">
                         <p class="text-[13px] text-slate-500 font-medium">今日消费</p>
@@ -97,7 +91,6 @@
                     </div>
                     <p class="text-[22px] font-bold text-slate-800">¥ 0.00</p>
                 </div>
-                <!-- 今日充值 -->
                 <div onclick="void(0)" class="bg-white rounded-xl p-4 border border-slate-100 shadow-sm cursor-pointer btn-press">
                     <div class="flex justify-between items-start mb-2">
                         <p class="text-[13px] text-slate-500 font-medium">今日充值</p>
@@ -105,7 +98,6 @@
                     </div>
                     <p class="text-[22px] font-bold text-slate-800">¥ 0.00</p>
                 </div>
-                <!-- 调用资格 -->
                 <div onclick="void(0)" class="bg-white rounded-xl p-4 border border-slate-100 shadow-sm cursor-pointer btn-press">
                     <div class="flex justify-between items-start mb-2">
                         <p class="text-[13px] text-slate-500 font-medium">调用资格</p>
@@ -113,7 +105,6 @@
                     </div>
                     <p class="text-[18px] font-bold mt-1" id="dash-call-status">计算中...</p>
                 </div>
-                <!-- 专属 Key -->
                 <div onclick="void(0)" class="bg-white rounded-xl p-4 border border-slate-100 shadow-sm cursor-pointer btn-press">
                     <div class="flex justify-between items-start mb-2">
                         <p class="text-[13px] text-slate-500 font-medium">专属 Key</p>
@@ -123,7 +114,6 @@
                 </div>
             </div>
             
-            <!-- 操作按钮组 -->
             <div class="grid grid-cols-2 gap-3 px-5 mt-4">
                 <button onclick="openRechargeModal()" class="py-2.5 bg-blue-600 text-white font-bold rounded-xl text-[14px] active:opacity-80 transition shadow-sm flex items-center justify-center gap-1">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg> 在线充值
@@ -160,21 +150,18 @@
             </div>
         </div>
 
-        <!-- 5. 账单与请求记录 (去掉了折叠外壳，直接显示Tab) -->
-        <div class="bg-white mt-2">
-            <!-- Tabs -->
+        <!-- 5. 账单与请求记录 -->
+        <div id="bill-tab-container" class="bg-white mt-2">
             <div class="flex border-b border-slate-100 bg-slate-50/50">
                 <button onclick="switchBillTab('bill')" id="tab-btn-bill" class="flex-1 py-3.5 text-[14px] font-bold text-blue-600 border-b-2 border-blue-600 bg-white">收支明细</button>
                 <button onclick="switchBillTab('request')" id="tab-btn-request" class="flex-1 py-3.5 text-[14px] font-bold text-slate-500 border-b-2 border-transparent active:bg-slate-100">消费记录</button>
             </div>
             
-            <!-- 列表容器 -->
             <div class="bg-white">
                 <div id="bill-list-container" class="w-full text-left"></div>
                 <div id="request-list-container" class="w-full text-left hidden"></div>
             </div>
             
-            <!-- 分页 -->
             <div class="flex justify-between items-center p-4 border-t border-slate-100">
                 <button onclick="changePage(-1)" class="px-4 py-1.5 bg-white border border-slate-200 text-slate-600 text-[13px] rounded-lg active:bg-slate-50">上一页</button>
                 <span class="text-[12px] text-slate-500 font-medium" id="page-info">第 1 页 · 每页 5 条</span>
@@ -199,18 +186,15 @@
     <!-- 通用自定义弹窗 -->
     <div id="custom-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[9999] hidden items-center justify-center px-4">
         <div class="bg-white rounded-2xl w-full max-w-[340px] p-5 text-center shadow-xl transform scale-95 transition-transform duration-200" id="modal-inner">
-            <!-- 动态内容区 -->
             <div id="modal-normal-content">
                 <h3 class="text-[17px] font-bold text-slate-800 mb-3" id="modal-title">提示</h3>
                 <div class="modal-body text-[14px] text-slate-600 mb-5" id="modal-desc"></div>
                 <div class="flex gap-3" id="modal-btns"></div>
             </div>
             
-            <!-- 专属充值内容区 (默认隐藏) -->
             <div id="modal-recharge-content" class="hidden text-left">
                 <h3 class="text-[17px] font-bold text-slate-800 mb-1 text-center">在线充值</h3>
                 <p class="text-[12px] text-slate-400 text-center mb-4">1U = 8 RMB</p>
-                
                 <div class="mb-4">
                     <label class="text-[13px] font-bold text-slate-700 mb-2 block">1. 选择支付方式</label>
                     <div class="flex gap-2">
@@ -218,7 +202,6 @@
                         <div onclick="selectPayType('usdt')" id="btn-usdt" class="flex-1 border border-slate-200 text-slate-600 text-[13px] py-2 rounded-lg text-center cursor-pointer">USDT</div>
                     </div>
                 </div>
-
                 <div class="mb-4">
                     <label class="text-[13px] font-bold text-slate-700 mb-2 block">2. 输入金额 (最低10U)</label>
                     <div class="flex items-center border border-slate-200 rounded-lg overflow-hidden">
@@ -226,19 +209,16 @@
                         <span class="bg-slate-50 px-3 py-2 text-[13px] text-slate-500 border-l border-slate-200" id="unit-text">USDT</span>
                     </div>
                 </div>
-
                 <div class="bg-slate-50 p-3 rounded-lg mb-5 border border-slate-100">
                     <p class="text-[12px] text-slate-500 mb-1">订单预估</p>
                     <p class="text-lg font-bold text-blue-600" id="recharge-calc">80.00 CNY</p>
                 </div>
-
                 <div class="flex gap-3">
                     <button onclick="closeCustomAlert()" class="flex-1 py-2.5 bg-slate-100 text-slate-600 font-bold rounded-xl text-[15px] active:bg-slate-200">取消</button>
                     <button onclick="generatePayOrder()" class="flex-1 py-2.5 bg-blue-600 text-white font-bold rounded-xl text-[15px] active:opacity-80">生成订单</button>
                 </div>
             </div>
 
-            <!-- 支付二维码内容区 (默认隐藏) -->
             <div id="modal-pay-content" class="hidden text-center">
                 <h3 class="text-[17px] font-bold text-slate-800 mb-4">扫码支付</h3>
                 <div class="bg-slate-100 w-48 h-48 mx-auto rounded-xl flex items-center justify-center mb-4 border border-slate-200">
@@ -255,36 +235,13 @@
 
     <script>
         // --- 初始化读取用户头像 ---
-        // 初始化
         document.addEventListener('DOMContentLoaded', () => {
-            // 头像读取逻辑
             const userAvatar = localStorage.getItem('user_avatar');
             const avatarContainer = document.getElementById('user-avatar-container');
             if (userAvatar) {
                 avatarContainer.innerHTML = `<img src="${userAvatar}" class="w-full h-full object-cover">`;
             } else {
                 avatarContainer.innerHTML = `<span class="text-blue-500 font-bold text-xl">B</span>`;
-            }
-
-            apis.forEach(api => { if (!apiKeys[api.id]) apiKeys[api.id] = `sk_${api.prefix}_` + Math.random().toString(36).substring(2); });
-            localStorage.setItem('api_keys', JSON.stringify(apiKeys));
-
-            renderDashboard();
-            renderApis();
-            renderKeys();
-            renderList();
-
-            // 处理跳转锚点
-            if (window.location.hash === '#bill-tab') {
-                switchBillTab('bill');
-                setTimeout(() => {
-                    document.getElementById('tab-btn-bill').scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }, 300);
-            } else if (window.location.hash === '#request-tab') {
-                switchBillTab('request');
-                setTimeout(() => {
-                    document.getElementById('tab-btn-request').scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }, 300);
             }
         });
 
@@ -303,7 +260,7 @@
         let isMasked = false;
         let expandedKeyId = null; 
 
-        // --- 模拟账单与请求数据 ---
+        // --- 模拟数据 ---
         const mockBills = Array.from({length: 12}).map((_, i) => ({
             id: `BL2026102216${Math.floor(Math.random()*1000000)}`,
             type: i % 3 === 0 ? '在线充值' : (i % 3 === 1 ? '手机号二要素认证 接口消费' : '退款入账'),
@@ -358,9 +315,7 @@
                               `<span class="status-btn status-active">🟢 启用中</span>`;
                 list.innerHTML += `
                     <div class="flex justify-between items-center py-3 border-b border-slate-50 last:border-0">
-                        <div>
-                            <p class="text-[14px] font-medium text-slate-800">${api.name}</p>
-                        </div>
+                        <div><p class="text-[14px] font-medium text-slate-800">${api.name}</p></div>
                         ${btnHtml}
                     </div>
                 `;
@@ -444,12 +399,7 @@
 
             if (currentTab === 'bill') {
                 const data = mockBills.slice(start, end);
-                let html = `
-                    <div class="flex justify-between items-center bg-slate-50 px-4 py-2 border-b border-slate-100 text-[12px] text-slate-500 font-medium">
-                        <span>流水号 / 类型</span>
-                        <span>收支金额</span>
-                    </div>
-                `;
+                let html = `<div class="flex justify-between items-center bg-slate-50 px-4 py-2 border-b border-slate-100 text-[12px] text-slate-500 font-medium"><span>流水号 / 类型</span><span>收支金额</span></div>`;
                 html += data.map(item => `
                     <div class="flex justify-between items-start px-4 py-3 border-b border-slate-100 last:border-0 hover:bg-slate-50 transition">
                         <div class="flex flex-col gap-1 pr-4">
@@ -467,12 +417,7 @@
                 listBill.innerHTML = html;
             } else {
                 const data = mockRequests.slice(start, end);
-                let html = `
-                    <div class="flex justify-between items-center bg-slate-50 px-4 py-2 border-b border-slate-100 text-[12px] text-slate-500 font-medium">
-                        <span>请求单号 / 项目</span>
-                        <span>详情 / 时间</span>
-                    </div>
-                `;
+                let html = `<div class="flex justify-between items-center bg-slate-50 px-4 py-2 border-b border-slate-100 text-[12px] text-slate-500 font-medium"><span>请求单号 / 项目</span><span>详情 / 时间</span></div>`;
                 html += data.map(item => `
                     <div class="flex justify-between items-start px-4 py-3 border-b border-slate-100 last:border-0 hover:bg-slate-50 transition">
                         <div class="flex flex-col gap-1 pr-4">
@@ -488,7 +433,6 @@
                 `).join('');
                 listReq.innerHTML = html;
             }
-
             document.getElementById('page-info').innerText = `第 ${currentPage} 页 · 每页 5 条`;
         }
 
@@ -504,39 +448,8 @@
 
         // --- 弹窗内容配置 ---
         const legalDocs = {
-            privacy: `
-                <h4>一、引言</h4>
-                <p>SOCKS5 开放平台（以下简称“本平台”）深知个人信息对您的重要性，并会尽全力保护您的个人信息安全可靠。我们致力于维持您对我们的信任，恪守以下原则，保护您的个人信息：权责一致原则、目的明确原则、选择同意原则、最少够用原则、确保安全原则、主体参与原则、公开透明原则等。同时，我们承诺，我们将按业界成熟的安全标准，采取相应的安全保护措施来保护您的个人信息。</p>
-                <h4>二、我们如何收集和使用您的个人信息</h4>
-                <p>1. 帮助您成为我们的用户：为注册成为用户并使用我们的服务，您需要提供手机号或电子邮箱，并创建账号、密码。我们将通过发送短信验证码或邮件的方式来验证您的身份是否有效。</p>
-                <p>2. 为您提供 API 服务：当您使用本平台 API 接口时，我们会记录您的 API 调用日志（包括但不限于调用时间、IP地址、请求参数、返回状态），以便为您提供技术支持、故障排查以及计费服务。</p>
-                <p>3. 保障交易安全：在您进行充值、购买商品时，我们会记录您的订单信息、交易流水，并可能会通过第三方支付机构收集相关的支付状态信息，以保障您的资金安全。</p>
-                <h4>三、我们如何共享、转让、公开披露您的个人信息</h4>
-                <p>1. 我们不会向其他任何公司、组织和个人分享您的个人信息，但以下情况除外：事先获得您明确的同意或授权；根据适用的法律法规、法律程序的要求、强制性的行政或司法要求所必须的情况进行提供。</p>
-                <p>2. 与授权合作伙伴共享：仅为实现本政策中声明的目的，我们的某些服务将由授权合作伙伴提供（如支付通道）。我们仅会出于合法、正当、必要、特定、明确的目的共享您的信息，并且只会共享提供服务所必要的个人信息。</p>
-                <h4>四、我们如何保护您的个人信息</h4>
-                <p>我们采用符合业界标准的安全防护措施，包括建立合理的制度规范、安全技术来防止您的个人信息遭到未经授权的访问使用、修改，避免数据的损坏或丢失。我们的网络服务采取了传输层安全协议等加密技术，确保您的数据在网络传输过程中的安全。我们会采取一切合理可行的措施，保护您的个人信息。</p>
-                <h4>五、您的权利</h4>
-                <p>按照中国相关的法律、法规、标准，以及其他国家、地区的通行做法，我们保障您对自己的个人信息行使以下权利：访问您的个人信息、更正您的个人信息、删除您的个人信息、改变您授权同意的范围、注销账户。由于 API 平台的特殊性，注销账户后，您的调用记录和资金流水将根据国家相关法律规定予以保留。</p>
-                <h4>六、本政策如何更新</h4>
-                <p>我们的隐私政策可能变更。未经您明确同意，我们不会削减您按照本政策所应享有的权利。我们会在本页面上发布对本政策所做的任何变更。对于重大变更，我们还会提供更为显著的通知（包括对于某些服务，我们会通过电子邮件发送通知，说明隐私政策的具体变更内容）。</p>
-            `,
-            about: `
-                <h4>公司简介</h4>
-                <p>SOCKS5 开放平台成立于2026年，是一家专注于数字资产流转与自动化接口服务的顶尖技术提供商。我们致力于通过强大的底层架构和卓越的 API 网关能力，为全球开发者与企业提供稳定、高效、安全的数字基础设施。</p>
-                <h4>核心业务矩阵</h4>
-                <p><b>1. 账号与接码矩阵：</b>提供百万级静态卡密池与动态实时接码服务，深度赋能跨境出海与社媒矩阵运营。</p>
-                <p><b>2. 节点与代理网络：</b>覆盖全球的优质 IP 资源池，支持海量并发与高可用定制，满足各类复杂网络环境需求。</p>
-                <p><b>3. 数据聚合网关：</b>无缝集成超 60 个底层优质数据源，提供毫秒级的二/三要素核验、反欺诈与司法涉诉查询服务。</p>
-                <p><b>4. 支付与域名分发：</b>合规的聚合支付通道与自动化的 Cloudflare DNS 解析分发能力。</p>
-                <h4>技术与安全</h4>
-                <p>本平台采用全球领先的 Cloudflare Worker 边缘计算架构与 D1 分布式数据库，确保每次请求的极速响应。在安全方面，我们严格遵循零信任架构，实行严格的 IP 白名单机制，所有资金交易均经过多重加密校验，确保客户数据和资产万无一失。</p>
-                <h4>联系我们</h4>
-                <p>如果您对我们的服务有任何疑问或需要商务合作，欢迎通过以下方式与我们取得联系：</p>
-                <p>官方邮箱：boss@lynli.me</p>
-                <p>官方 Telegram：qingtian_Boss</p>
-                <p>感谢您选择 SOCKS5，期待与您携手共创未来。</p>
-            `
+            privacy: `<h4>一、引言</h4><p>SOCKS5 开放平台（以下简称“本平台”）深知个人信息对您的重要性，并会尽全力保护您的个人信息安全可靠。我们致力于维持您对我们的信任，恪守以下原则，保护您的个人信息：权责一致原则、目的明确原则、选择同意原则、最少够用原则、确保安全原则、主体参与原则、公开透明原则等。</p><h4>二、我们如何收集和使用您的个人信息</h4><p>1. 帮助您成为我们的用户：为注册成为用户并使用我们的服务，您需要提供手机号或电子邮箱，并创建账号、密码。</p><p>2. 为您提供 API 服务：当您使用本平台 API 接口时，我们会记录您的 API 调用日志（包括但不限于调用时间、IP地址、请求参数、返回状态）。</p><p>3. 保障交易安全：在您进行充值、购买商品时，我们会记录您的订单信息、交易流水。</p><h4>三、我们如何共享、转让、公开披露您的个人信息</h4><p>1. 我们不会向其他任何公司、组织和个人分享您的个人信息，但以下情况除外：事先获得您明确的同意或授权；根据适用的法律法规、法律程序的要求、强制性的行政或司法要求所必须的情况进行提供。</p><h4>四、我们如何保护您的个人信息</h4><p>我们采用符合业界标准的安全防护措施，包括建立合理的制度规范、安全技术来防止您的个人信息遭到未经授权的访问使用、修改。</p><h4>五、您的权利</h4><p>按照中国相关的法律、法规、标准，我们保障您对自己的个人信息行使以下权利：访问、更正、删除您的个人信息及注销账户。</p>`,
+            about: `<h4>公司简介</h4><p>SOCKS5 开放平台成立于2026年，是一家专注于数字资产流转与自动化接口服务的顶尖技术提供商。我们致力于通过强大的底层架构和卓越的 API 网关能力，为全球开发者与企业提供稳定、高效、安全的数字基础设施。</p><h4>核心业务矩阵</h4><p><b>1. 账号与接码矩阵：</b>提供百万级静态卡密池与动态实时接码服务，深度赋能跨境出海与社媒矩阵运营。</p><p><b>2. 节点与代理网络：</b>覆盖全球的优质 IP 资源池，支持海量并发与高可用定制。</p><p><b>3. 数据聚合网关：</b>无缝集成超 60 个底层优质数据源，提供毫秒级的核验服务。</p><p><b>4. 支付与域名分发：</b>合规的聚合支付通道与自动化的 DNS 解析分发能力。</p><h4>技术与安全</h4><p>本平台采用全球领先的边缘计算架构与分布式数据库，确保每次请求的极速响应。实行严格的 IP 白名单机制，所有资金交易均经过多重加密校验。</p><h4>联系我们</h4><p>官方邮箱：boss@lynli.me</p><p>官方 Telegram：qingtian_Boss</p>`
         };
 
         function openLegalModal(type) {
@@ -649,18 +562,8 @@
             setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 200);
         }
 
-        // 初始化
-        // 初始化
+        // 核心初始化
         document.addEventListener('DOMContentLoaded', () => {
-            // 头像读取逻辑
-            const userAvatar = localStorage.getItem('user_avatar');
-            const avatarContainer = document.getElementById('user-avatar-container');
-            if (userAvatar) {
-                avatarContainer.innerHTML = `<img src="${userAvatar}" class="w-full h-full object-cover">`;
-            } else {
-                avatarContainer.innerHTML = `<span class="text-blue-500 font-bold text-xl">B</span>`;
-            }
-
             apis.forEach(api => { if (!apiKeys[api.id]) apiKeys[api.id] = `sk_${api.prefix}_` + Math.random().toString(36).substring(2); });
             localStorage.setItem('api_keys', JSON.stringify(apiKeys));
 
@@ -669,25 +572,18 @@
             renderKeys();
             renderList();
 
-            // 处理跳转锚点
+            // 处理跨页跳转锚点
             if (window.location.hash === '#bill-tab') {
                 switchBillTab('bill');
                 setTimeout(() => {
-                    document.getElementById('tab-btn-bill').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    document.getElementById('bill-tab-container').scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }, 300);
             } else if (window.location.hash === '#request-tab') {
                 switchBillTab('request');
                 setTimeout(() => {
-                    document.getElementById('tab-btn-request').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    document.getElementById('bill-tab-container').scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }, 300);
             }
-        });
-            localStorage.setItem('api_keys', JSON.stringify(apiKeys));
-
-            renderDashboard();
-            renderApis();
-            renderKeys();
-            renderList();
         });
     </script>
 </body>

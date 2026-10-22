@@ -13,12 +13,22 @@
         .highlight { color: #2563eb; font-weight: bold; }
         .faq-q { font-weight: bold; color: #1e293b; margin-bottom: 4px; display: block; }
         .faq-a { color: #64748b; font-size: 13px; line-height: 1.6; margin-bottom: 12px; display: block; }
+        
+        /* 抽屉动画 */
+        .drawer-panel { transition: transform 0.3s ease-in-out; }
     </style>
 </head>
 <body>
-    <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center gap-3 sticky top-0 z-50">
-        <a href="/index.html" class="text-slate-600 text-xl font-bold px-2">←</a>
-        <h1 class="text-[17px] font-bold text-slate-800">帮助中心</h1>
+    <!-- 头部区域，右上角加上 API 文档按钮 -->
+    <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
+        <div class="flex items-center gap-3">
+            <a href="/index.html" class="text-slate-600 text-xl font-bold px-2">←</a>
+            <h1 class="text-[17px] font-bold text-slate-800">帮助中心</h1>
+        </div>
+        <button onclick="openApiDrawer()" class="flex items-center gap-1 bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg active:bg-blue-100 transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+            <span class="text-[13px] font-bold">API文档</span>
+        </button>
     </header>
 
     <main class="px-5 pb-24 max-w-lg mx-auto">
@@ -51,7 +61,6 @@
                 <ul class="text-[14px] text-slate-600 space-y-3 leading-relaxed">
                     <li><b>🔒 金融级锁资机制：</b>取号瞬间仅冻结预估额度，绝不直接扣费。只有真实收到短信验证码后才实际扣除；若 15 分钟内未收到，冻结资金将全额释放退回余额。</li>
                     <li><b>🌍 多国长租与监听：</b>覆盖 60+ 国家地区号码。支持包月长期独占租赁，以及根据“关键词”进行短信精准监听，完美适配出海注册、防封测试与账号解封业务。</li>
-                    <li><b>⚡ 高并发 API 接入：</b>支持多线程并发取号，毫秒级响应。无论是单兵作战还是工作室批量矩阵，都能保证通道畅通。</li>
                 </ul>
             </div>
 
@@ -65,135 +74,86 @@
                     <p><b>🖥 无缝灾备与自动切服：</b>若主服务器遭遇攻击或封锁，系统自动为您迁移至备用服务器。<br>
                     ✅ 不需要重新购买<br>✅ 账号与密码不会变<br>✅ 到期时间不会变<br>
                     只需在收到推送后，一键导入新 IP，或在客户端手动修改即可恢复业务。</p>
-
                     <p><b>🔌 如何优雅地使用代理：</b><br>
                     <b>方法一：</b>在 TG 客户端到「📦 我的代理」页面，点「🚀 一键导入」，自动配置。<br>
-                    <b>方法二：</b>使用第三方客户端（如 Clash），协议选 SOCKS5，填入服务器 IP、端口及分配的用户名密码，无需任何高级设置。</p>
-
-                    <p><b>🔄 续费与生命周期规则：</b><br>
-                    <b>到期前续费：</b>在「我的代理」点「购买套餐」，原账号密码端口全部保留，时长直接叠加。<br>
-                    <b>到期后释放：</b>代理自动关闭，入站流量释放，需重新购买开通新代理。</p>
+                    <b>方法二：</b>使用第三方客户端（如 Clash），协议选 SOCKS5，填入服务器 IP、端口及分配的用户名密码。</p>
+                    <p><b>🏢 企业机房专线对接：</b><br>若您的公司机房或工作室需要海量动态 IP 或高纯净度静态 IP，请直接联系官方客服，我们将为您提供 <b>1v1 专属定制对接方案</b>。</p>
                 </div>
             </div>
 
-            <!-- 4. 短链与商务邮箱 (应用场景) -->
+            <!-- 4. 短链与商务邮箱 -->
             <div>
                 <h3 class="text-[16px] font-bold text-slate-800 mb-4 flex items-center">
                     <span class="title-bar bg-purple-500"></span> 商务防红短链与专属企业邮箱
                 </h3>
                 <ul class="text-[14px] text-slate-600 space-y-3 leading-relaxed">
-                    <li><b>🔗 高权重防红短链：</b>专为 TG/微信/QQ 引流设计。支持自定义后缀，自带防拦截跳转技术。无论您发送营销链接还是下载地址，都能极大降低被平台风控红名的概率。</li>
-                    <li><b>✉️ 品牌企业邮箱：</b>支持绑定您自己的域名，一键生成如 <span class="highlight">ceo@yourbrand.com</span> 的专属邮箱。底层直连高送达率 SMTP 网关，支持高并发发信，确保您的验证码与营销邮件精准触达客户，不进垃圾箱。</li>
+                    <li><b>🔗 高权重防红短链：</b>专为 TG/微信/QQ 引流设计。支持自定义后缀，自带防拦截跳转技术，极大降低被平台风控红名的概率。</li>
+                    <li><b>✉️ 品牌企业邮箱：</b>支持绑定您自己的域名，一键生成如 <span class="highlight">ceo@yourbrand.com</span> 的专属邮箱。底层直连高送达率 SMTP 网关，确保精准触达不进垃圾箱。</li>
                 </ul>
             </div>
 
-            <!-- 5. 防封指南与养号秘籍 (新增) -->
+            <!-- 5. 防封指南 -->
             <div>
                 <h3 class="text-[16px] font-bold text-slate-800 mb-4 flex items-center">
                     <span class="title-bar bg-red-500"></span> 核心防封指南与养号秘籍
                 </h3>
                 <ul class="text-[14px] text-slate-600 space-y-3 leading-relaxed">
-                    <li><b>1. 环境隔离（核心）：</b>批量操作时，务必使用指纹浏览器（如 AdsPower、Hubstudio）进行多开，确保每个账号的浏览器指纹、缓存、代理 IP 完全独立，切断关联。</li>
+                    <li><b>1. 环境隔离（核心）：</b>批量操作时，务必使用指纹浏览器（如 AdsPower）进行多开，确保每个账号的浏览器指纹、缓存、代理 IP 完全独立。</li>
                     <li><b>2. IP 纯净度：</b>购买账号后，严禁使用免费机场或公共节点登录。请务必使用本站的高质量节点或纯净住宅 IP 进行登录。</li>
-                    <li><b>3. 模拟真人操作：</b>新号登录后，切勿立刻修改密码或疯狂群发消息。建议静置 24 小时，正常浏览一下频道、点赞，模拟真人行为。</li>
-                    <li><b>4. 2FA 密码保护：</b>登录成功后，立刻在客户端设置中开启两步验证，并牢记二级密码，防止账号被恶意盗用申诉。</li>
+                    <li><b>3. 模拟真人操作：</b>新号登录后，切勿立刻修改密码或疯狂群发消息。建议静置 24 小时，正常浏览一下频道、点赞。</li>
                 </ul>
             </div>
 
-            <!-- 6. 支付与签到生态 -->
+            <!-- 6. 支付与签到 -->
             <div>
                 <h3 class="text-[16px] font-bold text-slate-800 mb-4 flex items-center">
                     <span class="title-bar bg-amber-500"></span> 支付、余额与签到分红生态
                 </h3>
                 <div class="text-[14px] text-slate-600 space-y-4 leading-relaxed">
-                    <p><b>💎 支付与在线充值：</b><br>
-                    支持 USDT (TRC20) / 支付宝（易支付扫码）。支付完成后 30 秒内自动到账。若您的分红余额 ≥ 套餐价格，支持直接使用余额一键抵扣，即时开通。</p>
-
-                    <p><b>📜 余额与分红来源：</b><br>
-                    · 每日签到（TG 群内，1-3GB）<br>
-                    · 邀请好友注册（每人 +0.625U 起，递增）<br>
-                    · 下级好友充值（返 15% 分红）</p>
-
-                    <p><b>📅 签到防坑说明：</b><br>
-                    签到群：<a href="https://t.me/qingtian_vip" class="text-blue-500 underline">点击加入</a><br>
+                    <p><b>💎 支付与在线充值：</b><br>支持 USDT (TRC20) / 支付宝（易支付扫码）。支付完成后 30 秒内自动到账。若分红余额充足，支持直接余额抵扣。</p>
+                    <p><b>📅 签到防坑说明：</b><br>签到群：<a href="https://t.me/qingtian_vip" class="text-blue-500 underline">点击加入</a><br>
                     1️⃣ 先私聊机器人发送 /start 激活<br>
-                    2️⃣ 加入签到群<br>
-                    3️⃣ 在群里发送「签到」<br>
-                    4️⃣ 随机获得 1-3GB 流量<br>
-                    <span class="text-red-500">⚠️ 私聊无法签到！每天限签一次。每次签到会新建节点覆盖旧的，节点有效期到次日 0 点。</span></p>
+                    2️⃣ 加入签到群并发送「签到」<br>
+                    3️⃣ 随机获得 1-3GB 流量<br>
+                    <span class="text-red-500">⚠️ 私聊无法签到！每次签到会新建节点覆盖旧的，节点有效期到次日 0 点。</span></p>
                 </div>
             </div>
 
-            <!-- 7. 新手常见问题 FAQ (新增) -->
+            <!-- 7. FAQ -->
             <div>
                 <h3 class="text-[16px] font-bold text-slate-800 mb-4 flex items-center">
                     <span class="title-bar bg-slate-500"></span> 新手常见问题 FAQ
                 </h3>
                 <div class="text-[14px] text-slate-600">
                     <span class="faq-q">Q1: 购买后没收到卡密怎么办？</span>
-                    <span class="faq-a">A1: 卡密不发邮件。请在支付成功后，返回网站首页，点击右下角“我的” -> “订单查询”，在对应订单中点击“查看卡密”即可。</span>
+                    <span class="faq-a">A1: 卡密不发邮件。请支付成功后，返回网站首页，点击右下角“我的” -> “订单查询”，在对应订单中点击“查看卡密”。</span>
                     
                     <span class="faq-q">Q2: 接码一直没收到验证码怎么办？</span>
-                    <span class="faq-a">A2: 接码存在上游网络延迟，请耐心等待。若超时未收到，系统会自动释放冻结资金回到您的余额。若一直失败，建议更换一个服务商或国家号码重新取号。</span>
-                    
-                    <span class="faq-q">Q3: 赠送的域名怎么解析？</span>
-                    <span class="faq-a">A3: 在“个人中心”进入“域名中心”，点击管理，即可添加 A 记录或 CNAME 记录，底层调用 Cloudflare API，解析秒级生效。免费域名默认最多 5 条记录。</span>
-
-                    <span class="faq-q">Q4: 账号购买后可以退换吗？</span>
-                    <span class="faq-a">A4: 虚拟商品具有可复制性。非商品质量问题（如密码错误无法登录），一经售出概不退款。请在购买后 24 小时内完成首次登录验号。</span>
+                    <span class="faq-a">A2: 接码存在上游网络延迟。若超时未收到，系统会自动释放冻结资金。若一直失败，建议更换服务商或国家重新取号。</span>
                 </div>
             </div>
 
-            <!-- 8. 推荐客户端 -->
-            <div>
-                <h3 class="text-[16px] font-bold text-slate-800 mb-4 flex items-center">
-                    <span class="title-bar bg-cyan-500"></span> 📱 推荐客户端
-                </h3>
-                <ul class="text-[14px] text-slate-600 space-y-2 leading-relaxed">
-                    <li><b>Windows：</b>Proxifier / Clash / v2rayN</li>
-                    <li><b>macOS：</b>ClashX / Surge</li>
-                    <li><b>iOS：</b>Shadowrocket（付费）/ Stash / Loon</li>
-                    <li><b>Android：</b>NekoBox / Clash for Android</li>
-                    <li><b>Telegram 内置：</b>直接点「📦 我的代理」→「🚀 一键导入」</li>
-                </ul>
-            </div>
-
-            <!-- 9. 售后免责与风控底线 -->
+            <!-- 8. 售后免责与风控底线 -->
             <div>
                 <h3 class="text-[16px] font-bold text-slate-800 mb-4 flex items-center">
                     <span class="title-bar bg-red-600"></span> 售后说明与风控免责声明
                 </h3>
                 <ul class="text-[14px] text-slate-600 space-y-3 leading-relaxed">
-                    <li><b>1. 平台合规底线：</b>严禁使用本平台任何资源（含域名、节点、短链）进行诈骗、黑灰产、恶意爬虫或触犯当地法律的行为。一经举报查实，平台将<span class="highlight">第一时间永久封禁 IP 及账户</span>，并保留移交司法机关的权利。</li>
-                    <li><b>2. 售后支持时间：</b>官方人工客服在线时间 10:00 - 22:00。如遇订单异常，请携带完整订单凭证联系 TG 客服：<a href="https://t.me/qingtian_Boss" class="text-blue-500 underline">@qingtian_Boss</a>。</li>
+                    <li><b>1. 平台合规底线：</b>严禁使用本平台任何资源进行诈骗、黑灰产或触犯当地法律的行为。一经举报查实，平台将<span class="highlight">第一时间永久封禁 IP 及账户</span>，并保留移交司法机关的权利。</li>
+                    <li><b>2. 售后支持时间：</b>官方客服在线 10:00 - 22:00。如遇异常，请携带订单凭证联系 TG 客服：<a href="https://t.me/qingtian_Boss" class="text-blue-500 underline">@qingtian_Boss</a>。</li>
                 </ul>
             </div>
 
-            <!-- 10. 开发者 API 接口导航 -->
-            <div class="pt-4 border-t border-slate-100">
-                <h3 class="text-[15px] font-bold text-slate-800 mb-2">开发者 API 接入</h3>
-                <p class="text-[13px] text-slate-500 mb-3">如需通过代码深度对接平台能力，请点击下方接口查阅文档：</p>
-                
-                <div class="flex flex-wrap gap-x-4 gap-y-2 text-[13px]">
-                    <a href="/doc-account.html" class="text-blue-500 font-medium active:text-blue-700">账号接口</a>
-                    <a href="/doc.html" class="text-blue-500 font-medium active:text-blue-700">节点接口</a>
-                    <a href="/doc.html" class="text-blue-500 font-medium active:text-blue-700">接码接口</a>
-                    <a href="/doc.html#cx" class="text-blue-500 font-medium active:text-blue-700">查询接口</a>
-                    <a href="/doc.html#zf" class="text-blue-500 font-medium active:text-blue-700">支付接口</a>
-                    <a href="/doc.html#email" class="text-blue-500 font-medium active:text-blue-700">邮箱网关</a>
-                </div>
-            </div>
-            
             <!-- 底部版权 -->
-            <div class="text-center pt-6 pb-4">
+            <div class="text-center pt-6 pb-4 border-t border-slate-100">
                 <p class="text-[11px] text-slate-400">© 2026 SOCKS5 开放平台。All Rights Reserved.</p>
             </div>
         </div>
     </main>
 
-    
+    <!-- API 文档侧边抽屉 -->
     <div id="api-drawer-overlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[9999] hidden" onclick="closeApiDrawer(event)">
-        <div id="api-drawer-panel" class="fixed right-0 top-0 bottom-0 w-[80%] max-w-[300px] bg-white shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col" onclick="event.stopPropagation()">
+        <div id="api-drawer-panel" class="drawer-panel fixed right-0 top-0 bottom-0 w-[80%] max-w-[300px] bg-white shadow-2xl transform translate-x-full flex flex-col" onclick="event.stopPropagation()">
             <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50">
                 <h3 class="text-[16px] font-bold text-slate-800">开发者 API 文档</h3>
                 <button onclick="closeApiDrawer()" class="text-slate-400 p-1"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
@@ -230,7 +190,7 @@
             </div>
         </div>
     </div>
-    
+
     <script>
         function openApiDrawer() {
             const overlay = document.getElementById('api-drawer-overlay');

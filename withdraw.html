@@ -2,71 +2,118 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-    <title>申请提现 - SOCKS5</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>佣金提现 - SOCKS5</title>
     <link rel="icon" href="/logo.jpg" type="image/jpeg">
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>* { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; } body { background-color: #f1f5f9; }</style>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #f8fafc; color: #1e293b; }
+        .card { background: #ffffff; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; }
+        .input-flat { width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; font-size: 14px; outline: none; transition: border 0.2s; }
+        .input-flat:focus { border-color: #3b82f6; background: #fff; }
+    </style>
 </head>
-<body class="pb-10">
-    <div class="bg-white p-4 flex items-center gap-3 sticky top-0 z-50 shadow-sm">
-        <a href="/invite.html" class="text-slate-600 font-bold text-xl px-2">←</a>
-        <h1 class="text-lg font-bold text-slate-800">申请提现</h1>
-    </div>
+<body class="pb-12">
+    <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center gap-3 sticky top-0 z-50">
+        <a href="/invite.html" class="text-slate-600 text-xl font-bold px-2">←</a>
+        <h1 class="text-[17px] font-bold text-slate-800">佣金提现</h1>
+    </header>
 
-    <div class="p-4">
-        <div class="bg-white rounded-xl shadow-sm p-4">
-            <div class="bg-slate-50 rounded-lg p-3 flex justify-between items-center mb-6">
-                <span class="text-sm text-slate-500">当前佣金余额：</span>
-                <span class="text-lg font-bold text-red-500">¥0.00</span>
-            </div>
+    <main class="px-4 py-6 max-w-lg mx-auto">
+        <!-- 余额展示 -->
+        <div class="text-center mb-8">
+            <p class="text-[13px] text-slate-500 mb-1">当前可提现佣金 (USDT)</p>
+            <p class="text-[36px] font-bold text-green-600">$ 45.50</p>
+            <p class="text-[12px] text-slate-400 mt-1">最低提现额度 15 USDT</p>
+        </div>
 
-            <div class="mb-6">
-                <label class="block text-xs text-slate-500 mb-2">提现类型</label>
-                <div class="flex gap-4">
-                    <label class="flex items-center gap-1 text-sm"><input type="radio" name="w-type" checked class="accent-blue-500"> 佣金提现</label>
-                    <label class="flex items-center gap-1 text-sm"><input type="radio" name="w-type" class="accent-blue-500"> 佣金转余额</label>
+        <div class="card p-5 space-y-5">
+            <!-- 提现方式选择 -->
+            <div>
+                <label class="text-[14px] font-bold text-slate-700 mb-3 block">选择提现方式</label>
+                <div class="grid grid-cols-2 gap-3">
+                    <div onclick="switchTab('alipay')" id="tab-alipay" class="border-2 border-blue-500 bg-blue-50 text-blue-600 font-bold text-[14px] py-3 rounded-xl text-center cursor-pointer transition">支付宝提现</div>
+                    <div onclick="switchTab('usdt')" id="tab-usdt" class="border border-slate-200 text-slate-600 font-bold text-[14px] py-3 rounded-xl text-center cursor-pointer transition">USDT (TRC20)</div>
                 </div>
             </div>
 
-            <div class="mb-6">
-                <label class="block text-xs text-slate-500 mb-2">提现金额</label>
-                <div class="flex items-center border border-slate-200 rounded-lg overflow-hidden">
-                    <button class="px-4 py-2 bg-slate-50 text-slate-500 border-r border-slate-200" onclick="changeAmount(-10)">-</button>
-                    <input type="number" id="w-amount" value="10.00" class="flex-1 text-center py-2 outline-none text-sm font-bold">
-                    <button class="px-4 py-2 bg-slate-50 text-slate-500 border-l border-slate-200" onclick="changeAmount(10)">+</button>
+            <!-- 表单区：支付宝 -->
+            <div id="form-alipay" class="space-y-4">
+                <div>
+                    <label class="text-[13px] font-bold text-slate-700 mb-1.5 block">支付宝账号</label>
+                    <input type="text" class="input-flat" placeholder="请输入支付宝手机号或邮箱">
                 </div>
-                <p class="text-[10px] text-slate-400 mt-2">• 最低提现金额：¥10.00</p>
+                <div>
+                    <label class="text-[13px] font-bold text-slate-700 mb-1.5 block">真实姓名</label>
+                    <input type="text" class="input-flat" placeholder="请输入支付宝实名认证姓名">
+                </div>
             </div>
 
-            <div class="mb-8">
-                <label class="block text-xs text-slate-500 mb-2">提现地址</label>
-                <textarea id="w-address" placeholder="请输入USDT-TRC20收款地址" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm outline-none resize-none" rows="3" maxlength="200"></textarea>
+            <!-- 表单区：USDT -->
+            <div id="form-usdt" class="space-y-4 hidden">
+                <div>
+                    <label class="text-[13px] font-bold text-slate-700 mb-1.5 block">USDT 收款地址 (TRC20)</label>
+                    <input type="text" class="input-flat" placeholder="请务必填写正确的 TRC20 地址">
+                </div>
             </div>
 
-            <div class="flex gap-3">
-                <a href="/invite.html" class="flex-1 py-3 text-center border border-slate-300 text-slate-600 font-bold rounded-lg">取消</a>
-                <button onclick="submitWithdraw()" class="flex-1 py-3 bg-blue-500 text-white font-bold rounded-lg">确认提现</button>
+            <!-- 提现金额 -->
+            <div>
+                <label class="text-[13px] font-bold text-slate-700 mb-1.5 block">提现金额 (USDT)</label>
+                <input type="number" class="input-flat" placeholder="最低 15 USDT" value="15">
             </div>
+
+            <!-- 提示 -->
+            <div class="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                <p class="text-[11px] text-slate-500 leading-relaxed">提现申请需经过财务人工审核，预计 24 小时内到账。请务必核对收款信息，因信息填写错误导致的资金损失由用户自行承担。</p>
+            </div>
+
+            <!-- 提交按钮 -->
+            <button onclick="submitWithdraw()" class="w-full py-3.5 bg-blue-600 text-white font-bold rounded-xl text-[16px] active:opacity-80 transition shadow-md shadow-blue-500/20 mt-2">确认提现</button>
+        </div>
+    </main>
+
+    <!-- 提示弹窗 -->
+    <div id="success-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden items-center justify-center px-4">
+        <div class="bg-white rounded-2xl w-full max-w-[300px] p-6 text-center shadow-xl">
+            <div class="w-12 h-12 bg-green-100 text-green-600 rounded-full mx-auto flex items-center justify-center mb-3">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            </div>
+            <h3 class="text-[18px] font-bold text-slate-800 mb-2">提交成功</h3>
+            <p class="text-[13px] text-slate-500 mb-5">您的提现申请已提交，请等待财务审核打款。</p>
+            <button onclick="window.location.href='/invite.html'" class="w-full py-2.5 bg-blue-600 text-white font-bold rounded-xl text-[15px]">我知道了</button>
         </div>
     </div>
 
     <script>
-        function changeAmount(val) {
-            const input = document.getElementById('w-amount');
-            let current = parseFloat(input.value) || 0;
-            current += val;
-            if (current < 10) current = 10;
-            input.value = current.toFixed(2);
+        let currentType = 'alipay';
+        
+        function switchTab(type) {
+            currentType = type;
+            const tabAlipay = document.getElementById('tab-alipay');
+            const tabUsdt = document.getElementById('tab-usdt');
+            const formAlipay = document.getElementById('form-alipay');
+            const formUsdt = document.getElementById('form-usdt');
+
+            if (type === 'alipay') {
+                tabAlipay.className = 'border-2 border-blue-500 bg-blue-50 text-blue-600 font-bold text-[14px] py-3 rounded-xl text-center cursor-pointer transition';
+                tabUsdt.className = 'border border-slate-200 text-slate-600 font-bold text-[14px] py-3 rounded-xl text-center cursor-pointer transition';
+                formAlipay.classList.remove('hidden');
+                formUsdt.classList.add('hidden');
+            } else {
+                tabUsdt.className = 'border-2 border-blue-500 bg-blue-50 text-blue-600 font-bold text-[14px] py-3 rounded-xl text-center cursor-pointer transition';
+                tabAlipay.className = 'border border-slate-200 text-slate-600 font-bold text-[14px] py-3 rounded-xl text-center cursor-pointer transition';
+                formUsdt.classList.remove('hidden');
+                formAlipay.classList.add('hidden');
+            }
         }
+
         function submitWithdraw() {
-            const address = document.getElementById('w-address').value;
-            if(!address || address.length < 10) return alert('请输入正确的USDT收款地址');
-            alert('提现申请已提交，等待管理员审核');
-            window.location.href = '/invite.html';
+            // 可以加一些简单的空值校验
+            document.getElementById('success-modal').classList.remove('hidden');
+            document.getElementById('success-modal').classList.add('flex');
         }
     </script>
-<script src="/ai-widget.js"></script>
-<script src="/notice.js"></script>
 </body>
 </html>

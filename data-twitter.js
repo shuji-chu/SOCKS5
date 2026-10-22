@@ -1,6 +1,6 @@
 const twitterData = {
     title: 'Twitter / X 教程',
-    subtitle: '2FA登录 · Token登录 · 防封必看',
+    subtitle: '2FA登录 · Token登录 · 养号防封',
     twoFactor: [
         {
             title: 'Android 登录出现 Attestation Denied 报错怎么办？',
@@ -205,6 +205,146 @@ const twitterData = {
                     </ul>
                     <div class="alert-box mt-4">
                         成功进入 Twitter / X 首页后，即代表 Token 登录完成。后续使用过程中请尽量保持设备和浏览器环境稳定，并谨慎进行退出账号、修改密码等操作。
+                    </div>
+                </div>
+            `
+        }
+    ],
+    warmup: [
+        {
+            title: '核心原则：模仿真人，减少异常',
+            content: `
+                <div class="p-4">
+                    <p class="text-[13px] text-slate-600 leading-relaxed">Twitter 的封号机制主要检测异常行为和关联风险，你的目标就是让账号行为看起来像一个真实的普通用户。</p>
+                </div>
+            `
+        },
+        {
+            title: '一、账号注册与初始化阶段（打好基础）',
+            content: `
+                <div class="p-4 space-y-4">
+                    <p class="text-[14px] font-bold text-slate-800">1. 干净的注册环境（最重要的防线）</p>
+                    <ul class="text-[13px] text-slate-600 space-y-2 leading-relaxed pl-1">
+                        <li>✅ <b>使用指纹浏览器：</b>为每个账号使用独立的指纹浏览器配置文件（如 AdsPower、Multilogin、Dolphin Anty），隔离 Cookie、Canvas 指纹、IP 地址等。</li>
+                        <li>✅ <b>使用优质代理 IP：</b></li>
+                        <ul class="pl-4 text-slate-500">
+                            <li>🟡 绝对不要用数据中心 IP！非常容易被识别和封禁。</li>
+                            <li>🟡 使用住宅 IP 或 4G/5G 移动 IP，这是最安全的选择。</li>
+                        </ul>
+                        <li>✅ <b>IP 独享 & 固定：</b>一个账号永远绑定一个固定的住宅 IP，每次登录都使用同一个 IP。</li>
+                        <li>✅ <b>清理环境：</b>注册前确保浏览器环境是"干净"的，没有其他 Twitter 账号的残留痕迹。</li>
+                    </ul>
+
+                    <p class="text-[14px] font-bold text-slate-800 mt-6">2. 完整的账号信息</p>
+                    <ul class="text-[13px] text-slate-600 space-y-2 leading-relaxed pl-1">
+                        <li>✅ 使用真人头像，不要用默认的蛋形头像。</li>
+                        <li>✅ 填写合理的用户名、姓名和简介，让账号看起来有血有肉。</li>
+                        <li>✅ <b>验证邮箱和手机号：</b></li>
+                        <ul class="pl-4 text-slate-500">
+                            <li>🟡 使用独立的真实邮箱（Gmail、Outlook 等），避免使用临时邮箱。</li>
+                            <li>🟡 手机验证尽量使用实体手机卡或可靠的虚拟手机号（非 VOIP 号码更安全）。</li>
+                        </ul>
+                    </ul>
+
+                    <p class="text-[14px] font-bold text-slate-800 mt-6">3. "养号"期（Warm-Up / 孵化期）</p>
+                    <ul class="text-[13px] text-slate-600 space-y-2 leading-relaxed pl-1">
+                        <li>🟡 新账号切勿立即进行大量操作！这是被封的最常见原因。</li>
+                        <li>✅ 第一周：像真人一样浏览，关注几个官方大号，看看热门推文，随机点赞 1-2 个。</li>
+                        <li>✅ 模拟真人行为：每次使用时间不要太短，行为要有随机性，不要像机器人一样规律。</li>
+                        <li>✅ 养号周期：建议至少养号 5-7 天，再开始逐步增加互动和发帖。</li>
+                    </ul>
+                </div>
+            `
+        },
+        {
+            title: '二、日常操作与行为规范（长期生存）',
+            content: `
+                <div class="p-4 space-y-4">
+                    <p class="text-[14px] font-bold text-slate-800">1. 操作频率与节奏</p>
+                    <ul class="text-[13px] text-slate-600 space-y-2 leading-relaxed pl-1">
+                        <li>✅ 遵循"慢开始"原则，即使过了养号期也要缓慢增加每日操作量。</li>
+                        <li>✅ <b>操作上限参考：</b></li>
+                        <ul class="pl-4 text-slate-500">
+                            <li>🟡 新号每日关注：不超过 10-15 人</li>
+                            <li>🟡 每日点赞：不超过 30-50 个</li>
+                            <li>🟡 每日转发：不超过 10-15 次</li>
+                        </ul>
+                        <li>✅ 每日总互动量（关注+点赞+转发+回复）控制在 150 次以内，分散在一天的不同时间段。</li>
+                        <li>🟡 避免重复性操作：不要连续、快速地执行同一动作（例如 1 分钟内关注 20 个人）。</li>
+                    </ul>
+
+                    <p class="text-[14px] font-bold text-slate-800 mt-6">2. 内容策略</p>
+                    <ul class="text-[13px] text-slate-600 space-y-2 leading-relaxed pl-1">
+                        <li>🟡 禁止发布违规内容：垃圾链接、色情、暴力、仇恨言论、大量重复内容等。</li>
+                        <li>🟡 不要滥用话题标签：每条推文使用 1-3 个相关标签即可，不要堆砌不相关的热门标签。</li>
+                        <li>🟡 不要大量发送含链接的推文，尤其是短链或可疑链接。</li>
+                        <li>✅ 原创为王：多发原创文字、图片、视频，少做"转发机器人"。</li>
+                    </ul>
+
+                    <p class="text-[14px] font-bold text-slate-800 mt-6">3. 社交互动</p>
+                    <ul class="text-[13px] text-slate-600 space-y-2 leading-relaxed pl-1">
+                        <li>🟡 关注/取消关注的比率：不要短时间内大量关注再取消，Twitter 会检测这种行为。</li>
+                        <li>🟡 谨慎发送私信：新号不要主动给陌生人发私信，尤其不能发链接或营销信息，这是高风险行为。</li>
+                    </ul>
+                </div>
+            `
+        },
+        {
+            title: '三、技术与环境安全（防关联）',
+            content: `
+                <div class="p-4 space-y-4">
+                    <p class="text-[14px] font-bold text-slate-800">1. 环境隔离</p>
+                    <ul class="text-[13px] text-slate-600 space-y-2 leading-relaxed pl-1">
+                        <li>✅ 坚持使用指纹浏览器，永远不要在同一台电脑的同一个浏览器上登录多个 Twitter 账号。</li>
+                        <li>✅ IP 地址恒定：确保每个账号始终通过其绑定的固定住宅 IP 访问，IP 频繁变动或地理位置跳跃是危险信号。</li>
+                    </ul>
+
+                    <p class="text-[14px] font-bold text-slate-800 mt-6">2. Cookie 管理</p>
+                    <ul class="text-[13px] text-slate-600 space-y-2 leading-relaxed pl-1">
+                        <li>🟡 通过 auth_token 登录后，尽量在同一个浏览器环境中持续使用。不要频繁导出、导入 Cookie 在不同 IP 或环境间切换，会导致会话异常。</li>
+                    </ul>
+
+                    <p class="text-[14px] font-bold text-slate-800 mt-6">3. 避免使用未授权的第三方应用</p>
+                    <ul class="text-[13px] text-slate-600 space-y-2 leading-relaxed pl-1">
+                        <li>🟡 尽量不要用要求提供 Twitter 账号密码的第三方客户端或自动化工具。</li>
+                        <li>✅ 如果必须使用，请只授权给信誉良好、使用 Twitter 官方 API 的应用，并定期检查已授权的应用列表。</li>
+                    </ul>
+                </div>
+            `
+        },
+        {
+            title: '四、特殊情况处理',
+            content: `
+                <div class="p-4 space-y-4">
+                    <p class="text-[14px] font-bold text-slate-800">1. 账号被限流（Shadow Ban）</p>
+                    <ul class="text-[13px] text-slate-600 space-y-2 leading-relaxed pl-1">
+                        <li>🟡 表现：你的推文不会出现在搜索结果或话题中，只有粉丝能看到。</li>
+                        <li>✅ 应对：立即停止所有主动操作（尤其是关注、点赞），回归"真人浏览模式"几天，通常可以恢复。</li>
+                    </ul>
+
+                    <p class="text-[14px] font-bold text-slate-800 mt-6">2. 收到账号锁定或验证挑战</p>
+                    <ul class="text-[13px] text-slate-600 space-y-2 leading-relaxed pl-1">
+                        <li>🟡 立即按要求操作，通常是验证邮箱或手机号。</li>
+                        <li>🟡 对于简单的验证挑战，直接完成验证比写申诉邮件更快。</li>
+                        <li>✅ 如果必须申诉，态度要诚恳，说明可能无意中违反了规定，并承诺遵守社区规则。</li>
+                    </ul>
+                </div>
+            `
+        },
+        {
+            title: '防封清单总结',
+            content: `
+                <div class="p-4">
+                    <ul class="text-[13px] text-slate-600 space-y-3 leading-relaxed">
+                        <li>✅ <b>环境：</b>是否为每个账号配置了独立的指纹浏览器环境 + 固定的住宅 IP？</li>
+                        <li>✅ <b>信息：</b>账号资料是否完整、像真人？</li>
+                        <li>✅ <b>养号：</b>新账号是否进行了至少 5-7 天的温和养号？</li>
+                        <li>🟡 <b>行为：</b>日常操作频率是否在安全阈值内，且行为随机、像真人？</li>
+                        <li>✅ <b>内容：</b>发布的内容是否以原创为主，避免垃圾和违规信息？</li>
+                        <li>✅ <b>稳定：</b>是否避免了频繁切换登录环境和 IP 地址？</li>
+                    </ul>
+                    <div class="alert-box mt-4">
+                        遵循以上规则，你的 Twitter 账号安全性将会得到极大的提升。记住，<b>"慢"就是"快"</b>，稳健运营才能长久。
                     </div>
                 </div>
             `

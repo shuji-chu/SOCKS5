@@ -40,6 +40,7 @@
                     <h2 class="text-sm text-slate-500 font-medium mb-1">当前账户</h2>
                     <div class="flex items-center gap-2">
                         <span class="text-xl font-bold text-slate-800">boss</span>
+                        <span class="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded border border-slate-200">ID: 10001</span>
                     </div>
                 </div>
                 <div class="text-right">
@@ -153,9 +154,9 @@
             pay: { title: '申请开通【支付接口】', content: `本接口提供易支付/支付宝聚合代收通道。因涉及资金清算，风控审核极严，请一次性提供以下信息供人工审核：<br><br>1️⃣ <b>业务内容</b>：请简述您的业务模式。<br>2️⃣ <b>业务链接</b>：频道 / 网站 / 机器人链接。<br>3️⃣ <b>证明资料</b>：相关聊天截图或业务证明。<br><br>🛡️ <b>风控声明</b>：平台需严格核实业务真实性与资金来源，坚决杜绝黑灰产接入。<br><br>💰 <b>费率说明</b>：支付调用点位 <b>10%</b>。<br><br>⚠️ 审核通过后，方为您开通商户权限并下发支付网关。` }
         };
 
-        // 模拟状态：为了演示，初始让接码接口(sms)为启用中(2)，其他未申请(0)
+        // 状态管理
         let apiStatus = JSON.parse(localStorage.getItem('api_status')) || {
-            account: 0, node: 0, sms: 2, query: 0, pay: 0
+            account: 0, node: 0, sms: 2, query: 0, pay: 0 // 默认接码接口为启用中，供演示
         };
         
         let apiKeys = JSON.parse(localStorage.getItem('api_keys')) || {};
@@ -169,6 +170,16 @@
                 result += chars.charAt(Math.floor(Math.random() * chars.length));
             }
             return 'sk_' + result;
+        }
+
+        // 【核心逻辑】初始化：不管状态如何，先给5个接口把Key生成好！
+        function initKeys() {
+            apis.forEach(api => {
+                if (!apiKeys[api.id]) {
+                    apiKeys[api.id] = generateKey();
+                }
+            });
+            localStorage.setItem('api_keys', JSON.stringify(apiKeys));
         }
 
         // 渲染接口权限列表
@@ -192,7 +203,7 @@
             });
         }
 
-        // 渲染专属Key
+        // 渲染专属Key（只渲染状态为2的）
         function renderKeys() {
             const keyContainer = document.getElementById('key-list');
             keyContainer.innerHTML = '';
@@ -201,10 +212,6 @@
             apis.forEach(api => {
                 if (apiStatus[api.id] === 2) {
                     hasActive = true;
-                    if (!apiKeys[api.id]) {
-                        apiKeys[api.id] = generateKey();
-                    }
-                    
                     const displayKey = isMasked ? 'sk_************************' : apiKeys[api.id];
                     
                     keyContainer.innerHTML += `
@@ -229,12 +236,12 @@
             if (!hasActive) {
                 keyContainer.innerHTML = '<div class="text-center py-6 text-[13px] text-slate-400 border border-dashed border-slate-200 rounded-lg">暂无已启用的接口，请先在上方申请权限</div>';
             }
-            localStorage.setItem('api_keys', JSON.stringify(apiKeys));
         }
 
         // 重置 Key
         function resetKey(id) {
             apiKeys[id] = generateKey();
+            localStorage.setItem('api_keys', JSON.stringify(apiKeys));
             renderKeys();
             const apiName = apis.find(a => a.id === id).name;
             showCustomAlert('重置成功', `【${apiName}】的专属 API Key 已重新生成，原 Key 已立即失效。`);
@@ -261,9 +268,11 @@
 
         function confirmApply() {
             if (currentApplyId) {
+                // 申请后状态变更为 审核中(1)
                 apiStatus[currentApplyId] = 1;
                 localStorage.setItem('api_status', JSON.stringify(apiStatus));
                 renderApis();
+                
                 document.getElementById('modal-title').innerText = '提交成功';
                 document.getElementById('modal-desc').innerHTML = '申请已提交，请等待管理员审核。审核通过后即可正式启用调用。';
                 document.getElementById('modal-btns').innerHTML = `
@@ -317,6 +326,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            initKeys(); // 核心：先全量生成五个Key
             renderApis();
             renderKeys();
         });

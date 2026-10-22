@@ -10,8 +10,11 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: #f8fafc; color: #1e293b; }
         .card { background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; }
-        .code-block { background: #1e293b; color: #e2e8f0; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 13px; overflow-x: auto; line-height: 1.6; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
+        /* 手风琴动画 */
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
+        .accordion-content.active { max-height: 800px; transition: max-height 0.4s ease-in; }
+        .rotate-180 { transform: rotate(180deg); }
     </style>
 </head>
 <body>
@@ -22,14 +25,13 @@
 
     <main class="px-4 py-4 pb-12 space-y-4 max-w-lg mx-auto">
         
-        <!-- 数据看板 (Dashboard) -->
+        <!-- 1. 顶部看板 -->
         <div class="card p-5">
             <div class="flex justify-between items-start mb-4">
                 <div>
                     <h2 class="text-sm text-slate-500 font-medium mb-1">当前账户</h2>
                     <div class="flex items-center gap-2">
                         <span class="text-xl font-bold text-slate-800">boss</span>
-                        <span class="bg-blue-50 text-blue-600 text-[10px] px-2 py-0.5 rounded-full font-bold">已认证</span>
                     </div>
                 </div>
                 <div class="text-right">
@@ -38,74 +40,121 @@
                 </div>
             </div>
             
-            <div class="grid grid-cols-2 gap-3 mt-4">
+            <div class="grid grid-cols-2 gap-3 mt-4 mb-4">
                 <div class="bg-slate-50 rounded-lg p-3 border border-slate-100">
                     <p class="text-xs text-slate-500 mb-1">今日消费</p>
                     <p class="text-base font-bold text-slate-800">¥ 0.00</p>
                 </div>
                 <div class="bg-slate-50 rounded-lg p-3 border border-slate-100">
-                    <p class="text-xs text-slate-500 mb-1">调用资格</p>
-                    <p class="text-base font-bold text-green-500">可以调用</p>
+                    <p class="text-xs text-slate-500 mb-1">今日充值</p>
+                    <p class="text-base font-bold text-slate-800">¥ 0.00</p>
                 </div>
             </div>
+            
+            <button onclick="showCustomAlert('提示', '正在唤起在线充值...')" class="w-full py-2.5 bg-blue-600 text-white font-bold rounded-xl text-[14px] active:opacity-80 transition shadow-sm">
+                在线充值
+            </button>
         </div>
 
-        <!-- 秘钥与白名单管理 -->
-        <div class="card p-5">
-            <h2 class="text-[16px] font-bold text-slate-800 mb-1">秘钥与白名单</h2>
-            <p class="text-[13px] text-slate-500 mb-4">专属 API Key，请妥善保管，切勿泄露。</p>
-            
-            <button onclick="showCustomAlert('提示', '重置秘钥请联系客服处理，此操作有风险。')" class="bg-blue-600 text-white text-[13px] font-medium px-4 py-2 rounded-lg active:opacity-80 transition shadow-sm">
-                更换 / 重置秘钥
+        <!-- 2. 手风琴：账户详情与接口权限 -->
+        <div class="card overflow-hidden">
+            <button onclick="toggleAccordion('accordion-1', 'icon-1')" class="w-full px-5 py-4 flex justify-between items-center bg-white active:bg-slate-50 transition">
+                <span class="font-bold text-slate-800 text-[15px]">账户详情与接口权限</span>
+                <svg id="icon-1" class="w-5 h-5 text-slate-400 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
             </button>
-
-            <!-- Key 展示 -->
-            <div class="mt-4 relative">
-                <div class="flex items-center bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5">
-                    <span id="api-key-text" class="font-mono text-[14px] text-slate-700 flex-1 truncate">sk_live_7a8b9c0d1e2f3g4h5i6j7k8l9m0n</span>
-                    <button onclick="toggleKey()" id="eye-btn" class="text-slate-400 hover:text-slate-600 px-1 ml-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+            <div id="accordion-1" class="accordion-content bg-white">
+                <div class="px-5 pb-5 pt-1 border-t border-slate-100">
+                    <!-- 5个接口权限列表 -->
+                    <div class="space-y-1">
+                        <!-- 1. 账号接口 -->
+                        <div class="flex justify-between items-center py-3 border-b border-slate-50">
+                            <div>
+                                <p class="text-[14px] font-medium text-slate-800">1. 账号接口</p>
+                                <p class="text-[12px] text-slate-400">TG / 邮箱等静态卡密提取</p>
+                            </div>
+                            <span class="text-[12px] font-medium px-2 py-1 bg-slate-100 text-slate-500 rounded border border-slate-200">未申请</span>
+                        </div>
+                        <!-- 2. 节点接口 -->
+                        <div class="flex justify-between items-center py-3 border-b border-slate-50">
+                            <div>
+                                <p class="text-[14px] font-medium text-slate-800">2. 节点接口</p>
+                                <p class="text-[12px] text-slate-400">代理节点 / IP 提取</p>
+                            </div>
+                            <button onclick="applyApi('节点接口', this)" class="text-[12px] font-medium px-3 py-1 bg-blue-50 text-blue-600 rounded border border-blue-100 active:bg-blue-100">申请调用</button>
+                        </div>
+                        <!-- 3. 接码接口 -->
+                        <div class="flex justify-between items-center py-3 border-b border-slate-50">
+                            <div>
+                                <p class="text-[14px] font-medium text-slate-800">3. 接码接口</p>
+                                <p class="text-[12px] text-slate-400">上游取号 / 动态收码</p>
+                            </div>
+                            <span class="text-[12px] font-medium px-2 py-1 bg-green-50 text-green-600 rounded border border-green-200">启用中</span>
+                        </div>
+                        <!-- 4. 查询接口 -->
+                        <div class="flex justify-between items-center py-3 border-b border-slate-50">
+                            <div>
+                                <p class="text-[14px] font-medium text-slate-800">4. 查询接口</p>
+                                <p class="text-[12px] text-slate-400">二要素 / 三要素数据核验</p>
+                            </div>
+                            <span class="text-[12px] font-medium px-2 py-1 bg-amber-50 text-amber-600 rounded border border-amber-200">审核中</span>
+                        </div>
+                        <!-- 5. 支付接口 -->
+                        <div class="flex justify-between items-center py-3">
+                            <div>
+                                <p class="text-[14px] font-medium text-slate-800">5. 支付接口</p>
+                                <p class="text-[12px] text-slate-400">易支付代收 / 回调下发</p>
+                            </div>
+                            <button onclick="applyApi('支付接口', this)" class="text-[12px] font-medium px-3 py-1 bg-blue-50 text-blue-600 rounded border border-blue-100 active:bg-blue-100">申请调用</button>
+                        </div>
+                    </div>
+                    
+                    <button onclick="showCustomAlert('提示', '已退出登录')" class="mt-4 w-full py-2.5 bg-red-50 text-red-600 font-bold rounded-lg text-[14px] border border-red-100 active:bg-red-100 transition">
+                        退出登录
                     </button>
                 </div>
             </div>
+        </div>
 
-            <!-- IP 白名单 -->
-            <div class="mt-5">
-                <label class="block text-[13px] font-bold text-slate-700 mb-2">IP 白名单</label>
-                <textarea id="ip-whitelist" rows="3" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-[13px] text-slate-700 focus:outline-none focus:border-blue-500 focus:bg-white transition resize-none" placeholder="一行一个 IP，例如：&#10;127.0.0.1&#10;192.168.1.1"></textarea>
-            </div>
-            <button onclick="saveWhitelist()" class="mt-3 w-full py-2.5 bg-blue-50 text-blue-600 font-bold rounded-lg text-[14px] border border-blue-100 active:bg-blue-100 transition">
-                保存白名单
+        <!-- 3. 手风琴：秘钥与白名单 -->
+        <div class="card overflow-hidden">
+            <button onclick="toggleAccordion('accordion-2', 'icon-2')" class="w-full px-5 py-4 flex justify-between items-center bg-white active:bg-slate-50 transition">
+                <span class="font-bold text-slate-800 text-[15px]">密钥与白名单</span>
+                <svg id="icon-2" class="w-5 h-5 text-slate-400 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
             </button>
-        </div>
+            <div id="accordion-2" class="accordion-content bg-white">
+                <div class="px-5 pb-5 pt-2 border-t border-slate-100">
+                    <!-- 专属 Key -->
+                    <div class="mb-4">
+                        <label class="block text-[13px] font-bold text-slate-700 mb-2">专属 API Key</label>
+                        <div class="flex items-center bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5">
+                            <span id="api-key-text" class="font-mono text-[14px] text-slate-700 flex-1 truncate">sk_live_7a8b9c0d1e2f3g4h5i6j7k8l9m0n</span>
+                            <button onclick="toggleKey()" class="text-slate-400 hover:text-slate-600 px-1 ml-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                            </button>
+                        </div>
+                    </div>
 
-        <!-- 接口文档区 -->
-        <div class="card p-5">
-            <h2 class="text-[16px] font-bold text-slate-800 mb-3 flex items-center gap-2">
-                <span class="w-1.5 h-4 bg-blue-500 rounded-full"></span> 接入指南
-            </h2>
-            <div class="text-[13px] text-slate-600 leading-relaxed space-y-4">
-                <p>请将您的 API Key 放在 HTTP 请求头中：<br>
-                <code class="bg-slate-100 px-1.5 py-0.5 rounded text-pink-600 font-mono mt-1 inline-block">Authorization: Bearer YOUR_API_KEY</code></p>
-                
-                <div>
-                    <h3 class="font-bold text-slate-800 mb-1">1. 获取账户余额</h3>
-                    <p class="mb-1 text-slate-500">GET /api/v1/user/balance</p>
-                    <div class="code-block">curl -X GET "https://web.lynli.me/api/v1/user/balance" \\<br>  -H "Authorization: Bearer YOUR_API_KEY"</div>
-                </div>
-
-                <div>
-                    <h3 class="font-bold text-slate-800 mb-1">2. 购买卡密 (静态)</h3>
-                    <p class="mb-1 text-slate-500">POST /api/v1/order/static</p>
-                    <div class="code-block">curl -X POST "https://web.lynli.me/api/v1/order/static" \\<br>  -H "Authorization: Bearer YOUR_API_KEY" \\<br>  -H "Content-Type: application/json" \\<br>  -d '{"product_id": 1, "quantity": 1}'</div>
+                    <!-- 全局 IP 白名单 -->
+                    <div>
+                        <label class="block text-[13px] font-bold text-slate-700 mb-1">全局 IP 白名单</label>
+                        <p class="text-[11px] text-slate-400 mb-2">此处设置对所有已开通接口生效</p>
+                        <textarea rows="3" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-[13px] text-slate-700 focus:outline-none focus:border-blue-500 focus:bg-white transition resize-none" placeholder="一行一个 IP，例如：&#10;127.0.0.1&#10;192.168.1.1"></textarea>
+                    </div>
+                    <button onclick="showCustomAlert('保存成功', '全局 IP 白名单已更新，即刻生效。')" class="mt-3 w-full py-2.5 bg-blue-50 text-blue-600 font-bold rounded-lg text-[14px] border border-blue-100 active:bg-blue-100 transition">
+                        保存白名单
+                    </button>
                 </div>
             </div>
         </div>
 
-        <!-- 底部说明 -->
+        <!-- 4. 底部说明 -->
+        <div class="card p-4 text-center">
+            <p class="text-[13px] text-slate-500 mb-2">需要查看接口参数和调用示例？</p>
+            <a href="/guide.html" class="inline-block text-[14px] font-bold text-blue-600">前往查看开发者文档 →</a>
+        </div>
+
         <div class="text-center pb-6">
-            <p class="text-[12px] text-slate-400">价格与服务状态以接口详情页为准。</p>
-            <p class="text-[12px] text-slate-400 mt-1">请妥善保管 API Key，切勿在公开页面暴露。</p>
+            <p class="text-[12px] text-slate-400">请妥善保管 API Key，切勿在公开页面暴露。</p>
         </div>
     </main>
 
@@ -119,28 +168,43 @@
     </div>
 
     <script>
-        const realKey = 'sk_live_7a8b9c0d1e2f3g4h5i6j7k8l9m0n';
-        const maskedKey = 'sk_live_************************';
-        let isMasked = false; // 默认显示明文，点击眼睛隐藏
-
-        function toggleKey() {
-            isMasked = !isMasked;
-            document.getElementById('api-key-text').innerText = isMasked ? maskedKey : realKey;
+        // 手风琴逻辑
+        function toggleAccordion(contentId, iconId) {
+            const content = document.getElementById(contentId);
+            const icon = document.getElementById(iconId);
             
-            // 切换图标 (简单处理，实际中可以换 SVG)
-            const eyeBtn = document.getElementById('eye-btn');
-            if (isMasked) {
-                eyeBtn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path></svg>';
+            if (content.classList.contains('active')) {
+                content.classList.remove('active');
+                content.style.maxHeight = null;
+                icon.classList.remove('rotate-180');
             } else {
-                eyeBtn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>';
+                content.classList.add('active');
+                content.style.maxHeight = content.scrollHeight + "px";
+                icon.classList.add('rotate-180');
             }
         }
 
-        function saveWhitelist() {
-            // 模拟保存动作
-            showCustomAlert('保存成功', '您的 IP 白名单已更新，即刻生效。');
+        // 掩码逻辑
+        const realKey = 'sk_live_7a8b9c0d1e2f3g4h5i6j7k8l9m0n';
+        const maskedKey = 'sk_live_************************';
+        let isMasked = false;
+        function toggleKey() {
+            isMasked = !isMasked;
+            document.getElementById('api-key-text').innerText = isMasked ? maskedKey : realKey;
         }
 
+        // 申请接口逻辑
+        function applyApi(apiName, btn) {
+            // 模拟点击后状态变为审核中
+            const originalText = btn.innerText;
+            btn.innerHTML = '审核中';
+            btn.className = 'text-[12px] font-medium px-2 py-1 bg-amber-50 text-amber-600 rounded border border-amber-200 cursor-default';
+            btn.onclick = null; // 移除点击事件
+            
+            showCustomAlert('申请已提交', apiName + ' 申请已提交，请等待老板审核。');
+        }
+
+        // 弹窗逻辑
         function showCustomAlert(title, desc) {
             document.getElementById('modal-title').innerText = title;
             document.getElementById('modal-desc').innerText = desc;
@@ -152,7 +216,6 @@
                 modal.querySelector('div').classList.add('scale-100');
             }, 10);
         }
-
         function closeCustomAlert() {
             const modal = document.getElementById('custom-modal');
             const innerDiv = modal.querySelector('div');

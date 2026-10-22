@@ -26,12 +26,11 @@
         .footer { position: absolute; bottom: 24px; left: 0; right: 0; text-align: center; font-size: 12px; color: #94a3b8; }
         .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 9999; display: none; align-items: flex-end; justify-content: center; }
         .modal-overlay.active { display: flex; }
-        .modal-content { background: white; width: 100%; max-width: 400px; border-radius: 24px 24px 0 0; padding: 24px; padding-bottom: 40px; max-height: 80vh; display: flex; flex-direction: column; animation: slideUp 0.3s ease-out; }
+        .modal-content { background: white; width: 100%; max-width: 400px; border-radius: 24px 24px 0 0; padding: 24px; padding-bottom: 40px; max-height: 80vh; display: flex; flex-direction: column; }
         .modal-header { display: flex; justify-content: space-between; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 16px; }
         .modal-body { font-size: 13px; color: #475569; line-height: 1.6; overflow-y: auto; }
         #toast { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); background: rgba(30,41,59,0.95); color: white; padding: 12px 24px; border-radius: 12px; font-size: 14px; transition: all 0.3s; z-index: 99999; }
         #toast.show { top: 30px; }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -123,6 +122,7 @@
             btn.innerText = '正在进入...'; btn.disabled = true;
             
             try {
+                // 真实请求你的 702 网关，拿到真 Token
                 const res = await fetch('https://api.lynli.me/api/v1/auth/direct-register', {
                     method: 'POST', headers: {'Content-Type': 'application/json'}, 
                     body: JSON.stringify({ email: email })
@@ -135,16 +135,18 @@
                     showToast('注册成功');
                     setTimeout(() => window.location.href = '/index.html', 800);
                 } else { 
-                    showToast('注册异常'); btn.innerText = '立即注册'; btn.disabled = false;
+                    showToast('系统异常'); btn.innerText = '立即注册'; btn.disabled = false;
                 }
             } catch (err) { 
-                showToast('网络错误'); btn.innerText = '立即注册'; btn.disabled = false;
+                // 如果这里还报网络错误，就是 Nginx 跨域没配好或者被 CF 拦截了
+                showToast('服务器连接失败'); 
+                btn.innerText = '立即注册'; btn.disabled = false;
             }
         });
 
         const modalContent = {
-            'privacy': { title: '隐私政策', text: '我们深知个人信息对您的重要性，并会尽全力保护您的个人信息安全可靠。未经您的同意，我们绝不会向任何第三方提供您的个人信息。' },
-            'terms': { title: '用户协议', text: '欢迎使用 SOCKS5 服务。本协议是您与 SOCKS5 之间关于您使用本服务所订立的协议。您在使用本服务时，必须遵守相关法律法规，不得利用本服务从事任何违法违规活动。' }
+            'privacy': { title: '隐私政策', text: '我们深知个人信息对您的重要性...' },
+            'terms': { title: '用户协议', text: '欢迎使用 SOCKS5 服务...' }
         };
         function openModal(type) {
             const data = modalContent[type]; if(!data) return;

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>数据接口查询 - SOCKS5</title>
+    <link rel="icon" href="/logo.jpg" type="image/jpeg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
+        body { background-color: #f1f5f9; color: #1e293b; padding-bottom: 20px; }
+        
+        .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 9999; display: none; align-items: center; justify-content: center; }
+        .modal-overlay.active { display: flex; }
+
+        .bottom-sheet { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-radius: 24px 24px 0 0; z-index: 10000; transform: translateY(100%); transition: transform 0.3s ease-out; padding: 24px; padding-bottom: calc(24px + env(safe-area-inset-bottom)); max-height: 90vh; overflow-y: auto; }
+        .bottom-sheet.active { transform: translateY(0); }
+        .sheet-overlay { z-index: 9998; background: rgba(0,0,0,0.5); display: none; position: fixed; inset: 0; backdrop-filter: blur(4px); }
+        .sheet-overlay.active { display: block; }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body>
+    <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center gap-3 sticky top-0 z-50">
+        <a href="/index.html" class="text-slate-600 text-xl font-bold px-2">←</a>
+        <h1 class="text-lg font-bold text-slate-800">数据接口开放平台</h1>
+    </header>
+
+    <main>
+        <!-- 顶部 Banner -->
+        <div class="bg-white px-4 py-5 mb-3">
+            <h2 class="text-xl font-bold text-slate-800 mb-2 flex items-center gap-2">
+                <svg class="w-6 h-6 text-blue-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                哪吒数据核验 API 市场
+            </h2>
+            <p class="text-xs text-slate-500 mb-4">当前展示 65 个接口，点击卡片查看接口详情并直接查询。</p>
+
+            <!-- 分类滑动栏 -->
+            <div class="flex overflow-x-auto no-scrollbar gap-2 text-[13px]">
+                <button class="bg-blue-50 text-blue-600 font-bold px-4 py-1.5 rounded-full whitespace-nowrap">全部</button>
+                <button class="bg-slate-100 text-slate-600 px-4 py-1.5 rounded-full whitespace-nowrap">实名认证</button>
+                <button class="bg-slate-100 text-slate-600 px-4 py-1.5 rounded-full whitespace-nowrap">生活服务</button>
+                <button class="bg-slate-100 text-slate-600 px-4 py-1.5 rounded-full whitespace-nowrap">手机号码</button>
+                <button class="bg-slate-100 text-slate-600 px-4 py-1.5 rounded-full whitespace-nowrap">企业工商</button>
+            </div>
+            
+            <!-- 筛选栏 -->
+            <div class="flex gap-3 mt-4 text-xs">
+                <button class="flex items-center gap-1 text-slate-600 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg">排序：综合 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                <button class="flex items-center gap-1 text-slate-600 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg">付费类型：全部 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+            </div>
+        </div>
+
+        <!-- 接口列表 -->
+        <div class="px-4 space-y-3">
+            
+            <!-- 接口1：二要素 -->
+            <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 cursor-pointer active:scale-[0.98] transition-transform" onclick="openQueryModal('手机号二要素认证', '通过姓名+手机号进行信息比对', '0.045', ['姓名', '手机号'])">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="w-10 h-10 bg-red-50 text-red-500 rounded-xl flex items-center justify-center">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5c-2.5 0-4.5-2-4.5-4.5s2-4.5 4.5-4.5 4.5 2 4.5 4.5-2 4.5-4.5 4.5zm0-7c-1.38 0-2.5 1.12-2.5 2.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5-1.12-2.5-2.5-2.5z"/></svg>
+                    </div>
+                    <span class="text-xs text-slate-400">手机号码</span>
+                </div>
+                <h3 class="text-[16px] font-bold text-slate-800 mb-1 flex items-center gap-2">手机号二要素认证 <span class="bg-orange-50 text-orange-500 text-[10px] px-1.5 py-0.5 rounded border border-orange-100">热门</span></h3>
+                <p class="text-[13px] text-slate-500 leading-relaxed mb-4 line-clamp-2">运营商二要素检验，通过姓名+手机号进行信息比对，运营商数据库实时校验姓名和手机号码是否匹配，结果更精准...</p>
+                
+                <div class="flex gap-2 text-[11px] font-medium mb-4">
+                    <span class="bg-slate-100 text-slate-500 px-2 py-1 rounded">付费</span>
+                    <span class="bg-orange-50 text-orange-600 px-2 py-1 rounded">$0.045/次</span>
+                    <span class="bg-blue-50 text-blue-600 px-2 py-1 rounded">POST</span>
+                </div>
+                <div class="flex justify-between items-center border-t border-slate-50 pt-3">
+                    <span class="text-[11px] text-slate-400">开发者 API</span>
+                    <span class="text-[11px] text-blue-500 flex items-center gap-1">查看详情并查询 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></span>
+                </div>
+            </div>
+
+            <!-- 接口2：三要素 -->
+            <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 cursor-pointer active:scale-[0.98] transition-transform" onclick="openQueryModal('全网手机号三要素', '校验姓名+手机号+身份证号', '0.037', ['姓名', '手机号', '身份证号'])">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="w-10 h-10 bg-red-50 text-red-500 rounded-xl flex items-center justify-center">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5c-2.5 0-4.5-2-4.5-4.5s2-4.5 4.5-4.5 4.5 2 4.5 4.5-2 4.5-4.5 4.5zm0-7c-1.38 0-2.5 1.12-2.5 2.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5-1.12-2.5-2.5-2.5z"/></svg>
+                    </div>
+                    <span class="text-xs text-slate-400">手机号码</span>
+                </div>
+                <h3 class="text-[16px] font-bold text-slate-800 mb-1 flex items-center gap-2">全网手机号三要素验证 <span class="bg-orange-50 text-orange-500 text-[10px] px-1.5 py-0.5 rounded border border-orange-100">热门</span></h3>
+                <p class="text-[13px] text-slate-500 leading-relaxed mb-4 line-clamp-2">全网运营商三要素检验-手机号+姓名+证件号实名验证，核验信息是否一致，覆盖全网...</p>
+                
+                <div class="flex gap-2 text-[11px] font-medium mb-4">
+                    <span class="bg-slate-100 text-slate-500 px-2 py-1 rounded">付费</span>
+                    <span class="bg-orange-50 text-orange-600 px-2 py-1 rounded">$0.037/次</span>
+                    <span class="bg-blue-50 text-blue-600 px-2 py-1 rounded">POST</span>
+                </div>
+                <div class="flex justify-between items-center border-t border-slate-50 pt-3">
+                    <span class="text-[11px] text-slate-400">开发者 API</span>
+                    <span class="text-[11px] text-blue-500 flex items-center gap-1">查看详情并查询 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></span>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- 查询表单抽屉 -->
+    <div id="query-overlay" class="sheet-overlay" onclick="closeQueryModal()"></div>
+    <div id="query-drawer" class="bottom-sheet">
+        <div class="flex justify-between items-center mb-5">
+            <h3 class="text-lg font-bold text-slate-800" id="q-title">接口名称</h3>
+            <button onclick="closeQueryModal()" class="text-slate-400 text-xl px-2">✕</button>
+        </div>
+        
+        <p class="text-sm text-slate-500 mb-5" id="q-desc">接口描述</p>
+
+        <div id="q-form-fields" class="space-y-4 mb-6">
+            <!-- JS 动态渲染输入框 -->
+        </div>
+
+        <div class="flex justify-between items-center bg-slate-50 p-3 rounded-lg mb-6 border border-slate-200">
+            <span class="text-sm text-slate-600">本次查询扣费：</span>
+            <span class="text-lg font-bold text-red-500" id="q-price">$0.00</span>
+        </div>
+
+        <div class="flex gap-3">
+            <button onclick="closeQueryModal()" class="flex-1 py-3 bg-slate-100 text-slate-600 font-bold rounded-xl text-sm">取消</button>
+            <button onclick="submitQuery()" class="flex-1 py-3 bg-blue-600 text-white font-bold rounded-xl text-sm shadow-sm" id="q-submit-btn">确认并查询</button>
+        </div>
+    </div>
+
+    <!-- 查询结果弹窗 -->
+    <div id="result-modal" class="modal-overlay">
+        <div class="bg-white rounded-2xl p-6 w-[85%] max-w-[340px] relative">
+            <div class="text-center mb-4">
+                <div class="w-12 h-12 bg-green-100 text-green-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+                <h3 class="text-lg font-bold text-slate-800">查询成功</h3>
+            </div>
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-6">
+                <p class="text-xs text-slate-500 mb-2">核验结果：</p>
+                <p class="text-sm text-slate-800 leading-relaxed font-bold" id="result-text">姓名与手机号完全匹配</p>
+                <div class="mt-3 pt-3 border-t border-slate-200 text-xs text-slate-400">
+                    <p>耗时：0.42秒</p>
+                    <p>流水号：API20261022XXXXX</p>
+                </div>
+            </div>
+            <button onclick="document.getElementById('result-modal').classList.remove('active')" class="w-full py-3 bg-blue-600 text-white font-bold rounded-xl text-sm shadow-sm">我知道了</button>
+        </div>
+    </div>
+
+    <script>
+        let currentApiName = '';
+        let currentPrice = '';
+
+        function openQueryModal(name, desc, price, fields) {
+            currentApiName = name;
+            currentPrice = price;
+            
+            document.getElementById('q-title').innerText = name;
+            document.getElementById('q-desc').innerText = desc;
+            document.getElementById('q-price').innerText = `$${price}`;
+
+            // 动态渲染输入框
+            const formEl = document.getElementById('q-form-fields');
+            formEl.innerHTML = '';
+            fields.forEach(field => {
+                const div = document.createElement('div');
+                div.innerHTML = `
+                    <label class="block text-xs text-slate-500 mb-1">${field}</label>
+                    <input type="text" placeholder="请输入${field}" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-blue-500">
+                `;
+                formEl.appendChild(div);
+            });
+
+            document.getElementById('query-overlay').classList.add('active');
+            document.getElementById('query-drawer').classList.add('active');
+        }
+
+        function closeQueryModal() {
+            document.getElementById('query-overlay').classList.remove('active');
+            document.getElementById('query-drawer').classList.remove('active');
+        }
+
+        function submitQuery() {
+            const btn = document.getElementById('q-submit-btn');
+            const originalText = btn.innerText;
+            btn.innerText = '正在拉取数据...';
+            btn.disabled = true;
+
+            // 模拟网络延迟与扣费请求
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.disabled = false;
+                closeQueryModal();
+                
+                // 随机生成结果
+                const isMatch = Math.random() > 0.3;
+                document.getElementById('result-text').innerText = isMatch ? '信息完全匹配 (True)' : '信息不一致 (False)';
+                document.getElementById('result-text').className = `text-sm leading-relaxed font-bold ${isMatch ? 'text-green-600' : 'text-red-500'}`;
+                
+                document.getElementById('result-modal').classList.add('active');
+            }, 1500);
+        }
+    </script>
+</body>
+</html>

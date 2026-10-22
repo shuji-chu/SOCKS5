@@ -11,6 +11,9 @@
         body { background-color: #f8fafc; color: #1e293b; padding-bottom: 20px; }
         .card { background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; margin-bottom: 16px; }
         
+        .sub-tab { flex: 1; padding: 8px 0; text-align: center; font-size: 13px; font-weight: bold; color: #64748b; border-bottom: 2px solid transparent; cursor: pointer; }
+        .sub-tab.active { color: #2563eb; border-bottom-color: #2563eb; }
+
         .accordion-btn { width: 100%; text-align: left; padding: 16px; font-size: 15px; font-weight: bold; color: #1e293b; display: flex; justify-content: space-between; align-items: center; background: #fff; border-bottom: 1px solid #f1f5f9; }
         .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; background: #f8fafc; }
         .accordion-content.active { max-height: 3000px; transition: max-height 0.4s ease-in; }
@@ -41,6 +44,12 @@
             <p class="text-[12px] text-slate-500 mt-1" id="main-subtitle">首次使用请仔细阅读对应平台的使用教程</p>
         </div>
 
+        <!-- 内层 Tab 切换 -->
+        <div class="flex border-b border-slate-200 mb-4 bg-white rounded-lg p-1 shadow-sm">
+            <div class="sub-tab active" onclick="switchTwitterTab('2fa', this)">2FA 账号登录</div>
+            <div class="sub-tab" onclick="switchTwitterTab('token', this)">Token 码登录</div>
+        </div>
+
         <div id="tutorial-content"></div>
     </main>
 
@@ -66,7 +75,6 @@
 
             container.innerHTML = html;
             
-            // 默认展开第一个
             const firstBtn = document.querySelector('.accordion-btn');
             if(firstBtn) toggleAccordion('acc-0', firstBtn);
         }
@@ -85,10 +93,22 @@
             }
         }
 
+        function switchTwitterTab(mode, el) {
+            document.querySelectorAll('.sub-tab').forEach(btn => btn.classList.remove('active'));
+            el.classList.add('active');
+            
+            if (mode === '2fa') {
+                renderSections(twitterData.twoFactor);
+            } else {
+                renderSections(twitterData.token);
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('main-title').innerText = twitterData.title;
             document.getElementById('main-subtitle').innerText = twitterData.subtitle;
-            renderSections(twitterData.sections);
+            // 默认展示 2FA
+            renderSections(twitterData.twoFactor);
         });
     </script>
     <script src="/notice-marquee.js"></script>

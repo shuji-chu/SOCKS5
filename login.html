@@ -5,106 +5,146 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>登录 - SOCKS5</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
-        body { background-color: #f8fafc; color: #1e293b; min-height: 100vh; display: flex; flex-direction: column; padding: 24px; overflow-y: auto; }
-        .header { text-align: center; margin-top: 24px; margin-bottom: 32px; }
-        .header img { width: 64px; height: 64px; border-radius: 20px; margin-bottom: 16px; object-fit: cover; }
-        .header h2 { font-size: 22px; font-weight: 700; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: #f8fafc; color: #1e293b; min-height: 100vh; display: flex; flex-direction: column; padding: 24px; }
+        
+        .header { text-align: center; margin-top: 40px; margin-bottom: 32px; }
+        .header img { width: 64px; height: 64px; border-radius: 20px; margin-bottom: 16px; object-fit: cover; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+        .header h2 { font-size: 22px; font-weight: 700; color: #0f172a; letter-spacing: -0.5px; }
         .header p { font-size: 13px; color: #64748b; margin-top: 6px; }
-        .card { background: #fff; padding: 24px; border-radius: 32px; border: 1px solid #f1f5f9; max-width: 380px; margin: 0 auto; width: 100%; }
-        .input-group input { width: 100%; padding: 14px 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; font-size: 15px; outline: none; margin-bottom: 14px; }
-        .btn { width: 100%; padding: 14px; background: #2563eb; color: white; border: none; border-radius: 16px; font-weight: 700; cursor: pointer; }
-        .link-text { text-align: center; margin: 20px 0 32px; }
+
+        .card { background: #ffffff; padding: 24px; border-radius: 32px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02), 0 2px 4px -1px rgba(0,0,0,0.02); border: 1px solid #f1f5f9; width: 100%; max-width: 380px; margin: 0 auto; }
+        
+        .input-group { margin-bottom: 14px; }
+        .input-group input { width: 100%; padding: 14px 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; font-size: 15px; outline: none; transition: all 0.2s; color: #1e293b; }
+        .input-group input:focus { border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.2); }
+        
+        .btn-primary { width: 100%; padding: 14px; background: #2563eb; color: white; border: none; border-radius: 16px; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 8px; transition: all 0.2s; }
+        .btn-primary:active { background: #1d4ed8; transform: scale(0.98); }
+        
+        .link-text { text-align: center; margin-top: 20px; }
         .link-text a { font-size: 13px; color: #2563eb; text-decoration: none; font-weight: 500; }
-        .divider { position: relative; margin-bottom: 24px; text-align: center; }
-        .divider::before { content: ""; position: absolute; top: 50%; left: 0; right: 0; border-top: 1px solid #f1f5f9; z-index: 1; }
-        .divider span { position: relative; z-index: 2; background: #fff; padding: 0 12px; font-size: 11px; color: #94a3b8; }
-        .auth-icons { display: flex; justify-content: center; gap: 20px; }
-        .auth-icons button { width: 44px; height: 44px; border-radius: 12px; border: 1px solid #e2e8f0; cursor: pointer; overflow: hidden; padding: 0; background: #fff; }
-        .auth-icons img { width: 100%; height: 100%; object-fit: cover; }
-        .footer { text-align: center; margin-top: 40px; margin-bottom: 16px; }
-        .footer img { width: 28px; height: 28px; border-radius: 8px; margin-bottom: 12px; opacity: 0.4; }
-        .footer p { font-size: 10px; color: #94a3b8; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 2px; }
-        .footer-links { display: flex; justify-content: center; gap: 12px; font-size: 11px; color: #94a3b8; }
-        .footer-links button { background: none; border: none; color: #94a3b8; cursor: pointer; }
-        #custom-toast { position: fixed; top: 40px; left: 50%; transform: translate(-50%, -20px); background: rgba(30, 41, 59, 0.95); color: white; padding: 12px 20px; border-radius: 16px; display: flex; align-items: center; gap: 12px; opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 9999; }
-        #custom-toast.show { opacity: 1; transform: translate(-50%, 0); }
-        #custom-toast img { width: 24px; height: 24px; border-radius: 6px; }
-        .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); z-index: 9999; display: none; align-items: flex-end; }
+
+        .footer { text-align: center; margin-top: auto; padding-top: 40px; margin-bottom: 16px; }
+        .footer img { width: 28px; height: 28px; border-radius: 8px; margin-bottom: 12px; opacity: 0.4; filter: grayscale(100%); object-fit: cover; }
+        .footer p.brand { font-size: 10px; font-weight: 600; color: #94a3b8; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px; }
+        .footer-links { display: flex; align-items: center; justify-content: center; gap: 12px; font-size: 11px; color: #94a3b8; }
+        .footer-links button { background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 11px; }
+        .footer-links button:hover { color: #475569; }
+
+        /* 自定义 Toast 提示 */
+        #custom-toast { position: fixed; top: 40px; left: 50%; transform: translateX(-50%) translateY(-20px); background: rgba(30, 41, 59, 0.95); color: white; padding: 12px 20px; border-radius: 16px; display: flex; align-items: center; gap: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 9999; opacity: 0; pointer-events: none; transition: all 0.3s; }
+        #custom-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        #custom-toast img { width: 24px; height: 24px; border-radius: 6px; object-fit: cover; }
+        .toast-text-box p:first-child { font-size: 11px; color: #94a3b8; font-weight: 500; }
+        .toast-text-box p:last-child { font-size: 13px; font-weight: 500; margin-top: 2px; }
+
+        /* 协议弹窗 */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 9999; display: none; align-items: flex-end; justify-content: center; }
         .modal-overlay.active { display: flex; }
-        .modal-content { background: white; width: 100%; max-width: 400px; border-radius: 24px 24px 0 0; padding: 24px; margin: 0 auto; max-height: 80vh; display: flex; flex-direction: column; }
-        .modal-header { display: flex; justify-content: space-between; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 16px; }
-        .modal-body { font-size: 13px; color: #475569; overflow-y: auto; line-height: 1.6; }
+        .modal-content { background: white; width: 100%; max-width: 400px; border-radius: 24px 24px 0 0; padding: 24px; padding-bottom: 40px; max-height: 80vh; display: flex; flex-direction: column; animation: slideUp 0.3s ease-out; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 16px; }
+        .modal-header h3 { font-size: 18px; font-weight: 700; color: #1e293b; }
+        .modal-close { background: none; border: none; font-size: 20px; color: #94a3b8; cursor: pointer; padding: 4px; }
+        .modal-body { font-size: 13px; color: #475569; line-height: 1.6; overflow-y: auto; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     </style>
 </head>
 <body>
+
     <div id="custom-toast">
-        <img src="/logo.jpg"><div><p style="font-size:11px;color:#94a3b8;">SOCKS5 提醒</p><p id="toast-msg" style="font-size:13px;">提示</p></div>
+        <img src="/logo.jpg">
+        <div class="toast-text-box">
+            <p>SOCKS5 提醒</p>
+            <p id="toast-msg">提示内容</p>
+        </div>
     </div>
+
     <div class="header">
-        <img src="/logo.jpg"><h2>欢迎回来</h2><p>登录以继续使用 SOCKS5 服务</p>
+        <img src="/logo.jpg">
+        <h2>欢迎回来</h2>
+        <p>登录以继续使用 SOCKS5 服务</p>
     </div>
+
     <div class="card">
         <form id="login-form">
-            <div class="input-group"><input type="email" id="email" required placeholder="工作邮箱"></div>
-            <div class="input-group"><input type="password" id="password" required placeholder="密码"></div>
-            <button type="submit" class="btn">安全登录</button>
+            <div class="input-group">
+                <input type="email" id="email" required placeholder="工作邮箱">
+            </div>
+            <div class="input-group">
+                <input type="password" id="password" required placeholder="密码">
+            </div>
+            <button type="submit" class="btn-primary">安全登录</button>
         </form>
-        <div class="link-text"><a href="/register.html">没有账号？立即注册</a></div>
-        <div class="divider"><span>快捷授权登录</span></div>
-        <div class="auth-icons">
-            <button onclick="showToast('请前往 Telegram 机器人内点击专属按钮')"><img src="/tg.jpg"></button>
-            <button onclick="showToast('请前往 SafeW 机器人内点击专属按钮')"><img src="/safew.jpg"></button>
-            <button onclick="showToast('请前往 Mivra 机器人内点击专属按钮')"><img src="/mivra.jpg"></button>
+        
+        <div class="link-text">
+            <a href="/register.html">没有账号？立即注册</a>
         </div>
     </div>
+
     <div class="footer">
-        <img src="/logo.jpg"><p>Powered by SOCKS5 Secure</p>
+        <img src="/logo.jpg">
+        <p class="brand">Powered by SOCKS5 Secure</p>
         <div class="footer-links">
-            <button onclick="openModal('privacy')">隐私政策</button> | <button onclick="openModal('terms')">用户协议</button> | <button onclick="openModal('about')">关于我们</button>
+            <button onclick="openModal('privacy')">隐私政策</button>
+            <span>|</span>
+            <button onclick="openModal('terms')">用户协议</button>
+            <span>|</span>
+            <button onclick="openModal('about')">关于我们</button>
         </div>
     </div>
+
     <div id="info-modal" class="modal-overlay">
         <div class="modal-content">
-            <div class="modal-header"><h3 id="modal-title" style="font-size:18px;font-weight:700;">标题</h3><button onclick="closeModal()" style="background:none;border:none;font-size:20px;color:#94a3b8;">✕</button></div>
+            <div class="modal-header">
+                <h3 id="modal-title">标题</h3>
+                <button class="modal-close" onclick="closeModal()">✕</button>
+            </div>
             <div class="modal-body" id="modal-body-content"></div>
         </div>
     </div>
+
     <script>
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
             try {
                 const res = await fetch('https://api.lynli.me/s5api/api/v1/passport/auth/login', {
-                    method: 'POST', headers: {'Content-Type': 'application/json'}, 
-                    body: JSON.stringify({ email: document.getElementById('email').value, password: document.getElementById('password').value })
+                    method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ email, password })
                 });
                 const data = await res.json();
                 if (res.ok) {
-                    localStorage.setItem('socks5_email', document.getElementById('email').value);
+                    localStorage.setItem('socks5_email', email);
                     localStorage.setItem('socks5_token', data.data?.token || data.token || '');
                     window.location.href = '/index.html';
                 } else { showToast(data.message || '登录失败'); }
-            } catch (err) { showToast('网络错误'); }
+            } catch (err) { showToast('网络错误，请稍后再试'); }
         });
+
         let toastTimer;
         function showToast(msg) {
-            const t = document.getElementById('custom-toast');
+            const toast = document.getElementById('custom-toast');
             document.getElementById('toast-msg').innerText = msg;
-            t.classList.add('show');
+            toast.classList.add('show');
             clearTimeout(toastTimer);
-            toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+            toastTimer = setTimeout(() => { toast.classList.remove('show'); }, 2500);
         }
+
         const modalContent = {
-            'privacy': { title: '隐私政策', text: '我们深知个人信息对您的重要性...' },
-            'terms': { title: '用户协议', text: '欢迎使用 SOCKS5 服务...' },
-            'about': { title: '关于我们', text: 'SOCKS5 致力于为您提供全球领先的虚拟资产...' }
+            'privacy': { title: '隐私政策', text: '我们深知个人信息对您的重要性，并会尽全力保护您的个人信息安全可靠...' },
+            'terms': { title: '用户协议', text: '欢迎使用 SOCKS5 服务。本协议是您与 SOCKS5 之间关于您使用本服务所订立的协议...' },
+            'about': { title: '关于我们', text: 'SOCKS5 致力于为您提供全球领先的虚拟资产与安全网络服务...' }
         };
         function openModal(type) {
-            document.getElementById('modal-title').innerText = modalContent[type].title;
-            document.getElementById('modal-body-content').innerText = modalContent[type].text;
+            const data = modalContent[type]; if(!data) return;
+            document.getElementById('modal-title').innerText = data.title;
+            document.getElementById('modal-body-content').innerText = data.text;
             document.getElementById('info-modal').classList.add('active');
         }
-        function closeModal() { document.getElementById('info-modal').classList.remove('active'); }
+        function closeModal() {
+            document.getElementById('info-modal').classList.remove('active');
+        }
     </script>
 </body>
 </html>

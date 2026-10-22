@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // 注入弹窗
+    // 1. 注入公告弹窗
     if (!document.getElementById('notice-modal')) {
         const modalHtml = `
             <div id="notice-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[99999] hidden items-center justify-center px-4">
@@ -19,35 +19,34 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.insertAdjacentHTML('beforeend', modalHtml);
     }
 
-    // 智能寻找右上角的图标区域
-    // 无论是首页还是我的页，右上角肯定是一个 icon，我们直接抓取包含 svg 的 relative 容器
-    const relativeContainers = document.querySelectorAll('.relative');
-    let foundBell = false;
-
-    relativeContainers.forEach(container => {
-        // 如果容器里含有 SVG（铃铛），并且不是底部导航，我们就当作是公告图标
-        if (container.querySelector('svg') && !container.closest('nav') && !container.closest('.bottom-tab')) {
-            foundBell = true;
-            container.style.cursor = 'pointer';
-            
-            // 绑定点击事件
-            container.onclick = (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                // 弹窗
-                const modal = document.getElementById('notice-modal');
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-                setTimeout(() => {
-                    document.getElementById('notice-modal-inner').classList.replace('scale-95', 'scale-100');
-                }, 10);
-                
-                // 标记已读，隐藏红点
-                localStorage.setItem('notice_read', 'true');
-                const dot = container.querySelector('.bg-red-500');
-                if (dot) dot.style.display = 'none';
-            };
+    // 2. 智能寻找页面右上角的铃铛
+    // 我们查找所有包含铃铛 SVG 路径的父容器（不管是 a 还是 div）
+    const allSvgs = document.querySelectorAll('svg');
+    allSvgs.forEach(svg => {
+        // 通过 path 的 d 属性特征来识别是不是铃铛
+        const isBell = svg.innerHTML.includes('M15 17h5l-1.405-1.405');
+        if (isBell) {
+            const container = svg.closest('.relative') || svg.parentElement;
+            if (container) {
+                container.style.cursor = 'pointer';
+                container.onclick = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // 弹出公告
+                    const modal = document.getElementById('notice-modal');
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                    setTimeout(() => {
+                        document.getElementById('notice-modal-inner').classList.replace('scale-95', 'scale-100');
+                    }, 10);
+                    
+                    // 标记已读并隐藏所有红点
+                    localStorage.setItem('notice_read', 'true');
+                    const dots = document.querySelectorAll('.bg-red-500.rounded-full');
+                    dots.forEach(dot => dot.style.display = 'none');
+                };
+            }
         }
     });
 

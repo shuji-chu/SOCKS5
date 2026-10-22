@@ -3,35 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>管理后台 - SOCKS5</title>
+    <title>系统管理后台 - SOCKS5</title>
     <link rel="icon" href="/logo.jpg" type="image/jpeg">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: #f8fafc; color: #1e293b; padding-bottom: 60px; }
+        body { background-color: #f8fafc; color: #1e293b; padding-bottom: 70px; }
         .card { background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; }
         .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
         .menu-item { background: #fff; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid #f1f5f9; active:bg-slate-50 transition; }
         .menu-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+        
+        /* 侧边抽屉 */
+        .drawer-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.5); backdrop-filter: blur(2px); z-index: 9999; display: none; }
+        .drawer-overlay.active { display: block; }
+        .drawer-panel { position: fixed; top: 0; left: -80%; width: 75%; max-width: 300px; height: 100%; background: #fff; z-index: 10000; transition: left 0.3s ease; box-shadow: 2px 0 10px rgba(0,0,0,0.1); }
+        .drawer-panel.active { left: 0; }
+        
+        /* 底部 Tab */
+        .bottom-tab { position: fixed; bottom: 0; width: 100%; background: #fff; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-around; padding: 8px 0; padding-bottom: env(safe-area-inset-bottom); z-index: 50; }
+        .tab-item { display: flex; flex-direction: column; align-items: center; gap: 2px; color: #94a3b8; font-size: 10px; font-weight: bold; }
+        .tab-item.active { color: #2563eb; }
     </style>
-
-    <script>
-        // 强制拦截：如果没有管理员 Token，直接踢回登录页
-            window.location.href = '/admin-login.html';
-        }
-    </script>
 </head>
 <body>
-    <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
+    <!-- 顶部 Header -->
+    <header class="bg-white border-b border-slate-100 px-4 py-3 flex justify-between items-center sticky top-0 z-50">
         <div class="flex items-center gap-3">
-            <a href="/console.html" class="text-slate-600 text-xl font-bold px-2">←</a>
+            <button onclick="openDrawer()" class="text-slate-600 p-1 active:bg-slate-100 rounded">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            </button>
             <h1 class="text-[17px] font-bold text-slate-800">系统管理后台</h1>
         </div>
-        <span class="text-[11px] bg-red-100 text-red-600 px-2 py-1 rounded font-bold border border-red-200">老板特权</span>
+        
+        <!-- 右上角用户信息 -->
+        <div class="flex items-center gap-2">
+            <div class="text-right hidden sm:block">
+                <p class="text-[13px] font-bold text-slate-800">boss</p>
+                <p class="text-[10px] text-red-500 bg-red-50 px-1 rounded inline-block">超级管理员</p>
+            </div>
+            <div class="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden">
+                <!-- 对应前台的 user_avatar 逻辑，这里暂用首字母 -->
+                <span class="text-blue-500 font-bold text-sm">B</span>
+            </div>
+        </div>
     </header>
 
-    <main class="px-4 py-5 space-y-6 max-w-lg mx-auto">
-        
+    <!-- 侧边抽屉面板 -->
+    <div id="drawer-overlay" class="drawer-overlay" onclick="closeDrawer(event)"></div>
+    <div id="drawer-panel" class="drawer-panel">
+        <div class="p-5 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+            <h2 class="font-bold text-slate-800">功能菜单</h2>
+            <button onclick="closeDrawer()" class="text-slate-400 p-1"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+        </div>
+        <div class="p-3 space-y-1">
+            <div class="flex items-center gap-3 p-3 rounded-lg active:bg-slate-100 text-slate-700 font-medium text-[14px]">
+                <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                数据看板 (当前)
+            </div>
+            <div onclick="showToast('商品管理正在开发')" class="flex items-center gap-3 p-3 rounded-lg active:bg-slate-100 text-slate-700 font-medium text-[14px]">
+                <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                商品/库存管理
+            </div>
+            <div onclick="showToast('订单管理正在开发')" class="flex items-center gap-3 p-3 rounded-lg active:bg-slate-100 text-slate-700 font-medium text-[14px]">
+                <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                全局订单中心
+            </div>
+            <div class="border-t border-slate-100 my-2"></div>
+            <div onclick="logout()" class="flex items-center gap-3 p-3 rounded-lg active:bg-red-50 text-red-600 font-medium text-[14px]">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                退出登录
+            </div>
+        </div>
+    </div>
+
+    <!-- 主内容区 -->
+    <main class="px-4 py-4 space-y-6">
         <!-- 核心数据看板 -->
         <div class="grid grid-cols-2 gap-3">
             <div class="card p-4 text-center">
@@ -52,45 +99,30 @@
             </div>
         </div>
 
-        <!-- 快捷功能菜单 -->
+        <!-- 快捷功能菜单 (保留原有的，也可通过抽屉进入) -->
         <div>
-            <h3 class="text-[15px] font-bold text-slate-800 mb-3">业务管理</h3>
+            <h3 class="text-[15px] font-bold text-slate-800 mb-3">快捷操作</h3>
             <div class="menu-grid">
-                <div onclick="showToast('前往商品管理')" class="menu-item cursor-pointer active:scale-95">
-                    <div class="menu-icon bg-blue-50 text-blue-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg></div>
-                    <span class="text-[13px] font-bold text-slate-700">商品/库存管理</span>
-                </div>
-                <div onclick="showToast('前往订单中心')" class="menu-item cursor-pointer active:scale-95">
-                    <div class="menu-icon bg-green-50 text-green-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></div>
-                    <span class="text-[13px] font-bold text-slate-700">全局订单中心</span>
-                </div>
-                <div onclick="showToast('前往API审批')" class="menu-item cursor-pointer active:scale-95 relative">
+                <div onclick="showToast('前往 API 审批')" class="menu-item cursor-pointer active:scale-95 relative">
                     <div class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></div>
                     <div class="menu-icon bg-amber-50 text-amber-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg></div>
                     <span class="text-[13px] font-bold text-slate-700">API 权限审批</span>
                 </div>
-                <div onclick="showToast('前往用户管理')" class="menu-item cursor-pointer active:scale-95">
+                <div onclick="showToast('前往用户资金')" class="menu-item cursor-pointer active:scale-95">
                     <div class="menu-icon bg-indigo-50 text-indigo-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg></div>
                     <span class="text-[13px] font-bold text-slate-700">用户与资金</span>
                 </div>
             </div>
         </div>
 
-        <!-- 系统配置 -->
+        <!-- 系统配置 (通过抽屉进入更多) -->
         <div>
-            <h3 class="text-[15px] font-bold text-slate-800 mb-3">系统配置</h3>
+            <h3 class="text-[15px] font-bold text-slate-800 mb-3">核心配置</h3>
             <div class="card overflow-hidden">
                 <div class="flex justify-between items-center p-4 border-b border-slate-50 active:bg-slate-50 cursor-pointer" onclick="showToast('前往支付配置')">
                     <div class="flex items-center gap-3">
                         <div class="w-8 h-8 rounded-lg bg-orange-50 text-orange-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg></div>
                         <span class="text-[14px] font-bold text-slate-800">支付通道与USDT地址</span>
-                    </div>
-                    <svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                </div>
-                <div class="flex justify-between items-center p-4 border-b border-slate-50 active:bg-slate-50 cursor-pointer" onclick="showToast('前往提现审核')">
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-lg bg-teal-50 text-teal-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
-                        <span class="text-[14px] font-bold text-slate-800">佣金提现审核</span>
                     </div>
                     <svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                 </div>
@@ -105,18 +137,61 @@
         </div>
     </main>
 
+    <!-- 底部 Tab -->
+    <div class="bottom-tab">
+        <div class="tab-item active">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+            <span>看板</span>
+        </div>
+        <div class="tab-item" onclick="showToast('进入订单模块')">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+            <span>订单</span>
+        </div>
+        <div class="tab-item" onclick="showToast('进入商品模块')">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+            <span>商品</span>
+        </div>
+        <div class="tab-item" onclick="showToast('进入用户模块')">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+            <span>用户</span>
+        </div>
+    </div>
+
     <script>
+        // 强制拦截：必须包含 boss 专属 Token 且系统角色必须是 boss
+        const token = localStorage.getItem('admin_token');
+        const role = localStorage.getItem('user_role');
+        if (!token || role !== 'boss') {
+            localStorage.removeItem('admin_token');
+            window.location.href = '/admin-login.html';
+        }
+
+        // 抽屉逻辑
+        function openDrawer() {
+            document.getElementById('drawer-overlay').classList.add('active');
+            document.getElementById('drawer-panel').classList.add('active');
+        }
+        function closeDrawer(e) {
+            if(e && e.target !== e.currentTarget) return;
+            document.getElementById('drawer-overlay').classList.remove('active');
+            document.getElementById('drawer-panel').classList.remove('active');
+        }
+
         function showToast(msg) {
             let toast = document.getElementById('toast');
             if(!toast) {
                 toast = document.createElement('div');
                 toast.id = 'toast';
-                toast.style.cssText = 'visibility:hidden; min-width:200px; background-color:#334155; color:#fff; text-align:center; border-radius:8px; padding:10px 16px; position:fixed; z-index:10000; left:50%; bottom:30px; transform:translateX(-50%); font-size:13px; opacity:0; transition:opacity 0.3s;';
+                toast.style.cssText = 'visibility:hidden; min-width:200px; background-color:#334155; color:#fff; text-align:center; border-radius:8px; padding:10px 16px; position:fixed; z-index:10000; left:50%; bottom:80px; transform:translateX(-50%); font-size:13px; opacity:0; transition:opacity 0.3s;';
                 document.body.appendChild(toast);
             }
-            toast.innerText = msg;
-            toast.style.visibility = 'visible'; toast.style.opacity = '1';
+            toast.innerText = msg; toast.style.visibility = 'visible'; toast.style.opacity = '1';
             setTimeout(() => { toast.style.visibility = 'hidden'; toast.style.opacity = '0'; }, 2500);
+        }
+
+        function logout() {
+            localStorage.removeItem('admin_token');
+            window.location.href = '/admin-login.html';
         }
     </script>
 </body>

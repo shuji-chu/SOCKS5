@@ -102,15 +102,23 @@
             </div>
         </div>
 
-        <!-- 账单 -->
+        <!-- 账单与请求记录 (带完整分页) -->
         <div id="bill-tab-container" class="bg-white mt-2">
             <div class="flex border-b border-slate-100">
                 <button onclick="switchBillTab('bill')" id="tab-btn-bill" class="flex-1 py-3.5 text-[14px] font-bold text-blue-600 border-b-2 border-blue-600 bg-white">收支明细</button>
                 <button onclick="switchBillTab('request')" id="tab-btn-request" class="flex-1 py-3.5 text-[14px] font-bold text-slate-500 border-b-2 border-transparent">消费记录</button>
             </div>
+            
             <div class="bg-white">
-                <div id="bill-list-container" class="text-left p-4">账单数据加载中...</div>
-                <div id="request-list-container" class="text-left p-4 hidden">请求数据加载中...</div>
+                <div id="bill-list-container" class="text-left w-full"></div>
+                <div id="request-list-container" class="text-left hidden w-full"></div>
+            </div>
+            
+            <!-- 分页控制区 -->
+            <div class="flex justify-between items-center p-4 border-t border-slate-100 bg-slate-50/50">
+                <button onclick="changePage(-1)" id="btn-prev-page" class="px-4 py-1.5 bg-white border border-slate-200 text-slate-600 text-[13px] rounded-lg active:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition">上一页</button>
+                <span class="text-[12px] text-slate-500 font-medium" id="page-info">第 1 页 / 共 1 页</span>
+                <button onclick="changePage(1)" id="btn-next-page" class="px-4 py-1.5 bg-white border border-slate-200 text-slate-600 text-[13px] rounded-lg active:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition">下一页</button>
             </div>
         </div>
     </main>
@@ -163,7 +171,6 @@
                 <h3 class="text-[17px] font-bold text-slate-800 mb-2">扫码支付</h3>
                 <p class="text-[13px] text-slate-500 mb-4" id="pay-tip-text">请使用支付宝扫码</p>
                 
-                <!-- 二维码占位/真实图 -->
                 <div class="w-48 h-48 bg-slate-100 mx-auto rounded-xl flex items-center justify-center mb-4 border border-slate-200">
                     <img id="pay-qrcode-img" src="" class="w-full h-full object-contain hidden">
                     <span id="pay-qrcode-placeholder" class="text-slate-400 text-sm">二维码加载中...</span>
@@ -197,7 +204,31 @@
         let apiStatus = { account: 1, node: 0, sms: 1, query: 0, pay: 1 };
         let apiKeys = { account: 'sk_tg_123', node: 'sk_jd_456', sms: 'sk_sms_789', query: 'sk_cx_000', pay: 'sk_zf_999' };
 
-        // ==== 渲染页面 ====
+        // ==== 模拟数据生成 ====
+        const mockBills = Array.from({length: 12}).map((_, i) => ({
+            id: `BL20261022${String(i).padStart(4, '0')}`,
+            type: i % 3 === 0 ? '在线充值' : (i % 3 === 1 ? '手机号二要素认证 接口消费' : '退款入账'),
+            amount: i % 3 === 0 ? '+800.00' : (i % 3 === 1 ? '-0.0455' : '+8.00'),
+            isPositive: i % 3 !== 1,
+            balanceAfter: `¥ ${(120 - i * 1.5).toFixed(4)}`,
+            time: `2026-10-22 15:${String(30+i).padStart(2,'0')}`
+        }));
+
+        const mockRequests = Array.from({length: 18}).map((_, i) => ({
+            apiName: i % 2 === 0 ? '手机号二要素认证' : '全网手机号三要素验证',
+            uuid: `req_${i}abc-d82k-4a1b`,
+            amount: i % 3 === 0 ? '0.0000' : '0.0455',
+            status: i % 3 === 0 ? 'fail' : 'success',
+            reason: i % 3 === 0 ? '余额不足，请先充值' : '',
+            time: `2026-10-21 16:59:${String(40+i).padStart(2,'0')}`
+        }));
+
+        // ==== 分页与渲染状态 ====
+        let currentTab = 'bill';
+        let currentPage = { bill: 1, request: 1 };
+        const pageSize = 5;
+
+        // ==== 渲染逻辑 ====
         function renderApis() {
             document.getElementById('api-list').innerHTML = apis.map(a => `
                 <div class="flex justify-between items-center py-3 border-b border-slate-50">
@@ -206,6 +237,7 @@
                 </div>
             `).join('');
         }
+
         function renderKeys() {
             document.getElementById('key-list').innerHTML = apis.map(a => `
                 <div class="p-3 bg-slate-50 border rounded-lg">
@@ -214,20 +246,91 @@
                 </div>
             `).join('');
         }
+
+        function renderList() {
+            const billCont = document.getElementById('bill-list-container');
+            const reqCont = document.getElementById('request-list-container');
+            const pageInfo = document.getElementById('page-info');
+            const btnPrev = document.getElementById('btn-prev-page');
+            const btnNext = document.getElementById('btn-next-page');
+
+            const data = currentTab === 'bill' ? mockBills : mockRequests;
+            const page = currentPage[currentTab];
+            const totalPage = Math.ceil(data.length / pageSize) || 1;
+            
+            // 截取当前页数据
+            const start = (page - 1) * pageSize;
+            const displayData = data.slice(start, start + pageSize);
+
+            if (currentTab === 'bill') {
+                billCont.innerHTML = displayData.map(item => `
+                    <div class="flex justify-between items-start px-4 py-3 border-b border-slate-50 last:border-0 hover:bg-slate-50 transition">
+                        <div class="flex flex-col gap-1 pr-4">
+                            <span class="text-[13px] font-bold text-slate-800 line-clamp-1">${item.type}</span>
+                            <span class="text-[11px] text-slate-400">${item.id}</span>
+                            <span class="text-[11px] text-slate-400">变更后: ${item.balanceAfter}</span>
+                        </div>
+                        <div class="flex flex-col items-end gap-1 shrink-0">
+                            <span class="text-[14px] font-bold ${item.isPositive ? 'text-green-600' : 'text-slate-800'}">${item.amount}</span>
+                            <span class="text-[11px] text-slate-400">${item.time.split(' ')[0]}</span>
+                            <span class="text-[11px] text-slate-400">${item.time.split(' ')[1]}</span>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                reqCont.innerHTML = displayData.map(item => `
+                    <div class="flex justify-between items-start px-4 py-3 border-b border-slate-50 last:border-0 hover:bg-slate-50 transition">
+                        <div class="flex flex-col gap-1 pr-4">
+                            <span class="text-[13px] font-bold text-slate-800 line-clamp-1">${item.apiName}</span>
+                            <span class="text-[11px] text-slate-400 truncate w-40">${item.uuid}</span>
+                        </div>
+                        <div class="flex flex-col items-end gap-1 shrink-0">
+                            <span class="text-[13px] font-bold text-slate-800">- $${item.amount}</span>
+                            <span class="text-[11px] ${item.status === 'success' ? 'text-green-500' : 'text-red-500'}">${item.status === 'success' ? '成功' : '失败: ' + item.reason}</span>
+                            <span class="text-[11px] text-slate-400">${item.time}</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // 更新分页文本
+            pageInfo.innerText = `第 ${page} 页 / 共 ${totalPage} 页`;
+
+            // 按钮状态控制
+            btnPrev.disabled = page <= 1;
+            btnNext.disabled = page >= totalPage;
+        }
+
+        function changePage(step) {
+            const data = currentTab === 'bill' ? mockBills : mockRequests;
+            const totalPage = Math.ceil(data.length / pageSize) || 1;
+            const newPage = currentPage[currentTab] + step;
+            
+            if (newPage >= 1 && newPage <= totalPage) {
+                currentPage[currentTab] = newPage;
+                renderList();
+            }
+        }
+
+        function switchBillTab(tab) {
+            currentTab = tab;
+            document.getElementById('tab-btn-bill').className = tab === 'bill' ? 'flex-1 py-3.5 text-[14px] font-bold text-blue-600 border-b-2 border-blue-600 bg-white' : 'flex-1 py-3.5 text-[14px] font-bold text-slate-500 border-b-2 border-transparent';
+            document.getElementById('tab-btn-request').className = tab === 'request' ? 'flex-1 py-3.5 text-[14px] font-bold text-blue-600 border-b-2 border-blue-600 bg-white' : 'flex-1 py-3.5 text-[14px] font-bold text-slate-500 border-b-2 border-transparent';
+            document.getElementById('bill-list-container').className = tab === 'bill' ? 'text-left w-full' : 'hidden';
+            document.getElementById('request-list-container').className = tab === 'request' ? 'text-left w-full' : 'hidden';
+            
+            // 切换时重新渲染列表
+            renderList(); 
+        }
+
+        // ==== 弹窗与基础逻辑 ====
         function toggleAccordion(id, iconId) {
             const el = document.getElementById(id);
             const ic = document.getElementById(iconId);
             if(el.classList.contains('active')){el.classList.remove('active'); el.style.maxHeight = null; ic.classList.remove('rotate-180');}
             else {el.classList.add('active'); el.style.maxHeight = el.scrollHeight + 'px'; ic.classList.add('rotate-180');}
         }
-        function switchBillTab(tab) {
-            document.getElementById('tab-btn-bill').className = tab === 'bill' ? 'flex-1 py-3.5 text-[14px] font-bold text-blue-600 border-b-2 border-blue-600 bg-white' : 'flex-1 py-3.5 text-[14px] font-bold text-slate-500 border-b-2 border-transparent';
-            document.getElementById('tab-btn-request').className = tab === 'request' ? 'flex-1 py-3.5 text-[14px] font-bold text-blue-600 border-b-2 border-blue-600 bg-white' : 'flex-1 py-3.5 text-[14px] font-bold text-slate-500 border-b-2 border-transparent';
-            document.getElementById('bill-list-container').className = tab === 'bill' ? 'text-left p-4' : 'hidden';
-            document.getElementById('request-list-container').className = tab === 'request' ? 'text-left p-4' : 'hidden';
-        }
 
-        // ==== 弹窗切换通用逻辑 ====
         function showModal() { document.getElementById('custom-modal').classList.add('active'); }
         function closeModal() { document.getElementById('custom-modal').classList.remove('active'); }
 
@@ -242,16 +345,12 @@
             showModal();
         }
 
-        // ==== 核心充值逻辑 ====
         let currentPayType = 'alipay';
-
         function openRechargeModal() {
-            // 展示充值输入界面
             document.getElementById('modal-normal').classList.add('hidden');
             document.getElementById('modal-pay').classList.add('hidden');
             document.getElementById('modal-recharge').classList.remove('hidden');
-            
-            selectPayType('alipay'); // 默认支付宝
+            selectPayType('alipay');
             document.getElementById('recharge-amount').value = 10;
             updateRechargeCalc();
             showModal();
@@ -278,12 +377,9 @@
         function updateRechargeCalc() {
             const val = parseFloat(document.getElementById('recharge-amount').value) || 0;
             const calcEl = document.getElementById('recharge-calc');
-            
             if (currentPayType === 'alipay') {
-                // 输入人民币，按 8 换算成 USDT
                 calcEl.innerText = `≈ ${(val / 8).toFixed(2)} USDT`;
             } else {
-                // 输入 USDT，按 8 换算成人民币
                 calcEl.innerText = `${(val * 8).toFixed(2)} CNY`;
             }
         }
@@ -292,7 +388,6 @@
             const val = parseFloat(document.getElementById('recharge-amount').value) || 0;
             if (val <= 0) { showToast('请输入正确金额'); return; }
 
-            // 隐藏输入界面，展示支付界面
             document.getElementById('modal-recharge').classList.add('hidden');
             document.getElementById('modal-pay').classList.remove('hidden');
 
@@ -306,30 +401,24 @@
                 payTip.innerText = '请使用支付宝扫码付款';
                 payAmount.innerText = `¥ ${val.toFixed(2)}`;
                 usdtBox.classList.add('hidden');
-                
-                // 模拟展示支付宝二维码图片
-                qrcodeImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=alipay_mock_order_' + val;
+                qrcodeImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=alipay_mock_' + val;
                 qrcodeImg.classList.remove('hidden');
                 placeholder.classList.add('hidden');
             } else {
                 payTip.innerText = '请使用钱包扫码或转账';
                 payAmount.innerText = `${val.toFixed(2)} USDT`;
                 usdtBox.classList.remove('hidden');
-                
-                // 模拟展示USDT二维码图片
                 qrcodeImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=TYu8x9ZqP3vK2mN4wL5jR6tB7cV8bA9sD0';
                 qrcodeImg.classList.remove('hidden');
                 placeholder.classList.add('hidden');
             }
         }
 
-        // ==== 工具函数 ====
         function showToast(msg) { const t = document.getElementById('toast'); t.innerText = msg; t.className = 'show'; setTimeout(() => t.className = '', 2000); }
 
         document.addEventListener('DOMContentLoaded', () => {
             renderApis(); renderKeys();
-            document.getElementById('bill-list-container').innerHTML = '<div class="p-4 text-center text-slate-400">暂无流水</div>';
-            document.getElementById('request-list-container').innerHTML = '<div class="p-4 text-center text-slate-400">暂无记录</div>';
+            renderList(); // 初始化渲染账单
         });
     </script>
 </body>

@@ -3,38 +3,163 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>域名解析管理 - SOCKS5</title>
+    <title>域名管理 - SOCKS5</title>
     <link rel="icon" href="/logo.jpg" type="image/jpeg">
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>* { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; } body { background-color: #f1f5f9; }</style>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
+        body { background-color: #f1f5f9; color: #1e293b; padding-bottom: 20px;}
+        .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 9999; display: none; align-items: center; justify-content: center; }
+        .modal-overlay.active { display: flex; }
+    </style>
 </head>
 <body>
     <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center gap-3 sticky top-0 z-50">
         <a href="/domain.html" class="text-slate-600 text-xl font-bold px-2">←</a>
         <h1 class="text-lg font-bold text-slate-800">域名解析管理</h1>
     </header>
+
     <main class="p-4">
-        <div class="bg-blue-500 text-white p-4 rounded-xl shadow-sm mb-4">
-            <h2 class="text-lg font-bold mb-1">lynli.kz.ci</h2>
-            <p class="text-xs text-blue-100">状态正常 | 剩余 365 天</p>
+        <!-- 头部信息 -->
+        <div class="bg-white border border-slate-100 p-4 rounded-xl shadow-sm mb-4 flex justify-between items-center">
+            <div>
+                <h2 class="text-lg font-bold text-slate-800 mb-1">lynli.kz.ci</h2>
+                <p class="text-xs text-slate-500">Asia/Singapore (UTC+8)</p>
+            </div>
+            <button onclick="openSSLModal()" class="bg-green-50 text-green-600 border border-green-200 px-4 py-2 rounded-lg text-sm font-bold shadow-sm flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                SSL证书
+            </button>
         </div>
-        <h3 class="font-bold text-slate-800 mb-3 ml-1 text-[15px]">DNS 记录列表</h3>
-        <div class="bg-white rounded-xl border border-slate-100 overflow-hidden text-sm">
+
+        <div class="flex justify-between items-center mb-3">
+            <h3 class="font-bold text-slate-800 text-[15px]">DNS 记录列表 (最多5条)</h3>
+            <button onclick="addDNSRecord()" class="text-xs bg-blue-500 text-white px-3 py-1.5 rounded-lg font-bold">+ 添加记录</button>
+        </div>
+
+        <!-- 解析记录列表 -->
+        <div class="bg-white rounded-xl border border-slate-100 overflow-hidden text-sm shadow-sm" id="dns-list">
             <div class="grid grid-cols-3 bg-slate-50 p-3 font-bold text-slate-600 border-b border-slate-100">
                 <span>类型</span><span>主机记录</span><span>记录值</span>
             </div>
-            <div class="grid grid-cols-3 p-3 border-b border-slate-50 text-slate-700 items-center">
+            
+            <!-- 已有记录1 -->
+            <div class="grid grid-cols-3 p-3 border-b border-slate-50 text-slate-700 items-center dns-item">
                 <span><span class="bg-orange-100 text-orange-600 text-[10px] px-1.5 py-0.5 rounded">A</span></span>
                 <span class="font-mono">@</span>
                 <span class="font-mono">8.210.61.146</span>
             </div>
-            <div class="grid grid-cols-3 p-3 text-slate-700 items-center">
+            <!-- 已有记录2 -->
+            <div class="grid grid-cols-3 p-3 text-slate-700 items-center dns-item border-b border-slate-50">
                 <span><span class="bg-green-100 text-green-600 text-[10px] px-1.5 py-0.5 rounded">CNAME</span></span>
                 <span class="font-mono">www</span>
                 <span class="font-mono">lynli.me</span>
             </div>
         </div>
-        <button class="w-full mt-6 py-3.5 bg-blue-500 text-white font-bold rounded-xl text-[15px] shadow-sm">+ 添加新记录</button>
     </main>
+
+    <!-- SSL 证书申请弹窗 (全屏遮罩) -->
+    <div id="ssl-modal" class="modal-overlay" style="align-items: flex-start; padding-top: 10vh;">
+        <div class="bg-white rounded-2xl w-[92%] max-w-[380px] relative max-h-[80vh] overflow-y-auto">
+            <div class="sticky top-0 bg-white px-5 py-4 border-b border-slate-100 flex justify-between items-center z-10">
+                <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                    <svg class="w-6 h-6 text-green-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                    SSL证书申请中心
+                </h3>
+                <button onclick="closeSSLModal()" class="text-slate-400 text-xl px-2">✕</button>
+            </div>
+            <div class="p-5">
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-5">
+                    <label class="block text-sm font-bold text-slate-700 mb-2">选择申请域名</label>
+                    <select class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-sm mb-3">
+                        <option>lynli.kz.ci (单域名)</option>
+                    </select>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">选择证书类型</label>
+                    <select class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-sm mb-4">
+                        <option>单域名证书 (免费)</option>
+                        <option>通配符证书 (付费)</option>
+                    </select>
+                    <button onclick="showToast('已提交SSL申请，请等待DNS生效')" class="w-full bg-green-500 text-white font-bold rounded-lg py-3 text-sm shadow-sm flex justify-center items-center gap-2">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg> 提交申请
+                    </button>
+                </div>
+                
+                <div class="flex justify-between items-center mb-3">
+                    <h4 class="font-bold text-slate-800 text-sm">申请历史</h4>
+                    <span class="text-xs text-slate-400">共 0 条</span>
+                </div>
+                <div class="border border-slate-100 rounded-xl p-6 text-center text-slate-400 text-sm mb-5">
+                    暂无证书申请记录。
+                </div>
+
+                <h4 class="font-bold text-slate-800 text-sm mb-3 flex items-center gap-2"><svg class="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg> 常见问题解答</h4>
+                <div class="border border-slate-100 rounded-xl overflow-hidden text-sm text-slate-600">
+                    <div class="p-3 border-b border-slate-100 flex justify-between"><span>同一个域名申请冷却需要多久？</span><span class="text-slate-300">∨</span></div>
+                    <div class="p-3 border-b border-slate-100 flex justify-between"><span>证书申请一般需要多久？</span><span class="text-slate-300">∨</span></div>
+                    <div class="p-3 border-b border-slate-100 flex justify-between"><span>为什么状态显示“等待DNS生效”？</span><span class="text-slate-300">∨</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 全局提示弹窗 -->
+    <div id="custom-modal" class="modal-overlay">
+        <div class="bg-white rounded-2xl p-6 w-[85%] max-w-[320px] relative">
+            <div class="text-center">
+                <h3 class="text-lg font-bold text-slate-800 mb-2 flex items-center justify-center gap-2"><img src="/logo.jpg" class="w-5 h-5 rounded"> <span id="modal-title">提示</span></h3>
+                <p id="modal-desc" class="text-sm text-slate-500 mb-6 leading-relaxed text-left bg-slate-50 p-4 rounded-lg">内容</p>
+                <button onclick="closeGlobalAlert()" class="w-full py-2.5 bg-blue-500 text-white font-bold rounded-xl text-sm shadow-sm">我知道了</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // SSL 弹窗
+        function openSSLModal() { document.getElementById('ssl-modal').classList.add('active'); }
+        function closeSSLModal() { document.getElementById('ssl-modal').classList.remove('active'); }
+
+        // 添加 DNS 记录逻辑 (强制限制5条)
+        function addDNSRecord() {
+            const items = document.querySelectorAll('.dns-item');
+            if (items.length >= 5) {
+                showGlobalAlert('解析上限', '免费二级域名最多只能添加 5 条解析记录，如需更多请升级或购买付费配额。');
+                return;
+            }
+            // 模拟添加一条
+            const list = document.getElementById('dns-list');
+            const newDiv = document.createElement('div');
+            newDiv.className = 'grid grid-cols-3 p-3 text-slate-700 items-center dns-item border-b border-slate-50';
+            newDiv.innerHTML = `
+                <span><span class="bg-orange-100 text-orange-600 text-[10px] px-1.5 py-0.5 rounded">A</span></span>
+                <span class="font-mono">test</span>
+                <span class="font-mono">1.1.1.1</span>
+            `;
+            list.appendChild(newDiv);
+            showToast('添加成功');
+        }
+
+        // 全局提示
+        function showGlobalAlert(title, desc) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-desc').innerText = desc;
+            document.getElementById('custom-modal').classList.add('active');
+        }
+        function closeGlobalAlert() { document.getElementById('custom-modal').classList.remove('active'); }
+        
+        let toastTimer;
+        function showToast(msg) {
+            let t = document.getElementById('toast');
+            if(!t) {
+                t = document.createElement('div');
+                t.id = 'toast';
+                t.className = 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black/80 text-white px-4 py-2 rounded-lg text-sm z-[9999] hidden';
+                document.body.appendChild(t);
+            }
+            t.innerText = msg;
+            t.classList.remove('hidden');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => t.classList.add('hidden'), 2000);
+        }
+    </script>
 </body>
 </html>

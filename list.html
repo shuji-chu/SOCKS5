@@ -11,6 +11,8 @@
         body { background-color: #ffffff; color: #1e293b; }
         .seamless-item { border-bottom: 1px solid #f1f5f9; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 9999; display: none; align-items: center; justify-content: center; }
+        .modal-overlay.active { display: flex; }
     </style>
 </head>
 <body>
@@ -26,18 +28,28 @@
                 <input type="text" id="search-input" oninput="renderProducts()" placeholder="搜索当前分类商品..." class="bg-transparent outline-none text-[14px] w-full text-slate-700">
             </div>
             
-            <!-- 只有节点分类才显示的协议筛选栏 -->
+            <!-- 协议筛选栏 -->
             <div id="protocol-filter" class="hidden flex overflow-x-auto no-scrollbar gap-2 text-[13px]">
-                <button onclick="filterProtocol('全部', this)" class="filter-btn bg-blue-500 text-white px-3 py-1.5 rounded-full whitespace-nowrap">全部</button>
+                <button onclick="filterProtocol('全部', this)" class="filter-btn bg-blue-500 text-white px-3 py-1.5 rounded-full whitespace-nowrap shadow-sm">全部</button>
                 <button onclick="filterProtocol('Socks5', this)" class="filter-btn bg-slate-100 text-slate-600 px-3 py-1.5 rounded-full whitespace-nowrap">Socks5</button>
                 <button onclick="filterProtocol('MTProto', this)" class="filter-btn bg-slate-100 text-slate-600 px-3 py-1.5 rounded-full whitespace-nowrap">MTProto</button>
                 <button onclick="filterProtocol('VMess', this)" class="filter-btn bg-slate-100 text-slate-600 px-3 py-1.5 rounded-full whitespace-nowrap">VMess</button>
                 <button onclick="filterProtocol('Trojan', this)" class="filter-btn bg-slate-100 text-slate-600 px-3 py-1.5 rounded-full whitespace-nowrap">Trojan</button>
-                <button onclick="filterProtocol('Hysteria2', this)" class="filter-btn bg-slate-100 text-slate-600 px-3 py-1.5 rounded-full whitespace-nowrap">Hysteria2</button>
             </div>
         </div>
         <div id="product-list" class="px-4 pb-10"></div>
     </main>
+
+    <!-- 全局自定义弹窗 -->
+    <div id="custom-modal" class="modal-overlay">
+        <div class="bg-white rounded-2xl p-6 w-[85%] max-w-[320px] relative" id="custom-modal-content">
+            <div class="text-center">
+                <h3 class="text-lg font-bold text-slate-800 mb-2 flex items-center justify-center gap-2"><img src="/logo.jpg" class="w-5 h-5 rounded"> <span id="modal-title">提示</span></h3>
+                <p id="modal-desc" class="text-sm text-slate-500 mb-6 leading-relaxed text-left bg-slate-50 p-4 rounded-lg">内容</p>
+                <button onclick="closeGlobalAlert()" class="w-full py-2.5 bg-blue-500 text-white font-bold rounded-xl text-sm shadow-sm">我知道了</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         const urlParams = new URLSearchParams(window.location.search);
@@ -47,12 +59,12 @@
         let allProducts = [];
         let currentProtocol = '全部';
 
-        // 根据业务分类生成高度逼真的数据
+        // 根据业务分类生成逼真的数据
         function generateData() {
             const data = [];
             if (pageType === '节点') {
                 document.getElementById('protocol-filter').classList.remove('hidden');
-                const protocols = ['Socks5', 'MTProto', 'VMess', 'Trojan', 'Hysteria2'];
+                const protocols = ['Socks5', 'MTProto', 'VMess', 'Trojan'];
                 const ips = ['静态独享', '动态住宅', '原生纯净'];
                 const countries = ['美国', '日本', '香港', '新加坡'];
                 
@@ -81,7 +93,7 @@
             document.querySelectorAll('.filter-btn').forEach(b => {
                 b.className = 'filter-btn bg-slate-100 text-slate-600 px-3 py-1.5 rounded-full whitespace-nowrap';
             });
-            btn.className = 'filter-btn bg-blue-500 text-white px-3 py-1.5 rounded-full whitespace-nowrap';
+            btn.className = 'filter-btn bg-blue-500 text-white px-3 py-1.5 rounded-full whitespace-nowrap shadow-sm';
             renderProducts();
         }
 
@@ -102,11 +114,10 @@
                 a.href = "javascript:void(0)";
                 a.onclick = () => { 
                     if(!localStorage.getItem('socks5_token')) { window.location.href = '/login.html'; return; }
-                    showCustomAlert('购买确认', `准备购买：\n${p.title}\n金额：¥${p.price}`); 
+                    showGlobalAlert('购买确认', `准备购买：\n${p.title}\n金额：¥${p.price}`); 
                 };
                 a.className = "block py-4 seamless-item active:bg-slate-50";
                 
-                // 节点专属高亮标识
                 let tagHtml = p.protocol ? `<span class="bg-indigo-50 text-indigo-600 border border-indigo-100 text-[10px] px-1.5 py-0.5 rounded mr-2">${p.protocol}</span>` : '';
 
                 a.innerHTML = `
@@ -128,43 +139,14 @@
             listEl.appendChild(fragment);
         }
 
-        // 全局弹窗
-        function showCustomAlert(title, desc) {
+        function showGlobalAlert(title, desc) {
             document.getElementById('modal-title').innerText = title;
             document.getElementById('modal-desc').innerText = desc;
             document.getElementById('custom-modal').classList.add('active');
         }
-        function closeCustomAlert() { document.getElementById('custom-modal').classList.remove('active'); }
+        function closeGlobalAlert() { document.getElementById('custom-modal').classList.remove('active'); }
 
         document.addEventListener('DOMContentLoaded', renderProducts);
-    </script>
-
-    <!-- 全局自定义弹窗 -->
-    <div id="custom-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] hidden items-center justify-center">
-        <div class="bg-white rounded-2xl p-6 w-[85%] max-w-[320px] relative" id="custom-modal-content">
-            <div class="text-center">
-                <h3 class="text-lg font-bold text-slate-800 mb-2 flex items-center justify-center gap-2">
-                    <img src="/logo.jpg" class="w-5 h-5 rounded"> <span id="modal-title">提示</span>
-                </h3>
-                <p id="modal-desc" class="text-sm text-slate-500 mb-6 leading-relaxed text-left bg-slate-50 p-4 rounded-lg">内容</p>
-                <button onclick="closeCustomAlert()" class="w-full py-2.5 bg-blue-500 text-white font-bold rounded-xl text-sm shadow-sm">我知道了</button>
-            </div>
-        </div>
-    </div>
-    <script>
-        // 为这个页面单独补充一下显示/隐藏的 class
-        const originalShowAlert = showCustomAlert;
-        showCustomAlert = function(title, desc) {
-            document.getElementById('custom-modal').classList.remove('hidden');
-            document.getElementById('custom-modal').classList.add('flex');
-            originalShowAlert(title, desc);
-        };
-        const originalCloseAlert = closeCustomAlert;
-        closeCustomAlert = function() {
-            document.getElementById('custom-modal').classList.add('hidden');
-            document.getElementById('custom-modal').classList.remove('flex');
-            originalCloseAlert();
-        }
     </script>
 </body>
 </html>

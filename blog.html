@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>博客中心 - SOCKS5</title>
+    <link rel="icon" href="/logo.jpg" type="image/jpeg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #f8fafc; color: #1e293b; padding-bottom: 20px; }
+        .card { background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; margin-bottom: 16px; }
+    </style>
+</head>
+<body>
+    <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
+        <div class="flex items-center gap-3">
+            <a href="/index.html" class="text-slate-600 text-xl font-bold px-2">←</a>
+            <h1 class="text-[17px] font-bold text-slate-800">博客中心</h1>
+        </div>
+    </header>
+
+    <main class="px-4 py-4 max-w-lg mx-auto">
+        <!-- 顶部搜索 -->
+        <div class="bg-white rounded-xl flex items-center px-3 py-2.5 border border-slate-200 shadow-sm mb-4">
+            <svg class="w-5 h-5 text-slate-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            <input type="text" placeholder="搜索教程、资讯..." class="bg-transparent outline-none text-[14px] w-full text-slate-700">
+        </div>
+
+        <div class="text-[12px] text-slate-400 mb-4 flex gap-4">
+            <span>产品公告</span>
+            <span>使用教程</span>
+            <span>优惠活动</span>
+            <span>行业资讯</span>
+        </div>
+
+        <!-- 文章卡片列表 -->
+        <a href="/blog-detail.html" class="block card p-4 active:bg-slate-50 transition">
+            <div class="flex justify-between items-start mb-2">
+                <span class="text-[11px] text-blue-600 bg-blue-50 px-2 py-0.5 rounded">Telegram（电报）使用运营指南</span>
+                <span class="text-[11px] text-slate-400">2026-08-11</span>
+            </div>
+            <h2 class="text-[16px] font-bold text-slate-800 leading-snug mb-3">Telegram短信验证码收费怎么办？电报账号付费验证码解决方法大全</h2>
+            <p class="text-[13px] text-slate-500 leading-relaxed line-clamp-2 mb-3">登录或注册 Telegram 时突然弹出 SMS Fee、验证码收费、Premium 验证或短信付费提示怎么办？这类问题在今年比较常见。下面把目前可以尝试的处理方式集中整理...</p>
+            <div class="flex items-center gap-3 text-[11px] text-slate-400">
+                <span>3126 阅读</span>
+                <span>18 评论</span>
+                <span>标签: TGX 账号平台, Telegram...</span>
+            </div>
+        </a>
+    </main>
+
+    <script src="/notice-marquee.js"></script>
+    <script src="/ai-widget.js"></script>
+</body>
+</html>

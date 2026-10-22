@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>账户设置 - SOCKS5</title>
+    <link rel="icon" href="/logo.jpg" type="image/jpeg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>* { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; } body { background-color: #f1f5f9; }</style>
+</head>
+<body class="pb-10">
+    <div class="bg-white p-4 flex items-center gap-3 sticky top-0 z-50 shadow-sm">
+        <a href="/profile.html" class="text-slate-600 font-bold text-xl px-2">←</a>
+        <h1 class="text-lg font-bold text-slate-800">账户设置</h1>
+    </div>
+
+    <div class="p-4">
+        <div class="bg-white rounded-xl p-6 shadow-sm mb-4 text-center">
+            <label class="block text-xs text-slate-500 mb-2">点击更换头像</label>
+            <div class="relative w-24 h-24 mx-auto cursor-pointer">
+                <img id="edit-avatar-preview" src="/logo.jpg" class="w-24 h-24 rounded-full object-cover border-2 border-slate-200">
+                <div class="absolute inset-0 bg-black/30 rounded-full flex items-center justify-center"><svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg></div>
+                <input type="file" id="avatar-upload" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="previewImage(this)">
+            </div>
+            <div class="mt-6 text-left">
+                <label class="block text-xs text-slate-500 mb-1">修改昵称</label>
+                <input type="text" id="edit-nickname" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg outline-none">
+            </div>
+            <button id="save-btn" onclick="saveProfile()" class="w-full mt-4 py-3 bg-blue-500 text-white font-bold rounded-lg">保存资料</button>
+        </div>
+
+        <div class="space-y-2 mb-8">
+            <button onclick="openPasswordModal()" class="w-full py-4 bg-white text-slate-700 font-bold rounded-xl flex justify-between px-4 items-center shadow-sm"><span>修改密码</span><svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></button>
+            <button onclick="logout()" class="w-full py-4 bg-red-50 text-red-500 font-bold rounded-xl flex justify-between px-4 items-center shadow-sm"><span>退出登录</span><svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg></button>
+        </div>
+    </div>
+
+    <!-- 修改密码半屏弹窗 (因为修改密码是独立操作) -->
+    <div id="password-modal" class="fixed inset-0 bg-black/50 hidden items-end justify-center z-[9999]">
+        <div class="bg-white w-full rounded-t-3xl p-6">
+            <div class="flex justify-between items-center border-b pb-3 mb-4"><h3 class="text-lg font-bold">修改密码</h3><button onclick="document.getElementById('password-modal').classList.add('hidden')" class="text-slate-400 text-xl">✕</button></div>
+            <input type="password" id="old-pwd" placeholder="当前密码" class="w-full px-4 py-2 bg-slate-50 border rounded-lg mb-3">
+            <div class="flex gap-2 mb-3">
+                <input type="text" id="pwd-code" placeholder="验证码" class="flex-1 px-4 py-2 bg-slate-50 border rounded-lg">
+                <button onclick="sendPwdCode()" class="px-4 bg-slate-800 text-white text-xs font-bold rounded-lg">获取验证码</button>
+            </div>
+            <input type="password" id="new-pwd" placeholder="新密码 (至少8位)" class="w-full px-4 py-2 bg-slate-50 border rounded-lg mb-3">
+            <input type="password" id="confirm-pwd" placeholder="确认新密码" class="w-full px-4 py-2 bg-slate-50 border rounded-lg mb-6">
+            <button onclick="savePassword()" class="w-full py-3 bg-blue-500 text-white font-bold rounded-lg">确认修改</button>
+        </div>
+    </div>
+
+    <script>
+        const email = localStorage.getItem('socks5_email');
+        let newAvatarBase64 = "";
+        if (!email) window.location.href = '/login.html';
+
+        document.getElementById('edit-nickname').value = localStorage.getItem('socks5_nickname') || email.split('@')[0];
+        document.getElementById('edit-avatar-preview').src = localStorage.getItem('socks5_avatar') || '/logo.jpg';
+
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 200;
+                        canvas.width = MAX_WIDTH; canvas.height = img.height * (MAX_WIDTH / img.width);
+                        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                        const base64 = canvas.toDataURL('image/jpeg', 0.8);
+                        document.getElementById('edit-avatar-preview').src = base64;
+                        newAvatarBase64 = base64;
+                    }
+                    img.src = e.target.result;
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        async function saveProfile() {
+            const btn = document.getElementById('save-btn');
+            btn.innerText = '保存中...'; btn.disabled = true;
+            const nName = document.getElementById('edit-nickname').value;
+            const nAvatar = newAvatarBase64 || document.getElementById('edit-avatar-preview').src;
+            try {
+                const res = await fetch('https://sendmail.lynli.me/update-profile', {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ email, nickname: nName, avatar: nAvatar })
+                });
+                if (res.ok) {
+                    localStorage.setItem('socks5_nickname', nName);
+                    localStorage.setItem('socks5_avatar', nAvatar);
+                    alert('资料已保存'); window.location.href = '/profile.html';
+                } else { alert('保存失败'); btn.innerText = '保存资料'; btn.disabled = false; }
+            } catch(e) { alert('网络错误'); btn.innerText = '保存资料'; btn.disabled = false; }
+        }
+
+        function openPasswordModal() { document.getElementById('password-modal').classList.remove('hidden'); document.getElementById('password-modal').classList.add('flex'); }
+        function logout() { localStorage.clear(); window.location.href = '/login.html'; }
+        function sendPwdCode() { alert('验证码已发送至邮箱'); }
+        function savePassword() {
+            alert('密码修改成功（等待后端接入）');
+            document.getElementById('password-modal').classList.add('hidden');
+            document.getElementById('password-modal').classList.remove('flex');
+        }
+    </script>
+</body>
+</html>

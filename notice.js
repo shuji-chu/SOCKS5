@@ -1,5 +1,14 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. 注入公告弹窗
+    // 核心逻辑：只在首页和我的页面展示
+    const path = window.location.pathname;
+    const allowedPages = ['/', '/index.html', '/profile.html'];
+    
+    // 如果不是首页或我的页，直接终止，不注入任何东西
+    if (!allowedPages.includes(path) && !path.endsWith('index.html') && !path.endsWith('profile.html')) {
+        return;
+    }
+
+    // 以下是原有的公告弹窗逻辑
     if (!document.getElementById('notice-modal')) {
         const modalHtml = `
             <div id="notice-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[99999] hidden items-center justify-center px-4">
@@ -19,11 +28,8 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.insertAdjacentHTML('beforeend', modalHtml);
     }
 
-    // 2. 智能寻找页面右上角的铃铛
-    // 我们查找所有包含铃铛 SVG 路径的父容器（不管是 a 还是 div）
     const allSvgs = document.querySelectorAll('svg');
     allSvgs.forEach(svg => {
-        // 通过 path 的 d 属性特征来识别是不是铃铛
         const isBell = svg.innerHTML.includes('M15 17h5l-1.405-1.405');
         if (isBell) {
             const container = svg.closest('.relative') || svg.parentElement;
@@ -32,28 +38,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 container.onclick = (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    
-                    // 弹出公告
                     const modal = document.getElementById('notice-modal');
                     modal.classList.remove('hidden');
                     modal.classList.add('flex');
                     setTimeout(() => {
                         document.getElementById('notice-modal-inner').classList.replace('scale-95', 'scale-100');
                     }, 10);
-                    
-                    // 标记已读并隐藏所有红点
                     localStorage.setItem('notice_read', 'true');
-                    const dots = document.querySelectorAll('.bg-red-500.rounded-full');
-                    dots.forEach(dot => dot.style.display = 'none');
+                    document.querySelectorAll('.bg-red-500.rounded-full').forEach(dot => dot.style.display = 'none');
                 };
             }
         }
     });
 
-    // 初始化检查已读状态，如果已读，隐藏所有红点
     if (localStorage.getItem('notice_read') === 'true') {
-        const dots = document.querySelectorAll('.bg-red-500.rounded-full');
-        dots.forEach(dot => dot.style.display = 'none');
+        document.querySelectorAll('.bg-red-500.rounded-full').forEach(dot => dot.style.display = 'none');
     }
 });
 

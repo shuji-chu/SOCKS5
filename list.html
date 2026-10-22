@@ -8,27 +8,27 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
-        body { background-color: #f1f5f9; color: #1e293b; padding-bottom: 20px; }
+        body { background-color: #ffffff; color: #1e293b; }
+        .seamless-item { border-bottom: 1px solid #f1f5f9; }
     </style>
 </head>
 <body>
-    <!-- 顶部导航 -->
     <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center gap-3 sticky top-0 z-50">
         <a href="/index.html" class="text-slate-600 text-xl font-bold px-2">←</a>
         <h1 id="page-title" class="text-lg font-bold text-slate-800">商品列表</h1>
     </header>
 
-    <main class="p-4">
-        <!-- 搜索框 -->
-        <div class="flex gap-2 mb-4">
-            <div class="flex-1 bg-white rounded-xl flex items-center px-4 py-2.5 shadow-sm border border-slate-100">
+    <main>
+        <!-- 粘性搜索框 -->
+        <div class="px-4 py-3 bg-white sticky top-[56px] z-40 border-b border-slate-100">
+            <div class="flex-1 bg-slate-50 rounded-lg flex items-center px-3 py-2 border border-slate-100">
                 <svg class="w-4 h-4 text-slate-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                 <input type="text" id="search-input" oninput="renderProducts()" placeholder="搜索当前分类商品..." class="bg-transparent outline-none text-[14px] w-full text-slate-700 placeholder-slate-400">
             </div>
         </div>
 
-        <!-- 无限滑动列表区 -->
-        <div id="product-list" class="space-y-3 pb-10">
+        <!-- 无缝商品列表 -->
+        <div id="product-list" class="px-4 pb-10">
             <!-- JS 动态渲染 -->
         </div>
     </main>
@@ -38,16 +38,12 @@
         const pageType = urlParams.get('type') || '默认分类';
         document.getElementById('page-title').innerText = pageType;
 
-        // 模拟生成 30 条数据以确保能无限滑动
         function generateMockData(type) {
             const data = [];
-            const titles = [
-                "高权重防封号", "全新无密码直登", "支持改密换绑", "纯净住宅IP", "原生环境注册"
-            ];
             for(let i=1; i<=30; i++) {
                 data.push({
                     id: i,
-                    title: `[货号${1000+i}] ${type} - ${titles[i%5]} | 商品编号 ${i} | 稳定售后`,
+                    title: `[货号${1000+i}] ${type} - 高权重纯净号 | 商品编号 ${i} | 稳定售后`,
                     price: (Math.random() * 50 + 5).toFixed(2),
                     stock: Math.floor(Math.random() * 100)
                 });
@@ -77,7 +73,7 @@
                     if(!localStorage.getItem('socks5_token')) { window.location.href = '/login.html'; return; }
                     alert(`准备购买：${p.title}\n金额：¥${p.price}`);
                 };
-                a.className = "block bg-white rounded-xl p-4 shadow-sm border border-slate-100 active:bg-slate-50 transition-colors";
+                a.className = "block py-4 seamless-item active:bg-slate-50 transition-colors";
                 a.innerHTML = `
                     <div class="flex items-start gap-3">
                         <img src="/logo.jpg" class="w-10 h-10 rounded-lg object-cover shrink-0 mt-0.5">

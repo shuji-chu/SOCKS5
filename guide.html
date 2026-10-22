@@ -6,31 +6,77 @@
     <title>使用说明 - SOCKS5</title>
     <link rel="icon" href="/logo.jpg" type="image/jpeg">
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>* { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; } body { background-color: #f1f5f9; padding-bottom: 80px; }</style>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
+        body { background-color: #ffffff; color: #1e293b; }
+        .seamless-item { border-bottom: 1px solid #f1f5f9; }
+        .seamless-item:last-child { border-bottom: none; }
+    </style>
 </head>
 <body>
-    <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center gap-3 sticky top-0 z-50"><h1 class="text-lg font-bold text-slate-800">导航</h1></header>
+    <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center gap-3 sticky top-0 z-50">
+        <a href="/index.html" class="text-slate-600 text-xl font-bold px-2">←</a>
+        <h1 class="text-lg font-bold text-slate-800">帮助中心</h1>
+    </header>
 
-    <div class="p-4">
-        <div class="bg-white p-6 rounded-2xl shadow-sm mb-4">
-            <h2 class="text-lg font-bold text-slate-800 mb-4 border-l-4 border-blue-500 pl-2">新手使用指南</h2>
-            <div class="space-y-4 text-sm text-slate-600 leading-relaxed">
-                <p><strong>1. 注册账号：</strong> 点击底部“我的” -> 立即注册，填入真实邮箱获取验证码完成注册。</p>
-                <p><strong>2. 浏览商品：</strong> 在首页选择您需要的商品分类（TG账号、专线节点、企业邮箱、苹果ID）。</p>
-                <p><strong>3. 支付购买：</strong> 选择商品后，点击“立即获取”，完成支付。系统自动发货。</p>
-                <p><strong>4. 查收资产：</strong> 支付成功后，前往“我的” -> “资产/订单”页面，即可查看您购买的账号或节点信息。</p>
-            </div>
+    <main class="px-4 pb-12">
+        <div class="py-6">
+            <h2 class="text-2xl font-bold text-slate-800 mb-2">新手必读</h2>
+            <p class="text-sm text-slate-500">了解如何在 SOCKS5 购买和使用数字资产</p>
         </div>
 
-        <div class="bg-white p-6 rounded-2xl shadow-sm">
-            <h2 class="text-lg font-bold text-slate-800 mb-4 border-l-4 border-green-500 pl-2">常见问题</h2>
-            <div class="space-y-3 text-sm text-slate-600 leading-relaxed">
-                <p><strong>Q: 购买的账号怎么用？</strong><br>A: TG号支持直接登录，附带密码和2FA。邮箱和苹果ID提供原始凭证。</p>
-                <p><strong>Q: 节点怎么连？</strong><br>A: 复制节点链接，导入到 V2ray、Clash 或 sing-box 等代理软件中即可使用。</p>
-                <p><strong>Q: 遇到问题找谁？</strong><br>A: 请发送邮件至客服邮箱 boss@lynli.me，或通过右下角客服图标联系我们。</p>
+        <div class="space-y-0">
+            <!-- 购买流程 -->
+            <div class="seamless-item py-5">
+                <h3 class="text-base font-bold text-slate-800 mb-3 flex items-center gap-2">
+                    <span class="w-1.5 h-4 bg-blue-500 rounded-full"></span> 购买与发货流程
+                </h3>
+                <ul class="text-[14px] text-slate-600 space-y-2 leading-relaxed">
+                    <li>1. 注册并登录 SOCKS5 账号。</li>
+                    <li>2. 在首页或对应分类下选择您需要的商品（如 TG号、邮箱号、接码服务）。</li>
+                    <li>3. 点击购买，选择支付方式并完成付款。</li>
+                    <li>4. <strong class="text-slate-800">全自动发货</strong>：付款成功后，系统立即将卡密展示在页面，或在“个人中心-我的订单”中随时查看。</li>
+                </ul>
+            </div>
+
+            <!-- 卡密安全与防封 -->
+            <div class="seamless-item py-5">
+                <h3 class="text-base font-bold text-slate-800 mb-3 flex items-center gap-2">
+                    <span class="w-1.5 h-4 bg-red-500 rounded-full"></span> 账号安全与防封提醒
+                </h3>
+                <ul class="text-[14px] text-slate-600 space-y-2 leading-relaxed">
+                    <li>1. <strong>IP 隔离</strong>：购买账号后，请务必使用干净的住宅 IP 或您自己的代理节点登录，切勿使用公共免费节点。</li>
+                    <li>2. <strong>设备隔离</strong>：批量操作时，建议使用指纹浏览器（如 AdsPower、Hubstudio）进行多开隔离。</li>
+                    <li>3. <strong>养号建议</strong>：新号登录后请先静置 24 小时，不要立刻修改密码或群发消息，正常浏览即可。</li>
+                </ul>
+            </div>
+
+            <!-- 售后与免责 -->
+            <div class="seamless-item py-5">
+                <h3 class="text-base font-bold text-slate-800 mb-3 flex items-center gap-2">
+                    <span class="w-1.5 h-4 bg-amber-500 rounded-full"></span> 售后说明与免责条款
+                </h3>
+                <ul class="text-[14px] text-slate-600 space-y-2 leading-relaxed">
+                    <li>1. 虚拟商品具有可复制性，<strong>一经售出，非商品本身质量问题（如密码错误、无法登录）概不退款</strong>。</li>
+                    <li>2. 静态卡密请在购买后 24 小时内完成首登验号，过期视为自动验收。</li>
+                    <li>3. 动态/限时商品（如苹果 ID 共享），请在有效期内使用，次数用尽或到期后自动失效。</li>
+                    <li>4. 因用户自身网络环境、违规操作（如发广告、诈骗）导致的封号，平台不承担任何责任。</li>
+                </ul>
+            </div>
+
+            <!-- 联系方式 -->
+            <div class="seamless-item py-5">
+                <h3 class="text-base font-bold text-slate-800 mb-3 flex items-center gap-2">
+                    <span class="w-1.5 h-4 bg-green-500 rounded-full"></span> 联系客服
+                </h3>
+                <p class="text-[14px] text-slate-600 leading-relaxed mb-3">
+                    如遇系统故障或订单异常，请携带订单号联系官方客服。
+                </p>
+                <a href="https://t.me/gsdlvpnbot" target="_blank" class="inline-flex items-center justify-center w-full py-2.5 bg-blue-50 text-blue-600 font-bold rounded-xl text-sm border border-blue-100">
+                    前往 Telegram 联系客服
+                </a>
             </div>
         </div>
-    </div>
-
-    </body>
+    </main>
+</body>
 </html>

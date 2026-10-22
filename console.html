@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>开发者控制台 - SOCKS5</title>
+    <link rel="icon" href="/logo.jpg" type="image/jpeg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
+        body { background-color: #ffffff; color: #1e293b; }
+        .seamless-item { border-bottom: 1px solid #f1f5f9; }
+        .code-block { background: #1e293b; color: #e2e8f0; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 12px; overflow-x: auto; margin-top: 8px; }
+    </style>
+</head>
+<body>
+    <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center gap-3 sticky top-0 z-50">
+        <a href="/profile.html" class="text-slate-600 text-xl font-bold px-2">←</a>
+        <h1 class="text-lg font-bold text-slate-800">开发者控制台</h1>
+    </header>
+
+    <main class="px-4 py-4 pb-10">
+        <!-- 凭证展示 -->
+        <div class="bg-slate-50 rounded-xl p-4 mb-6 border border-slate-100">
+            <h2 class="text-sm font-bold text-slate-800 mb-3">接口凭证</h2>
+            <div class="mb-3">
+                <label class="text-xs text-slate-500 block mb-1">API Key</label>
+                <div class="flex justify-between items-center bg-white border border-slate-200 rounded-lg px-3 py-2">
+                    <span id="api-key" class="text-[13px] font-mono text-slate-700">sk_live_................</span>
+                    <button onclick="copyText('api-key')" class="text-blue-500 text-xs font-medium">复制</button>
+                </div>
+            </div>
+            <div>
+                <label class="text-xs text-slate-500 block mb-1">API Secret</label>
+                <div class="flex justify-between items-center bg-white border border-slate-200 rounded-lg px-3 py-2">
+                    <span id="api-secret" class="text-[13px] font-mono text-slate-700">••••••••••••••••••••</span>
+                    <button onclick="copyText('api-secret')" class="text-blue-500 text-xs font-medium">复制</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 对接说明 -->
+        <h2 class="text-base font-bold text-slate-800 mb-3">对接说明</h2>
+        <div class="text-sm text-slate-600 leading-relaxed space-y-4">
+            <p>请将您的 API Key 放在 HTTP 请求头中：<code class="bg-slate-100 px-1 py-0.5 rounded text-pink-600">Authorization: Bearer YOUR_API_KEY</code></p>
+            
+            <div>
+                <h3 class="font-bold text-slate-800 text-[14px] mb-1">1. 获取账户余额</h3>
+                <p class="mb-1">接口：<span class="text-blue-500">GET /api/v1/user/balance</span></p>
+                <div class="code-block">curl -X GET "https://web.lynli.me/api/v1/user/balance" \\<br>  -H "Authorization: Bearer YOUR_API_KEY"</div>
+            </div>
+
+            <div>
+                <h3 class="font-bold text-slate-800 text-[14px] mb-1">2. 购买卡密 (静态)</h3>
+                <p class="mb-1">接口：<span class="text-blue-500">POST /api/v1/order/static</span></p>
+                <div class="code-block">curl -X POST "https://web.lynli.me/api/v1/order/static" \\<br>  -H "Authorization: Bearer YOUR_API_KEY" \\<br>  -H "Content-Type: application/json" \\<br>  -d '{"product_id": 1, "quantity": 1}'</div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // 模拟数据，后续接入真实后端时替换
+        document.getElementById('api-key').innerText = 'sk_live_' + Math.random().toString(36).substr(2, 24);
+        
+        function copyText(id) {
+            const text = document.getElementById(id).innerText;
+            if(text.includes('•••')) { alert('请先点击显示明文(待开发)'); return; }
+            navigator.clipboard.writeText(text).then(() => {
+                // 这里可以调用你封装的自定义弹窗
+                window.showCustomAlert ? showCustomAlert('提示', '复制成功') : alert('复制成功');
+            });
+        }
+    </script>
+</body>
+</html>

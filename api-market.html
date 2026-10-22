@@ -30,7 +30,7 @@
 
     <main>
         <!-- 顶部导航 -->
-        <div class="bg-white px-4 py-3 border-b border-slate-100 flex gap-4 text-sm font-medium text-slate-500 overflow-x-auto no-scrollbar">
+        <a href="/api-detail.html?id=1" class="block bg-white px-4 py-3 border-b border-slate-100 flex gap-4 text-sm font-medium text-slate-500 overflow-x-auto no-scrollbar">
             <span class="text-blue-600 bg-blue-50 px-3 py-1.5 rounded-full">API接口</span>
             <span class="py-1.5">使用说明</span>
             <span class="py-1.5">用户中心</span>
@@ -38,7 +38,7 @@
         </div>
 
         <!-- 一级分类胶囊 (可滑动) -->
-        <div class="bg-white px-4 py-3 mb-3">
+        <a href="/api-detail.html?id=1" class="block bg-white px-4 py-3 mb-3">
             <div class="flex overflow-x-auto no-scrollbar gap-2" id="category-tabs">
                 <!-- JS 动态渲染 -->
             </div>
@@ -160,7 +160,7 @@
                     `<span class="bg-orange-50 text-orange-600 px-2 py-1 rounded">$${api.price}/次</span>`;
 
                 return `
-                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 cursor-pointer active:scale-[0.98] transition-transform" onclick="window.location.href='/api-detail.html'">
+                <a href="/api-detail.html?id=1" class="block bg-white rounded-2xl p-5 shadow-sm border border-slate-100 cursor-pointer active:scale-[0.98] transition-transform" onclick="window.location.href='/api-detail.html'">
                     <div class="flex justify-between items-start mb-3">
                         <div class="w-10 h-10 ${iconColor} rounded-xl flex items-center justify-center">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>

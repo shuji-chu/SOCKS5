@@ -3,73 +3,173 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>登录 - SOCKS5</title>
+    <title>登录 / 注册 - SOCKS5</title>
     <link rel="icon" href="/logo.jpg" type="image/jpeg">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: #f8fafc; display: flex; align-items: center; justify-content: center; height: 100vh; padding: 20px; }
-        .card { background: #fff; border-radius: 16px; padding: 30px 20px; width: 100%; max-width: 340px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); }
-        .input-flat { width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; font-size: 14px; outline: none; transition: border 0.2s; }
+        body { background-color: #f8fafc; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+        .card { background: #fff; border-radius: 20px; padding: 30px 24px; width: 100%; max-width: 360px; box-shadow: 0 10px 30px -5px rgba(0,0,0,0.08); }
+        .input-flat { width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 16px; font-size: 14px; outline: none; transition: border 0.2s; }
         .input-flat:focus { border-color: #3b82f6; background: #fff; }
         
         /* 磨砂弹窗 */
         .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.4); backdrop-filter: blur(4px); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 0 20px; }
         .modal-overlay.active { display: flex; }
-        .modal-box { background: #fff; border-radius: 16px; padding: 24px; width: 100%; max-width: 300px; text-align: center; transform: scale(0.95); transition: transform 0.2s; opacity: 0; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+        .modal-box { background: #fff; border-radius: 16px; padding: 24px; width: 100%; max-width: 300px; text-align: center; transform: scale(0.95); transition: transform 0.2s; opacity: 0; }
         .modal-overlay.active .modal-box { transform: scale(1); opacity: 1; }
     </style>
 </head>
 <body>
-    <div class="card text-center">
-        <h1 class="text-[22px] font-bold text-slate-800 mb-2">欢迎回来</h1>
-        <p class="text-[13px] text-slate-500 mb-8">登录您的 SOCKS5 账号</p>
+    <div class="card text-center relative overflow-hidden">
+        <!-- 品牌 Logo 占位 -->
+        <div class="w-16 h-16 bg-blue-600 rounded-2xl mx-auto flex items-center justify-center mb-5 shadow-lg shadow-blue-500/30">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+        </div>
+        
+        <h1 class="text-[24px] font-extrabold text-slate-800 mb-1">SOCKS5 平台</h1>
+        <p class="text-[13px] text-slate-500 mb-8" id="page-subtitle">登录您的账号以继续</p>
+
+        <!-- 登录/注册切换 Tab -->
+        <div class="flex bg-slate-100 p-1 rounded-xl mb-6">
+            <button onclick="switchTab('login')" id="tab-login" class="flex-1 py-2 text-[14px] font-bold bg-white text-blue-600 rounded-lg shadow-sm transition-all">登录</button>
+            <button onclick="switchTab('register')" id="tab-register" class="flex-1 py-2 text-[14px] font-bold text-slate-500 rounded-lg transition-all">注册</button>
+        </div>
+
+        <!-- 表单区 -->
         <div class="space-y-4 mb-6 text-left">
             <div>
-                <label class="text-[12px] text-slate-500 mb-1 block">邮箱</label>
-                <input type="text" id="login-email" class="input-flat" placeholder="请输入邮箱" value="boss@lynli.me">
+                <label class="text-[13px] font-bold text-slate-700 mb-1.5 block">邮箱地址</label>
+                <input type="email" id="auth-email" class="input-flat" placeholder="请输入邮箱" value="boss@lynli.me">
             </div>
+            
+            <!-- 注册时才显示的验证码输入框 -->
+            <div id="code-box" class="hidden">
+                <label class="text-[13px] font-bold text-slate-700 mb-1.5 block">邮箱验证码</label>
+                <div class="flex gap-2">
+                    <input type="text" id="auth-code" class="input-flat flex-1" placeholder="6位数字验证码">
+                    <button onclick="sendCode()" id="btn-send-code" class="px-4 bg-slate-100 text-slate-600 text-[13px] font-bold rounded-xl whitespace-nowrap active:bg-slate-200 transition">获取验证码</button>
+                </div>
+            </div>
+
             <div>
-                <label class="text-[12px] text-slate-500 mb-1 block">密码</label>
-                <input type="password" id="login-pass" class="input-flat" placeholder="请输入密码" value="123456">
+                <label class="text-[13px] font-bold text-slate-700 mb-1.5 block">密码</label>
+                <input type="password" id="auth-pass" class="input-flat" placeholder="请输入密码" value="123456">
+            </div>
+            
+            <div class="flex justify-between items-center text-[12px]">
+                <label class="flex items-center gap-1.5 text-slate-500 cursor-pointer">
+                    <input type="checkbox" checked class="w-3.5 h-3.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                    记住我
+                </label>
+                <a href="#" class="text-blue-600 active:opacity-60">忘记密码？</a>
             </div>
         </div>
-        <button onclick="doLogin()" class="w-full py-3.5 bg-blue-600 text-white font-bold rounded-xl text-[15px] active:opacity-80 transition shadow-sm">登录</button>
+
+        <button onclick="doAuth()" id="btn-submit" class="w-full py-3.5 bg-blue-600 text-white font-bold rounded-xl text-[16px] active:opacity-80 transition shadow-md shadow-blue-500/20 mb-6">立即登录</button>
+
+        <!-- 底部第三方与协议 -->
+        <div class="relative flex items-center justify-center mb-6">
+            <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-100"></div></div>
+            <div class="relative bg-white px-3 text-[12px] text-slate-400">其他登录方式</div>
+        </div>
+
+        <div class="flex justify-center gap-4 mb-8">
+            <div class="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 active:bg-slate-50"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.418 22 12c0-5.523-4.477-10-10-10z"></path></svg></div>
+            <div class="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 active:bg-slate-50"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path></svg></div>
+        </div>
+
+        <p class="text-[11px] text-slate-400">登录或注册即表示同意 <a href="#" class="text-slate-600 font-bold">用户协议</a> 与 <a href="#" class="text-slate-600 font-bold">隐私政策</a></p>
     </div>
 
-    <!-- 专属报错弹窗 -->
+    <!-- 自定义提示弹窗 -->
     <div id="error-modal" class="modal-overlay">
         <div class="modal-box">
             <h3 class="text-[17px] font-bold text-slate-800 mb-2" id="error-title">提示</h3>
             <p class="text-[14px] text-slate-500 mb-6" id="error-msg">请输入账号和密码。</p>
-            <button onclick="closeErrorModal()" class="w-full py-2.5 bg-blue-600 text-white font-bold rounded-xl active:opacity-80 transition-colors">我知道了</button>
+            <button onclick="closeModal()" class="w-full py-2.5 bg-blue-600 text-white font-bold rounded-xl active:opacity-80 transition-colors">我知道了</button>
         </div>
     </div>
 
     <script>
-        function doLogin() {
-            const email = document.getElementById('login-email').value;
-            const pass = document.getElementById('login-pass').value;
-            
-            if(!email || !pass) { 
-                document.getElementById('error-msg').innerText = '请输入完整的账号和密码。';
-                document.getElementById('error-modal').classList.add('active');
-                return; 
-            }
+        let currentMode = 'login'; // 'login' or 'register'
 
-            if (email === 'boss@lynli.me') {
-                localStorage.setItem('user_id', '10001');
-                localStorage.setItem('user_email', email);
-                localStorage.setItem('user_role', 'boss');
+        function switchTab(mode) {
+            currentMode = mode;
+            const tabLogin = document.getElementById('tab-login');
+            const tabRegister = document.getElementById('tab-register');
+            const subtitle = document.getElementById('page-subtitle');
+            const codeBox = document.getElementById('code-box');
+            const btnSubmit = document.getElementById('btn-submit');
+
+            if (mode === 'login') {
+                tabLogin.className = 'flex-1 py-2 text-[14px] font-bold bg-white text-blue-600 rounded-lg shadow-sm transition-all';
+                tabRegister.className = 'flex-1 py-2 text-[14px] font-bold text-slate-500 rounded-lg transition-all';
+                subtitle.innerText = '登录您的账号以继续';
+                codeBox.classList.add('hidden');
+                btnSubmit.innerText = '立即登录';
             } else {
-                localStorage.setItem('user_id', '10002');
-                localStorage.setItem('user_email', email);
-                localStorage.setItem('user_role', 'user');
+                tabRegister.className = 'flex-1 py-2 text-[14px] font-bold bg-white text-blue-600 rounded-lg shadow-sm transition-all';
+                tabLogin.className = 'flex-1 py-2 text-[14px] font-bold text-slate-500 rounded-lg transition-all';
+                subtitle.innerText = '注册一个全新的账号';
+                codeBox.classList.remove('hidden');
+                btnSubmit.innerText = '立即注册';
             }
-            window.location.href = '/profile.html';
         }
 
-        function closeErrorModal() {
+        function sendCode() {
+            const email = document.getElementById('auth-email').value;
+            if(!email) { showError('请先输入邮箱地址'); return; }
+            const btn = document.getElementById('btn-send-code');
+            btn.disabled = true;
+            let count = 60;
+            btn.innerText = `${count}s 后重发`;
+            const timer = setInterval(() => {
+                count--;
+                if(count <= 0) {
+                    clearInterval(timer);
+                    btn.innerText = '获取验证码';
+                    btn.disabled = false;
+                } else {
+                    btn.innerText = `${count}s 后重发`;
+                }
+            }, 1000);
+        }
+
+        function doAuth() {
+            const email = document.getElementById('auth-email').value;
+            const pass = document.getElementById('auth-pass').value;
+            
+            if(!email || !pass) { showError('请输入完整的邮箱和密码'); return; }
+
+            if (currentMode === 'register') {
+                const code = document.getElementById('auth-code').value;
+                if(!code) { showError('请输入验证码'); return; }
+                // 模拟注册成功，直接登录
+                localStorage.setItem('user_id', '1000' + Math.floor(Math.random()*100)); // 随机生成ID
+                localStorage.setItem('user_email', email);
+                localStorage.setItem('user_role', 'user');
+                window.location.href = '/profile.html';
+            } else {
+                // 登录逻辑
+                if (email === 'boss@lynli.me') {
+                    localStorage.setItem('user_id', '10001');
+                    localStorage.setItem('user_email', email);
+                    localStorage.setItem('user_role', 'boss');
+                } else {
+                    localStorage.setItem('user_id', '10002');
+                    localStorage.setItem('user_email', email);
+                    localStorage.setItem('user_role', 'user');
+                }
+                window.location.href = '/profile.html';
+            }
+        }
+
+        function showError(msg) {
+            document.getElementById('error-msg').innerText = msg;
+            document.getElementById('error-modal').classList.add('active');
+        }
+        function closeModal() {
             document.getElementById('error-modal').classList.remove('active');
         }
     </script>

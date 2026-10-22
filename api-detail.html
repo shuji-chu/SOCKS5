@@ -19,6 +19,9 @@
         .api-table td { padding: 12px 10px; border-bottom: 1px solid #f1f5f9; color: #334155; }
         
         .code-block { background: #1e293b; color: #e2e8f0; padding: 16px; border-radius: 10px; font-family: monospace; font-size: 12px; overflow-x: auto; line-height: 1.6; white-space: pre-wrap; }
+        
+        .input-flat { width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; font-size: 14px; outline: none; margin-bottom: 12px; transition: border 0.2s; }
+        .input-flat:focus { border-color: #2563eb; background: #fff; }
     </style>
 </head>
 <body>
@@ -67,6 +70,30 @@
                 <div class="flex gap-3 mt-2">
                     <a href="/user-api.html" class="flex-1 py-2.5 bg-blue-600 text-white font-bold rounded-lg text-[14px] text-center active:opacity-80">申请 Key / 充值</a>
                     <a href="javascript:void(0)" onclick="switchDetailTab('docs', document.querySelectorAll('.tab-btn')[1])" class="flex-1 py-2.5 bg-slate-100 text-slate-600 font-bold rounded-lg text-[14px] text-center border border-slate-200 active:bg-slate-200">查看开发指南</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= 核心：在线查询体验 (完全动态) ================= -->
+        <div class="px-4 mb-4">
+            <div class="card p-5">
+                <h3 class="text-[16px] font-bold text-slate-800 mb-1">在线查询体验</h1>
+                <p class="text-[13px] text-slate-500 mb-4">无需写代码，直接在此测试接口并查看返回结果</p>
+                
+                <!-- 动态生成的输入区 -->
+                <div id="test-inputs-container">
+                    <!-- JS 注入 -->
+                </div>
+                
+                <button onclick="runTest()" id="btn-test" class="w-full py-3.5 bg-slate-800 text-white font-bold rounded-xl text-[15px] active:opacity-80 transition shadow-sm mt-2">立即在线测试</button>
+                
+                <!-- 测试结果展示区 (默认隐藏) -->
+                <div id="test-result-area" class="mt-4 hidden">
+                    <p class="text-[13px] font-bold text-slate-700 mb-2 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        请求响应结果 (JSON)
+                    </p>
+                    <div class="code-block" id="result-json"></div>
                 </div>
             </div>
         </div>
@@ -164,6 +191,8 @@
             '金融风险': 'text-red-600 bg-red-50', '默认': 'text-slate-600 bg-slate-50'
         };
 
+        let currentApiData = null;
+
         function switchDetailTab(tab, el) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             if(el) el.classList.add('active');
@@ -176,43 +205,39 @@
         document.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             const apiId = parseInt(urlParams.get('id')) || 1;
-            const currentApi = apisData.find(a => a.id === apiId) || apisData[0];
+            currentApiData = apisData.find(a => a.id === apiId) || apisData[0];
 
-            const iconPath = categoryIcons[currentApi.category] || categoryIcons['默认'];
-            const colorClass = categoryColors[currentApi.category] || categoryColors['默认'];
-            const isFree = currentApi.price === '免费';
+            const iconPath = categoryIcons[currentApiData.category] || categoryIcons['默认'];
+            const colorClass = categoryColors[currentApiData.category] || categoryColors['默认'];
+            const isFree = currentApiData.price === '免费';
 
-            // 渲染基础信息
-            document.getElementById('breadcrumb-category').innerText = currentApi.category;
-            document.getElementById('api-name').innerText = currentApi.title;
-            document.getElementById('api-desc').innerText = currentApi.desc;
-            document.getElementById('api-category').innerText = currentApi.category;
-            document.getElementById('api-id').innerText = currentApi.id;
-            document.getElementById('api-method').innerText = currentApi.method;
-            
+            // 渲染头部
+            document.getElementById('breadcrumb-category').innerText = currentApiData.category;
+            document.getElementById('api-name').innerText = currentApiData.title;
+            document.getElementById('api-desc').innerText = currentApiData.desc;
+            document.getElementById('api-category').innerText = currentApiData.category;
+            document.getElementById('api-id').innerText = currentApiData.id;
+            document.getElementById('api-method').innerText = currentApiData.method;
             document.getElementById('api-icon-container').className = `w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border border-slate-100 ${colorClass}`;
             document.getElementById('api-icon-container').innerHTML = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">${iconPath}</svg>`;
-
-            document.getElementById('api-price').innerHTML = isFree ? '<span class="text-green-500 font-bold">免费</span>' : `$${currentApi.price}<span class="text-[12px] font-sans font-normal text-slate-400">/次</span>`;
+            document.getElementById('api-price').innerHTML = isFree ? '<span class="text-green-500 font-bold">免费</span>' : `$${currentApiData.price}<span class="text-[12px] font-sans font-normal text-slate-400">/次</span>`;
             
-            document.getElementById('stat-apps').innerText = (currentApi.id * 3 + 5) + ' 个';
-            document.getElementById('stat-calls').innerText = (currentApi.id * 113 + 24) + ' 次';
-            document.getElementById('api-endpoint').innerText = `POST https://web.lynli.me/api/v1/query/${currentApi.id}`;
+            document.getElementById('stat-apps').innerText = (currentApiData.id * 3 + 5) + ' 个';
+            document.getElementById('stat-calls').innerText = (currentApiData.id * 113 + 24) + ' 次';
+            document.getElementById('api-endpoint').innerText = `POST https://web.lynli.me/api/v1/query/${currentApiData.id}`;
 
-            // 渲染真实参数
-            let paramHtml = `<tr><th>参数名</th><th>必填</th><th>说明</th></tr><tr><td>api_id</td><td>是</td><td>接口ID (${currentApi.id})</td></tr><tr><td>key</td><td>是</td><td>您的专属 API Key</td></tr>`;
-            if(currentApi.params && currentApi.params.length > 0) {
-                currentApi.params.forEach(p => {
+            // 渲染 API 文档参数
+            let paramHtml = `<tr><th>参数名</th><th>必填</th><th>说明</th></tr><tr><td>api_id</td><td>是</td><td>接口ID (${currentApiData.id})</td></tr><tr><td>key</td><td>是</td><td>您的专属 API Key</td></tr>`;
+            if(currentApiData.params && currentApiData.params.length > 0) {
+                currentApiData.params.forEach(p => {
                     paramHtml += `<tr><td>${p.name}</td><td>${p.req}</td><td>${p.desc}</td></tr>`;
                 });
             }
             document.getElementById('api-params-table').innerHTML = paramHtml;
+            document.getElementById('json-example').innerText = currentApiData.response || '{\n  "code": 200,\n  "msg": "success",\n  "data": {}\n}';
 
-            // 渲染真实 JSON
-            document.getElementById('json-example').innerText = currentApi.response || '{\n  "code": 200,\n  "msg": "success",\n  "data": {}\n}';
-
-            // 渲染真实场景
-            const scenes = currentApi.scenes || ['业务接入场景测试', '风控审核数据支撑'];
+            // 渲染场景
+            const scenes = currentApiData.scenes || ['业务接入场景测试', '风控审核数据支撑'];
             document.getElementById('scenes-list').innerHTML = scenes.map((text, i) => `
                 <div class="flex gap-3 ${i !== 0 ? 'border-t border-slate-100 pt-3' : ''}">
                     <span class="text-[18px] font-bold text-blue-300">0${i+1}</span>
@@ -220,13 +245,20 @@
                 </div>
             `).join('');
 
-            // 渲染相关推荐
-            const relatedList = document.getElementById('related-apis');
-            let related = apisData.filter(a => a.category === currentApi.category && a.id !== currentApi.id).slice(0, 4);
-            if(related.length < 4) {
-                related = related.concat(apisData.filter(a => a.id !== currentApi.id && a.category !== currentApi.category).slice(0, 4 - related.length));
+            // ================= 渲染在线测试的动态表单 =================
+            const testContainer = document.getElementById('test-inputs-container');
+            if (currentApiData.params && currentApiData.params.length > 0) {
+                testContainer.innerHTML = currentApiData.params.map(p => `
+                    <input type="text" id="test-${p.name}" placeholder="请输入 ${p.desc} (${p.name})" class="input-flat">
+                `).join('');
+            } else {
+                testContainer.innerHTML = `<input type="text" id="test-keyword" placeholder="请输入测试内容" class="input-flat">`;
             }
 
+            // 渲染推荐
+            const relatedList = document.getElementById('related-apis');
+            let related = apisData.filter(a => a.category === currentApiData.category && a.id !== currentApiData.id).slice(0, 4);
+            if(related.length < 4) related = related.concat(apisData.filter(a => a.id !== currentApiData.id && a.category !== currentApiData.category).slice(0, 4 - related.length));
             relatedList.innerHTML = related.map(a => `
                 <a href="/api-detail.html?id=${a.id}" class="block w-52 shrink-0 bg-white p-3 rounded-xl border border-slate-100 shadow-sm active:bg-slate-50">
                     <h4 class="text-[13px] font-bold text-slate-800 line-clamp-1 mb-1">${a.title}</h4>
@@ -238,6 +270,52 @@
                 </a>
             `).join('');
         });
+
+        // 执行在线测试
+        function runTest() {
+            const btn = document.getElementById('btn-test');
+            const originalText = btn.innerText;
+            
+            // 收集输入值
+            let inputs = {};
+            let hasEmpty = false;
+            if (currentApiData.params && currentApiData.params.length > 0) {
+                currentApiData.params.forEach(p => {
+                    const val = document.getElementById('test-' + p.name).value.trim();
+                    if (!val && p.req === '是') hasEmpty = true;
+                    inputs[p.name] = val;
+                });
+            } else {
+                const val = document.getElementById('test-keyword').value.trim();
+                if (!val) hasEmpty = true;
+                inputs['keyword'] = val;
+            }
+
+            if (hasEmpty) {
+                alert('请填写必填的测试参数');
+                return;
+            }
+
+            btn.innerText = '正在请求接口...';
+            btn.disabled = true;
+            btn.classList.add('opacity-70');
+
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.disabled = false;
+                btn.classList.remove('opacity-70');
+                
+                // 显示结果区
+                const resultArea = document.getElementById('test-result-area');
+                resultArea.classList.remove('hidden');
+                
+                // 模拟真实响应
+                const mockData = JSON.parse(currentApiData.response || '{"code":200, "data":{}}');
+                mockData.request_params = inputs; // 把用户输入的参数塞进去展示
+                
+                document.getElementById('result-json').innerText = JSON.stringify(mockData, null, 2);
+            }, 800);
+        }
     </script>
 </body>
 </html>

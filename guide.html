@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>帮助中心 - SOCKS5</title>
+    <title>帮助中心 - SOCKS5 生态白皮书</title>
     <link rel="icon" href="/logo.jpg" type="image/jpeg">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: #ffffff; color: #1e293b; }
-        .title-bar { width: 4px; height: 16px; border-radius: 2px; display: inline-block; margin-right: 8px; vertical-align: middle; }
+        .title-bar { width: 4px; height: 18px; border-radius: 2px; display: inline-block; margin-right: 8px; vertical-align: middle; }
+        .highlight { color: #2563eb; font-weight: bold; }
         .btn-press { transition: transform 0.1s, background-color 0.2s; }
         .btn-press:active { transform: scale(0.98); background-color: #f8fafc; }
     </style>
@@ -21,94 +22,91 @@
     </header>
 
     <main class="px-5 pb-24 max-w-lg mx-auto">
-        <div class="py-6">
-            <h2 class="text-[26px] font-bold text-slate-800 mb-2">新手必读与业务指南</h2>
-            <p class="text-[14px] text-slate-500">深入了解 SOCKS5 全系数字资产的安全购买、使用与接入流程。</p>
+        <!-- 平台愿景 -->
+        <div class="py-6 border-b border-slate-100">
+            <h2 class="text-[26px] font-extrabold text-slate-800 mb-3 tracking-tight">SOCKS5 全球数字资产生态白皮书</h2>
+            <p class="text-[14px] text-slate-500 leading-relaxed">
+                我们致力于为全球开发者和企业提供 <span class="highlight">极速、稳定、高可用</span> 的底层数字基础设施。从高质量账号矩阵、毫秒级接码网关，到企业级防红短链与商务邮箱，一站式赋能您的全球化业务。
+            </p>
         </div>
 
-        <div class="space-y-8">
-            <!-- 1. 购买与发货 -->
+        <div class="space-y-8 mt-6">
+            <!-- 1. 数字资产与接码矩阵 -->
             <div>
                 <h3 class="text-[16px] font-bold text-slate-800 mb-4 flex items-center">
-                    <span class="title-bar bg-blue-500"></span> 购买与官方背书
+                    <span class="title-bar bg-blue-500"></span> 高权重账号矩阵与接码服务
                 </h3>
                 <ul class="text-[14px] text-slate-600 space-y-3 leading-relaxed">
-                    <li><b>1. 极速全自动发货：</b>支付成功后，系统立即弹出卡密或生成限时链接。</li>
-                    <li><b>2. 完整交易背书：</b>每个账号用户下单，系统均生成包含订单号、时间、金额的完整电子凭证。支持随时查阅交易流水。</li>
+                    <li><b>🚀 全自动极速发卡：</b>覆盖 TG、Gmail、Discord 等千款高权重资产。支付成功毫秒级下发卡密，系统自动记录完整交易背书（含流水单号与时间），售后核验零死角。</li>
+                    <li><b>🛡️ 金融级接码锁资机制：</b>采用“先冻结、后扣费”逻辑。取号瞬间仅冻结预估额度，收到验证码才实际扣费，超时未收到则全额释放。资金安全绝对保障。</li>
+                    <li><b>📡 多国长租与监听：</b>支持 60+ 国家地区号码长期独占租赁，并支持关键词精准短信监听，完美适配各类海外业务注册与防封测试。</li>
                 </ul>
             </div>
 
-            <!-- 2. 节点代理业务 (补全你发的全部文案) -->
+            <!-- 2. 节点代理与算力网络 -->
             <div>
                 <h3 class="text-[16px] font-bold text-slate-800 mb-4 flex items-center">
-                    <span class="title-bar bg-indigo-500"></span> 节点代理业务详解
+                    <span class="title-bar bg-indigo-500"></span> 企业级节点代理网络
                 </h3>
                 <div class="text-[14px] text-slate-600 space-y-4 leading-relaxed">
-                    <p><b>🖥 服务器切换说明：</b><br>当代理服务器遇到异常（如被封），管理员会将您的代理迁移至备用服务器。<br>
-                    ✅ 不需要重新购买<br>✅ 用户名与密码不会变<br>✅ 到期时间不会变<br>
-                    <span class="text-slate-500">您会收到推送（含新 IP+端口及一键导入按钮），或在客户端手动修改。支持高速传输文件、图片与链接。</span></p>
-
-                    <p><b>🔌 如何使用代理：</b><br>
-                    <b>方法一：</b>到「📦 我的代理」页面，点「🚀 一键导入」，Telegram 自动添加。<br>
-                    <b>方法二：</b>手动配置。协议填 SOCKS5，输入服务器、端口及代理卡片里的用户名/密码即可。</p>
-
-                    <p><b>🔄 续费与到期规则：</b><br>
-                    <b>到期前：</b>在「我的代理」点「购买套餐」续费，保留原账号/密码/端口，时长叠加。<br>
-                    <b>到期后：</b>代理自动关闭释放，需重新购买开通。</p>
-
-                    <p><b>💎 余额与支付：</b><br>
-                    支持 USDT (TRC20) / 支付宝。若分红余额 ≥ 套餐价格，可直接余额支付，即时开通。<br>
-                    余额来源：每日签到（群内，1-3GB）、邀请好友奖励、好友充值 15% 分红。</p>
-
-                    <p><b>📅 签到说明：</b><br>
-                    签到群：<a href="https://t.me/qingtian_vip" class="text-blue-500 underline">点击加入</a><br>
-                    1️⃣ 先私聊机器人发送 /start 激活<br>
-                    2️⃣ 加入签到群<br>
-                    3️⃣ 在群里发送「签到」<br>
-                    4️⃣ 随机获得 1-3GB 流量<br>
-                    <span class="text-red-500">⚠️ 每天限签一次，私聊无法签到。每次签到会新建节点覆盖旧的，有效期到次日 0 点。</span></p>
-
-                    <p><b>📱 推荐客户端：</b><br>
-                    Windows: Proxifier / Clash / v2rayN<br>
-                    macOS: ClashX / Surge<br>
-                    iOS: Shadowrocket / Stash / Loon<br>
-                    Android: NekoBox / Clash for Android<br>
-                    Telegram 内置: 直接点「我的代理」→「一键导入」</p>
+                    <p><b>🌐 域名级防连坐隔离：</b>全站节点采用独立域名分配机制，一人一域，彻底杜绝公共 IP 泛滥导致的连坐封禁。原生支持高速传输文件、图片、链接等大型业务流。</p>
+                    <p><b>🖥 无缝灾备与自动切服：</b>若主服务器遭遇攻击或封锁，系统自动为您的账号迁移至备用节点。您的账号密码、到期时间完全不变，只需一键导入新 IP 即可恢复业务。</p>
+                    <p><b>🎁 分红抵扣与签到生态：</b>加入官方 TG 签到群（<a href="https://t.me/qingtian_vip" class="text-blue-500 underline">点击加入</a>），每日随机获赠 1-3GB 流量节点。好友充值您可享受 15% 分红返佣，分红余额可直接抵扣购买套餐，实现“零成本”代理体验。</p>
                 </div>
             </div>
 
-            <!-- 3. 售后与免责声明 -->
+            <!-- 3. 域名分发与短链系统 (新增) -->
             <div>
                 <h3 class="text-[16px] font-bold text-slate-800 mb-4 flex items-center">
-                    <span class="title-bar bg-red-500"></span> 售后说明与免责条款
+                    <span class="title-bar bg-emerald-500"></span> 域名分发与高防短链
                 </h3>
                 <ul class="text-[14px] text-slate-600 space-y-3 leading-relaxed">
-                    <li><b>1. 虚拟商品属性：</b>卡密一经售出，非质量问题（如密码错误、无法登录）概不退款。请于购买后 24 小时内完成首登验号。</li>
-                    <li><b>2. 违规封禁：</b>因用户自身违规操作（如恶意爬虫、黑灰产多开、触犯上游服务商风控政策等）导致的封号或节点封禁，平台不承担退款责任。</li>
-                    <li><b>3. 客服支持：</b>如遇系统故障或订单异常，请携带订单号联系官方 Telegram 客服：<a href="https://t.me/qingtian_Boss" class="text-blue-500">@qingtian_Boss</a>。</li>
+                    <li><b>🎁 免费二级域名裂变：</b>完成首单并加入 TG 群，即送价值不菲的二级域名解析特权。调用 Cloudflare 底层 API，解析秒级生效。赠送期长达 90 天，单域名最高支持 5 条解析记录。</li>
+                    <li><b>🔗 商务防红短链系统：</b>提供高权重、抗拦截的短域名生成服务。无论是引流跳转还是防微信/TG 屏蔽，我们的短链系统都能保障您的转化路径畅通无阻，支持自定义后缀与点击数据统计。</li>
                 </ul>
             </div>
 
-            <!-- 4. 开发者 API 接口导航 (彻底轻量化) -->
+            <!-- 4. 商务邮箱定制 (新增) -->
             <div>
-                <h3 class="text-[16px] font-bold text-slate-800 mb-2 flex items-center">
-                    <span class="title-bar bg-slate-400"></span> 开发者 API 接口导航
+                <h3 class="text-[16px] font-bold text-slate-800 mb-4 flex items-center">
+                    <span class="title-bar bg-orange-500"></span> 企业级商务邮箱矩阵
                 </h3>
-                <p class="text-[13px] text-slate-500 mb-3">如需通过代码调用平台能力，请点击下方对应接口查看对接文档。</p>
+                <ul class="text-[14px] text-slate-600 space-y-3 leading-relaxed">
+                    <li><b>✉️ 品牌专属定制：</b>支持绑定您自己的企业域名，一键生成如 <span class="highlight">name@yourdomain.com</span> 的专属商务邮箱。瞬间提升您的品牌形象与信任度。</li>
+                    <li><b>⚡ 超高送达率 SMTP 网关：</b>底层直连优质发信服务器，支持高并发 API 发信，确保营销邮件与验证码极速抵达客户信箱，不进垃圾箱。</li>
+                </ul>
+            </div>
+
+            <!-- 5. 售后免责与风控底线 -->
+            <div>
+                <h3 class="text-[16px] font-bold text-slate-800 mb-4 flex items-center">
+                    <span class="title-bar bg-red-500"></span> 售后说明与风控免责声明
+                </h3>
+                <ul class="text-[14px] text-slate-600 space-y-3 leading-relaxed">
+                    <li><b>1. 虚拟资产售后：</b>账号卡密非质量问题（如密码错误无法登录）不支持退款，请在 24 小时内首登验号。</li>
+                    <li><b>2. 平台风控底线：</b>严禁使用本平台任何资源（含域名、节点、短链）进行诈骗、黑灰产或触犯当地法律的行为。一经举报查实，平台将<span class="highlight">第一时间永久封禁 IP 及账户</span>，并保留移交司法机关的权利。</li>
+                    <li><b>3. 官方唯一售后：</b>如遇订单异常，请携带完整订单凭证联系官方 TG 客服：<a href="https://t.me/qingtian_Boss" class="text-blue-500 underline">@qingtian_Boss</a>。</li>
+                </ul>
+            </div>
+
+            <!-- 6. 开发者 API 接口导航 (极简一排五个) -->
+            <div class="pt-4 border-t border-slate-100">
+                <h3 class="text-[15px] font-bold text-slate-800 mb-2">开发者 API 接入</h3>
+                <p class="text-[13px] text-slate-500 mb-3">如需通过代码深度对接平台能力，请点击下方接口查阅文档：</p>
                 
-                <!-- 一排五个极小蓝字 -->
-                <div class="flex flex-wrap gap-x-4 gap-y-2 text-[13px] mt-2">
-                    <a href="/doc.html#tg" class="text-blue-500 active:text-blue-700 font-medium">账号接口</a>
-                    <a href="/doc.html#jd" class="text-blue-500 active:text-blue-700 font-medium">节点接口</a>
-                    <a href="/doc.html#sms" class="text-blue-500 active:text-blue-700 font-medium">接码接口</a>
-                    <a href="/doc.html#cx" class="text-blue-500 active:text-blue-700 font-medium">查询接口</a>
-                    <a href="/doc.html#zf" class="text-blue-500 active:text-blue-700 font-medium">支付接口</a>
+                <div class="flex flex-wrap gap-x-5 gap-y-3 text-[13px]">
+                    <a href="/doc.html#tg" class="text-blue-500 font-medium active:text-blue-700">账号接口</a>
+                    <a href="/doc.html#jd" class="text-blue-500 font-medium active:text-blue-700">节点接口</a>
+                    <a href="/doc.html#sms" class="text-blue-500 font-medium active:text-blue-700">接码接口</a>
+                    <a href="/doc.html#cx" class="text-blue-500 font-medium active:text-blue-700">查询接口</a>
+                    <a href="/doc.html#zf" class="text-blue-500 font-medium active:text-blue-700">支付接口</a>
                 </div>
             </div>
             
             <!-- 底部版权声明 -->
-            <div class="text-center pt-6 pb-4 border-t border-slate-100">
-                <p class="text-[11px] text-slate-400">© 2026 SOCKS5 版权所有 | 严禁用于任何违法违规行为</p>
+            <div class="text-center pt-6 pb-4">
+                <p class="text-[11px] text-slate-400">© 2026 SOCKS5 开放平台。All Rights Reserved.</p>
+                <p class="text-[11px] text-slate-400 mt-1">Built for Developers, Secured by Innovation.</p>
             </div>
         </div>
     </main>

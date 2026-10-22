@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>注册 - SOCKS5</title>
+    <link rel="icon" href="/logo.jpg" type="image/jpeg">
+    <link rel="shortcut icon" href="/logo.jpg" type="image/jpeg">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
         body { background-color: #f8fafc; color: #1e293b; min-height: 100vh; display: flex; flex-direction: column; padding: 24px; justify-content: center; position: relative; }
@@ -22,7 +24,11 @@
         .agreement { display: flex; align-items: flex-start; gap: 8px; margin-top: 16px; font-size: 12px; color: #64748b; }
         .agreement input { margin-top: 2px; width: 14px; height: 14px; accent-color: #2563eb; }
         .agreement a { color: #2563eb; text-decoration: none; }
-        .footer { position: absolute; bottom: 24px; text-align: center; font-size: 12px; color: #94a3b8; }
+        
+        .footer { position: absolute; bottom: 24px; left: 0; right: 0; text-align: center; display: flex; flex-direction: column; gap: 8px; font-size: 12px; color: #94a3b8; }
+        .footer-links { display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .footer-links button { background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 12px; }
+        
         .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 9999; display: none; align-items: flex-end; justify-content: center; }
         .modal-overlay.active { display: flex; }
         .modal-content { background: white; width: 100%; max-width: 400px; border-radius: 24px 24px 0 0; padding: 24px; padding-bottom: 40px; max-height: 80vh; display: flex; flex-direction: column; animation: slideUp 0.3s ease-out; }
@@ -52,7 +58,16 @@
         </form>
         <div class="link-text"><a href="/login.html">已有账号？返回登录</a></div>
     </div>
-    <div class="footer">客服邮箱：boss@lynli.me</div>
+    
+    <div class="footer">
+        <div>客服邮箱：boss@lynli.me</div>
+        <div class="footer-links">
+            <button onclick="openModal('terms')">《用户协议》</button>
+            <span>|</span>
+            <button onclick="openModal('privacy')">《隐私政策》</button>
+        </div>
+    </div>
+
     <div id="info-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header"><h3 id="modal-title" style="font-size:18px;font-weight:700;">标题</h3><button onclick="closeModal()" style="border:none;background:none;font-size:20px;color:#94a3b8;">✕</button></div>
@@ -67,7 +82,9 @@
             clearTimeout(toastTimer);
             toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
         }
+        
         const WORKER_URL = 'https://sendmail.lynli.me';
+        
         document.getElementById('send-code-btn').addEventListener('click', async function() {
             const email = document.getElementById('email').value;
             if(!email || !email.includes('@')) { showToast('请输入正确邮箱'); return; }
@@ -86,6 +103,7 @@
                 } else { showToast('发送失败'); this.disabled = false; this.innerText = '获取验证码'; }
             } catch (e) { showToast('网络错误'); this.disabled = false; this.innerText = '获取验证码'; }
         });
+        
         document.getElementById('reg-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!document.getElementById('agree-check').checked) { showToast('请先同意协议'); return; }
@@ -94,7 +112,9 @@
             const code = document.getElementById('code').value;
             if(code !== localStorage.getItem('my_verify_code')) { showToast('验证码错误'); return; }
             btn.innerText = '正在进入...'; btn.disabled = true;
+            
             try {
+                // 存入 D1 数据库
                 const res = await fetch(`${WORKER_URL}/register`, {
                     method: 'POST', headers: {'Content-Type': 'application/json'}, 
                     body: JSON.stringify({ email: email })
@@ -105,15 +125,22 @@
                     localStorage.setItem('socks5_token', data.data.token);
                     localStorage.setItem('socks5_nickname', data.data.nickname);
                     localStorage.setItem('socks5_avatar', data.data.avatar);
-                    showToast('注册成功');
-                    setTimeout(() => window.location.href = '/index.html', 800);
-                } else { showToast('注册异常'); btn.innerText = '立即注册'; btn.disabled = false; }
-            } catch (err) { showToast('网络错误'); btn.innerText = '立即注册'; btn.disabled = false; }
+                    
+                    // 直接跳转主页
+                    window.location.href = '/index.html';
+                } else { 
+                    showToast('注册异常'); btn.innerText = '立即注册'; btn.disabled = false; 
+                }
+            } catch (err) { 
+                showToast('网络错误'); btn.innerText = '立即注册'; btn.disabled = false; 
+            }
         });
+        
         const modalContent = {
-            'privacy': { title: '隐私政策', text: '我们深知个人信息对您的重要性...' },
-            'terms': { title: '用户协议', text: '欢迎使用 SOCKS5 服务...' }
+            'privacy': { title: '隐私政策', text: '我们深知个人信息对您的重要性，并会尽全力保护您的个人信息安全可靠。未经您的同意，我们绝不会向任何第三方提供您的个人信息。' },
+            'terms': { title: '用户协议', text: '欢迎使用 SOCKS5 服务。本协议是您与 SOCKS5 之间关于您使用本服务所订立的协议。您在使用本服务时，必须遵守相关法律法规。' }
         };
+        
         function openModal(type) {
             const data = modalContent[type]; if(!data) return;
             document.getElementById('modal-title').innerText = data.title;

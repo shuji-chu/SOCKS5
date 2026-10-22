@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>登录 - SOCKS5</title>
+    <!-- 解决浏览器历史记录里没有图标的问题 -->
+    <link rel="icon" href="/logo.jpg" type="image/jpeg">
+    <link rel="shortcut icon" href="/logo.jpg" type="image/jpeg">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
         body { background-color: #f8fafc; color: #1e293b; min-height: 100vh; display: flex; flex-direction: column; padding: 24px; justify-content: center; position: relative; }
@@ -19,7 +22,13 @@
         .btn-primary { width: 100%; padding: 14px; background: #2563eb; color: white; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; }
         .link-text { text-align: center; margin-top: 24px; }
         .link-text a { font-size: 14px; color: #2563eb; text-decoration: none; font-weight: 500; }
-        .footer { position: absolute; bottom: 24px; text-align: center; font-size: 12px; color: #94a3b8; }
+        
+        /* 底部区域 */
+        .footer { position: absolute; bottom: 24px; left: 0; right: 0; text-align: center; display: flex; flex-direction: column; gap: 8px; font-size: 12px; color: #94a3b8; }
+        .footer-links { display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .footer-links button { background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 12px; }
+        
+        /* 弹窗 */
         .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 9999; display: none; align-items: flex-end; justify-content: center; }
         .modal-overlay.active { display: flex; }
         .modal-content { background: white; width: 100%; max-width: 400px; border-radius: 24px 24px 0 0; padding: 24px; padding-bottom: 40px; max-height: 80vh; display: flex; flex-direction: column; animation: slideUp 0.3s ease-out; }
@@ -36,29 +45,50 @@
             <div class="input-group"><input type="password" id="password" required placeholder="密码"></div>
             <div class="options">
                 <label><input type="checkbox" checked> 记住密码</label>
-                <a href="javascript:void(0)" onclick="openModal()">忘记密码？</a>
+                <a href="javascript:void(0)" onclick="openModal('forget')">忘记密码？</a>
             </div>
             <button type="submit" class="btn-primary">安全登录</button>
         </form>
         <div class="link-text"><a href="/register.html">没有账号？立即注册</a></div>
     </div>
-    <div class="footer">客服邮箱：boss@lynli.me</div>
+    
+    <div class="footer">
+        <div>客服邮箱：boss@lynli.me</div>
+        <div class="footer-links">
+            <button onclick="openModal('terms')">《用户协议》</button>
+            <span>|</span>
+            <button onclick="openModal('privacy')">《隐私政策》</button>
+        </div>
+    </div>
+
     <div id="info-modal" class="modal-overlay">
         <div class="modal-content">
-            <div class="modal-header"><h3 id="modal-title" style="font-size:18px;font-weight:700;">找回密码</h3><button onclick="closeModal()" style="border:none;background:none;font-size:20px;color:#94a3b8;">✕</button></div>
+            <div class="modal-header"><h3 id="modal-title" style="font-size:18px;font-weight:700;">标题</h3><button onclick="closeModal()" style="border:none;background:none;font-size:20px;color:#94a3b8;">✕</button></div>
             <div class="modal-body" id="modal-body-content"></div>
         </div>
     </div>
     <script>
+        // 如果已经有 Token，直接免密进主页
         if (localStorage.getItem('socks5_token')) { window.location.href = '/index.html'; }
+        
+        // 登录直接跳转
         document.getElementById('login-form').addEventListener('submit', (e) => {
             e.preventDefault();
             localStorage.setItem('socks5_email', document.getElementById('email').value);
             localStorage.setItem('socks5_token', 'direct_' + Date.now());
             window.location.href = '/index.html';
         });
-        function openModal() {
-            document.getElementById('modal-body-content').innerText = '请发送邮件至客服邮箱 boss@lynli.me 进行密码重置。';
+        
+        const modalContent = {
+            'privacy': { title: '隐私政策', text: '我们深知个人信息对您的重要性，并会尽全力保护您的个人信息安全可靠。未经您的同意，我们绝不会向任何第三方提供您的个人信息。' },
+            'terms': { title: '用户协议', text: '欢迎使用 SOCKS5 服务。本协议是您与 SOCKS5 之间关于您使用本服务所订立的协议。您在使用本服务时，必须遵守相关法律法规。' },
+            'forget': { title: '忘记密码', text: '请发送邮件至客服邮箱 boss@lynli.me 进行密码重置。' }
+        };
+        
+        function openModal(type) {
+            const data = modalContent[type]; if(!data) return;
+            document.getElementById('modal-title').innerText = data.title;
+            document.getElementById('modal-body-content').innerText = data.text;
             document.getElementById('info-modal').classList.add('active');
         }
         function closeModal() { document.getElementById('info-modal').classList.remove('active'); }

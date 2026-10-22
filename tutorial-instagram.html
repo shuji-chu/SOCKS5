@@ -58,42 +58,10 @@
     <script src="/data-instagram.js"></script>
     <script>
         function renderSections(sections) {
-            const container = document.getElementById('tutorial-content');
-            let html = '';
-
-            sections.forEach((sec, index) => {
-                html += `
-                    <div class="card overflow-hidden">
-                        <button class="accordion-btn" onclick="toggleAccordion('acc-${index}', this)">
-                            ${sec.title}
-                            <svg class="w-4 h-4 text-slate-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                        </button>
-                        <div id="acc-${index}" class="accordion-content border-t border-slate-100">
-                            ${sec.content}
-                        </div>
-                    </div>
-                `;
-            });
-
-            container.innerHTML = html;
-            
-            const firstBtn = document.querySelector('.accordion-btn');
-            if(firstBtn) toggleAccordion('acc-0', firstBtn);
+            renderAutoTutorial(sections, "tutorial-content");
         }
 
-        function toggleAccordion(id, btn) {
-            const content = document.getElementById(id);
-            const icon = btn.querySelector('svg');
-            if (content.classList.contains('active')) {
-                content.classList.remove('active');
-                content.style.maxHeight = null;
-                icon.classList.remove('rotate-180');
-            } else {
-                content.classList.add('active');
-                content.style.maxHeight = content.scrollHeight + 'px';
-                icon.classList.add('rotate-180');
-            }
-        }
+        
 
         function switchInsTab(mode, el) {
             document.querySelectorAll('.sub-tab').forEach(btn => btn.classList.remove('active'));
@@ -120,5 +88,6 @@
     
     <script src="/ai-widget.js"></script>
 <script src="/notice.js"></script>
+<script src="/tutorial-engine.js"></script>
 </body>
 </html>

@@ -279,22 +279,51 @@
             }, 1000);
         }
 
-        function mockPaySuccess() {
+        
+        // ================= 真实后端支付对接区 =================
+        async function mockPaySuccess() {
             clearInterval(timer);
-            document.getElementById('pay-step-1').classList.remove('active');
-            document.getElementById('pay-step-2').classList.add('active');
             
-            // 生成订单号并绑定跳转
+            // 获取订单信息
             const qty = document.getElementById('buy-qty').value;
             const orderNo = 'ORD' + Date.now() + Math.floor(Math.random() * 1000);
-            const finalBtn = document.getElementById('btn-go-order');
+            const amountStr = document.getElementById('total-amount').innerText.replace(/[^0-9.]/g, '');
+            const amount = parseFloat(amountStr);
             
-            finalBtn.innerText = '查看订单并提取节点';
-            finalBtn.onclick = () => {
-                // 使用单引号包裹模板字符串，避免被 bash 解析
-                window.location.href = '/order-detail.html?id=' + currentProduct.id + '&order_no=' + orderNo + '&qty=' + qty;
-            };
+            try {
+                // 【老板请注意】这里是你后端对接的真实入口
+                /*
+                const response = await fetch('/api/pay/notify/check', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        order_no: orderNo,
+                        amount: amount,
+                        product_id: currentProduct.id
+                    })
+                });
+                const resData = await response.json();
+                if(resData.code !== 200) {
+                    alert('支付确认失败：' + resData.msg);
+                    return;
+                }
+                */
+                
+                // 前端模拟成功状态
+                document.getElementById('pay-step-1').classList.remove('active');
+                document.getElementById('pay-step-2').classList.add('active');
+                
+                const finalBtn = document.getElementById('btn-go-order');
+                finalBtn.innerText = '查看订单并提取';
+                finalBtn.onclick = () => {
+                    window.location.href = '/order-detail.html?id=' + currentProduct.id + '&order_no=' + orderNo + '&qty=' + qty;
+                };
+                
+            } catch(e) {
+                alert('网络异常，请稍后重试');
+            }
         }
+
     </script>
     <script src="/ai-widget.js"></script>
     

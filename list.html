@@ -13,6 +13,7 @@
     </style>
 </head>
 <body>
+    <!-- 顶部导航 -->
     <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center gap-3 sticky top-0 z-50">
         <a href="/index.html" class="text-slate-600 text-xl font-bold px-2">←</a>
         <h1 id="page-title" class="text-lg font-bold text-slate-800">商品列表</h1>
@@ -38,15 +39,52 @@
         const pageType = urlParams.get('type') || '默认分类';
         document.getElementById('page-title').innerText = pageType;
 
+        // 高度逼真的商品数据模拟
         function generateMockData(type) {
             const data = [];
-            for(let i=1; i<=30; i++) {
-                data.push({
-                    id: i,
-                    title: `[货号${1000+i}] ${type} - 高权重纯净号 | 商品编号 ${i} | 稳定售后`,
-                    price: (Math.random() * 50 + 5).toFixed(2),
-                    stock: Math.floor(Math.random() * 100)
+            
+            // 根据不同分类生成不同的逼真商品文案
+            if (type === '节点') {
+                const nodes = [
+                    { title: "[节点A1] 美国原生住宅 IP | 纯净独享 | 极低延迟 | 支持流媒体解锁", price: "29.90" },
+                    { title: "[节点B2] 日本高速中转专线 | 软银线路 | 游戏/视频专用 | 不限速", price: "19.90" },
+                    { title: "[节点C3] 香港 CN2 GIA 顶级专线 | 毫秒级响应 | 企业级稳定", price: "49.90" },
+                    { title: "[节点D4] 新加坡原生 IP | 纯净防封 | 跨境电商专用 | 支持 Socks5", price: "35.00" },
+                    { title: "[节点E5] 德国法兰克福节点 | 欧洲大带宽 | 4K秒开 | 季付特惠", price: "88.00" },
+                    { title: "[节点F6] 台湾动态住宅 IP | 自动轮换 | 爬虫/注册专用 | 日付", price: "12.50" }
+                ];
+                nodes.forEach((n, i) => {
+                    data.push({ id: i, title: n.title, price: n.price, stock: Math.floor(Math.random() * 50) + 1 });
                 });
+            } else if (type === 'TG') {
+                const tgs = [
+                    { title: "[TG账号1] 美国 +1 老号 | 已养号3个月 | 带 2FA | 防封极强", price: "68.00" },
+                    { title: "[TG账号2] 印尼 +62 白号 | 全新无密码 | 直登 | 适合批量", price: "15.00" },
+                    { title: "[TG账号3] 菲律宾 +63 双绑号 | 带原始邮箱 | 支持改密", price: "35.00" },
+                    { title: "[TG账号4] 英国 +44 高质量号 | 活跃度高 | 无违规记录", price: "55.00" }
+                ];
+                tgs.forEach((t, i) => {
+                    data.push({ id: i, title: t.title, price: t.price, stock: Math.floor(Math.random() * 20) + 1 });
+                });
+            } else if (type === '接码') {
+                const sms = [
+                    { title: "[接码服务1] 美国 WhatsApp 接码 | 纯净号池 | 成功率高", price: "3.50" },
+                    { title: "[接码服务2] Telegram 全球通用接码 | 支持多国家 | 极速到码", price: "5.00" },
+                    { title: "[接码服务3] 印尼/菲律宾 手机号接码 | 实体卡池 | 防封防黑", price: "2.80" }
+                ];
+                sms.forEach((s, i) => {
+                    data.push({ id: i, title: s.title, price: s.price, stock: Math.floor(Math.random() * 200) + 10 });
+                });
+            } else {
+                // 其他分类的通用模拟数据
+                for(let i=1; i<=15; i++) {
+                    data.push({
+                        id: i,
+                        title: `[${type}商品] 高品质自动发货 - 编号 ${i} - 稳定售后保障`,
+                        price: (Math.random() * 50 + 10).toFixed(2),
+                        stock: Math.floor(Math.random() * 100)
+                    });
+                }
             }
             return data;
         }
@@ -73,14 +111,25 @@
                     if(!localStorage.getItem('socks5_token')) { window.location.href = '/login.html'; return; }
                     alert(`准备购买：${p.title}\n金额：¥${p.price}`);
                 };
-                a.className = "block py-4 seamless-item active:bg-slate-50 transition-colors";
+                a.className = "block py-5 seamless-item active:bg-slate-50 transition-colors";
+                
+                // 这里我用了更符合商品属性的图标占位，以后对接后台可以直接换成后台传过来的图片
+                let iconHtml = `<img src="/logo.jpg" class="w-10 h-10 rounded-xl object-cover shrink-0 mt-0.5 shadow-sm">`;
+                if (pageType === '节点') {
+                    iconHtml = `<div class="w-10 h-10 bg-indigo-50 text-indigo-500 rounded-xl flex items-center justify-center shrink-0 mt-0.5"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg></div>`;
+                } else if (pageType === 'TG') {
+                    iconHtml = `<div class="w-10 h-10 bg-blue-50 text-blue-500 rounded-xl flex items-center justify-center shrink-0 mt-0.5"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg></div>`;
+                } else if (pageType === '接码') {
+                    iconHtml = `<div class="w-10 h-10 bg-green-50 text-green-500 rounded-xl flex items-center justify-center shrink-0 mt-0.5"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg></div>`;
+                }
+
                 a.innerHTML = `
-                    <div class="flex items-start gap-3">
-                        <img src="/logo.jpg" class="w-10 h-10 rounded-lg object-cover shrink-0 mt-0.5">
+                    <div class="flex items-start gap-3.5">
+                        ${iconHtml}
                         <div class="flex-1 min-w-0">
-                            <h3 class="text-[14px] font-medium text-slate-800 leading-snug line-clamp-2">${p.title}</h3>
-                            <div class="flex justify-between items-end mt-3">
-                                <span class="text-lg font-bold text-red-500">¥${p.price}</span>
+                            <h3 class="text-[14.5px] font-semibold text-slate-800 leading-snug line-clamp-2">${p.title}</h3>
+                            <div class="flex justify-between items-end mt-3.5">
+                                <span class="text-[18px] font-bold text-red-500">¥${p.price}</span>
                                 <span class="text-xs text-slate-400">库存: <span class="${p.stock > 0 ? 'text-green-500' : 'text-slate-400'} font-medium">${p.stock}</span></span>
                             </div>
                         </div>

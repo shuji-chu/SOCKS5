@@ -55,7 +55,7 @@
                 <div class="w-14 h-14 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg></div>
                 <span class="text-[13px] font-medium text-slate-700">TG账号</span>
             </a>
-            <a href="/product-detail.html?id=node" class="flex flex-col items-center gap-2 active:opacity-60">
+            <a href="/product-detail.html?id=node1" class="flex flex-col items-center gap-2 active:opacity-60">
                 <div class="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-500 flex items-center justify-center"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg></div>
                 <span class="text-[13px] font-medium text-slate-700">代理节点</span>
             </a>
@@ -67,7 +67,7 @@
                 <div class="w-14 h-14 rounded-2xl bg-orange-50 text-orange-500 flex items-center justify-center"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg></div>
                 <span class="text-[13px] font-medium text-slate-700">免费域名</span>
             </a>
-            <a href="/doc-query.html" class="flex flex-col items-center gap-2 active:opacity-60">
+            <a href="/api-market.html" class="flex flex-col items-center gap-2 active:opacity-60">
                 <div class="w-14 h-14 rounded-2xl bg-purple-50 text-purple-500 flex items-center justify-center"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></div>
                 <span class="text-[13px] font-medium text-slate-700">数据查询</span>
             </a>
@@ -88,8 +88,17 @@
             </button>
         </div>
 
-        <!-- 商品列表 -->
-        <div id="product-list" class="px-4 pb-12 space-y-3"></div>
+        <!-- 商品列表容器 -->
+        <div id="product-list" class="px-4 pb-12 space-y-3">
+            <!-- 骨架屏加载动画 -->
+            <div class="animate-pulse flex space-x-4 p-4 bg-white rounded-xl border border-slate-100">
+                <div class="rounded-xl bg-slate-200 h-12 w-12"></div>
+                <div class="flex-1 space-y-3 py-1">
+                    <div class="h-4 bg-slate-200 rounded w-3/4"></div>
+                    <div class="h-3 bg-slate-200 rounded w-1/2"></div>
+                </div>
+            </div>
+        </div>
     </main>
 
     <!-- 筛选抽屉 -->
@@ -117,19 +126,6 @@
     </div>
 
     <script>
-        // 模拟商品数据库
-        const mockProducts = [
-            { id: '3965', title: '[货号3965] Telegram飞机号 | +1美国电话注册 | 成品号 | API接码登录', category: 'TG账号', price: '8.72', stock: 1934, tags: ['推荐', '热门', '自动发货'], icon: 'tg' },
-            { id: '1907', title: '[库存号] 谷歌 Gmail 白号 | 2019年老号 | 纯手工注册', category: '邮箱账号', price: '12.35', stock: 120, tags: ['老号', '带辅助邮箱'], icon: 'gmail' },
-            { id: 'node1', title: 'MTP 高速代理节点 | 支持流媒体 | 极速稳定', category: '代理节点', price: '15.00', stock: 999, tags: ['防封', '高可用'], icon: 'node' },
-            { id: 'sms1', title: '全球接码服务 | 60+国家支持 | 验证码实时接收', category: '接码服务', price: '1.50', stock: 9999, tags: ['锁资保护', '极速回码'], icon: 'sms' },
-            { id: 'domain1', title: '免费二级域名赠送 | 支持CF解析 | 90天有效期', category: '域名服务', price: '0.00', stock: 500, tags: ['免费领取', '限购1个'], icon: 'domain' },
-            { id: 'api1', title: '二要素/三要素 API 接口 | 数据核验 | 聚合网关', category: '数据查询', price: '0.05', stock: 9999, tags: ['极速响应', '高并发'], icon: 'api' }
-        ];
-
-        let currentCategory = '全部';
-        let searchQuery = '';
-
         // 图标库
         const icons = {
             tg: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>',
@@ -140,10 +136,14 @@
             api: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>'
         };
 
+        let mockProducts = [];
+        let currentCategory = '全部';
+        let searchQuery = '';
+
+        // 渲染商品列表
         function renderProducts() {
             const list = document.getElementById('product-list');
             
-            // 过滤数据
             const filtered = mockProducts.filter(p => {
                 const matchCategory = currentCategory === '全部' || p.category === currentCategory;
                 const matchSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase()) || p.category.toLowerCase().includes(searchQuery.toLowerCase());
@@ -155,20 +155,16 @@
                 return;
             }
 
-            // 渲染卡片 (瘦身版)
             list.innerHTML = filtered.map(p => `
                 <a href="/product-detail.html?id=${p.id}" class="block bg-white rounded-xl p-3 border border-slate-100 shadow-sm active:bg-slate-50 transition fade-in">
                     <div class="flex gap-3">
-                        <!-- 图标 -->
                         <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${p.icon === 'tg' ? 'bg-blue-50 text-blue-500' : p.icon === 'gmail' ? 'bg-pink-50 text-pink-500' : p.icon === 'node' ? 'bg-indigo-50 text-indigo-500' : p.icon === 'sms' ? 'bg-green-50 text-green-500' : p.icon === 'domain' ? 'bg-orange-50 text-orange-500' : 'bg-purple-50 text-purple-500'}">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">${icons[p.icon] || icons.tg}</svg>
                         </div>
-                        
-                        <!-- 内容 -->
                         <div class="flex-1 min-w-0">
                             <h3 class="text-[14px] font-bold text-slate-800 leading-snug line-clamp-2 mb-1">${p.title}</h3>
                             <div class="flex gap-1.5 mb-2">
-                                ${p.tags.map(t => `<span class="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded border border-slate-200">${t}</span>`).join('')}
+                                ${(p.tags || []).map(t => `<span class="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded border border-slate-200">${t}</span>`).join('')}
                             </div>
                             <div class="flex justify-between items-end">
                                 <span class="text-[18px] font-bold text-red-500 leading-none">¥${p.price}</span>
@@ -185,12 +181,16 @@
             renderProducts();
         }
 
-        // 筛选抽屉逻辑
-        const categories = ['全部', 'TG账号', '邮箱账号', '代理节点', '接码服务', '域名服务', '数据查询'];
+        // 筛选逻辑
+        const defaultCategories = ['全部', 'TG账号', '邮箱账号', '代理节点', '接码服务', '域名服务', '数据查询'];
         
         function renderFilterOptions() {
             const container = document.getElementById('filter-options');
-            container.innerHTML = categories.map(cat => `
+            // 动态合并预设分类和实际商品里有的分类
+            const dbCategories = [...new Set(mockProducts.map(p => p.category))];
+            const allCats = [...new Set([...defaultCategories, ...dbCategories])];
+
+            container.innerHTML = allCats.map(cat => `
                 <div onclick="selectCategory('${cat}')" class="py-2.5 text-center text-[14px] font-medium rounded-lg border ${currentCategory === cat ? 'border-blue-500 bg-blue-50 text-blue-600' : 'border-slate-200 text-slate-600'} active:bg-slate-100 transition cursor-pointer">
                     ${cat}
                 </div>
@@ -214,10 +214,19 @@
             document.getElementById('filter-panel').classList.remove('active');
         }
 
-        // 初始化
-        document.addEventListener('DOMContentLoaded', () => {
-            renderFilterOptions();
-            renderProducts();
+        // ================= 核心初始化：真实读取 JSON =================
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // 请求存放在根目录的 products.json 文件
+                const res = await fetch('/products.json');
+                mockProducts = await res.json();
+                
+                renderFilterOptions();
+                renderProducts();
+            } catch(e) {
+                console.error('获取商品数据失败，请检查 JSON 格式或网络:', e);
+                document.getElementById('product-list').innerHTML = '<div class="text-center py-10 text-red-400 text-[14px]">商品数据加载失败，请刷新重试</div>';
+            }
         });
     </script>
     <script src="/ai-widget.js"></script>

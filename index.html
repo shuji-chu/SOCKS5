@@ -214,6 +214,37 @@
             document.getElementById('filter-panel').classList.remove('active');
         }
 
+        // 保存搜索和筛选状态
+        function saveState() {
+            sessionStorage.setItem('home_search', searchQuery);
+            sessionStorage.setItem('home_category', currentCategory);
+            sessionStorage.setItem('home_scroll', window.scrollY);
+        }
+
+        // 恢复搜索和筛选状态
+        function restoreState() {
+            const savedSearch = sessionStorage.getItem('home_search');
+            const savedCategory = sessionStorage.getItem('home_category');
+            const savedScroll = sessionStorage.getItem('home_scroll');
+
+            if (savedSearch) {
+                searchQuery = savedSearch;
+                document.getElementById('search-input').value = savedSearch;
+            }
+            if (savedCategory) {
+                currentCategory = savedCategory;
+            }
+            return savedScroll;
+        }
+
+        // 监听点击商品时的状态保存
+        document.addEventListener('click', (e) => {
+            const productLink = e.target.closest('a[href^="/product-detail.html"]');
+            if (productLink) {
+                saveState();
+            }
+        });
+
         // ================= 核心初始化：真实读取 JSON =================
         document.addEventListener('DOMContentLoaded', async () => {
             try {
@@ -221,8 +252,16 @@
                 const res = await fetch('/products.json');
                 mockProducts = await res.json();
                 
+                // 恢复之前的状态
+                const savedScroll = restoreState();
+                
                 renderFilterOptions();
                 renderProducts();
+
+                // 恢复滚动位置
+                if (savedScroll) {
+                    setTimeout(() => { window.scrollTo(0, parseInt(savedScroll)); }, 100);
+                }
             } catch(e) {
                 console.error('获取商品数据失败，请检查 JSON 格式或网络:', e);
                 document.getElementById('product-list').innerHTML = '<div class="text-center py-10 text-red-400 text-[14px]">商品数据加载失败，请刷新重试</div>';

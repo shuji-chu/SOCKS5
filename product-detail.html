@@ -33,7 +33,7 @@
 </head>
 <body>
     <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center gap-3 sticky top-0 z-50">
-        <a href="/index.html" class="text-slate-600 text-xl font-bold px-2">←</a>
+        <button onclick="goBack()" class="text-slate-600 text-xl font-bold px-2">←</button>
         <h1 class="text-[17px] font-bold text-slate-800">商品详情</h1>
     </header>
 
@@ -183,6 +183,18 @@
             <p>3. <b>域名与节点风控：</b>平台系统会不定时向用户发送正规使用提醒。如发现或接到举报查实用户利用本平台资源进行违法违规活动，平台有权第一时间收回资源、封禁对应 IP 及账户，且不予退款。</p>
             <p>4. 用户需自行承担因违规使用带来的法律责任，本平台不承担任何连带责任。</p>
         `;
+
+        
+        // 智能返回逻辑
+        function goBack() {
+            // 如果是从其他页面跳转来的，直接后退，保留之前的页面状态（搜索词、滚动条）
+            if (document.referrer && document.referrer.includes(window.location.host)) {
+                window.history.back();
+            } else {
+                // 如果是直接分享链接打开，没有上一页，兜底回首页
+                window.location.href = '/index.html';
+            }
+        }
 
         // ================= 页面初始化 =================
         let currentProduct = null;

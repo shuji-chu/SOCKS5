@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>商品列表 - SOCKS5</title>
+    <link rel="icon" href="/logo.jpg" type="image/jpeg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
+        body { background-color: #f1f5f9; color: #1e293b; padding-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center gap-3 sticky top-0 z-50">
+        <a href="/index.html" class="text-slate-600 text-xl font-bold px-2">←</a>
+        <h1 id="page-title" class="text-lg font-bold text-slate-800">商品列表</h1>
+    </header>
+
+    <main class="p-4">
+        <!-- 搜索框 -->
+        <div class="flex gap-2 mb-4">
+            <div class="flex-1 bg-white rounded-xl flex items-center px-4 py-2.5 shadow-sm border border-slate-100">
+                <svg class="w-4 h-4 text-slate-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                <input type="text" id="search-input" oninput="renderProducts()" placeholder="搜索当前分类商品..." class="bg-transparent outline-none text-[14px] w-full text-slate-700 placeholder-slate-400">
+            </div>
+        </div>
+
+        <!-- 无限滑动列表区 -->
+        <div id="product-list" class="space-y-3 pb-10">
+            <!-- JS 动态渲染 -->
+        </div>
+    </main>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const pageType = urlParams.get('type') || '默认分类';
+        document.getElementById('page-title').innerText = pageType;
+
+        // 模拟生成 30 条数据以确保能无限滑动
+        function generateMockData(type) {
+            const data = [];
+            const titles = [
+                "高权重防封号", "全新无密码直登", "支持改密换绑", "纯净住宅IP", "原生环境注册"
+            ];
+            for(let i=1; i<=30; i++) {
+                data.push({
+                    id: i,
+                    title: `[货号${1000+i}] ${type} - ${titles[i%5]} | 商品编号 ${i} | 稳定售后`,
+                    price: (Math.random() * 50 + 5).toFixed(2),
+                    stock: Math.floor(Math.random() * 100)
+                });
+            }
+            return data;
+        }
+
+        const allProducts = generateMockData(pageType);
+
+        function renderProducts() {
+            const keyword = document.getElementById('search-input').value.trim().toLowerCase();
+            const listEl = document.getElementById('product-list');
+            listEl.innerHTML = '';
+
+            const filtered = allProducts.filter(p => p.title.toLowerCase().includes(keyword));
+
+            if (filtered.length === 0) {
+                listEl.innerHTML = '<div class="text-center py-10 text-slate-400 text-sm">没有找到相关商品</div>';
+                return;
+            }
+
+            const fragment = document.createDocumentFragment();
+            filtered.forEach(p => {
+                const a = document.createElement('a');
+                a.href = "javascript:void(0)";
+                a.onclick = () => {
+                    if(!localStorage.getItem('socks5_token')) { window.location.href = '/login.html'; return; }
+                    alert(`准备购买：${p.title}\n金额：¥${p.price}`);
+                };
+                a.className = "block bg-white rounded-xl p-4 shadow-sm border border-slate-100 active:bg-slate-50 transition-colors";
+                a.innerHTML = `
+                    <div class="flex items-start gap-3">
+                        <img src="/logo.jpg" class="w-10 h-10 rounded-lg object-cover shrink-0 mt-0.5">
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-[14px] font-medium text-slate-800 leading-snug line-clamp-2">${p.title}</h3>
+                            <div class="flex justify-between items-end mt-3">
+                                <span class="text-lg font-bold text-red-500">¥${p.price}</span>
+                                <span class="text-xs text-slate-400">库存: <span class="${p.stock > 0 ? 'text-green-500' : 'text-slate-400'} font-medium">${p.stock}</span></span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                fragment.appendChild(a);
+            });
+            listEl.appendChild(fragment);
+        }
+
+        document.addEventListener('DOMContentLoaded', renderProducts);
+    </script>
+</body>
+</html>

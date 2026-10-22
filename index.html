@@ -15,76 +15,88 @@
 </head>
 <body>
 
-    <header class="bg-white px-4 py-3 flex items-center justify-between sticky top-0 z-50">
+    <header class="bg-white px-4 py-3 flex items-center justify-between sticky top-0 z-50 border-b border-slate-100">
         <div class="flex items-center gap-2">
             <img src="/logo.jpg" class="w-8 h-8 rounded-lg object-cover shadow-sm">
             <h1 class="text-xl font-bold text-slate-800 tracking-tight">SOCKS5</h1>
         </div>
         <div class="flex items-center gap-3 text-slate-500">
-            <!-- 广告通知按钮 -->
             <div class="relative cursor-pointer p-1" onclick="openAdModal()">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
-                <!-- 红点：如果本地没存已读状态，就显示 -->
                 <span id="ad-dot" class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border border-white hidden"></span>
             </div>
         </div>
     </header>
 
     <main class="p-4">
-        <!-- 六大业务入口 -->
+        <!-- 顶部文案卡片 (回归) -->
+        <div class="bg-white rounded-2xl p-6 mb-5 shadow-sm border border-slate-100">
+            <h2 class="text-[20px] font-bold text-slate-800 mb-1">SOCKS5 账号购买中心</h2>
+            <p class="text-[13px] text-slate-400 font-medium mb-3">专业社交媒体及数字资产出售平台</p>
+            <p class="text-[13px] text-slate-500 leading-relaxed">提供高质量 Telegram 账号、稳定代理节点、纯净接码服务及企业级邮箱推送。支持免费赠送子域名，全自动发货，售后无忧。</p>
+        </div>
+
+        <!-- 六大金刚 (全部跳转 list.html) -->
         <div class="bg-white rounded-2xl p-5 mb-5 shadow-sm border border-slate-100">
             <div class="grid grid-cols-3 gap-y-6 gap-x-2 text-center">
-                <!-- 1. TG账号 -->
-                <a href="javascript:void(0)" onclick="filterCategory('TG')" class="flex flex-col items-center gap-2 group">
+                <a href="/list.html?type=TG" class="flex flex-col items-center gap-2 group">
                     <div class="w-12 h-12 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center group-hover:scale-105 transition-transform"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg></div>
                     <span class="text-[13px] font-medium text-slate-700">TG账号</span>
                 </a>
-                <!-- 2. 代理节点 -->
-                <a href="javascript:void(0)" onclick="filterCategory('节点')" class="flex flex-col items-center gap-2 group">
+                <a href="/list.html?type=节点" class="flex flex-col items-center gap-2 group">
                     <div class="w-12 h-12 bg-indigo-50 text-indigo-500 rounded-2xl flex items-center justify-center group-hover:scale-105 transition-transform"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg></div>
                     <span class="text-[13px] font-medium text-slate-700">代理节点</span>
                 </a>
-                <!-- 3. 接码服务 -->
-                <a href="javascript:void(0)" onclick="filterCategory('接码')" class="flex flex-col items-center gap-2 group">
+                <a href="/list.html?type=接码" class="flex flex-col items-center gap-2 group">
                     <div class="w-12 h-12 bg-green-50 text-green-500 rounded-2xl flex items-center justify-center group-hover:scale-105 transition-transform"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg></div>
                     <span class="text-[13px] font-medium text-slate-700">接码服务</span>
                 </a>
-                <!-- 4. 域名赠送 -->
-                <a href="javascript:void(0)" onclick="showToast('消费满100自动赠送子域名')" class="flex flex-col items-center gap-2 group">
+                <a href="/list.html?type=域名" class="flex flex-col items-center gap-2 group">
                     <div class="w-12 h-12 bg-orange-50 text-orange-500 rounded-2xl flex items-center justify-center group-hover:scale-105 transition-transform"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg></div>
                     <span class="text-[13px] font-medium text-slate-700">免费域名</span>
                 </a>
-                <!-- 5. 订单查询 -->
-                <a href="javascript:void(0)" onclick="showToast('查询页面开发中')" class="flex flex-col items-center gap-2 group">
+                <a href="/list.html?type=查询" class="flex flex-col items-center gap-2 group">
                     <div class="w-12 h-12 bg-purple-50 text-purple-500 rounded-2xl flex items-center justify-center group-hover:scale-105 transition-transform"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></div>
                     <span class="text-[13px] font-medium text-slate-700">订单查询</span>
                 </a>
-                <!-- 6. 邮箱推送 -->
-                <a href="javascript:void(0)" onclick="showToast('推送功能开发中')" class="flex flex-col items-center gap-2 group">
+                <a href="/list.html?type=推送" class="flex flex-col items-center gap-2 group">
                     <div class="w-12 h-12 bg-pink-50 text-pink-500 rounded-2xl flex items-center justify-center group-hover:scale-105 transition-transform"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg></div>
                     <span class="text-[13px] font-medium text-slate-700">邮箱推送</span>
                 </a>
             </div>
         </div>
 
-        <!-- 搜索框 (支持实时过滤) -->
-        <div class="flex gap-2 mb-4">
-            <div class="flex-1 bg-white rounded-xl flex items-center px-4 py-2.5 shadow-sm border border-slate-100">
-                <svg class="w-4 h-4 text-slate-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                <input type="text" id="search-input" oninput="renderProducts()" placeholder="搜索商品（如：美国，节点，接码）..." class="bg-transparent outline-none text-[14px] w-full text-slate-700 placeholder-slate-400">
-            </div>
-            <button class="bg-white rounded-xl px-4 py-2.5 text-sm font-medium text-slate-600 shadow-sm border border-slate-100 flex items-center gap-1">
-                筛选 <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-            </button>
-        </div>
-
-        <!-- 无限滑动商品列表 -->
-        <div id="product-list" class="space-y-3 pb-6">
-            <!-- JS 动态渲染 -->
+        <h3 class="font-bold text-slate-800 mb-3 ml-1 text-[15px]">热门推荐</h3>
+        <!-- 首页推荐列表 -->
+        <div class="space-y-3">
+            <a href="/list.html?type=TG" class="block bg-white rounded-xl p-4 shadow-sm border border-slate-100 active:bg-slate-50 transition-colors">
+                <div class="flex items-start gap-3">
+                    <img src="/tg.jpg" class="w-10 h-10 rounded-lg object-cover shrink-0 mt-0.5">
+                    <div class="flex-1 min-w-0">
+                        <h3 class="text-[14px] font-medium text-slate-800 leading-snug line-clamp-2">[货号3965] Telegram 飞机号 | +1 美国电话注册 | 成品号 | 稳定推荐</h3>
+                        <div class="flex justify-between items-end mt-3">
+                            <span class="text-lg font-bold text-red-500">¥8.72</span>
+                            <span class="text-xs text-slate-400">库存: <span class="text-green-500 font-medium">128</span></span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+            <a href="/list.html?type=节点" class="block bg-white rounded-xl p-4 shadow-sm border border-slate-100 active:bg-slate-50 transition-colors">
+                <div class="flex items-start gap-3">
+                    <img src="/mivra.jpg" class="w-10 h-10 rounded-lg object-cover shrink-0 mt-0.5">
+                    <div class="flex-1 min-w-0">
+                        <h3 class="text-[14px] font-medium text-slate-800 leading-snug line-clamp-2">[节点402] Socks5 独享高速节点 | 美国原生IP | 月付套餐</h3>
+                        <div class="flex justify-between items-end mt-3">
+                            <span class="text-lg font-bold text-red-500">¥15.00</span>
+                            <span class="text-xs text-slate-400">库存: <span class="text-green-500 font-medium">99</span></span>
+                        </div>
+                    </div>
+                </div>
+            </a>
         </div>
     </main>
 
-    <!-- 只有两个Tab的主导航 -->
+    <!-- 双Tab -->
     <div class="fixed bottom-0 left-0 right-0 bg-white flex justify-around py-3 border-t border-slate-200 z-50 pb-[calc(10px+env(safe-area-inset-bottom))]">
         <a href="/index.html" class="flex flex-col items-center gap-1 text-blue-500">
             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
@@ -96,94 +108,19 @@
         </a>
     </div>
 
-    <!-- 广告通知弹窗 -->
+    <!-- 广告弹窗 -->
     <div id="ad-modal" class="modal-overlay">
         <div class="bg-white rounded-2xl p-6 w-[85%] max-w-[320px] relative">
             <button onclick="closeAdModal()" class="absolute top-3 right-3 text-slate-400 text-lg">✕</button>
             <div class="text-center">
-                <div class="w-12 h-12 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path></svg>
-                </div>
                 <h3 class="text-lg font-bold text-slate-800 mb-2">平台公告</h3>
-                <p class="text-sm text-slate-500 mb-5 leading-relaxed">欢迎使用 SOCKS5 商城！目前接码、节点及各类账号均已补货。新增子域名赠送及邮箱推送服务！</p>
+                <p class="text-sm text-slate-500 mb-5 leading-relaxed">欢迎使用 SOCKS5 商城！目前全业务线均已补货，新增免费域名及推送服务，点击下方卡片查看！</p>
                 <button onclick="closeAdModal()" class="w-full py-2.5 bg-blue-500 text-white font-bold rounded-xl text-sm">我知道了</button>
             </div>
         </div>
     </div>
 
-    <!-- 轻提示 -->
-    <div id="toast" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black/80 text-white px-4 py-2 rounded-lg text-sm z-[9999] hidden"></div>
-
     <script>
-        // 核心：真实的商品数据源 (后续可对接接口)
-        const allProducts = [
-            { id: 1, category: "TG", title: "[货号3965] Telegram 飞机号 | +1 美国电话注册 | 成品号 | 稳定推荐", price: 8.72, stock: 128, img: "/tg.jpg" },
-            { id: 2, category: "节点", title: "[节点402] Socks5 独享高速节点 | 美国原生IP | 月付套餐", price: 15.00, stock: 99, img: "/mivra.jpg" },
-            { id: 3, category: "接码", title: "[接码89] 美国 WhatsApp 接码 | 纯净接码池 | 高成功率", price: 3.50, stock: 520, img: "/safew.jpg" },
-            { id: 4, category: "TG", title: "[货号1907] Gmail 超级老号 | 2006-2019年 | 确认辅助邮箱", price: 12.35, stock: 0, img: "/safew.jpg" },
-            { id: 5, category: "节点", title: "[节点888] 全球高速中转专线 | 支持流媒体解锁", price: 39.90, stock: 50, img: "/tg.jpg" },
-            { id: 6, category: "接码", title: "[接码12] 印尼 TG 接码直登 | 物理卡注册", price: 2.80, stock: 210, img: "/mivra.jpg" }
-        ];
-
-        let currentCategory = "全部";
-
-        // 渲染列表 (支持搜索和分类过滤)
-        function renderProducts() {
-            const keyword = document.getElementById('search-input').value.trim().toLowerCase();
-            const listEl = document.getElementById('product-list');
-            listEl.innerHTML = '';
-
-            const filtered = allProducts.filter(p => {
-                const matchKeyword = p.title.toLowerCase().includes(keyword) || p.category.toLowerCase().includes(keyword);
-                const matchCategory = currentCategory === "全部" || p.category === currentCategory;
-                return matchKeyword && matchCategory;
-            });
-
-            if (filtered.length === 0) {
-                listEl.innerHTML = '<div class="text-center py-10 text-slate-400 text-sm">没有找到相关商品</div>';
-                return;
-            }
-
-            // 使用文档片段提高渲染性能
-            const fragment = document.createDocumentFragment();
-            filtered.forEach(p => {
-                const a = document.createElement('a');
-                a.href = "javascript:void(0)";
-                a.onclick = () => buyProduct(p.id, p.title, p.price);
-                a.className = "block bg-white rounded-xl p-4 shadow-sm border border-slate-100 active:bg-slate-50 transition-colors";
-                a.innerHTML = `
-                    <div class="flex items-start gap-3">
-                        <img src="${p.img}" class="w-10 h-10 rounded-lg object-cover shrink-0 mt-0.5">
-                        <div class="flex-1 min-w-0">
-                            <h3 class="text-[14px] font-medium text-slate-800 leading-snug line-clamp-2">${p.title}</h3>
-                            <div class="flex justify-between items-end mt-3">
-                                <span class="text-lg font-bold text-red-500">¥${p.price.toFixed(2)}</span>
-                                <span class="text-xs text-slate-400">库存: <span class="${p.stock > 0 ? 'text-green-500' : 'text-slate-400'} font-medium">${p.stock}</span></span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                fragment.appendChild(a);
-            });
-            listEl.appendChild(fragment);
-        }
-
-        // 分类点击处理
-        function filterCategory(cat) {
-            currentCategory = cat;
-            document.getElementById('search-input').value = ''; // 清空搜索框
-            renderProducts();
-            showToast(`已为您筛选：${cat}`);
-        }
-
-        // 购买逻辑占位
-        function buyProduct(id, name, price) {
-            const token = localStorage.getItem('socks5_token');
-            if(!token) { window.location.href = '/login.html'; return; }
-            showToast(`准备下单：${name}`);
-        }
-
-        // 广告红点逻辑
         function openAdModal() { 
             document.getElementById('ad-modal').classList.add('active'); 
             document.getElementById('ad-dot').classList.add('hidden');
@@ -191,24 +128,11 @@
         }
         function closeAdModal() { document.getElementById('ad-modal').classList.remove('active'); }
 
-        // 轻提示
-        let toastTimer;
-        function showToast(msg) {
-            const t = document.getElementById('toast');
-            t.innerText = msg;
-            t.classList.remove('hidden');
-            clearTimeout(toastTimer);
-            toastTimer = setTimeout(() => t.classList.add('hidden'), 2000);
-        }
-
-        // 初始化
+        // 检查红点
         document.addEventListener('DOMContentLoaded', () => {
-            // 检查公告是否已读
             if (!localStorage.getItem('ad_read')) {
                 document.getElementById('ad-dot').classList.remove('hidden');
             }
-            // 首次渲染列表
-            renderProducts();
         });
     </script>
 </body>

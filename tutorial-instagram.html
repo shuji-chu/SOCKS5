@@ -11,12 +11,12 @@
         body { background-color: #f8fafc; color: #1e293b; padding-bottom: 20px; }
         .card { background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; margin-bottom: 16px; }
         
-        .sub-tab { flex: 1; padding: 8px 0; text-align: center; font-size: 13px; font-weight: bold; color: #64748b; border-bottom: 2px solid transparent; cursor: pointer; white-space: nowrap; }
+        .sub-tab { padding: 8px 12px; text-align: center; font-size: 13px; font-weight: bold; color: #64748b; border-bottom: 2px solid transparent; cursor: pointer; white-space: nowrap; }
         .sub-tab.active { color: #2563eb; border-bottom-color: #2563eb; }
 
         .accordion-btn { width: 100%; text-align: left; padding: 16px; font-size: 15px; font-weight: bold; color: #1e293b; display: flex; justify-content: space-between; align-items: center; background: #fff; border-bottom: 1px solid #f1f5f9; }
         .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; background: #f8fafc; }
-        .accordion-content.active { max-height: 3000px; transition: max-height 0.4s ease-in; }
+        .accordion-content.active { max-height: 5000px; transition: max-height 0.4s ease-in; }
         .rotate-180 { transform: rotate(180deg); }
 
         .step-num { width: 24px; height: 24px; border-radius: 50%; background: #eff6ff; color: #2563eb; font-size: 13px; font-weight: bold; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -44,10 +44,12 @@
             <p class="text-[12px] text-slate-500 mt-1" id="main-subtitle">首次使用请仔细阅读对应平台的使用教程</p>
         </div>
 
-        <!-- 内层 Tab 切换 -->
-        <div class="flex border-b border-slate-200 mb-4 bg-white rounded-lg p-1 shadow-sm">
-            <div class="sub-tab active" onclick="switchInsTab('cookie', this)">Cookie 登录方法</div>
-            <div class="sub-tab" onclick="switchInsTab('2fa', this)">2FA 登录教程</div>
+        <!-- 内层 Tab 切换 (4个) -->
+        <div class="flex border-b border-slate-200 mb-4 bg-white rounded-lg p-1 shadow-sm overflow-x-auto no-scrollbar">
+            <div class="sub-tab active" onclick="switchInsTab('cookie', this)">Cookie 登录</div>
+            <div class="sub-tab" onclick="switchInsTab('2fa', this)">2FA 登录</div>
+            <div class="sub-tab" onclick="switchInsTab('changePasswordWarning', this)">无法立即改密</div>
+            <div class="sub-tab" onclick="switchInsTab('overseasIP', this)">海外 IP 登录</div>
         </div>
 
         <div id="tutorial-content"></div>
@@ -99,8 +101,12 @@
             
             if (mode === 'cookie') {
                 renderSections(instagramData.cookie);
-            } else {
+            } else if (mode === '2fa') {
                 renderSections(instagramData.twoFactor);
+            } else if (mode === 'changePasswordWarning') {
+                renderSections(instagramData.changePasswordWarning);
+            } else if (mode === 'overseasIP') {
+                renderSections(instagramData.overseasIP);
             }
         }
 

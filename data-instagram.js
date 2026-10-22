@@ -1,6 +1,6 @@
 const instagramData = {
     title: 'Instagram 教程 & 养号',
-    subtitle: '2FA登录 · Cookie登录 · 防封必看',
+    subtitle: '2FA登录 · Cookie登录 · IP防封指南',
     cookie: [
         {
             title: 'Cookie 登录前必看',
@@ -142,6 +142,103 @@ const instagramData = {
                         <li>卡密分隔符可能使用 :、 ;、 |、 ｜、 —— 等不同格式。</li>
                         <li>如果看不懂卡密格式，可以直接复制完整卡密发送给客服，并发送提示词：<b>Instagram 账号分卡密</b>。</li>
                     </ul>
+                </div>
+            `
+        }
+    ],
+    changePasswordWarning: [
+        {
+            title: '无法立即更改密码 / 2FA / 邮箱',
+            content: `
+                <div class="p-4">
+                    <div class="danger-box text-[14px]">
+                        <b>大多数 Facebook / Instagram 无法立即更改密码 / 2FA / 邮箱 / 踢除旧设备（执行操作 WhatsApp）。</b><br><br>
+                        建议养号周期 <b>30-45 天</b>；不保证这个问题！购买前请考虑！
+                    </div>
+                </div>
+            `
+        }
+    ],
+    overseasIP: [
+        {
+            title: '海外 IP 登录核心原则',
+            content: `
+                <div class="p-4">
+                    <p class="text-[13px] text-slate-600 leading-relaxed mb-3">在 Instagram 上使用海外 IP 登录，尤其是进行工作室式的批量操作，需要注意大量细节，否则极易触发风控导致封号。</p>
+                    <div class="bg-blue-50 border border-blue-100 rounded-lg p-4 text-[13px] text-blue-800 leading-relaxed font-bold">
+                        核心原则：环境、IP、行为的三位一体。你的目标不是"能用"，而是让 Instagram 认为你就是一个在当地正常生活的真实用户。任何一方面的不匹配都会带来风险。
+                    </div>
+                </div>
+            `
+        },
+        {
+            title: '一、IP 地址的选择与使用（重中之重）',
+            content: `
+                <div class="p-4 space-y-4">
+                    <p class="text-[13px] text-slate-600 leading-relaxed">这是最关键的一环，IP 的质量直接决定了账号的生死。</p>
+                    <div>
+                        <p class="text-[14px] font-bold text-slate-800 mb-1">IP 类型：首选住宅 IP，其次是移动 IP</p>
+                        <p class="text-[13px] text-slate-600 leading-relaxed">住宅 IP：来自真实家庭宽带运营商的 IP（如 Comcast、Spectrum 等）。这是最安全、最逼真的选择。</p>
+                        <p class="text-[13px] text-slate-600 leading-relaxed">4G/5G 移动 IP：来自移动数据网络的 IP，同样非常优质。</p>
+                        <p class="text-[13px] text-red-500 leading-relaxed mt-1">绝对避免：数据中心 IP。这类 IP 段非常容易被 Instagram 识别和标记，新号注册或老号登录几乎会立刻被限制。</p>
+                    </div>
+                    <div class="border-t border-slate-100 pt-3">
+                        <p class="text-[14px] font-bold text-slate-800 mb-1">IP 的纯净度与关联风险</p>
+                        <p class="text-[13px] text-slate-600 leading-relaxed">独享 IP：一个 Instagram 账号最好固定使用一个独享的住宅 IP。共享 IP 可能被其他滥用者污染，连累你的账号。</p>
+                        <p class="text-[13px] text-slate-600 leading-relaxed">IP 地理位置固定：确保 IP 的地理位置（国家、城市）是固定的。切忌今天美国纽约，明天英国伦敦。IP 的频繁跨国跳跃是高风险行为。</p>
+                        <p class="text-[13px] text-slate-600 leading-relaxed">IP 的"黑历史"：使用前，最好通过工具检查 IP 是否已被标记为滥用或进入黑名单。选择信誉良好的代理服务商。</p>
+                    </div>
+                </div>
+            `
+        },
+        {
+            title: '二、浏览器环境的匹配与隔离',
+            content: `
+                <div class="p-4 space-y-4">
+                    <p class="text-[13px] text-slate-600 leading-relaxed">IP 只是地址，浏览器环境则是你的"设备"。</p>
+                    <div>
+                        <p class="text-[14px] font-bold text-slate-800 mb-1">1. 使用指纹浏览器</p>
+                        <p class="text-[13px] text-slate-600 leading-relaxed">工具：AdsPower、Multilogin、Dolphin Anty 等。它们为每个账号创建独立的、防关联的浏览器环境。</p>
+                        <p class="text-[13px] text-slate-600 leading-relaxed mt-1">配置时必须确保以下要素与你的 IP 所在地完全匹配：时区、语言、地区/位置（在浏览器权限中设置）。</p>
+                        <p class="text-[13px] text-slate-600 leading-relaxed mt-1">设备模拟：优先模拟移动设备（如 iPhone 13、Samsung Galaxy S22），因为 Instagram 是移动端优先的应用。设置对应的分辨率。</p>
+                    </div>
+                    <div class="border-t border-slate-100 pt-3">
+                        <p class="text-[14px] font-bold text-slate-800 mb-1">2. 环境的纯洁性</p>
+                        <p class="text-[13px] text-slate-600 leading-relaxed">每次登录前，确保使用的是同一个浏览器配置文件。不要在多个不同环境或设备之间频繁切换登录同一个账号。</p>
+                        <p class="text-[13px] text-slate-600 leading-relaxed">清除环境中的任何异常插件或可能暴露自动化脚本的痕迹。</p>
+                    </div>
+                </div>
+            `
+        },
+        {
+            title: '三、账号本身的状态与操作行为',
+            content: `
+                <div class="p-4 space-y-4">
+                    <div>
+                        <p class="text-[14px] font-bold text-slate-800 mb-1">1. 账号注册地与 IP 地匹配</p>
+                        <p class="text-[13px] text-slate-600 leading-relaxed">新号：最好直接用目标国家的 IP 和环境进行注册。例如，你想做美国市场，就用美国住宅 IP 和美国环境注册。</p>
+                        <p class="text-[13px] text-slate-600 leading-relaxed mt-1">老号：如果老号原本在中国使用，突然切换到美国 IP 登录，这本身就是一个风险点。需要模拟"旅行"——切换后不要立即进行敏感操作，先像正常游客一样浏览几天。如果收到"是否是你本人在登录"的提示，如实确认。</p>
+                    </div>
+                    <div class="border-t border-slate-100 pt-3">
+                        <p class="text-[14px] font-bold text-slate-800 mb-1">2. 登录后的行为模式</p>
+                        <p class="text-[13px] text-slate-600 leading-relaxed">切勿立即操作：使用新 IP 登录后，不要马上开始关注、点赞或发帖。先浏览！</p>
+                        <p class="text-[13px] text-slate-600 leading-relaxed mt-1">模拟真人节奏：浏览首页、看看 Stories、刷刷 Reels，持续 10-15 分钟。让系统适应你的"新位置"。</p>
+                        <p class="text-[13px] text-slate-600 leading-relaxed mt-1">渐进式增加互动：在确认环境稳定后，再缓慢地、随机地进行点赞、关注等操作。避免规律性的、机器人的行为模式。</p>
+                    </div>
+                    <div class="border-t border-slate-100 pt-3">
+                        <p class="text-[14px] font-bold text-slate-800 mb-1">3. 双重验证</p>
+                        <p class="text-[13px] text-slate-600 leading-relaxed">如果账号开启了双重验证，确保你能在切换 IP 后接收到验证码（通过邮箱或备用手机号）。使用海外 IP 登录可能会触发安全验证。</p>
+                    </div>
+                </div>
+            `
+        },
+        {
+            title: '安全登录检查清单',
+            content: `
+                <div class="p-4">
+                    <div class="alert-box">
+                        稳定性、一致性和真实性是避免封号的关键。确保 IP 固定纯净 → 浏览器环境匹配 → 登录后先浏览养号 → 渐进式操作。
+                    </div>
                 </div>
             `
         }

@@ -9,7 +9,6 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: #f8fafc; color: #1e293b; }
-        .card { background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; }
         .tab-btn { flex: 1; padding: 12px 0; font-size: 14px; font-weight: bold; color: #64748b; border-bottom: 2px solid transparent; cursor: pointer; }
         .tab-btn.active { color: #2563eb; border-bottom-color: #2563eb; }
         .drawer-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 9999; display: none; }
@@ -28,43 +27,25 @@
     </header>
 
     <main class="max-w-lg mx-auto">
-        <div class="flex border-b border-slate-200 bg-white">
+        <div class="flex border-b border-slate-200 bg-white sticky top-[57px] z-40">
             <div class="tab-btn active" onclick="switchTab('service')">按服务接码</div>
             <div class="tab-btn" onclick="switchTab('keyword')">关键词监听</div>
             <div class="tab-btn" onclick="switchTab('longterm')">长期租借</div>
         </div>
 
-        <!-- 按服务 -->
-        <div id="tab-service" class="p-4 space-y-3">
-            <div class="card p-4 flex justify-between items-center cursor-pointer active:bg-slate-50 border-l-4 border-l-blue-500" onclick="openDrawer('Telegram')">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-500 flex items-center justify-center">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .33z"/></svg>
-                    </div>
-                    <div>
-                        <h3 class="text-[15px] font-bold text-slate-800">Telegram</h3>
-                        <p class="text-[12px] text-slate-500">支持 60+ 国家号码</p>
-                    </div>
-                </div>
-                <div class="text-right">
-                    <p class="text-[16px] font-bold text-orange-500">$0.15</p>
-                    <p class="text-[11px] text-slate-400">库存充足</p>
-                </div>
-            </div>
-            <div class="card p-4 flex justify-between items-center cursor-pointer active:bg-slate-50 border-l-4 border-l-green-500" onclick="openDrawer('WhatsApp')">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-green-100 text-green-500 flex items-center justify-center font-bold">W</div>
-                    <div>
-                        <h3 class="text-[15px] font-bold text-slate-800">WhatsApp</h3>
-                        <p class="text-[12px] text-slate-500">全球多国支持</p>
-                    </div>
-                </div>
-                <div class="text-right">
-                    <p class="text-[16px] font-bold text-orange-500">$0.25</p>
-                    <p class="text-[11px] text-slate-400">库存充足</p>
-                </div>
+        <!-- 搜索框 -->
+        <div class="p-4 bg-slate-50">
+            <div class="bg-white rounded-xl flex items-center px-3 py-2.5 border border-slate-200 shadow-sm">
+                <svg class="w-5 h-5 text-slate-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                <input type="text" id="search-input" oninput="renderServices()" placeholder="搜索 Telegram, WhatsApp, 推特..." class="bg-transparent outline-none text-[14px] w-full text-slate-700">
             </div>
         </div>
+
+        <!-- 服务列表 -->
+        <div id="tab-service" class="px-4 space-y-2 pb-10">
+            <div id="service-list"></div>
+        </div>
+        
         <div id="tab-keyword" class="p-4 hidden"><div class="text-center text-slate-400 py-10">关键词监听开发中...</div></div>
         <div id="tab-longterm" class="p-4 hidden"><div class="text-center text-slate-400 py-10">长期租借开发中...</div></div>
     </main>
@@ -77,26 +58,26 @@
             <button onclick="closeDrawer()" class="text-slate-400"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
         </div>
         
-        <!-- 步骤1：选国家 -->
         <div id="drawer-step-1">
             <p class="text-[13px] text-slate-500 mb-3">选择接收号码的国家/地区：</p>
             <div class="flex gap-2 overflow-x-auto no-scrollbar mb-6 pb-2">
-                <div class="px-4 py-2 bg-blue-50 border-2 border-blue-500 text-blue-600 rounded-lg text-sm font-bold whitespace-nowrap">美国 (+1)</div>
-                <div class="px-4 py-2 bg-slate-50 border border-slate-200 text-slate-600 rounded-lg text-sm font-bold whitespace-nowrap">英国 (+44)</div>
-                <div class="px-4 py-2 bg-slate-50 border border-slate-200 text-slate-600 rounded-lg text-sm font-bold whitespace-nowrap">印尼 (+62)</div>
+                <div class="px-4 py-2 bg-blue-50 border-2 border-blue-500 text-blue-600 rounded-lg text-sm font-bold whitespace-nowrap cursor-pointer">美国 (+1)</div>
+                <div class="px-4 py-2 bg-slate-50 border border-slate-200 text-slate-600 rounded-lg text-sm font-bold whitespace-nowrap cursor-pointer">英国 (+44)</div>
+                <div class="px-4 py-2 bg-slate-50 border border-slate-200 text-slate-600 rounded-lg text-sm font-bold whitespace-nowrap cursor-pointer">印尼 (+62)</div>
+                <div class="px-4 py-2 bg-slate-50 border border-slate-200 text-slate-600 rounded-lg text-sm font-bold whitespace-nowrap cursor-pointer">菲律宾 (+63)</div>
             </div>
-            <div class="bg-amber-50 text-amber-600 text-[12px] p-3 rounded-lg mb-4 border border-amber-100">
-                取号将冻结 $0.15，若未收到短信释放将全额退回。
+            <div class="bg-amber-50 text-amber-600 text-[12px] p-3 rounded-lg mb-4 border border-amber-100 flex justify-between">
+                <span>本次取号将冻结:</span>
+                <span class="font-bold" id="drawer-price">$0.15</span>
             </div>
             <button onclick="getNumber()" class="w-full py-3.5 bg-blue-600 text-white font-bold rounded-xl text-[16px] active:opacity-80">立即取号</button>
         </div>
 
-        <!-- 步骤2：等待接码 -->
         <div id="drawer-step-2" class="hidden">
             <div class="text-center py-2">
-                <p class="text-[13px] text-slate-500 mb-1">已冻结金额 $0.15，当前号码：</p>
-                <h4 class="text-[28px] font-bold text-slate-800 font-mono mb-2">+1 202 555 0143</h4>
-                <p class="text-[13px] text-blue-600 mb-6 font-bold" id="countdown">等待短信中 (14:59)</p>
+                <p class="text-[13px] text-slate-500 mb-1">当前号码 (等待短信中)：</p>
+                <h4 class="text-[26px] font-bold text-slate-800 font-mono mb-2">+1 202 555 0143</h4>
+                <p class="text-[13px] text-blue-600 mb-6 font-bold" id="countdown">14:59</p>
                 
                 <div class="w-16 h-16 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin mx-auto mb-6"></div>
                 <div class="text-[12px] text-slate-400 mb-6 bg-slate-50 p-3 rounded-lg">
@@ -116,6 +97,63 @@
         let balance = parseFloat(localStorage.getItem('user_balance') || '120.00');
         document.getElementById('sms-balance').innerText = balance.toFixed(2);
 
+        // 庞大的接码服务数据库
+        const servicesData = [
+            { name: 'Telegram', price: 0.15, color: 'bg-blue-100 text-blue-600', icon: 'TG' },
+            { name: 'WhatsApp', price: 0.25, color: 'bg-green-100 text-green-600', icon: 'WA' },
+            { name: 'Twitter / X', price: 0.18, color: 'bg-slate-800 text-white', icon: 'X' },
+            { name: 'Facebook', price: 0.20, color: 'bg-blue-600 text-white', icon: 'FB' },
+            { name: 'Instagram', price: 0.22, color: 'bg-pink-100 text-pink-600', icon: 'IG' },
+            { name: 'TikTok', price: 0.20, color: 'bg-black text-white', icon: 'TK' },
+            { name: 'Discord', price: 0.12, color: 'bg-indigo-100 text-indigo-600', icon: 'DC' },
+            { name: 'Google / Gmail', price: 0.10, color: 'bg-red-100 text-red-600', icon: 'G' },
+            { name: 'Apple ID', price: 0.35, color: 'bg-slate-100 text-slate-800', icon: 'A' },
+            { name: 'Amazon', price: 0.28, color: 'bg-orange-100 text-orange-600', icon: 'AM' },
+            { name: 'Tinder', price: 0.30, color: 'bg-pink-500 text-white', icon: 'TD' },
+            { name: 'Bumble', price: 0.32, color: 'bg-yellow-100 text-yellow-600', icon: 'BB' },
+            { name: 'Line', price: 0.15, color: 'bg-green-500 text-white', icon: 'LN' },
+            { name: 'WeChat', price: 0.45, color: 'bg-green-600 text-white', icon: 'WC' },
+            { name: 'PayPal', price: 0.50, color: 'bg-blue-800 text-white', icon: 'PP' },
+            { name: 'Uber', price: 0.22, color: 'bg-slate-800 text-white', icon: 'UB' },
+            { name: 'Steam', price: 0.18, color: 'bg-slate-900 text-white', icon: 'ST' },
+            { name: 'Microsoft / Outlook', price: 0.12, color: 'bg-blue-500 text-white', icon: 'MS' },
+            { name: 'Yahoo', price: 0.08, color: 'bg-purple-100 text-purple-600', icon: 'YH' },
+            { name: 'Tumblr', price: 0.10, color: 'bg-blue-900 text-white', icon: 'TB' }
+        ];
+
+        let currentProductName = '';
+        let currentProductPrice = 0;
+
+        function renderServices() {
+            const list = document.getElementById('service-list');
+            const keyword = document.getElementById('search-input').value.toLowerCase();
+            
+            const filtered = servicesData.filter(s => s.name.toLowerCase().includes(keyword));
+            
+            if(filtered.length === 0) {
+                list.innerHTML = '<div class="text-center py-10 text-slate-400 text-[14px]">没有找到相关接码服务</div>';
+                return;
+            }
+
+            list.innerHTML = filtered.map(s => `
+                <div class="bg-white rounded-xl p-4 border border-slate-100 shadow-sm flex items-center justify-between active:bg-slate-50 transition cursor-pointer mb-2" onclick="openDrawer('${s.name}', ${s.price})">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg ${s.color} flex items-center justify-center font-bold text-[14px]">
+                            ${s.icon}
+                        </div>
+                        <div>
+                            <h3 class="text-[15px] font-bold text-slate-800">${s.name}</h3>
+                            <p class="text-[12px] text-slate-400">支持多国号码</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[16px] font-bold text-orange-500">$${s.price.toFixed(2)}</p>
+                        <p class="text-[11px] text-green-500 mt-0.5">库存充足</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
         function switchTab(tab) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
@@ -124,26 +162,36 @@
             document.getElementById('tab-longterm').classList.add('hidden');
             document.getElementById('tab-' + tab).classList.remove('hidden');
         }
-        function openDrawer(name) {
+
+        function openDrawer(name, price) {
+            currentProductName = name;
+            currentProductPrice = price;
             document.getElementById('drawer-title').innerText = '获取 ' + name + ' 号码';
+            document.getElementById('drawer-price').innerText = '$' + price.toFixed(2);
             document.getElementById('drawer-step-1').classList.remove('hidden');
             document.getElementById('drawer-step-2').classList.add('hidden');
             document.getElementById('drawer-overlay').classList.add('active');
             document.getElementById('drawer-panel').classList.add('active');
         }
+
         function closeDrawer() {
             document.getElementById('drawer-overlay').classList.remove('active');
             document.getElementById('drawer-panel').classList.remove('active');
         }
+
         function getNumber() {
-            if(balance < 0.15) { alert('余额不足，请先充值'); return; }
+            if(balance < currentProductPrice) { alert('余额不足，请先充值'); return; }
             document.getElementById('drawer-step-1').classList.add('hidden');
             document.getElementById('drawer-step-2').classList.remove('hidden');
         }
+
         function releaseNumber() {
             closeDrawer();
             alert('号码已释放，冻结资金已退回！');
         }
+
+        // 初始渲染
+        renderServices();
     </script>
 </body>
 </html>

@@ -7,234 +7,155 @@
     <link rel="icon" href="/logo.jpg" type="image/jpeg">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
-        body { background-color: #f1f5f9; color: #1e293b; padding-bottom: 20px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #f8fafc; color: #1e293b; padding-bottom: 20px; }
+        .card { background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; }
+        .btn-press { transition: transform 0.1s; }
+        .btn-press:active { transform: scale(0.98); }
         
-        .no-scrollbar::-webkit-scrollbar { display: none; }
+        /* 分类标签胶囊 */
+        .pill-btn { padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: bold; white-space: nowrap; transition: all 0.2s; background: #f1f5f9; color: #64748b; }
+        .pill-btn.active { background: #3b82f6; color: #ffffff; shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3); }
 
-        /* 弹窗 */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 9999; display: none; align-items: flex-end; justify-content: center; }
-        .modal-overlay.active { display: flex; }
-        .modal-content { background: #fff; width: 100%; max-width: 400px; border-radius: 24px 24px 0 0; padding: 24px; padding-bottom: calc(24px + env(safe-area-inset-bottom)); animation: slideUp 0.2s ease-out; }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        /* 下拉筛选样式 */
+        .filter-select { appearance: none; background-color: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; font-size: 13px; color: #475569; outline: none; font-weight: 500;}
     </style>
 </head>
 <body>
+    <!-- 统一的高级 Header -->
     <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
         <div class="flex items-center gap-3">
-            <button onclick="window.history.back()" class="text-slate-600 text-xl font-bold px-2">←</button>
-            <h1 class="text-lg font-bold text-slate-800">数据接口开放平台</h1>
+            <a href="/index.html" class="text-slate-600 text-xl font-bold px-2">←</a>
+            <h1 class="text-[17px] font-bold text-slate-800">数据接口开放平台</h1>
         </div>
-        <div class="w-8 h-8 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center font-bold text-sm">晴</div>
+        <div class="w-8 h-8 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center font-bold">
+            <!-- 统一放置铃铛，去掉了原来的“晴”字 -->
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+        </div>
     </header>
 
-    <main>
-        <!-- 顶部导航 -->
-        <a href="/api-detail.html?id=1" class="block bg-white px-4 py-3 border-b border-slate-100 flex gap-4 text-sm font-medium text-slate-500 overflow-x-auto no-scrollbar">
-            <span class="text-blue-600 bg-blue-50 px-3 py-1.5 rounded-full">API接口</span>
-            <span class="py-1.5">使用说明</span>
-            <span class="py-1.5">用户中心</span>
-            <span class="py-1.5 flex items-center gap-1">官方频道 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></span>
+    <main class="max-w-lg mx-auto">
+        <!-- 横向滑动分类 -->
+        <div class="flex overflow-x-auto no-scrollbar gap-2 px-4 py-4 sticky top-[57px] bg-slate-50 z-40">
+            <div class="pill-btn active" onclick="selectCategory('全部', this)">全部</div>
+            <div class="pill-btn" onclick="selectCategory('实名认证', this)">实名认证</div>
+            <div class="pill-btn" onclick="selectCategory('生活服务', this)">生活服务</div>
+            <div class="pill-btn" onclick="selectCategory('手机号码', this)">手机号码</div>
         </div>
 
-        <!-- 一级分类胶囊 (可滑动) -->
-        <a href="/api-detail.html?id=1" class="block bg-white px-4 py-3 mb-3">
-            <div class="flex overflow-x-auto no-scrollbar gap-2" id="category-tabs">
-                <!-- JS 动态渲染 -->
-            </div>
+        <!-- 标题与统计 -->
+        <div class="px-4 mb-3">
+            <h2 class="text-[20px] font-extrabold text-slate-800 mb-1" id="current-cat-title">全部</h2>
+            <p class="text-[12px] text-slate-500">当前展示 <span class="text-blue-600 font-bold">8</span> 个接口，点击卡片查看详情并直接查询。</p>
         </div>
 
-        <!-- 列表区 -->
-        <div class="px-4">
-            <!-- 标题与筛选栏 -->
-            <div class="mb-3">
-                <h2 class="text-xl font-bold text-slate-800 mb-1" id="current-category-title">全部</h2>
-                <p class="text-xs text-slate-500" id="current-category-desc">当前展示 0 个接口，点击卡片查看详情并直接查询。</p>
-            </div>
+        <!-- 排序筛选栏 -->
+        <div class="px-4 flex gap-3 mb-4">
+            <select class="filter-select flex-1">
+                <option>排序：综合</option>
+                <option>排序：价格从低到高</option>
+                <option>排序：最新上架</option>
+            </select>
+            <select class="filter-select flex-1">
+                <option>付费类型：全部</option>
+                <option>付费类型：按次收费</option>
+                <option>付费类型：包月</option>
+            </select>
+        </div>
 
-            <div class="flex gap-3 mb-4 text-xs">
-                <!-- 排序按钮 -->
-                <button onclick="openFilterModal('sort')" class="flex items-center gap-1 text-slate-600 bg-white border border-slate-200 px-3 py-2 rounded-lg shadow-sm">
-                    <span id="sort-label">排序：综合</span> <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                </button>
-                <!-- 付费类型按钮 -->
-                <button onclick="openFilterModal('pay')" class="flex items-center gap-1 text-slate-600 bg-white border border-slate-200 px-3 py-2 rounded-lg shadow-sm">
-                    <span id="pay-label">付费类型：全部</span> <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                </button>
-            </div>
+        <!-- API 接口卡片列表 -->
+        <div id="api-list" class="px-4 pb-12 space-y-4">
+            
+            <!-- 卡片 1 -->
+            <a href="/api-detail.html?id=1" class="block card p-5 active:bg-slate-50 transition relative">
+                <div class="absolute top-5 right-5 text-[12px] text-slate-400">手机号码</div>
+                
+                <div class="w-10 h-10 rounded-xl bg-red-50 text-red-500 flex items-center justify-center mb-3">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                </div>
+                
+                <h3 class="text-[16px] font-bold text-slate-800 mb-1 flex items-center gap-2">
+                    手机号二要素认证 
+                    <span class="text-[10px] bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded border border-orange-200">热门</span>
+                </h3>
+                <p class="text-[13px] text-slate-500 leading-relaxed mb-4 line-clamp-2">运营商二要素检验，通过姓名+手机号进行信息比对，毫秒级返回。</p>
+                
+                <div class="flex gap-2 mb-4">
+                    <span class="text-[11px] bg-slate-100 text-slate-500 px-2 py-1 rounded">付费</span>
+                    <span class="text-[11px] bg-orange-50 text-orange-600 font-bold px-2 py-1 rounded">$0.045/次</span>
+                    <span class="text-[11px] bg-blue-50 text-blue-600 px-2 py-1 rounded">POST</span>
+                </div>
+                
+                <div class="flex justify-between items-center pt-3 border-t border-slate-50">
+                    <span class="text-[12px] text-slate-400">开发者 API</span>
+                    <span class="text-[12px] text-blue-600 font-bold flex items-center gap-1">查看详情并查询 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></span>
+                </div>
+            </a>
 
-            <!-- 接口卡片列表 -->
-            <div id="api-list" class="space-y-3 pb-10"></div>
+            <!-- 卡片 2 -->
+            <a href="/api-detail.html?id=2" class="block card p-5 active:bg-slate-50 transition relative">
+                <div class="absolute top-5 right-5 text-[12px] text-slate-400">手机号码</div>
+                
+                <div class="w-10 h-10 rounded-xl bg-red-50 text-red-500 flex items-center justify-center mb-3">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                </div>
+                
+                <h3 class="text-[16px] font-bold text-slate-800 mb-1 flex items-center gap-2">
+                    全网手机号三要素验证
+                    <span class="text-[10px] bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded border border-orange-200">热门</span>
+                </h3>
+                <p class="text-[13px] text-slate-500 leading-relaxed mb-4 line-clamp-2">全网运营商三要素检验 - 手机号+姓名+证件号实名验证，数据精准。</p>
+                
+                <div class="flex gap-2 mb-4">
+                    <span class="text-[11px] bg-slate-100 text-slate-500 px-2 py-1 rounded">付费</span>
+                    <span class="text-[11px] bg-orange-50 text-orange-600 font-bold px-2 py-1 rounded">$0.085/次</span>
+                    <span class="text-[11px] bg-blue-50 text-blue-600 px-2 py-1 rounded">POST</span>
+                </div>
+                
+                <div class="flex justify-between items-center pt-3 border-t border-slate-50">
+                    <span class="text-[12px] text-slate-400">开发者 API</span>
+                    <span class="text-[12px] text-blue-600 font-bold flex items-center gap-1">查看详情并查询 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></span>
+                </div>
+            </a>
+
+            <!-- 卡片 3 -->
+            <a href="/api-detail.html?id=3" class="block card p-5 active:bg-slate-50 transition relative">
+                <div class="absolute top-5 right-5 text-[12px] text-slate-400">实名认证</div>
+                
+                <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center mb-3">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"></path></svg>
+                </div>
+                
+                <h3 class="text-[16px] font-bold text-slate-800 mb-1">身份证实名认证核验</h3>
+                <p class="text-[13px] text-slate-500 leading-relaxed mb-4 line-clamp-2">输入姓名与身份证号码，校验两者是否一致，直连权威数据库。</p>
+                
+                <div class="flex gap-2 mb-4">
+                    <span class="text-[11px] bg-slate-100 text-slate-500 px-2 py-1 rounded">付费</span>
+                    <span class="text-[11px] bg-orange-50 text-orange-600 font-bold px-2 py-1 rounded">$0.12/次</span>
+                    <span class="text-[11px] bg-blue-50 text-blue-600 px-2 py-1 rounded">GET</span>
+                </div>
+                
+                <div class="flex justify-between items-center pt-3 border-t border-slate-50">
+                    <span class="text-[12px] text-slate-400">开发者 API</span>
+                    <span class="text-[12px] text-blue-600 font-bold flex items-center gap-1">查看详情并查询 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></span>
+                </div>
+            </a>
         </div>
     </main>
 
-    <!-- 筛选底部弹窗 -->
-    <div id="filter-modal" class="modal-overlay">
-        <div class="modal-content relative">
-            <h3 class="text-lg font-bold text-slate-800 mb-4" id="filter-title">排序方式</h3>
-            <div id="filter-options" class="space-y-2 mb-6">
-                <!-- JS 动态渲染选项 -->
-            </div>
-            <button onclick="closeFilterModal()" class="w-full py-3 bg-slate-100 text-slate-600 font-bold rounded-xl text-sm">取消</button>
-        </div>
-    </div>
-
     <script>
-        // 核心数据源
-        const categories = ['全部', '实名认证', '生活服务', '手机号码', '企业工商', '网站域名', '金融风险', '交通与车辆'];
-        
-        // 极其丰富的接口数据
-        const allApis = [
-            { id: 1, category: '手机号码', title: '手机号二要素认证', desc: '运营商二要素检验，通过姓名+手机号进行信息比对...', price: 0.045, isFree: false, type: 'POST', icon: 'phone', tag: '热门' },
-            { id: 2, category: '手机号码', title: '全网手机号三要素验证', desc: '全网运营商三要素检验-手机号+姓名+证件号实名验证...', price: 0.037, isFree: false, type: 'POST', icon: 'phone', tag: '热门' },
-            { id: 3, category: '交通与车辆', title: '名下ETC车辆查询', desc: '根据证件号码查询名下ETC车辆详情。', price: 0.377, isFree: false, type: 'POST', icon: 'car', tag: '热门' },
-            { id: 4, category: '金融风险', title: '司法综合数据查询', desc: '司法综合数据查询API接口，提供全国法院司法数据一站式检索服务...', price: 0.085, isFree: false, type: 'POST', icon: 'shield', tag: '热门' },
-            { id: 5, category: '网站域名', title: 'icp备案实时查询', desc: 'ICP域名备案实时查询根据域名实时返回查询域名的备案信息...', price: 0.006, isFree: false, type: 'POST', icon: 'globe', tag: '' },
-            { id: 6, category: '企业工商', title: '企业任职记录', desc: '企业任职记录，查询关联企业，一键实时查询名下企业，精准追溯任职经历。', price: 0.259, isFree: false, type: 'POST', icon: 'building', tag: '热门' },
-            { id: 7, category: '实名认证', title: '身份证实名认证', desc: '输入姓名和身份证号进行全国公民身份信息系统核验。', price: 0.02, isFree: false, type: 'POST', icon: 'idcard', tag: '' },
-            { id: 8, category: '生活服务', title: '天气预报查询', desc: '全国主要城市天气预报实时查询接口。', price: 0, isFree: true, type: 'GET', icon: 'cloud', tag: '免费' }
-        ];
-
-        let currentCategory = '全部';
-        let currentSort = '综合';
-        let currentPay = '全部';
-
-        // 渲染分类 Tab
-        function renderTabs() {
-            const container = document.getElementById('category-tabs');
-            container.innerHTML = categories.map(c => `
-                <button onclick="switchCategory('${c}')" class="whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${c === currentCategory ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-600'}">${c}</button>
-            `).join('');
-        }
-
-        // 切换分类
-        function switchCategory(cat) {
-            currentCategory = cat;
-            renderTabs();
-            renderList();
-        }
-
-        // 渲染接口列表
-        function renderList() {
-            // 更新标题
-            document.getElementById('current-category-title').innerText = currentCategory;
+        function selectCategory(cat, el) {
+            // 切换高亮
+            document.querySelectorAll('.pill-btn').forEach(btn => btn.classList.remove('active'));
+            el.classList.add('active');
             
-            // 1. 过滤分类
-            let list = allApis;
-            if (currentCategory !== '全部') {
-                list = list.filter(a => a.category === currentCategory);
-            }
-
-            // 2. 过滤付费类型
-            if (currentPay === '免费') {
-                list = list.filter(a => a.isFree);
-            } else if (currentPay === '付费') {
-                list = list.filter(a => !a.isFree);
-            }
-
-            // 3. 排序
-            if (currentSort === '价格最低') {
-                list.sort((a, b) => a.price - b.price);
-            } else if (currentSort === '价格最高') {
-                list.sort((a, b) => b.price - a.price);
-            }
-
-            document.getElementById('current-category-desc').innerText = `当前展示 ${list.length} 个接口，点击卡片查看详情并直接查询。`;
-
-            // 4. 渲染 HTML
-            const listEl = document.getElementById('api-list');
-            if (list.length === 0) {
-                listEl.innerHTML = '<div class="text-center py-10 text-slate-400 text-sm">该分类下暂无接口</div>';
-                return;
-            }
-
-            listEl.innerHTML = list.map(api => {
-                // 处理图标颜色
-                let iconColor = 'text-blue-500 bg-blue-50';
-                if(api.icon === 'phone') iconColor = 'text-red-500 bg-red-50';
-                if(api.icon === 'shield') iconColor = 'text-green-500 bg-green-50';
-                
-                // 价格展示
-                let priceHtml = api.isFree ? 
-                    `<span class="bg-green-50 text-green-600 px-2 py-1 rounded">免费</span>` : 
-                    `<span class="bg-orange-50 text-orange-600 px-2 py-1 rounded">$${api.price}/次</span>`;
-
-                return `
-                <a href="/api-detail.html?id=1" class="block bg-white rounded-2xl p-5 shadow-sm border border-slate-100 cursor-pointer active:scale-[0.98] transition-transform" onclick="window.location.href='/api-detail.html'">
-                    <div class="flex justify-between items-start mb-3">
-                        <div class="w-10 h-10 ${iconColor} rounded-xl flex items-center justify-center">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                        </div>
-                        <span class="text-xs text-slate-400">${api.category}</span>
-                    </div>
-                    <h3 class="text-[16px] font-bold text-slate-800 mb-1 flex items-center gap-2">
-                        ${api.title} ${api.tag ? `<span class="bg-orange-50 text-orange-500 text-[10px] px-1.5 py-0.5 rounded border border-orange-100">${api.tag}</span>` : ''}
-                    </h3>
-                    <p class="text-[13px] text-slate-500 leading-relaxed mb-4 line-clamp-2">${api.desc}</p>
-                    
-                    <div class="flex gap-2 text-[11px] font-medium mb-4">
-                        <span class="bg-slate-100 text-slate-500 px-2 py-1 rounded">${api.isFree ? '免费' : '付费'}</span>
-                        ${priceHtml}
-                        <span class="bg-blue-50 text-blue-600 px-2 py-1 rounded">${api.type}</span>
-                    </div>
-                    <div class="flex justify-between items-center border-t border-slate-50 pt-3">
-                        <span class="text-[11px] text-slate-400">开发者 API</span>
-                        <span class="text-[11px] text-blue-500 flex items-center gap-1">查看详情并查询 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></span>
-                    </div>
-                </div>
-                `;
-            }).join('');
+            // 修改标题
+            document.getElementById('current-cat-title').innerText = cat;
+            
+            // 这里可以接真实的过滤逻辑
         }
-
-        // 下拉筛选弹窗
-        function openFilterModal(type) {
-            const modal = document.getElementById('filter-modal');
-            const title = document.getElementById('filter-title');
-            const optionsEl = document.getElementById('filter-options');
-            let options = [];
-            let currentVal = '';
-
-            if (type === 'sort') {
-                title.innerText = '排序方式';
-                options = ['综合', '价格最低', '价格最高'];
-                currentVal = currentSort;
-            } else {
-                title.innerText = '付费类型';
-                options = ['全部', '免费', '付费'];
-                currentVal = currentPay;
-            }
-
-            optionsEl.innerHTML = options.map(opt => `
-                <button onclick="applyFilter('${type}', '${opt}')" class="w-full text-left px-4 py-3 rounded-lg ${opt === currentVal ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-700 hover:bg-slate-50'}">
-                    ${opt}
-                </button>
-            `).join('');
-
-            modal.classList.add('active');
-        }
-
-        function closeFilterModal() { document.getElementById('filter-modal').classList.remove('active'); }
-
-        // 应用筛选
-        function applyFilter(type, value) {
-            if (type === 'sort') {
-                currentSort = value;
-                document.getElementById('sort-label').innerText = `排序：${value}`;
-            } else {
-                currentPay = value;
-                document.getElementById('pay-label').innerText = `付费类型：${value}`;
-            }
-            closeFilterModal();
-            renderList();
-        }
-
-        // 初始化
-        document.addEventListener('DOMContentLoaded', () => {
-            renderTabs();
-            renderList();
-        });
     </script>
-<script src="/ai-widget.js"></script>
-<script src="/notice.js"></script>
+    <script src="/ai-widget.js"></script>
+    <script src="/notice.js"></script>
 </body>
 </html>

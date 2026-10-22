@@ -10,8 +10,23 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: #f8fafc; color: #1e293b; }
         .card { background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; }
-        .btn-press { transition: transform 0.1s, background-color 0.2s; }
-        .btn-press:active { transform: scale(0.97); background-color: #f1f5f9; }
+        .btn-press { transition: transform 0.1s; }
+        .btn-press:active { transform: scale(0.97); }
+        
+        /* Tab 样式 */
+        .tab-btn { flex: 1; padding: 14px 0; font-size: 14px; font-weight: bold; color: #64748b; border-bottom: 2px solid transparent; transition: all 0.2s; }
+        .tab-btn.active { color: #2563eb; border-bottom-color: #2563eb; }
+
+        /* AI 客服悬浮窗 */
+        .ai-chat-modal { position: fixed; inset: 0; background: rgba(15,23,42,0.5); backdrop-filter: blur(4px); z-index: 9999; display: none; justify-content: flex-end; flex-direction: column; }
+        .ai-chat-modal.active { display: flex; }
+        .ai-chat-panel { background: #fff; width: 100%; height: 85vh; border-radius: 20px 20px 0 0; display: flex; flex-direction: column; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .ai-chat-modal.active .ai-chat-panel { transform: translateY(0); }
+        
+        /* 聊天打字机光标 */
+        .typing-cursor::after { content: '▋'; animation: blink 1s step-end infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
+
         #toast { visibility: hidden; min-width: 200px; background-color: #334155; color: #fff; text-align: center; border-radius: 8px; padding: 10px 16px; position: fixed; z-index: 10000; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 13px; opacity: 0; transition: opacity 0.3s; }
         #toast.show { visibility: visible; opacity: 1; }
     </style>
@@ -40,7 +55,7 @@
                 <h3 class="text-[14px] font-bold text-orange-800">申请成为代理</h3>
                 <p class="text-[12px] text-orange-600 mt-1">享受最高 50% 专属返佣特权</p>
             </div>
-            <button onclick="applyAgent()" class="bg-orange-500 text-white text-[12px] font-bold px-4 py-2 rounded-lg active:opacity-80">立即申请</button>
+            <button onclick="showToast('已提交代理申请，客服将联系您')" class="bg-orange-500 text-white text-[12px] font-bold px-4 py-2 rounded-lg active:opacity-80">立即申请</button>
         </div>
 
         <!-- 四宫格数据看板 -->
@@ -53,65 +68,207 @@
                 <p class="text-[12px] text-slate-500 mb-1">有效订单 (笔)</p>
                 <p class="text-[20px] font-bold text-slate-800">8</p>
             </div>
-            <div class="card p-4">
+            <div class="card p-4 cursor-pointer active:bg-slate-50" onclick="window.location.href='/commission.html'">
                 <p class="text-[12px] text-slate-500 mb-1">佣金金额 (元)</p>
                 <p class="text-[20px] font-bold text-green-500">¥ 45.50</p>
             </div>
-            <div class="card p-4">
+            <div class="card p-4 cursor-pointer active:bg-slate-50" onclick="window.location.href='/commission.html'">
                 <p class="text-[12px] text-slate-500 mb-1">已提现 (元)</p>
                 <p class="text-[20px] font-bold text-slate-800">¥ 20.00</p>
             </div>
         </div>
 
-        <!-- 核心管理入口 -->
-        <div class="card overflow-hidden">
-            <a href="/commission.html" class="flex items-center justify-between p-4 border-b border-slate-50 active:bg-slate-50 btn-press cursor-pointer">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-lg bg-green-50 text-green-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
-                    <span class="text-[14px] font-bold text-slate-800">佣金管理</span>
-                </div>
-                <svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-            </a>
-            
-            <a href="/invite-logs.html#subordinates" class="flex items-center justify-between p-4 border-b border-slate-50 active:bg-slate-50 btn-press cursor-pointer">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg></div>
-                    <span class="text-[14px] font-bold text-slate-800">我的下级</span>
-                </div>
-                <svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-            </a>
-
-            <a href="/invite-logs.html#rebates" class="flex items-center justify-between p-4 active:bg-slate-50 btn-press cursor-pointer">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></div>
-                    <span class="text-[14px] font-bold text-slate-800">返佣订单</span>
-                </div>
-                <svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-            </a>
-        </div>
-
-        <!-- 佣金明细展示 -->
-        <div class="card p-4">
-            <div class="flex justify-between items-center mb-3">
-                <h3 class="text-[14px] font-bold text-slate-800">最近佣金明细</h3>
-                <a href="/invite-logs.html#details" class="text-[12px] text-blue-500">查看全部</a>
+        <!-- 佣金管理快捷入口 -->
+        <a href="/commission.html" class="card p-4 flex justify-between items-center active:bg-slate-50 block cursor-pointer">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-green-50 text-green-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
+                <span class="text-[15px] font-bold text-slate-800">资金管理与提现</span>
             </div>
-            <div class="space-y-3">
-                <div class="flex justify-between items-center border-b border-slate-50 pb-2">
-                    <div><p class="text-[13px] font-bold text-slate-700">下级消费返佣 (15%)</p><p class="text-[11px] text-slate-400">2026-10-22 14:30</p></div>
-                    <span class="text-[15px] font-bold text-green-500">+ ¥ 1.50</span>
-                </div>
-                <div class="flex justify-between items-center border-b border-slate-50 pb-2">
-                    <div><p class="text-[13px] font-bold text-slate-700">下级消费返佣 (15%)</p><p class="text-[11px] text-slate-400">2026-10-21 09:15</p></div>
-                    <span class="text-[15px] font-bold text-green-500">+ ¥ 0.45</span>
-                </div>
+            <svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+        </a>
+
+        <!-- 明细列表区 (无缝Tab) -->
+        <div class="bg-white rounded-xl border border-slate-100 overflow-hidden">
+            <div class="flex border-b border-slate-100 bg-slate-50/50">
+                <button onclick="switchTab('details')" id="tab-btn-details" class="tab-btn active">佣金明细</button>
+                <button onclick="switchTab('subordinates')" id="tab-btn-subordinates" class="tab-btn">我的下级</button>
+                <button onclick="switchTab('rebates')" id="tab-btn-rebates" class="tab-btn">返佣订单</button>
+            </div>
+            
+            <div class="bg-white">
+                <div id="list-container" class="w-full text-left"></div>
+            </div>
+            
+            <!-- 分页 -->
+            <div class="flex justify-between items-center p-4 border-t border-slate-100 bg-white">
+                <button class="px-4 py-1.5 bg-white border border-slate-200 text-slate-600 text-[13px] rounded-lg active:bg-slate-50">上一页</button>
+                <span class="text-[12px] text-slate-500 font-medium" id="page-info">第 1 页 · 每页 5 条</span>
+                <button class="px-4 py-1.5 bg-white border border-slate-200 text-slate-600 text-[13px] rounded-lg active:bg-slate-50">下一页</button>
             </div>
         </div>
     </main>
 
+    <!-- AI 智能客服悬浮球 -->
+    <div onclick="openAiChat()" class="fixed right-4 bottom-20 w-14 h-14 bg-blue-600 rounded-full shadow-lg shadow-blue-500/30 flex items-center justify-center cursor-pointer active:scale-90 transition-transform z-50">
+        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+    </div>
+
+    <!-- AI 聊天弹窗 -->
+    <div id="ai-chat-modal" class="ai-chat-modal" onclick="closeAiChat(event)">
+        <div class="ai-chat-panel" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center p-4 border-b border-slate-100">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-[15px] font-bold text-slate-800">AI 智能客服</h3>
+                        <p class="text-[11px] text-green-500">在线 | 秒级响应</p>
+                    </div>
+                </div>
+                <button onclick="closeAiChat()" class="text-slate-400 p-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+            </div>
+            
+            <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-4 bg-slate-50">
+                <!-- 欢迎语 -->
+                <div class="flex gap-2">
+                    <div class="w-8 h-8 rounded-full bg-blue-100 flex-shrink-0 flex items-center justify-center"><svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg></div>
+                    <div class="bg-white p-3 rounded-2xl rounded-tl-sm shadow-sm text-[13px] text-slate-700 leading-relaxed">
+                        您好，我是 SOCKS5 智能助理。请问有什么可以帮您？<br><br>
+                        <div class="flex flex-col gap-2 mt-2">
+                            <button onclick="askQuestion('如何对接API？')" class="text-left text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100">如何对接API？</button>
+                            <button onclick="askQuestion('提现多久到账？')" class="text-left text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100">提现多久到账？</button>
+                            <button onclick="askQuestion('佣金比例是多少？')" class="text-left text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100">佣金比例是多少？</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-3 border-t border-slate-100 bg-white flex gap-2 pb-safe">
+                <input type="text" id="chat-input" onkeypress="handleEnter(event)" class="flex-1 bg-slate-100 border-none rounded-full px-4 py-2.5 text-[14px] outline-none" placeholder="请输入您的问题...">
+                <button onclick="sendMessage()" class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center active:scale-95">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div id="toast">提示内容</div>
 
     <script>
+        // ========= 列表 Tab 切换逻辑 =========
+        const mockData = {
+            details: [
+                { title: '下级消费返佣 (15%)', id: '流水号: OD20261022140001', amount: '+ $1.50', time: '2026-10-22 14:30' },
+                { title: '下级消费返佣 (15%)', id: '流水号: OD20261021090002', amount: '+ $0.45', time: '2026-10-21 09:15' },
+                { title: '邀请注册奖励', id: '流水号: REG20261020180001', amount: '+ $2.00', time: '2026-10-20 18:00' }
+            ],
+            subordinates: [
+                { title: '用户 boss_01', id: '注册时间: 2026-10-22', amount: '有效', time: '累计消费: $15.00' },
+                { title: '用户 king_88', id: '注册时间: 2026-10-20', amount: '有效', time: '累计消费: $4.50' },
+                { title: '用户 test_user', id: '注册时间: 2026-10-15', amount: '未消费', time: '累计消费: $0.00' }
+            ],
+            rebates: [
+                { title: '手机号二要素认证 接口消费', id: '订单号: RB123456789', amount: '+ $0.045', time: '返佣比例: 15%' },
+                { title: 'Gmail 卡密购买', id: '订单号: RB987654321', amount: '+ $1.200', time: '返佣比例: 15%' }
+            ]
+        };
+
+        function switchTab(tab) {
+            ['details', 'subordinates', 'rebates'].forEach(t => {
+                const btn = document.getElementById(`tab-btn-${t}`);
+                if (t === tab) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+            renderList(tab);
+        }
+
+        function renderList(tab) {
+            const container = document.getElementById('list-container');
+            const data = mockData[tab];
+            let html = data.map(item => `
+                <div class="flex justify-between items-start px-4 py-3 border-b border-slate-100 hover:bg-slate-50">
+                    <div class="flex flex-col gap-1 pr-4">
+                        <span class="text-[13px] font-bold text-slate-800 line-clamp-1">${item.title}</span>
+                        <span class="text-[11px] text-slate-400">${item.id}</span>
+                    </div>
+                    <div class="flex flex-col items-end gap-1 shrink-0">
+                        <span class="text-[14px] font-bold ${tab === 'subordinates' ? 'text-blue-600' : 'text-green-600'}">${item.amount}</span>
+                        <span class="text-[11px] text-slate-400">${item.time}</span>
+                    </div>
+                </div>
+            `).join('');
+            container.innerHTML = html;
+        }
+
+        // ========= AI 客服逻辑 =========
+        function openAiChat() {
+            document.getElementById('ai-chat-modal').classList.add('active');
+            setTimeout(() => {
+                const msgs = document.getElementById('chat-messages');
+                msgs.scrollTop = msgs.scrollHeight;
+            }, 300);
+        }
+
+        function closeAiChat(e) {
+            if(e && e.target !== e.currentTarget) return;
+            document.getElementById('ai-chat-modal').classList.remove('active');
+        }
+
+        function handleEnter(e) {
+            if (e.key === 'Enter') sendMessage();
+        }
+
+        function askQuestion(q) {
+            document.getElementById('chat-input').value = q;
+            sendMessage();
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const msg = input.value.trim();
+            if (!msg) return;
+
+            appendMessage('user', msg);
+            input.value = '';
+            
+            // 模拟 AI 思考
+            setTimeout(() => {
+                let reply = "作为 AI 客服，我已经收到了您的问题。咱们平台的支付和接口对接都很简单，详细步骤可以看看底部的开发者文档哦。";
+                if (msg.includes('API')) reply = "对接 API 非常简单：前往【开发者控制台】获取您的专属 sk_live_xxx 密钥。每个接口独立密钥，请在请求头加上 Authorization: Bearer YOUR_API_KEY。如果还没权限，点击申请即可。";
+                if (msg.includes('提现')) reply = "提现需要在【佣金管理】中申请，最低 15 USDT。请务必填写真实的 TRC20 地址，财务人工审核后会在 24 小时内打款。";
+                if (msg.includes('佣金')) reply = "咱们目前的返佣政策是永久 15%！如果您申请成为代理，最高可以拿到 50% 的返佣特权。下级消费自动结算。";
+                
+                appendMessage('ai', reply);
+            }, 800);
+        }
+
+        function appendMessage(role, text) {
+            const msgs = document.getElementById('chat-messages');
+            const isAi = role === 'ai';
+            
+            const html = `
+                <div class="flex gap-2 ${isAi ? '' : 'flex-row-reverse'}">
+                    <div class="w-8 h-8 rounded-full ${isAi ? 'bg-blue-100 text-blue-600' : 'bg-slate-200 text-slate-600'} flex-shrink-0 flex items-center justify-center">
+                        ${isAi ? '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>' : '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>'}
+                    </div>
+                    <div class="bg-${isAi ? 'white' : 'blue-600'} p-3 rounded-2xl ${isAi ? 'rounded-tl-sm text-slate-700' : 'rounded-tr-sm text-white'} shadow-sm text-[13px] leading-relaxed max-w-[80%] ${isAi ? 'typing-cursor' : ''}">
+                        ${text}
+                    </div>
+                </div>
+            `;
+            msgs.insertAdjacentHTML('beforeend', html);
+            msgs.scrollTop = msgs.scrollHeight;
+            
+            // 移除打字机光标
+            if (isAi) {
+                setTimeout(() => {
+                    const cursors = msgs.querySelectorAll('.typing-cursor');
+                    cursors.forEach(c => c.classList.remove('typing-cursor'));
+                }, 1000);
+            }
+        }
+
         function copyLink() {
             const link = "https://web.lynli.me/register.html?ref=10001";
             if(navigator.clipboard && window.isSecureContext) {
@@ -125,14 +282,17 @@
                 document.body.removeChild(textArea);
             }
         }
-        function applyAgent() {
-            showToast('已提交代理申请，客服将联系您');
-        }
+
         function showToast(msg) {
             const toast = document.getElementById('toast');
             toast.innerText = msg; toast.className = 'show';
             setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 2500);
         }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            renderList('details');
+        });
     </script>
 </body>
 </html>

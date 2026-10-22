@@ -6,7 +6,7 @@
     <title>注册 - SOCKS5</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
-        body { background-color: #f8fafc; color: #1e293b; min-height: 100vh; display: flex; flex-direction: column; padding: 24px; justify-content: center;}
+        body { background-color: #f8fafc; color: #1e293b; min-height: 100vh; display: flex; flex-direction: column; padding: 24px; justify-content: center; position: relative; }
         .header { text-align: center; margin-bottom: 32px; }
         .header img { width: 64px; height: 64px; border-radius: 20px; margin-bottom: 16px; object-fit: cover; }
         .header h2 { font-size: 22px; font-weight: 700; }
@@ -23,8 +23,15 @@
         .agreement { display: flex; align-items: flex-start; gap: 8px; margin-top: 16px; font-size: 12px; color: #64748b; }
         .agreement input { margin-top: 2px; width: 14px; height: 14px; accent-color: #2563eb; }
         .agreement a { color: #2563eb; text-decoration: none; }
+        .footer { position: absolute; bottom: 24px; left: 0; right: 0; text-align: center; font-size: 12px; color: #94a3b8; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 9999; display: none; align-items: flex-end; justify-content: center; }
+        .modal-overlay.active { display: flex; }
+        .modal-content { background: white; width: 100%; max-width: 400px; border-radius: 24px 24px 0 0; padding: 24px; padding-bottom: 40px; max-height: 80vh; display: flex; flex-direction: column; animation: slideUp 0.3s ease-out; }
+        .modal-header { display: flex; justify-content: space-between; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 16px; }
+        .modal-body { font-size: 13px; color: #475569; line-height: 1.6; overflow-y: auto; }
         #toast { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); background: rgba(30,41,59,0.95); color: white; padding: 12px 24px; border-radius: 12px; font-size: 14px; transition: all 0.3s; z-index: 99999; }
         #toast.show { top: 30px; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -37,16 +44,28 @@
                 <input type="text" id="code" required placeholder="验证码">
                 <button type="button" id="send-code-btn" class="btn-code">获取验证码</button>
             </div>
-            <div class="input-group"><input type="password" id="password" required placeholder="设置密码 (至少8位)"></div>
+            <div class="input-group"><input type="password" id="password" required placeholder="设置密码"></div>
             
             <label class="agreement">
                 <input type="checkbox" id="agree-check">
-                <span>我已阅读并同意 <a href="javascript:void(0)">《用户协议》</a> 和 <a href="javascript:void(0)">《隐私政策》</a></span>
+                <span>我已阅读并同意 <a href="javascript:void(0)" onclick="openModal('terms')">《用户协议》</a> 和 <a href="javascript:void(0)" onclick="openModal('privacy')">《隐私政策》</a></span>
             </label>
             
             <button type="submit" class="btn-primary" id="submit-btn">立即注册</button>
         </form>
         <div class="link-text"><a href="/login.html">已有账号？返回登录</a></div>
+    </div>
+
+    <div class="footer">客服邮箱：boss@lynli.me</div>
+
+    <div id="info-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title" style="font-size:18px;font-weight:700;">标题</h3>
+                <button onclick="closeModal()" style="border:none;background:none;font-size:20px;color:#94a3b8;">✕</button>
+            </div>
+            <div class="modal-body" id="modal-body-content"></div>
+        </div>
     </div>
 
     <script>
@@ -59,7 +78,6 @@
             toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
         }
 
-        // 1. 获取验证码（纯前端调 Cloudflare Worker 发信）
         document.getElementById('send-code-btn').addEventListener('click', async function() {
             const email = document.getElementById('email').value;
             if(!email || !email.includes('@')) { showToast('请输入正确邮箱'); return; }
@@ -87,12 +105,11 @@
             }
         });
 
-        // 2. 提交注册（验证码正确后，去后端拿真 Token，免密进入）
         document.getElementById('reg-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             
             if (!document.getElementById('agree-check').checked) {
-                showToast('请先同意用户协议和隐私政策'); return;
+                showToast('请先同意协议'); return;
             }
 
             const btn = document.getElementById('submit-btn');
@@ -106,25 +123,38 @@
             btn.innerText = '正在进入...'; btn.disabled = true;
             
             try {
-                // 核心：只要验证码对了，直接去请求 702 网关，拿真实的 Token
-                const res = await fetch('https://api.lynli.me/api/v1/auth/sso-login', {
+                const res = await fetch('https://api.lynli.me/api/v1/auth/direct-register', {
                     method: 'POST', headers: {'Content-Type': 'application/json'}, 
-                    body: JSON.stringify({ platform: 'email', open_id: email, nickname: email.split('@')[0] })
+                    body: JSON.stringify({ email: email })
                 });
                 const data = await res.json();
                 
-                if (res.ok && data.code === 200) {
+                if (res.ok && data.data) {
                     localStorage.setItem('socks5_email', email);
                     localStorage.setItem('socks5_token', data.data.token);
-                    showToast('注册成功，正在进入...');
+                    showToast('注册成功');
                     setTimeout(() => window.location.href = '/index.html', 800);
                 } else { 
-                    showToast('系统异常'); btn.innerText = '立即注册'; btn.disabled = false;
+                    showToast('注册异常'); btn.innerText = '立即注册'; btn.disabled = false;
                 }
             } catch (err) { 
                 showToast('网络错误'); btn.innerText = '立即注册'; btn.disabled = false;
             }
         });
+
+        const modalContent = {
+            'privacy': { title: '隐私政策', text: '我们深知个人信息对您的重要性，并会尽全力保护您的个人信息安全可靠。未经您的同意，我们绝不会向任何第三方提供您的个人信息。' },
+            'terms': { title: '用户协议', text: '欢迎使用 SOCKS5 服务。本协议是您与 SOCKS5 之间关于您使用本服务所订立的协议。您在使用本服务时，必须遵守相关法律法规，不得利用本服务从事任何违法违规活动。' }
+        };
+        function openModal(type) {
+            const data = modalContent[type]; if(!data) return;
+            document.getElementById('modal-title').innerText = data.title;
+            document.getElementById('modal-body-content').innerText = data.text;
+            document.getElementById('info-modal').classList.add('active');
+        }
+        function closeModal() {
+            document.getElementById('info-modal').classList.remove('active');
+        }
     </script>
 </body>
 </html>

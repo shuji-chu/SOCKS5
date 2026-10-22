@@ -3,184 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>域名中心 - SOCKS5</title>
+    <title>域名分发中心 - SOCKS5</title>
     <link rel="icon" href="/logo.jpg" type="image/jpeg">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
-        body { background-color: #f1f5f9; color: #1e293b; padding-bottom: 20px; }
-        .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 9999; display: none; align-items: center; justify-content: center; }
-        .modal-overlay.active { display: flex; }
-        
-        .bottom-sheet { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-radius: 24px 24px 0 0; z-index: 10000; transform: translateY(100%); transition: transform 0.3s ease-out; padding: 24px; padding-bottom: calc(24px + env(safe-area-inset-bottom)); max-height: 90vh; overflow-y: auto; overscroll-behavior: contain; }
-        .bottom-sheet.active { transform: translateY(0); }
-        .sheet-overlay { z-index: 9998; background: rgba(0,0,0,0.5); display: none; position: fixed; inset: 0; backdrop-filter: blur(4px); }
-        .sheet-overlay.active { display: block; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #f8fafc; color: #1e293b; padding-bottom: 20px; }
+        .card { background: #ffffff; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; }
     </style>
 </head>
 <body>
-    <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center gap-3 sticky top-0 z-50">
-        <a href="/index.html" class="text-slate-600 text-xl font-bold px-2">←</a>
-        <h1 class="text-lg font-bold text-slate-800">免费域名中心</h1>
+    <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
+        <div class="flex items-center gap-3">
+            <a href="/index.html" class="text-slate-600 text-xl font-bold px-2">←</a>
+            <h1 class="text-[17px] font-bold text-slate-800">域名分发</h1>
+        </div>
     </header>
 
-    <main class="p-4">
-        <!-- 头部操作区 -->
-        <div class="grid grid-cols-2 gap-3 mb-4">
-            <button onclick="openRegisterModal()" class="bg-blue-500 text-white rounded-xl py-3 font-bold text-sm shadow-sm flex justify-center items-center gap-1 active:scale-95 transition-transform">
-                <span class="text-lg leading-none">+</span> 注册新域名
-            </button>
-            <a href="/invite.html" class="bg-white text-blue-500 border border-blue-500 rounded-xl py-3 font-bold text-sm flex justify-center items-center gap-1 shadow-sm active:scale-95 transition-transform">
-                邀请好友
-            </a>
+    <main class="px-4 py-6 max-w-lg mx-auto space-y-4">
+        <!-- 额度卡片 -->
+        <div class="card p-5 bg-gradient-to-br from-indigo-500 to-blue-600 text-white">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <p class="text-[13px] text-blue-100 mb-1">当前可用额度</p>
+                    <p class="text-[36px] font-extrabold" id="domain-quota">1</p>
+                </div>
+                <a href="/invite.html" class="bg-white/20 px-3 py-1.5 rounded-lg text-[12px] backdrop-blur-sm">获取更多额度</a>
+            </div>
+            <p class="text-[12px] text-blue-200">消费满 200 / 邀请 5 人 / 首单加群 即可获赠额度。有效期 90 天。</p>
         </div>
 
-        <div class="bg-white rounded-xl border border-slate-100 p-4 mb-4 shadow-sm">
-            <div class="flex justify-between items-center mb-3">
-                <h2 class="font-bold text-slate-800 text-sm flex items-center gap-2"><span class="w-1.5 h-3.5 bg-blue-500 rounded-full"></span>解锁免费域名额度</h2>
-                <button onclick="openQuotaModal()" class="bg-blue-50 text-blue-600 px-3 py-1 rounded text-xs font-bold">购买配额</button>
+        <!-- 注册模块 -->
+        <div class="card p-5">
+            <h3 class="text-[16px] font-bold text-slate-800 mb-4">免费注册二级域名</h3>
+            <div class="flex items-center bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 mb-4">
+                <input type="text" id="domain-input" placeholder="请输入您想要的前缀" class="bg-transparent outline-none flex-1 text-[15px]">
+                <span class="text-[15px] font-bold text-slate-400">.lynli.me</span>
             </div>
-            <div class="space-y-3 text-sm text-slate-600">
-                <div class="flex justify-between items-center">
-                    <span>下 1 单 + 加入 TG 签到群</span>
-                    <span class="text-xs text-green-500 bg-green-50 px-2 py-0.5 rounded">已达成</span>
-                </div>
-                <div class="flex justify-between items-center">
-                    <span>当前可用配额</span>
-                    <span class="text-red-500 font-bold">1 个</span>
-                </div>
-            </div>
+            <button onclick="registerDomain()" class="w-full py-3 bg-blue-600 text-white font-bold rounded-xl text-[15px] active:opacity-80">立即注册</button>
         </div>
-
-        <!-- 域名卡片 -->
-        <div class="bg-white rounded-xl border border-slate-100 p-5 shadow-sm mb-3">
-            <div class="flex items-center gap-2 mb-4">
-                <div class="w-8 h-8 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>
-                </div>
-                <h3 class="font-bold text-blue-600 text-[16px]">lynli.kz.ci</h3>
+        
+        <!-- 我的域名列表 -->
+        <div class="card overflow-hidden">
+            <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <h3 class="text-[15px] font-bold text-slate-800">我的域名</h3>
             </div>
-            <div class="mb-3">
-                <p class="text-xs text-slate-400 mb-1">状态</p>
-                <span class="bg-green-50 text-green-600 border border-green-200 text-xs px-2 py-0.5 rounded-full inline-flex items-center gap-1"><span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>正常</span>
-            </div>
-            <a href="/domain-manage.html" class="w-full border border-blue-500 text-blue-500 font-bold rounded-xl flex items-center justify-center gap-2 text-sm shadow-sm py-3 active:bg-blue-50">
-                管理域名 (解析/SSL)
-            </a>
+            <div id="domain-list" class="divide-y divide-slate-100"></div>
         </div>
     </main>
 
-    <!-- 1. 注册新域名抽屉 -->
-    <div id="reg-overlay" class="sheet-overlay" onclick="closeRegisterModal()"></div>
-    <div id="reg-drawer" class="bottom-sheet">
-        <div class="flex justify-between items-center mb-2">
-            <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-                <div class="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-lg leading-none">+</div>
-                注册新域名
-            </h3>
-            <button onclick="closeRegisterModal()" class="text-slate-400 text-xl px-2">✕</button>
-        </div>
-        <p class="text-xs text-slate-500 mb-5">选择根域名并输入前缀，快速注册一个专属您的免费域名</p>
-
-        <div class="mb-4">
-            <select id="reg-root" class="w-full bg-white border border-blue-400 rounded-lg px-3 py-3 text-sm font-medium outline-none">
-                <option value="">请选择根域名</option>
-                <option value="lynli.kz.ci">lynli.kz.ci</option>
-                <option value="lynli.me">lynli.me</option>
-                <option value="shuji.cc.cd">shuji.cc.cd</option>
-            </select>
-        </div>
-
-        <div class="mb-2">
-            <label class="block text-sm font-bold text-slate-700 mb-2">域名前缀</label>
-            <div class="flex">
-                <input type="text" id="reg-prefix" oninput="updatePreview()" placeholder="输入前缀，如: myblog" class="flex-1 bg-slate-50 border border-slate-200 rounded-l-lg px-3 py-3 text-sm outline-none border-r-0">
-                <div id="reg-suffix" class="bg-slate-100 border border-slate-200 rounded-r-lg px-3 py-3 text-sm text-slate-500 flex items-center min-w-[100px]">.请选择根域名</div>
-            </div>
-            <p class="text-[10px] text-slate-400 mt-1">2-63 位，仅支持字母、数字和连字符 -</p>
-        </div>
-
-        <div class="bg-[#fffbe6] border border-yellow-200 p-4 rounded-lg mb-4 text-xs leading-relaxed text-yellow-800">
-            <p class="font-bold mb-2">暂无域名免费注册额度，可通过下方功能获取注册额度 ↓ ↓ ↓</p>
-            <a href="/invite.html" class="text-blue-600 underline">前往奖励中心完成任务获取额度</a> 或者 <a href="javascript:void(0)" onclick="closeRegisterModal();openQuotaModal()" class="text-blue-600 underline">功能中心 → 购买注册配额</a>
-        </div>
-
-        <div class="bg-slate-50 border border-slate-100 p-4 rounded-lg mb-4">
-            <p class="text-xs text-slate-500 mb-1">完整域名预览</p>
-            <p class="text-sm font-bold text-slate-800" id="reg-preview">请选择根域名并输入前缀</p>
-        </div>
-
-        <div class="bg-blue-50 border border-blue-100 p-3 rounded-lg text-xs text-blue-700 mb-6 flex gap-2">
-            <svg class="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-            <div>
-                <p class="font-bold mb-1">注册成功后，您需要手动设置DNS解析</p>
-                <span class="underline cursor-pointer">查看完整说明 ></span>
-            </div>
-        </div>
-
-        <div class="flex gap-3">
-            <button onclick="closeRegisterModal()" class="flex-1 py-3 bg-white border border-slate-300 text-slate-700 font-bold rounded-xl text-sm">取消</button>
-            <button onclick="showToast('注册成功，请前往配置解析')" class="flex-1 py-3 bg-slate-300 text-white font-bold rounded-xl text-sm cursor-not-allowed">确认注册</button>
-        </div>
-    </div>
-
-    <!-- 2. 购买配额弹窗 (简化版) -->
-    <div id="quota-modal" class="modal-overlay">
-        <div class="bg-white rounded-2xl p-6 w-[90%] max-w-[340px] relative">
-            <button onclick="document.getElementById('quota-modal').classList.remove('active')" class="absolute top-3 right-3 text-slate-400 text-xl">✕</button>
-            <h3 class="text-lg font-bold text-slate-800 mb-4 text-center">购买注册配额</h3>
-            <select class="w-full border border-slate-200 rounded-lg p-3 text-sm mb-4"><option>5 个配额 - $2.00 USD</option></select>
-            <button onclick="showToast('正在生成支付账单...')" class="w-full py-3 bg-blue-500 text-white font-bold rounded-xl text-sm shadow-sm">提交购买</button>
-        </div>
-    </div>
-
+    <script src="/notice.js"></script>
+    <script src="/ai-widget.js"></script>
     <script>
-        function openRegisterModal() {
-            document.getElementById('reg-overlay').classList.add('active');
-            document.getElementById('reg-drawer').classList.add('active');
-        }
-        function closeRegisterModal() {
-            document.getElementById('reg-overlay').classList.remove('active');
-            document.getElementById('reg-drawer').classList.remove('active');
-        }
-        function openQuotaModal() { document.getElementById('quota-modal').classList.add('active'); }
+        // 初始化本地数据
+        let quota = parseInt(localStorage.getItem('domain_quota') || '1');
+        let myDomains = JSON.parse(localStorage.getItem('my_domains') || '[]');
+        document.getElementById('domain-quota').innerText = quota;
 
-        // 实时更新预览和根域名后缀
-        function updatePreview() {
-            const prefix = document.getElementById('reg-prefix').value;
-            const root = document.getElementById('reg-root').value;
-            const suffixEl = document.getElementById('reg-suffix');
-            const previewEl = document.getElementById('reg-preview');
-            
-            if(root) { suffixEl.innerText = `.${root}`; } 
-            else { suffixEl.innerText = `.请选择根域名`; }
-
-            if(prefix && root) { previewEl.innerText = `${prefix}.${root}`; } 
-            else { previewEl.innerText = '请选择根域名并输入前缀'; }
-        }
-
-        // 监听下拉框变化
-        document.getElementById('reg-root').addEventListener('change', updatePreview);
-
-        // 通用 Toast
-        let toastTimer;
-        function showToast(msg) {
-            let t = document.getElementById('toast');
-            if(!t) {
-                t = document.createElement('div');
-                t.id = 'toast';
-                t.className = 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black/80 text-white px-4 py-2 rounded-lg text-sm z-[9999] hidden text-center max-w-[80%]';
-                document.body.appendChild(t);
+        function renderDomains() {
+            const list = document.getElementById('domain-list');
+            if (myDomains.length === 0) {
+                list.innerHTML = '<div class="p-6 text-center text-slate-400 text-[13px]">暂无域名，快去注册一个吧</div>';
+                return;
             }
-            t.innerText = msg;
-            t.classList.remove('hidden');
-            clearTimeout(toastTimer);
-            toastTimer = setTimeout(() => t.classList.add('hidden'), 2000);
+            list.innerHTML = myDomains.map(d => `
+                <div class="p-4 flex justify-between items-center">
+                    <div>
+                        <p class="text-[15px] font-bold text-blue-600">${d.name}.lynli.me</p>
+                        <p class="text-[11px] text-slate-400 mt-1">注册时间: ${d.date} | 到期时间: ${d.expire}</p>
+                    </div>
+                    <a href="/domain-manage.html?domain=${d.name}" class="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-[13px] font-bold">管理</a>
+                </div>
+            `).join('');
         }
+
+        function registerDomain() {
+            const prefix = document.getElementById('domain-input').value.trim();
+            if (!prefix) { alert('请输入域名前缀'); return; }
+            if (quota <= 0) { alert('额度不足，请前往邀请页获取'); return; }
+            
+            const today = new Date();
+            const expireDate = new Date(today);
+            expireDate.setDate(today.getDate() + 90);
+
+            const newDomain = {
+                name: prefix,
+                date: today.toISOString().split('T')[0],
+                expire: expireDate.toISOString().split('T')[0]
+            };
+            myDomains.push(newDomain);
+            quota--;
+            
+            localStorage.setItem('my_domains', JSON.stringify(myDomains));
+            localStorage.setItem('domain_quota', quota.toString());
+            
+            document.getElementById('domain-quota').innerText = quota;
+            document.getElementById('domain-input').value = '';
+            renderDomains();
+            alert('注册成功！有效期 90 天。');
+        }
+
+        renderDomains();
     </script>
-<script src="/ai-widget.js"></script>
-
-
-<script src="/notice.js"></script>
 </body>
 </html>

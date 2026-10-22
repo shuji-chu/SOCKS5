@@ -140,7 +140,17 @@
             qrImg.classList.remove('hidden');
             modal.classList.add('active');
         }
-        function closeModal() { document.getElementById('pay-modal').classList.remove('active'); window.location.href = '/console.html'; }
+        function closeModal() { 
+            document.getElementById('pay-modal').classList.remove('active'); 
+            // 给余额加钱
+            const val = parseFloat(document.getElementById('recharge-amount').value) || 0;
+            let balance = parseFloat(localStorage.getItem('user_balance') || '120.00');
+            balance += val;
+            localStorage.setItem('user_balance', balance.toFixed(2));
+            
+            alert('充值成功！已到账 ' + val + ' 元');
+            window.location.href = '/console.html'; 
+        }
     </script>
 </body>
 </html>

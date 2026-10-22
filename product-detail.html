@@ -203,7 +203,10 @@
 
                 // 渲染数据
                 document.getElementById('p-title').innerText = currentProduct.title;
-                document.getElementById('p-price').innerText = `¥ ${currentProduct.price.toFixed(2)}`;
+                
+                // 动态币种符号
+                const symbol = currentProduct.currency === 'USDT' ? '$' : '¥';
+                document.getElementById('p-price').innerText = `${symbol} ${currentProduct.price.toFixed(2)}`;
                 document.getElementById('p-stock').innerText = currentProduct.stock;
                 document.getElementById('p-desc').innerHTML = currentProduct.desc;
                 
@@ -252,8 +255,9 @@
         function updateTotal() {
             const qty = parseInt(document.getElementById('buy-qty').value);
             const total = (qty * currentProduct.price).toFixed(2);
-            document.getElementById('total-amount').innerText = `¥ ${total}`;
-            document.getElementById('bottom-amount').innerText = `¥ ${total}`;
+            const symbol = currentProduct.currency === 'USDT' ? '$' : '¥';
+            document.getElementById('total-amount').innerText = `${symbol} ${total}`;
+            document.getElementById('bottom-amount').innerText = `${symbol} ${total}`;
         }
 
         function selectPayType(type) {
@@ -303,7 +307,8 @@
         let timeLeft = 600; // 600秒 = 10分钟
 
         function openPayModal() {
-            const total = parseFloat(document.getElementById('total-amount').innerText.replace('¥', ''));
+            const totalStr = document.getElementById('total-amount').innerText;
+            const total = parseFloat(totalStr.replace(/[¥$]/g, ''));
             
             // 初始化 UI
             document.getElementById('pay-modal').classList.add('active');
@@ -317,12 +322,14 @@
 
             if (currentPayType === 'alipay') {
                 tip.innerText = '请使用支付宝扫码付款';
-                amount.innerText = `¥ ${total.toFixed(2)}`;
+                // 如果商品本身是USDT，按汇率换算成人民币
+                amount.innerText = currentProduct.currency === 'USDT' ? `¥ ${(total * 8).toFixed(2)}` : `¥ ${total.toFixed(2)}`;
                 usdtAddr.classList.add('hidden');
                 qr.src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=alipay_order_' + total;
             } else {
                 tip.innerText = '请转账至以下 TRC20 地址';
-                amount.innerText = `${(total / 8).toFixed(2)} USDT`; // 模拟换算
+                // 如果商品本身是人民币，按汇率换算成USDT
+                amount.innerText = currentProduct.currency === 'USDT' ? `${total.toFixed(2)} USDT` : `${(total / 8).toFixed(2)} USDT`;
                 usdtAddr.classList.remove('hidden');
                 qr.src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=TYu8x9ZqP3vK2mN4wL5jR6tB7cV8bA9sD0';
             }

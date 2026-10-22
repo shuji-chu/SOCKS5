@@ -167,7 +167,7 @@
                                 ${(p.tags || []).map(t => `<span class="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded border border-slate-200">${t}</span>`).join('')}
                             </div>
                             <div class="flex justify-between items-end">
-                                <span class="text-[18px] font-bold text-red-500 leading-none">¥${p.price}</span>
+                                <span class="text-[18px] font-bold text-red-500 leading-none">${p.currency === 'USDT' ? '$' : '¥'}${p.price}</span>
                                 <span class="text-[11px] text-slate-400">${p.category === '接码服务' || p.category === '数据查询' ? '点击进入控制台' : '库存: <span class="text-green-500 font-medium">' + p.stock + '</span>'}</span>
                             </div>
                         </div>

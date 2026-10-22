@@ -12,7 +12,6 @@
         .card { background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; }
         .pill-btn { padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: bold; white-space: nowrap; background: #f1f5f9; color: #64748b; transition: all 0.2s; }
         .pill-btn.active { background: #2563eb; color: #ffffff; box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2); }
-        .filter-select { appearance: none; background-color: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; font-size: 13px; color: #475569; outline: none; font-weight: 500;}
     </style>
 </head>
 <body>
@@ -25,58 +24,44 @@
 
     <main class="max-w-lg mx-auto">
         <div class="flex overflow-x-auto no-scrollbar gap-2 px-4 py-4 sticky top-[57px] bg-slate-50 z-40">
-            <div class="pill-btn active" onclick="selectCategory('全部', this)">全部</div>
-            <div class="pill-btn" onclick="selectCategory('实名认证', this)">实名认证</div>
-            <div class="pill-btn" onclick="selectCategory('生活服务', this)">生活服务</div>
-            <div class="pill-btn" onclick="selectCategory('手机号码', this)">手机号码</div>
+            <div class="pill-btn active">全部接口</div>
+            <div class="pill-btn">实名认证</div>
+            <div class="pill-btn">生活服务</div>
         </div>
 
-        <div class="px-4 mb-3">
-            <h2 class="text-[20px] font-extrabold text-slate-800 mb-1" id="current-cat-title">全部</h2>
-            <p class="text-[12px] text-slate-500">当前展示 <span class="text-blue-600 font-bold">3</span> 个接口，点击卡片查看详情并直接查询。</p>
-        </div>
-
-        <div class="px-4 flex gap-3 mb-4">
-            <select class="filter-select flex-1">
-                <option>排序：综合</option>
-            </select>
-            <select class="filter-select flex-1">
-                <option>付费类型：全部</option>
-            </select>
-        </div>
-
-        <div id="api-list" class="px-4 pb-12 space-y-4">
+        <div class="px-4 pb-12 space-y-3">
             <!-- 卡片 1 -->
-            <a href="/api-detail.html?id=1" class="block card p-5 active:bg-slate-50 transition relative">
+            <a href="/api-detail.html?id=1" class="block card p-5 active:bg-slate-50 relative">
                 <div class="absolute top-5 right-5 text-[12px] text-slate-400">手机号码</div>
-                <div class="w-10 h-10 rounded-xl bg-red-50 text-red-500 flex items-center justify-center mb-3">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                </div>
-                <h3 class="text-[16px] font-bold text-slate-800 mb-1 flex items-center gap-2">
-                    手机号二要素认证 
-                    <span class="text-[10px] bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded border border-orange-200">热门</span>
-                </h3>
-                <p class="text-[13px] text-slate-500 leading-relaxed mb-4 line-clamp-2">运营商二要素检验，通过姓名+手机号进行信息比对。</p>
-                <div class="flex gap-2 mb-4">
-                    <span class="text-[11px] bg-slate-100 text-slate-500 px-2 py-1 rounded">付费</span>
+                <h3 class="text-[16px] font-bold text-slate-800 mb-1">手机号二要素认证</h3>
+                <p class="text-[13px] text-slate-500 mb-3 line-clamp-2">运营商二要素检验，通过姓名+手机号进行信息比对，毫秒级返回。</p>
+                <div class="flex gap-2 mb-3">
                     <span class="text-[11px] bg-orange-50 text-orange-600 font-bold px-2 py-1 rounded">$0.045/次</span>
                     <span class="text-[11px] bg-blue-50 text-blue-600 px-2 py-1 rounded">POST</span>
                 </div>
                 <div class="flex justify-between items-center pt-3 border-t border-slate-50">
                     <span class="text-[12px] text-slate-400">开发者 API</span>
-                    <span class="text-[12px] text-blue-600 font-bold flex items-center gap-1">查看详情并查询 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></span>
+                    <span class="text-[13px] text-blue-600 font-bold">查看详情 →</span>
+                </div>
+            </a>
+
+            <!-- 卡片 2 -->
+            <a href="/api-detail.html?id=2" class="block card p-5 active:bg-slate-50 relative">
+                <div class="absolute top-5 right-5 text-[12px] text-slate-400">实名认证</div>
+                <h3 class="text-[16px] font-bold text-slate-800 mb-1">身份证实名核验</h3>
+                <p class="text-[13px] text-slate-500 mb-3 line-clamp-2">输入姓名与身份证号，校验是否一致，直连权威库。</p>
+                <div class="flex gap-2 mb-3">
+                    <span class="text-[11px] bg-orange-50 text-orange-600 font-bold px-2 py-1 rounded">$0.120/次</span>
+                    <span class="text-[11px] bg-blue-50 text-blue-600 px-2 py-1 rounded">GET</span>
+                </div>
+                <div class="flex justify-between items-center pt-3 border-t border-slate-50">
+                    <span class="text-[12px] text-slate-400">开发者 API</span>
+                    <span class="text-[13px] text-blue-600 font-bold">查看详情 →</span>
                 </div>
             </a>
         </div>
     </main>
     <script src="/notice.js"></script>
     <script src="/ai-widget.js"></script>
-    <script>
-        function selectCategory(cat, el) {
-            document.querySelectorAll('.pill-btn').forEach(btn => btn.classList.remove('active'));
-            el.classList.add('active');
-            document.getElementById('current-cat-title').innerText = cat;
-        }
-    </script>
 </body>
 </html>

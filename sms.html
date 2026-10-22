@@ -12,8 +12,6 @@
         .card { background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; }
         .tab-btn { flex: 1; padding: 12px 0; font-size: 14px; font-weight: bold; color: #64748b; border-bottom: 2px solid transparent; cursor: pointer; }
         .tab-btn.active { color: #2563eb; border-bottom-color: #2563eb; }
-        
-        /* 底部抽屉 */
         .drawer-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 9999; display: none; }
         .drawer-overlay.active { display: block; }
         .drawer-panel { position: fixed; bottom: -100%; left: 0; right: 0; background: #fff; border-radius: 20px 20px 0 0; z-index: 10000; transition: bottom 0.3s ease; padding-bottom: env(safe-area-inset-bottom); }
@@ -26,19 +24,19 @@
             <a href="/index.html" class="text-slate-600 text-xl font-bold px-2">←</a>
             <h1 class="text-[17px] font-bold text-slate-800">接码控制台</h1>
         </div>
-        <div class="bg-blue-50 text-blue-600 px-3 py-1 rounded-lg text-[12px] font-bold">余额: $ 120.00</div>
+        <div class="bg-blue-50 text-blue-600 px-3 py-1 rounded-lg text-[12px] font-bold">余额: $ <span id="sms-balance">120.00</span></div>
     </header>
 
     <main class="max-w-lg mx-auto">
         <div class="flex border-b border-slate-200 bg-white">
-            <div class="tab-btn active" onclick="switchTab('service')">按服务</div>
-            <div class="tab-btn" onclick="switchTab('keyword')">关键词</div>
-            <div class="tab-btn" onclick="switchTab('longterm')">长租</div>
+            <div class="tab-btn active" onclick="switchTab('service')">按服务接码</div>
+            <div class="tab-btn" onclick="switchTab('keyword')">关键词监听</div>
+            <div class="tab-btn" onclick="switchTab('longterm')">长期租借</div>
         </div>
 
         <!-- 按服务 -->
         <div id="tab-service" class="p-4 space-y-3">
-            <div class="card p-4 flex justify-between items-center active:bg-slate-50 cursor-pointer" onclick="openDrawer('Telegram')">
+            <div class="card p-4 flex justify-between items-center cursor-pointer active:bg-slate-50 border-l-4 border-l-blue-500" onclick="openDrawer('Telegram')">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-500 flex items-center justify-center">
                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .33z"/></svg>
@@ -53,10 +51,22 @@
                     <p class="text-[11px] text-slate-400">库存充足</p>
                 </div>
             </div>
+            <div class="card p-4 flex justify-between items-center cursor-pointer active:bg-slate-50 border-l-4 border-l-green-500" onclick="openDrawer('WhatsApp')">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-green-100 text-green-500 flex items-center justify-center font-bold">W</div>
+                    <div>
+                        <h3 class="text-[15px] font-bold text-slate-800">WhatsApp</h3>
+                        <p class="text-[12px] text-slate-500">全球多国支持</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-[16px] font-bold text-orange-500">$0.25</p>
+                    <p class="text-[11px] text-slate-400">库存充足</p>
+                </div>
+            </div>
         </div>
-        
-        <div id="tab-keyword" class="p-4 hidden text-center text-slate-400 py-10">关键词监听功能准备中...</div>
-        <div id="tab-longterm" class="p-4 hidden text-center text-slate-400 py-10">长租号码功能准备中...</div>
+        <div id="tab-keyword" class="p-4 hidden"><div class="text-center text-slate-400 py-10">关键词监听开发中...</div></div>
+        <div id="tab-longterm" class="p-4 hidden"><div class="text-center text-slate-400 py-10">长期租借开发中...</div></div>
     </main>
 
     <!-- 底部半屏抽屉 -->
@@ -67,22 +77,33 @@
             <button onclick="closeDrawer()" class="text-slate-400"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
         </div>
         
+        <!-- 步骤1：选国家 -->
         <div id="drawer-step-1">
-            <p class="text-[13px] text-slate-500 mb-4">选择国家：</p>
-            <div class="flex gap-2 overflow-x-auto no-scrollbar mb-6">
-                <div class="px-4 py-2 bg-blue-50 border border-blue-200 text-blue-600 rounded-lg text-sm font-bold whitespace-nowrap">美国 (+1)</div>
+            <p class="text-[13px] text-slate-500 mb-3">选择接收号码的国家/地区：</p>
+            <div class="flex gap-2 overflow-x-auto no-scrollbar mb-6 pb-2">
+                <div class="px-4 py-2 bg-blue-50 border-2 border-blue-500 text-blue-600 rounded-lg text-sm font-bold whitespace-nowrap">美国 (+1)</div>
                 <div class="px-4 py-2 bg-slate-50 border border-slate-200 text-slate-600 rounded-lg text-sm font-bold whitespace-nowrap">英国 (+44)</div>
+                <div class="px-4 py-2 bg-slate-50 border border-slate-200 text-slate-600 rounded-lg text-sm font-bold whitespace-nowrap">印尼 (+62)</div>
             </div>
-            <button onclick="getNumber()" class="w-full py-3.5 bg-blue-600 text-white font-bold rounded-xl text-[16px] active:opacity-80">立即取号 (冻结 $0.15)</button>
+            <div class="bg-amber-50 text-amber-600 text-[12px] p-3 rounded-lg mb-4 border border-amber-100">
+                取号将冻结 $0.15，若未收到短信释放将全额退回。
+            </div>
+            <button onclick="getNumber()" class="w-full py-3.5 bg-blue-600 text-white font-bold rounded-xl text-[16px] active:opacity-80">立即取号</button>
         </div>
 
+        <!-- 步骤2：等待接码 -->
         <div id="drawer-step-2" class="hidden">
-            <div class="text-center py-4">
-                <p class="text-[13px] text-slate-500 mb-2">已为您分配号码：</p>
-                <h4 class="text-[28px] font-bold text-slate-800 font-mono mb-4">+1 202 555 0143</h4>
-                <p class="text-[13px] text-blue-600 mb-6">正在等待接收短信验证码...</p>
-                <div class="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-6"></div>
-                <button onclick="closeDrawer()" class="w-full py-3.5 bg-slate-100 text-slate-600 font-bold rounded-xl text-[16px]">释放号码并退款</button>
+            <div class="text-center py-2">
+                <p class="text-[13px] text-slate-500 mb-1">已冻结金额 $0.15，当前号码：</p>
+                <h4 class="text-[28px] font-bold text-slate-800 font-mono mb-2">+1 202 555 0143</h4>
+                <p class="text-[13px] text-blue-600 mb-6 font-bold" id="countdown">等待短信中 (14:59)</p>
+                
+                <div class="w-16 h-16 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin mx-auto mb-6"></div>
+                <div class="text-[12px] text-slate-400 mb-6 bg-slate-50 p-3 rounded-lg">
+                    请将上方号码填入目标 APP 获取验证码。<br>收到短信后，此处会自动显示验证码。
+                </div>
+                
+                <button onclick="releaseNumber()" class="w-full py-3.5 bg-slate-100 text-slate-600 font-bold rounded-xl text-[16px]">未收到短信，释放号码并退款</button>
             </div>
         </div>
         <div class="h-6"></div>
@@ -91,6 +112,10 @@
     <script src="/notice.js"></script>
     <script src="/ai-widget.js"></script>
     <script>
+        // 真实余额显示
+        let balance = parseFloat(localStorage.getItem('user_balance') || '120.00');
+        document.getElementById('sms-balance').innerText = balance.toFixed(2);
+
         function switchTab(tab) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
@@ -111,8 +136,13 @@
             document.getElementById('drawer-panel').classList.remove('active');
         }
         function getNumber() {
+            if(balance < 0.15) { alert('余额不足，请先充值'); return; }
             document.getElementById('drawer-step-1').classList.add('hidden');
             document.getElementById('drawer-step-2').classList.remove('hidden');
+        }
+        function releaseNumber() {
+            closeDrawer();
+            alert('号码已释放，冻结资金已退回！');
         }
     </script>
 </body>

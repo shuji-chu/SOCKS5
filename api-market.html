@@ -9,12 +9,11 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: #f8fafc; color: #1e293b; padding-bottom: 20px; }
-        .card { background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; }
+        .card { background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.03); border: 1px solid #f1f5f9; }
         .pill-btn { padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: bold; white-space: nowrap; background: #f1f5f9; color: #64748b; transition: all 0.2s; cursor: pointer; }
         .pill-btn.active { background: #2563eb; color: #ffffff; box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2); }
         .filter-select { appearance: none; background-color: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; font-size: 13px; color: #475569; outline: none; font-weight: 500; cursor: pointer;}
         
-        /* 分页按钮样式 */
         .page-btn { padding: 6px 12px; border-radius: 8px; border: 1px solid #e2e8f0; background: #fff; color: #475569; font-size: 13px; cursor: pointer; transition: all 0.2s; }
         .page-btn:hover:not(:disabled) { background: #f8fafc; }
         .page-btn.active { background: #2563eb; color: #fff; border-color: #2563eb; }
@@ -60,7 +59,7 @@
             <p class="text-[12px] text-slate-500">当前展示 <span class="text-blue-600 font-bold" id="total-count">0</span> 个接口。</p>
         </div>
 
-        <!-- 排序与付费筛选 -->
+        <!-- 排序与筛选 -->
         <div class="px-4 flex gap-3 mb-4">
             <select id="sort-select" onchange="handleFilterChange()" class="filter-select flex-1">
                 <option value="default">排序：综合</option>
@@ -77,10 +76,8 @@
         <!-- 列表容器 -->
         <div id="api-list" class="px-4 pb-6 space-y-4"></div>
 
-        <!-- 真实分页控制区 -->
-        <div id="pagination" class="flex justify-center items-center gap-2 px-4 pb-12 mt-4 flex-wrap">
-            <!-- JS 动态渲染 -->
-        </div>
+        <!-- 分页 -->
+        <div id="pagination" class="flex justify-center items-center gap-2 px-4 pb-12 mt-4 flex-wrap"></div>
     </main>
 
     <script src="/api-data.js"></script>
@@ -90,8 +87,9 @@
     <script>
         let currentCategory = '全部';
         let currentPage = 1;
-        const pageSize = 10; // 每页 10 条
+        const pageSize = 10;
 
+        // 大厂同款纯色极简图标
         const categoryIcons = {
             '手机号码': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>',
             '实名认证': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>',
@@ -118,32 +116,30 @@
             document.querySelectorAll('.pill-btn').forEach(btn => btn.classList.remove('active'));
             el.classList.add('active');
             currentCategory = cat;
-            currentPage = 1; // 切换分类重置页码
+            currentPage = 1;
             document.getElementById('current-title').innerText = cat === '全部' ? '全部接口' : cat + '接口';
             renderApis();
         }
 
         function handleFilterChange() {
-            currentPage = 1; // 改变排序或筛选时重置页码
+            currentPage = 1;
             renderApis();
         }
 
         function changePage(page) {
             currentPage = page;
             renderApis();
-            window.scrollTo({ top: 300, behavior: 'smooth' }); // 翻页后轻微上滑
+            window.scrollTo({ top: 300, behavior: 'smooth' });
         }
 
         function renderApis() {
             const list = document.getElementById('api-list');
             let filtered = [...apisData];
 
-            // 1. 分类过滤
             if (currentCategory !== '全部') {
                 filtered = filtered.filter(a => a.category === currentCategory);
             }
 
-            // 2. 付费类型过滤
             const payType = document.getElementById('pay-type-select').value;
             if (payType === 'paid') {
                 filtered = filtered.filter(a => a.price !== '免费');
@@ -151,7 +147,6 @@
                 filtered = filtered.filter(a => a.price === '免费');
             }
 
-            // 3. 排序
             const sortType = document.getElementById('sort-select').value;
             if (sortType === 'price-asc') {
                 filtered.sort((a, b) => {
@@ -169,64 +164,58 @@
 
             document.getElementById('total-count').innerText = filtered.length;
 
-            // 4. 分页截取
             const totalPages = Math.ceil(filtered.length / pageSize) || 1;
             if (currentPage > totalPages) currentPage = totalPages;
             
             const startIdx = (currentPage - 1) * pageSize;
             const pageData = filtered.slice(startIdx, startIdx + pageSize);
 
-            // 渲染列表
             if (pageData.length === 0) {
                 list.innerHTML = '<div class="text-center py-12 text-slate-400 text-[14px]">没有符合条件的接口</div>';
             } else {
                 list.innerHTML = pageData.map(api => {
                     const iconPath = categoryIcons[api.category] || categoryIcons['默认'];
                     const colorClass = categoryColors[api.category] || categoryColors['默认'];
+                    const isFree = api.price === '免费';
 
                     return `
-                    <a href="/api-detail.html?id=${api.id}" class="block card p-5 active:bg-slate-50 transition relative">
-                        <div class="flex justify-between items-start mb-3">
-                            <div class="w-12 h-12 rounded-xl relative overflow-hidden shrink-0 shadow-sm border border-slate-100">
-                                <img src="https://picsum.photos/seed/${api.id}/100/100" class="absolute inset-0 w-full h-full object-cover opacity-80">
-                                <div class="absolute inset-0 flex items-center justify-center bg-white/50 backdrop-blur-sm ${colorClass}">
-                                    <svg class="w-6 h-6 drop-shadow-md" fill="none" stroke="currentColor" viewBox="0 0 24 24">${iconPath}</svg>
-                                </div>
+                    <a href="/api-detail.html?id=${api.id}" class="block card p-4 active:bg-slate-50 transition">
+                        <!-- 头部：分类 + 图标 -->
+                        <div class="flex items-center gap-1.5 mb-2">
+                            <div class="w-5 h-5 rounded flex items-center justify-center ${colorClass}">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">${iconPath}</svg>
                             </div>
-                            <div class="text-right">
-                                <p class="text-[12px] text-slate-500 font-bold">${api.category}</p>
-                                <p class="text-[11px] text-slate-400 font-mono mt-1">ID: ${api.id}</p>
-                            </div>
+                            <span class="text-[12px] text-slate-500">${api.category}</span>
                         </div>
                         
-                        <h3 class="text-[16px] font-bold text-slate-800 mb-1 flex items-center gap-2">
+                        <!-- 标题 -->
+                        <h3 class="text-[16px] font-bold text-slate-800 mb-2 flex items-center gap-2">
                             ${api.title}
-                            ${api.isHot ? '<span class="text-[10px] bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded border border-orange-200">热门</span>' : ''}
-                            ${api.status === '维护' ? '<span class="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded border border-slate-200">维护</span>' : ''}
+                            ${api.isHot ? '<span class="text-[10px] bg-orange-100 text-orange-600 px-1 py-0.5 rounded font-normal">热门</span>' : ''}
                         </h3>
                         
-                        <p class="text-[13px] text-slate-500 leading-relaxed mb-4 line-clamp-2">${api.desc}</p>
+                        <!-- 描述 -->
+                        <p class="text-[13px] text-slate-500 leading-relaxed mb-4 line-clamp-3">${api.desc}</p>
                         
-                        <div class="flex gap-2 mb-4">
-                            <span class="text-[11px] bg-slate-100 text-slate-500 px-2 py-1 rounded">${api.price === '免费' ? '免费' : '付费'}</span>
-                            <span class="text-[11px] ${api.price === '免费' ? 'bg-green-50 text-green-600' : 'bg-orange-50 text-orange-600'} font-bold px-2 py-1 rounded">${api.price === '免费' ? '免费' : '$' + api.price + '/次'}</span>
+                        <!-- 标签组 -->
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="text-[11px] bg-slate-100 text-slate-500 px-2 py-1 rounded">${isFree ? '免费' : '付费'}</span>
+                            <span class="text-[11px] ${isFree ? 'bg-green-50 text-green-600' : 'bg-orange-50 text-orange-600'} font-bold px-2 py-1 rounded">${isFree ? '免费' : '$' + api.price + '/次'}</span>
                             <span class="text-[11px] bg-blue-50 text-blue-600 px-2 py-1 rounded">${api.method}</span>
                         </div>
                         
-                        <div class="flex justify-between items-center pt-3 border-t border-slate-50">
+                        <!-- 底部操作 -->
+                        <div class="flex justify-between items-center pt-3 border-t border-slate-100">
                             <span class="text-[12px] text-slate-400">开发者 API</span>
-                            <span class="text-[13px] text-blue-600 font-bold flex items-center gap-1">查看文档并测试 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></span>
+                            <span class="text-[13px] text-blue-600 font-bold flex items-center gap-1">查看文档 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></span>
                         </div>
                     </a>
                     `;
                 }).join('');
             }
 
-            // 渲染分页按钮
             const pagination = document.getElementById('pagination');
             let phtml = `<button class="page-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>上一页</button>`;
-            
-            // 显示最大 5 个页码
             let startPage = Math.max(1, currentPage - 2);
             let endPage = Math.min(totalPages, startPage + 4);
             if (endPage - startPage < 4) startPage = Math.max(1, endPage - 4);
@@ -234,7 +223,6 @@
             for (let i = startPage; i <= endPage; i++) {
                 phtml += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
             }
-
             phtml += `<button class="page-btn" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>下一页</button>`;
             pagination.innerHTML = phtml;
         }

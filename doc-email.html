@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>邮箱网关文档 - SOCKS5</title>
+    <link rel="icon" href="/logo.jpg" type="image/jpeg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #f8fafc; color: #1e293b; scroll-behavior: smooth; }
+        .card { background: #ffffff; border-radius: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); border: 1px solid #f1f5f9; }
+        .num-box { width: 28px; height: 28px; background: #eff6ff; color: #2563eb; font-weight: bold; font-size: 14px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .code-wrapper { position: relative; margin: 12px 0 20px 0; }
+        .code-block { background: #1e293b; color: #e2e8f0; padding: 16px; border-radius: 10px; font-family: 'Courier New', Courier, monospace; font-size: 13px; overflow-y: auto; max-height: 300px; line-height: 1.6; white-space: pre-wrap; word-wrap: break-word; }
+        .copy-btn { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.1); color: #cbd5e1; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-family: sans-serif; cursor: pointer; transition: all 0.2s; }
+        .copy-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
+        
+        .nav-dot { width: 6px; height: 6px; border-radius: 50%; background: #cbd5e1; display: inline-block; margin-right: 8px; transition: all 0.2s; }
+        .nav-item.active .nav-dot { background: #2563eb; width: 16px; border-radius: 4px; }
+        .nav-item.active { color: #2563eb; font-weight: bold; }
+        
+        .api-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 13px; }
+        .api-table th { text-align: left; padding: 10px 12px; background: #f1f5f9; color: #475569; font-weight: bold; border-bottom: 1px solid #e2e8f0; }
+        .api-table td { padding: 12px; border-bottom: 1px solid #e2e8f0; color: #1e293b; background: #fff; line-height: 1.5; }
+        .api-table td:first-child { font-family: 'Courier New', Courier, monospace; color: #2563eb; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center gap-3 sticky top-0 z-50">
+        <a href="/guide.html" class="text-slate-600 text-xl font-bold px-2">←</a>
+        <h1 class="text-[17px] font-bold text-slate-800">邮箱网关 API</h1>
+    </header>
+
+    <main class="px-4 py-6 pb-24 max-w-2xl mx-auto">
+        <!-- Hero 区域 -->
+        <div class="mb-8">
+            <h2 class="text-[26px] font-extrabold text-slate-800 mb-2 tracking-tight">企业级邮件推送网关</h2>
+            <p class="text-[14px] text-slate-500 mb-5 leading-relaxed">支持绑定自定义域名、全托管代发，助您瞬间触达全球客户，直达收件箱不进垃圾邮件。</p>
+            <div class="flex flex-wrap gap-2">
+                <span class="bg-blue-50 text-blue-600 text-[12px] font-bold px-3 py-1 rounded-full">全自动解析绑定</span>
+                <span class="bg-blue-50 text-blue-600 text-[12px] font-bold px-3 py-1 rounded-full">高可用 SMTP 池</span>
+                <span class="bg-blue-50 text-blue-600 text-[12px] font-bold px-3 py-1 rounded-full">自定义发件前缀</span>
+            </div>
+        </div>
+
+        <!-- 导航锚点 -->
+        <div class="flex overflow-x-auto no-scrollbar gap-6 border-b border-slate-200 pb-3 mb-8 text-[13px] text-slate-500">
+            <a href="#step1" class="nav-item active flex items-center whitespace-nowrap"><span class="nav-dot"></span>快速接入</a>
+            <a href="#step2" class="nav-item flex items-center whitespace-nowrap"><span class="nav-dot"></span>核心概念</a>
+            <a href="#step3" class="nav-item flex items-center whitespace-nowrap"><span class="nav-dot"></span>发信接口</a>
+            <a href="#step4" class="nav-item flex items-center whitespace-nowrap"><span class="nav-dot"></span>充值计费</a>
+            <a href="#step5" class="nav-item flex items-center whitespace-nowrap"><span class="nav-dot"></span>调试排查</a>
+        </div>
+
+        <!-- 01 快速接入 -->
+        <div id="step1" class="mb-12 scroll-mt-20">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="num-box">01</div>
+                <h3 class="text-[18px] font-bold text-slate-800">快速接入流程</h3>
+            </div>
+            <p class="text-[13px] text-slate-500 mb-4">三步完成配置，即刻开始海量发信。</p>
+            
+            <div class="space-y-3">
+                <div class="card p-4 flex gap-4 items-start">
+                    <div class="text-[12px] font-bold text-blue-500 bg-blue-50 px-2 py-1 rounded">01</div>
+                    <div>
+                        <h4 class="text-[14px] font-bold text-slate-800 mb-1">获取网关 Key</h4>
+                        <p class="text-[13px] text-slate-500">在控制台申请 `sk_email_` 开头的专属密钥。</p>
+                    </div>
+                </div>
+                <div class="card p-4 flex gap-4 items-start">
+                    <div class="text-[12px] font-bold text-blue-500 bg-blue-50 px-2 py-1 rounded">02</div>
+                    <div>
+                        <h4 class="text-[14px] font-bold text-slate-800 mb-1">提交域名核实（可选）</h4>
+                        <p class="text-[13px] text-slate-500">在控制台绑定您的域名。您只需配置 CNAME，系统核实无误后自动绑定生效。</p>
+                    </div>
+                </div>
+                <div class="card p-4 flex gap-4 items-start">
+                    <div class="text-[12px] font-bold text-blue-500 bg-blue-50 px-2 py-1 rounded">03</div>
+                    <div>
+                        <h4 class="text-[14px] font-bold text-slate-800 mb-1">开始调用 API 代发</h4>
+                        <p class="text-[13px] text-slate-500">调用发信接口，传入您自定义的前缀（如 `noreply`），平台将为您全托管发送。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 02 核心概念 -->
+        <div id="step2" class="mb-12 scroll-mt-20">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="num-box">02</div>
+                <h3 class="text-[18px] font-bold text-slate-800">核心概念与代发机制</h3>
+            </div>
+            
+            <div class="grid grid-cols-1 gap-3">
+                <div class="card p-5">
+                    <h4 class="text-[14px] font-bold text-slate-800 mb-2">1. 专属域名绑定 & 自动核实</h4>
+                    <p class="text-[13px] text-slate-600 leading-relaxed">您可以将您的品牌域名（如 `@yourdomain.com`）绑定到本平台。系统会给出解析记录，<b>APP 或网站确认归属后，自动绑定发送</b>，无需人工干预。</p>
+                </div>
+                <div class="card p-5">
+                    <h4 class="text-[14px] font-bold text-slate-800 mb-2">2. 全托管代发 (无需自建)</h4>
+                    <p class="text-[13px] text-slate-600 leading-relaxed">您不需要懂任何邮件服务器配置（SPF/DKIM 等）。只要绑定域名，我们底层的高可用 SMTP 池会全权代理发送，极大提升送达率。</p>
+                </div>
+                <div class="card p-5">
+                    <h4 class="text-[14px] font-bold text-slate-800 mb-2">3. 自定义前缀编辑</h4>
+                    <p class="text-[13px] text-slate-600 leading-relaxed">支持 API 动态传入 `from_name` 和 `from_prefix`。例如，您可以自定义发出 `admin@yourdomain.com` 或 `vip@yourdomain.com`。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 03 发信接口 -->
+        <div id="step3" class="mb-12 scroll-mt-20">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="num-box">03</div>
+                <h3 class="text-[18px] font-bold text-slate-800">发送邮件接口</h3>
+            </div>
+            
+            <div class="card p-5">
+                <div class="flex items-center mb-3">
+                    <span class="bg-green-50 text-green-600 px-2 py-1 rounded text-[11px] font-bold border border-green-200 mr-2">POST</span>
+                    <span class="font-mono text-[14px] font-bold text-slate-800">/email/send</span>
+                </div>
+                <p class="text-[12px] text-slate-500 mb-4">请求地址：<code>https://web.lynli.me/api/v1/email/send</code><br>提交格式：<code>application/json</code></p>
+
+                <p class="text-[13px] font-bold text-slate-700 mb-2">请求参数：</p>
+                <table class="api-table">
+                    <tr><th>参数名</th><th>必填</th><th>说明</th></tr>
+                    <tr><td>to</td><td>是</td><td>收件人邮箱地址</td></tr>
+                    <tr><td>subject</td><td>是</td><td>邮件主题</td></tr>
+                    <tr><td>html</td><td>是</td><td>HTML 格式的邮件内容</td></tr>
+                    <tr><td>from_prefix</td><td>否</td><td>自定义前缀 (如 noreply, admin)，不传则使用默认</td></tr>
+                    <tr><td>from_name</td><td>否</td><td>发件人显示名称 (如 SOCKS5 官方)</td></tr>
+                </table>
+
+                <p class="text-[13px] font-bold text-slate-700 mb-2 mt-4">cURL 示例：</p>
+                <div class="code-wrapper">
+                    <div class="copy-btn" onclick="copyCode(this)">复制</div>
+                    <div class="code-block">curl -X POST "https://web.lynli.me/api/v1/email/send" \
+-H "Authorization: Bearer sk_email_xxxxxx" \
+-H "Content-Type: application/json" \
+-d '{
+  "to": "customer@gmail.com",
+  "subject": "您的验证码",
+  "html": "<h1>您的验证码是 8888</h1>",
+  "from_prefix": "security",
+  "from_name": "安全中心"
+}'</div>
+                </div>
+
+                <p class="text-[13px] font-bold text-slate-700 mb-2 mt-4">返回示例：</p>
+                <div class="code-wrapper">
+                    <div class="copy-btn" onclick="copyCode(this)">复制</div>
+                    <div class="code-block">{
+  "code": 200,
+  "msg": "发送任务已提交",
+  "data": {
+    "message_id": "msg_99887766",
+    "status": "queued"
+  }
+}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 04 充值计费 -->
+        <div id="step4" class="mb-12 scroll-mt-20">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="num-box">04</div>
+                <h3 class="text-[18px] font-bold text-slate-800">计费规则</h3>
+            </div>
+            
+            <div class="card p-5 space-y-4 text-[13px] text-slate-600">
+                <div>
+                    <h4 class="text-[14px] font-bold text-slate-800 mb-1">发送计费</h4>
+                    <p>采用<b>按量计费</b>模式，发送成功才扣除额度。余额可直接用于平台内充值。</p>
+                </div>
+                <div class="border-t border-slate-100 pt-3">
+                    <h4 class="text-[14px] font-bold text-slate-800 mb-1">域名绑定月租</h4>
+                    <p>为防止恶意发信，绑定专属自定义域名需缴纳固定的月租费（如 50元/月）。绑定后赠送测试额度。</p>
+                </div>
+                <div class="border-t border-slate-100 pt-3">
+                    <h4 class="text-[14px] font-bold text-slate-800 mb-1">高可用通道保障</h4>
+                    <p>平台底层采用多 IP 轮询与海外优质 SMTP 池，保障极高的送达率。遇到退信不扣费。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 05 调试排查 -->
+        <div id="step5" class="mb-10 scroll-mt-20">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="num-box">05</div>
+                <h3 class="text-[18px] font-bold text-slate-800">调试排查</h3>
+            </div>
+            
+            <div class="space-y-3">
+                <div class="card p-4">
+                    <h4 class="text-[14px] font-bold text-slate-800 mb-1 text-red-500">域名未核实通过</h4>
+                    <p class="text-[13px] text-slate-600">请检查您域名的 TXT / CNAME 解析记录是否正确配置。核实过程通常需要 5-10 分钟生效。</p>
+                </div>
+                <div class="card p-4">
+                    <h4 class="text-[14px] font-bold text-slate-800 mb-1 text-red-500">发件权限受限</h4>
+                    <p class="text-[13px] text-slate-600">可能是账户余额不足，或者触发了防滥发风控（如单日发送量突增，收件人退信率过高）。</p>
+                </div>
+                <div class="card p-4">
+                    <h4 class="text-[14px] font-bold text-slate-800 mb-1 text-amber-500">进入垃圾箱</h4>
+                    <p class="text-[13px] text-slate-600">建议邮件内容尽量规避敏感营销词汇，提供退订链接。也可以联系客服申请切换到高信誉 IP 池通道。</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function copyCode(btn) {
+            const textToCopy = btn.nextElementSibling.innerText;
+            if(navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    btn.innerText = '已复制!'; btn.style.color = '#10b981';
+                    setTimeout(() => { btn.innerText = '复制'; btn.style.color = '#cbd5e1'; }, 2000);
+                });
+            }
+        }
+
+        // 滚动监听高亮导航
+        const sections = document.querySelectorAll('div[id^="step"]');
+        const navItems = document.querySelectorAll('.nav-item');
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (scrollY >= sectionTop - 100) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('href') === `#${current}`) {
+                    item.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

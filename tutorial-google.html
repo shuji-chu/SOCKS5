@@ -28,9 +28,10 @@
         .ai-prompt-box { background: #1e293b; color: #e2e8f0; padding: 16px; border-radius: 8px; font-family: monospace; font-size: 12px; position: relative; margin-top: 12px; }
         .copy-btn { position: absolute; top: 8px; right: 8px; background: #3b82f6; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; border: none; font-family: sans-serif; font-weight: bold;}
     </style>
+    <link rel="stylesheet" href="./style.css">
 </head>
-<body>
-    <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
+<body class="bg-[#f8f9fa]">
+    <header class="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
         <div class="flex items-center gap-3">
             <a href="./tutorial.html" class="text-slate-600 text-xl font-bold px-2">←</a>
             <h1 class="text-[17px] font-bold text-slate-800">Google 教程</h1>
@@ -48,7 +49,7 @@
         </div>
 
         <!-- 内层 Tab 切换 (2个) -->
-        <div class="flex border-b border-slate-200 mb-4 bg-white rounded-lg p-1 shadow-sm">
+        <div class="flex border-b border-gray-200 mb-4 bg-white rounded-lg p-1 shadow-sm">
             <div class="sub-tab active" onclick="switchGoogleTab('email', this)">辅助邮箱登录教程</div>
             <div class="sub-tab" onclick="switchGoogleTab('2fa', this)">身份验证器2FA登录教程</div>
         </div>
@@ -56,7 +57,7 @@
         <div id="tutorial-content"></div>
         
         <!-- 底部特别说明 -->
-        <div class="mt-6 mb-8 bg-blue-50 border border-blue-100 rounded-lg p-4 text-[13px] text-blue-800 leading-relaxed">
+        <div class="mt-6 mb-8 bg-gray-50 border border-blue-100 rounded-lg p-4 text-[13px] text-blue-800 leading-relaxed">
             <b>💡 提示：</b>Gmail 老号权重高不易触发风控，建议绑定手机号并定期使用避免被回收。
         </div>
     </main>

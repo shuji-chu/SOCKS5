@@ -24,9 +24,10 @@
         
         .alert-box { background: #fffbeb; border: 1px solid #fde68a; color: #b45309; font-size: 13px; padding: 12px; border-radius: 8px; line-height: 1.6; }
     </style>
+    <link rel="stylesheet" href="./style.css">
 </head>
-<body>
-    <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
+<body class="bg-[#f8f9fa]">
+    <header class="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
         <div class="flex items-center gap-3">
             <a href="./tutorial.html" class="text-slate-600 text-xl font-bold px-2">←</a>
             <h1 class="text-[17px] font-bold text-slate-800">Discord 教程</h1>
@@ -40,7 +41,7 @@
         </div>
 
         <!-- 内层 Tab 切换 -->
-        <div class="flex border-b border-slate-200 mb-4 bg-white rounded-lg p-1 shadow-sm">
+        <div class="flex border-b border-gray-200 mb-4 bg-white rounded-lg p-1 shadow-sm">
             <div class="sub-tab" onclick="switchDiscordTab('password', this)">账号密码登录</div>
             <div class="sub-tab active" onclick="switchDiscordTab('token', this)">Token 码登录</div>
         </div>

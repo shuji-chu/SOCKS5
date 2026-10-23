@@ -25,9 +25,10 @@
         .api-table td { padding: 12px; border-bottom: 1px solid #e2e8f0; color: #1e293b; background: #fff; line-height: 1.5; }
         .api-table td:first-child { font-family: 'Courier New', Courier, monospace; color: #2563eb; font-weight: bold; }
     </style>
+    <link rel="stylesheet" href="./style.css">
 </head>
-<body>
-    <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center gap-3 sticky top-0 z-50">
+<body class="bg-[#f8f9fa]">
+    <header class="bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-3 sticky top-0 z-50">
         <a href="./guide.html" class="text-slate-600 text-xl font-bold px-2">←</a>
         <h1 class="text-[17px] font-bold text-slate-800">节点接口 API</h1>
     </header>
@@ -38,14 +39,14 @@
             <h2 class="text-[26px] font-extrabold text-slate-800 mb-2 tracking-tight">VPN / 代理节点开发指南</h2>
             <p class="text-[14px] text-slate-500 mb-5 leading-relaxed">底层基于 Lynli Panel 驱动，提供多格式订阅下发与节点调度能力。</p>
             <div class="flex flex-wrap gap-2">
-                <span class="bg-blue-50 text-blue-600 text-[12px] font-bold px-3 py-1 rounded-full">Clash / V2Ray</span>
-                <span class="bg-blue-50 text-blue-600 text-[12px] font-bold px-3 py-1 rounded-full">高并发拉取</span>
-                <span class="bg-blue-50 text-blue-600 text-[12px] font-bold px-3 py-1 rounded-full">严格权限隔离</span>
+                <span class="bg-gray-50 text-black text-[12px] font-bold px-3 py-1 rounded-full">Clash / V2Ray</span>
+                <span class="bg-gray-50 text-black text-[12px] font-bold px-3 py-1 rounded-full">高并发拉取</span>
+                <span class="bg-gray-50 text-black text-[12px] font-bold px-3 py-1 rounded-full">严格权限隔离</span>
             </div>
         </div>
 
         <!-- 导航锚点 -->
-        <div class="flex overflow-x-auto no-scrollbar gap-6 border-b border-slate-200 pb-3 mb-8 text-[13px] text-slate-500">
+        <div class="flex overflow-x-auto no-scrollbar gap-6 border-b border-gray-200 pb-3 mb-8 text-[13px] text-slate-500">
             <a href="#step1" class="nav-item active flex items-center whitespace-nowrap"><span class="nav-dot"></span>套餐与下单</a>
             <a href="#step2" class="nav-item flex items-center whitespace-nowrap"><span class="nav-dot"></span>支付与开通</a>
             <a href="#step3" class="nav-item flex items-center whitespace-nowrap"><span class="nav-dot"></span>获取订阅</a>
@@ -62,7 +63,7 @@
             
             <div class="card p-5 mb-4">
                 <div class="flex items-center mb-3">
-                    <span class="bg-blue-50 text-blue-600 px-2 py-1 rounded text-[11px] font-bold border border-blue-200 mr-2">GET</span>
+                    <span class="bg-gray-50 text-black px-2 py-1 rounded text-[11px] font-bold border border-blue-200 mr-2">GET</span>
                     <span class="font-mono text-[14px] font-bold text-slate-800">/user/plan/fetch</span>
                 </div>
                 <p class="text-[12px] text-slate-500 mb-4">请求地址：<code>https://web.lynli.me/api/v1/user/plan/fetch</code></p>
@@ -86,7 +87,7 @@
 
             <div class="card p-5">
                 <div class="flex items-center mb-3">
-                    <span class="bg-green-50 text-green-600 px-2 py-1 rounded text-[11px] font-bold border border-green-200 mr-2">POST</span>
+                    <span class="bg-gray-50 text-green-600 px-2 py-1 rounded text-[11px] font-bold border border-green-200 mr-2">POST</span>
                     <span class="font-mono text-[14px] font-bold text-slate-800">/user/order/save</span>
                 </div>
                 <p class="text-[12px] text-slate-500 mb-4">请求地址：<code>https://web.lynli.me/api/v1/user/order/save</code></p>
@@ -120,7 +121,7 @@
             
             <div class="card p-5">
                 <div class="flex items-center mb-3">
-                    <span class="bg-green-50 text-green-600 px-2 py-1 rounded text-[11px] font-bold border border-green-200 mr-2">POST</span>
+                    <span class="bg-gray-50 text-green-600 px-2 py-1 rounded text-[11px] font-bold border border-green-200 mr-2">POST</span>
                     <span class="font-mono text-[14px] font-bold text-slate-800">/user/order/pay</span>
                 </div>
                 <p class="text-[12px] text-slate-500 mb-4">请求地址：<code>https://web.lynli.me/api/v1/user/order/pay</code></p>
@@ -151,7 +152,7 @@
             
             <div class="card p-5">
                 <div class="flex items-center mb-3">
-                    <span class="bg-blue-50 text-blue-600 px-2 py-1 rounded text-[11px] font-bold border border-blue-200 mr-2">GET</span>
+                    <span class="bg-gray-50 text-black px-2 py-1 rounded text-[11px] font-bold border border-blue-200 mr-2">GET</span>
                     <span class="font-mono text-[14px] font-bold text-slate-800">/sub/{token}</span>
                 </div>
                 <p class="text-[12px] text-slate-500 mb-4">请求地址：<code>https://web.lynli.me/api/v1/sub/{token}</code></p>
@@ -179,7 +180,7 @@
                 <div class="num-box">04</div>
                 <h3 class="text-[18px] font-bold text-slate-800">严格权限隔离机制</h3>
             </div>
-            <div class="bg-red-50 border border-red-100 rounded-lg p-4 text-[13px] text-red-600 leading-relaxed">
+            <div class="bg-gray-50 border border-red-100 rounded-lg p-4 text-[13px] text-red-600 leading-relaxed">
                 <b>⚠️ 跨模块调用将会被拦截：</b><br><br>
                 本平台实行极其严格的模块隔离原则。节点接口必须使用 <code>sk_jd_</code> 开头的专属 API Key 发起调用。<br><br>
                 如果您使用账号（<code>sk_tg_</code>）、接码（<code>sk_sms_</code>）等无关模块的 Key 强行请求本接口，系统网关会直接返回 <code>403 Forbidden</code>。

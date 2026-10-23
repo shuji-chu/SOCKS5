@@ -19,9 +19,10 @@
         .page-btn.active { background: #2563eb; color: #fff; border-color: #2563eb; }
         .page-btn:disabled { opacity: 0.5; cursor: not-allowed; background: #f1f5f9; }
     </style>
+    <link rel="stylesheet" href="./style.css">
 </head>
-<body>
-    <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
+<body class="bg-[#f8f9fa]">
+    <header class="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
         <div class="flex items-center gap-3">
             <a href="./index.html" class="text-slate-600 text-xl font-bold px-2">←</a>
             <h1 class="text-[17px] font-bold text-slate-800">数据接口开放平台</h1>
@@ -31,7 +32,7 @@
     <main class="max-w-lg mx-auto">
         <!-- 顶部 Banner -->
         <div class="px-4 pt-4 pb-2">
-            <div class="bg-gradient-to-r from-slate-900 to-slate-800 rounded-xl p-5 text-white shadow-lg relative overflow-hidden">
+            <div class="bg-gradient-to-r from-slate-900 to-slate-800 rounded-lg p-5 text-white shadow-sm relative overflow-hidden">
                 <h2 class="text-[18px] font-bold mb-1 relative z-10">开发者 API 市场</h2>
                 <p class="text-[12px] text-slate-300 mb-3 relative z-10">聚合 65+ 优质数据源，毫秒级响应，合规稳定</p>
                 <div class="flex gap-2 relative z-10">
@@ -56,7 +57,7 @@
 
         <div class="px-4 mb-2">
             <h3 class="text-[18px] font-bold text-slate-800 mb-1" id="current-title">全部接口</h3>
-            <p class="text-[12px] text-slate-500">当前展示 <span class="text-blue-600 font-bold" id="total-count">0</span> 个接口。</p>
+            <p class="text-[12px] text-slate-500">当前展示 <span class="text-black font-bold" id="total-count">0</span> 个接口。</p>
         </div>
 
         <!-- 排序与筛选 -->
@@ -102,13 +103,13 @@
         };
 
         const categoryColors = {
-            '手机号码': 'text-blue-600 bg-blue-50',
-            '实名认证': 'text-green-600 bg-green-50',
-            '交通与车辆': 'text-orange-600 bg-orange-50',
-            '企业工商': 'text-indigo-600 bg-indigo-50',
+            '手机号码': 'text-black bg-gray-50',
+            '实名认证': 'text-green-600 bg-gray-50',
+            '交通与车辆': 'text-orange-600 bg-gray-50',
+            '企业工商': 'text-indigo-600 bg-gray-50',
             '生活服务': 'text-teal-600 bg-teal-50',
-            '网站域名': 'text-purple-600 bg-purple-50',
-            '金融风险': 'text-red-600 bg-red-50',
+            '网站域名': 'text-purple-600 bg-gray-50',
+            '金融风险': 'text-red-600 bg-gray-50',
             '默认': 'text-slate-600 bg-slate-50'
         };
 
@@ -200,14 +201,14 @@
                         <!-- 标签组 -->
                         <div class="flex flex-wrap gap-2 mb-4">
                             <span class="text-[11px] bg-slate-100 text-slate-500 px-2 py-1 rounded">${isFree ? '免费' : '付费'}</span>
-                            <span class="text-[11px] ${isFree ? 'bg-green-50 text-green-600' : 'bg-orange-50 text-orange-600'} font-bold px-2 py-1 rounded">${isFree ? '免费' : '$' + api.price + '/次'}</span>
-                            <span class="text-[11px] bg-blue-50 text-blue-600 px-2 py-1 rounded">${api.method}</span>
+                            <span class="text-[11px] ${isFree ? 'bg-gray-50 text-green-600' : 'bg-gray-50 text-orange-600'} font-bold px-2 py-1 rounded">${isFree ? '免费' : '$' + api.price + '/次'}</span>
+                            <span class="text-[11px] bg-gray-50 text-black px-2 py-1 rounded">${api.method}</span>
                         </div>
                         
                         <!-- 底部操作 -->
-                        <div class="flex justify-between items-center pt-3 border-t border-slate-100">
+                        <div class="flex justify-between items-center pt-3 border-t border-gray-200">
                             <span class="text-[12px] text-slate-400">开发者 API</span>
-                            <span class="text-[13px] text-blue-600 font-bold flex items-center gap-1">查看文档 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></span>
+                            <span class="text-[13px] text-black font-bold flex items-center gap-1">查看文档 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></span>
                         </div>
                     </a>
                     `;

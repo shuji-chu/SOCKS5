@@ -25,9 +25,10 @@
         .alert-box { background: #fffbeb; border: 1px solid #fde68a; color: #b45309; font-size: 13px; padding: 12px; border-radius: 8px; line-height: 1.6; }
         .danger-box { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; font-size: 13px; padding: 12px; border-radius: 8px; line-height: 1.6; }
     </style>
+    <link rel="stylesheet" href="./style.css">
 </head>
-<body>
-    <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
+<body class="bg-[#f8f9fa]">
+    <header class="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
         <div class="flex items-center gap-3">
             <a href="./tutorial.html" class="text-slate-600 text-xl font-bold px-2">←</a>
             <h1 class="text-[17px] font-bold text-slate-800">TikTok 教程</h1>
@@ -45,7 +46,7 @@
         </div>
 
         <!-- 内层 Tab 切换 (4个) -->
-        <div class="flex border-b border-slate-200 mb-4 bg-white rounded-lg p-1 shadow-sm overflow-x-auto no-scrollbar">
+        <div class="flex border-b border-gray-200 mb-4 bg-white rounded-lg p-1 shadow-sm overflow-x-auto no-scrollbar">
             <div class="sub-tab" onclick="switchTikTokTab('email', this)">邮箱登入教程</div>
             <div class="sub-tab active" onclick="switchTikTokTab('cookie', this)">Cookie直接登入</div>
             <div class="sub-tab" onclick="switchTikTokTab('changeInfo', this)">换绑邮箱及修改密码</div>

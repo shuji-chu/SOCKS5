@@ -26,9 +26,10 @@
         .api-table td { padding: 12px; border-bottom: 1px solid #e2e8f0; color: #1e293b; background: #fff; line-height: 1.5; }
         .api-table td:first-child { font-family: 'Courier New', Courier, monospace; color: #2563eb; font-weight: bold; }
     </style>
+    <link rel="stylesheet" href="./style.css">
 </head>
-<body>
-    <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center gap-3 sticky top-0 z-50">
+<body class="bg-[#f8f9fa]">
+    <header class="bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-3 sticky top-0 z-50">
         <a href="./guide.html" class="text-slate-600 text-xl font-bold px-2">←</a>
         <h1 class="text-[17px] font-bold text-slate-800">支付接口 API</h1>
     </header>
@@ -39,14 +40,14 @@
             <h2 class="text-[26px] font-extrabold text-slate-800 mb-2 tracking-tight">支付网关接入规范</h2>
             <p class="text-[14px] text-slate-500 mb-5 leading-relaxed">为您提供稳定、合规的代收通道。支持 SHA256WithRSA 高级别加密验签，保障商户资金安全。</p>
             <div class="flex flex-wrap gap-2">
-                <span class="bg-blue-50 text-blue-600 text-[12px] font-bold px-3 py-1 rounded-full">SHA256WithRSA 签名</span>
-                <span class="bg-blue-50 text-blue-600 text-[12px] font-bold px-3 py-1 rounded-full">JSON 数据格式</span>
-                <span class="bg-blue-50 text-blue-600 text-[12px] font-bold px-3 py-1 rounded-full">毫秒级异步回调</span>
+                <span class="bg-gray-50 text-black text-[12px] font-bold px-3 py-1 rounded-full">SHA256WithRSA 签名</span>
+                <span class="bg-gray-50 text-black text-[12px] font-bold px-3 py-1 rounded-full">JSON 数据格式</span>
+                <span class="bg-gray-50 text-black text-[12px] font-bold px-3 py-1 rounded-full">毫秒级异步回调</span>
             </div>
         </div>
 
         <!-- 导航锚点 -->
-        <div class="flex overflow-x-auto no-scrollbar gap-6 border-b border-slate-200 pb-3 mb-8 text-[13px] text-slate-500">
+        <div class="flex overflow-x-auto no-scrollbar gap-6 border-b border-gray-200 pb-3 mb-8 text-[13px] text-slate-500">
             <a href="#step1" class="nav-item active flex items-center whitespace-nowrap"><span class="nav-dot"></span>统一下单</a>
             <a href="#step2" class="nav-item flex items-center whitespace-nowrap"><span class="nav-dot"></span>订单查询</a>
             <a href="#step3" class="nav-item flex items-center whitespace-nowrap"><span class="nav-dot"></span>关闭订单</a>
@@ -66,7 +67,7 @@
             
             <div class="card p-5">
                 <div class="flex items-center mb-3">
-                    <span class="bg-green-50 text-green-600 px-2 py-1 rounded text-[11px] font-bold border border-green-200 mr-2">POST</span>
+                    <span class="bg-gray-50 text-green-600 px-2 py-1 rounded text-[11px] font-bold border border-green-200 mr-2">POST</span>
                     <span class="font-mono text-[14px] font-bold text-slate-800">/api/pay/create</span>
                 </div>
                 <p class="text-[12px] text-slate-500 mb-4">请求地址：<code>https://web.lynli.me/api/pay/create</code><br>提交格式：<code>application/x-www-form-urlencoded</code></p>
@@ -116,7 +117,7 @@
             
             <div class="card p-5">
                 <div class="flex items-center mb-3">
-                    <span class="bg-green-50 text-green-600 px-2 py-1 rounded text-[11px] font-bold border border-green-200 mr-2">POST</span>
+                    <span class="bg-gray-50 text-green-600 px-2 py-1 rounded text-[11px] font-bold border border-green-200 mr-2">POST</span>
                     <span class="font-mono text-[14px] font-bold text-slate-800">/api/pay/query</span>
                 </div>
                 <p class="text-[12px] text-slate-500 mb-4">请求地址：<code>https://web.lynli.me/api/pay/query</code></p>
@@ -156,7 +157,7 @@
             
             <div class="card p-5">
                 <div class="flex items-center mb-3">
-                    <span class="bg-green-50 text-green-600 px-2 py-1 rounded text-[11px] font-bold border border-green-200 mr-2">POST</span>
+                    <span class="bg-gray-50 text-green-600 px-2 py-1 rounded text-[11px] font-bold border border-green-200 mr-2">POST</span>
                     <span class="font-mono text-[14px] font-bold text-slate-800">/api/pay/close</span>
                 </div>
                 <p class="text-[12px] text-slate-500 mb-4">请求地址：<code>https://web.lynli.me/api/pay/close</code></p>
@@ -184,7 +185,7 @@
             <p class="text-[13px] text-slate-500 mb-4">订单支付成功后，平台会向商户传入的 <code>notify_url</code> 发起 GET 通知。</p>
             
             <div class="card p-5">
-                <div class="bg-blue-50 border border-blue-100 rounded-lg p-3 text-[13px] text-blue-700 mb-4">
+                <div class="bg-gray-50 border border-blue-100 rounded-lg p-3 text-[13px] text-blue-700 mb-4">
                     💡 <b>通知签名说明：</b><br>
                     通知签名跟随下单接口：V2接口使用 <b>RSA</b>；V1兼容接口使用 <b>MD5</b>。
                 </div>
@@ -225,11 +226,11 @@
                     <p>3. 拼接为 <code>key=value&key2=value2</code> 格式。</p>
                     <p>4. 使用<b>商户私钥</b>执行 <code>SHA256WithRSA</code> 签名，将结果进行 Base64 编码。</p>
                 </div>
-                <div class="border-t border-slate-100 pt-3">
+                <div class="border-t border-gray-200 pt-3">
                     <h4 class="font-bold text-slate-800 mb-1">验证签名 (回调/返回)</h4>
                     <p>接口返回、异步通知均使用平台私钥签名。商户系统按同样规则拼接待签名字符串，再用<b>平台公钥</b>验签。</p>
                 </div>
-                <div class="border-t border-slate-100 pt-3">
+                <div class="border-t border-gray-200 pt-3">
                     <h4 class="font-bold text-slate-800 mb-1">待签名串示例</h4>
                     <div class="code-wrapper">
                         <div class="copy-btn" onclick="copyCode(this)">复制</div>
@@ -247,7 +248,7 @@
             
             <div class="card p-5">
                 <div class="flex items-center mb-3">
-                    <span class="bg-blue-50 text-blue-600 px-2 py-1 rounded text-[11px] font-bold border border-blue-200 mr-2">GET</span>
+                    <span class="bg-gray-50 text-black px-2 py-1 rounded text-[11px] font-bold border border-blue-200 mr-2">GET</span>
                     <span class="font-mono text-[14px] font-bold text-slate-800">/api/merchant/balance</span>
                 </div>
                 <p class="text-[13px] text-slate-500 mb-4">查询当前商户可提现余额与待结算资金。</p>
@@ -275,17 +276,17 @@
                 <p class="text-[13px] text-slate-600 mb-4">为降低您的开发成本，我们提供了封装好 RSA 签名算法的官方 SDK。请下载后修改 <code>epay.config.php</code>，填入商户 ID 与私钥即可使用。</p>
                 
                 <div class="flex flex-col gap-3">
-                    <a href="./sdk.zip" class="flex items-center justify-between p-3 border border-slate-200 rounded-lg active:bg-slate-50">
+                    <a href="./sdk.zip" class="flex items-center justify-between p-3 border border-gray-200 rounded-lg active:bg-slate-50">
                         <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">PHP</div>
+                            <div class="w-8 h-8 rounded bg-gray-50 text-indigo-600 flex items-center justify-center font-bold">PHP</div>
                             <div>
                                 <p class="text-[14px] font-bold text-slate-800">PHP-SDK.zip (V2.1)</p>
                                 <p class="text-[11px] text-slate-500">适配 ThinkPHP / Laravel 等主流框架</p>
                             </div>
                         </div>
-                        <span class="text-[12px] text-blue-500 font-bold">下载</span>
+                        <span class="text-[12px] text-gray-900 font-bold">下载</span>
                     </a>
-                    <div class="flex items-center justify-between p-3 border border-slate-100 rounded-lg bg-slate-50 opacity-60">
+                    <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg bg-slate-50 opacity-60">
                         <div class="flex items-center gap-3">
                             <div class="w-8 h-8 rounded bg-slate-200 text-slate-500 flex items-center justify-center font-bold">JAVA</div>
                             <div>

@@ -26,14 +26,15 @@
         .bar-fill { width: 100%; background: #e2e8f0; border-radius: 4px 4px 0 0; transition: height 0.3s; min-height: 4px; }
         .bar-label { font-size: 10px; color: #94a3b8; margin-top: 8px; }
     </style>
+    <link rel="stylesheet" href="./style.css">
 </head>
-<body>
-    <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
+<body class="bg-[#f8f9fa]">
+    <header class="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
         <div class="flex items-center gap-3">
             <a href="./profile.html" class="text-slate-600 text-xl font-bold px-2">←</a>
             <h1 class="text-[17px] font-bold text-slate-800">返佣联盟</h1>
         </div>
-        <span class="bg-blue-50 text-blue-600 text-[11px] px-2 py-1 rounded border border-blue-100 font-bold">一级返佣 5%</span>
+        <span class="bg-gray-50 text-black text-[11px] px-2 py-1 rounded border border-blue-100 font-bold">一级返佣 5%</span>
     </header>
 
     <main class="px-4 py-4 max-w-lg mx-auto">
@@ -48,7 +49,7 @@
                 <p class="text-[11px] text-slate-500 mt-1">本月邀请订单</p>
             </div>
             <div class="text-center">
-                <p class="text-[20px] font-bold text-green-500">5%</p>
+                <p class="text-[20px] font-bold text-gray-500">5%</p>
                 <p class="text-[11px] text-slate-500 mt-1">返佣比例</p>
             </div>
         </div>
@@ -76,8 +77,8 @@
             <h3 class="text-[15px] font-bold text-slate-800 mb-2">我的专属推广链接</h3>
             <p class="text-[12px] text-slate-500 mb-3">好友通过此链接注册并购买商品，订单完成后您可获得 5% 返佣。</p>
             <div class="flex gap-2">
-                <input type="text" id="promo-link" value="https://web.lynli.me/register.html?ref=10001" readonly class="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[13px] font-mono text-slate-600 outline-none">
-                <button onclick="copyLink()" class="bg-blue-600 text-white font-bold px-4 py-2 rounded-lg text-[13px] active:opacity-80">复制链接</button>
+                <input type="text" id="promo-link" value="https://web.lynli.me/register.html?ref=10001" readonly class="flex-1 bg-slate-50 border border-gray-200 rounded-lg px-3 py-2 text-[13px] font-mono text-slate-600 outline-none">
+                <button onclick="copyLink()" class="bg-black text-white font-bold px-4 py-2 rounded-lg text-[13px] active:opacity-80">复制链接</button>
             </div>
         </div>
 
@@ -85,21 +86,21 @@
         <div class="card p-5">
             <div class="flex flex-col gap-4">
                 <div class="flex gap-3 items-start">
-                    <div class="w-6 h-6 rounded bg-blue-50 text-blue-600 text-[12px] font-bold flex items-center justify-center shrink-0">01</div>
+                    <div class="w-6 h-6 rounded bg-gray-50 text-black text-[12px] font-bold flex items-center justify-center shrink-0">01</div>
                     <div>
                         <p class="text-[13px] font-bold text-slate-800">复制上方专属链接</p>
                         <p class="text-[11px] text-slate-500">链接带你的专属参数，用于识别邀请关系</p>
                     </div>
                 </div>
                 <div class="flex gap-3 items-start">
-                    <div class="w-6 h-6 rounded bg-blue-50 text-blue-600 text-[12px] font-bold flex items-center justify-center shrink-0">02</div>
+                    <div class="w-6 h-6 rounded bg-gray-50 text-black text-[12px] font-bold flex items-center justify-center shrink-0">02</div>
                     <div>
                         <p class="text-[13px] font-bold text-slate-800">发给好友或社群</p>
                         <p class="text-[11px] text-slate-500">好友点击链接完成注册并下单</p>
                     </div>
                 </div>
                 <div class="flex gap-3 items-start">
-                    <div class="w-6 h-6 rounded bg-blue-50 text-blue-600 text-[12px] font-bold flex items-center justify-center shrink-0">03</div>
+                    <div class="w-6 h-6 rounded bg-gray-50 text-black text-[12px] font-bold flex items-center justify-center shrink-0">03</div>
                     <div>
                         <p class="text-[13px] font-bold text-slate-800">返佣自动入账</p>
                         <p class="text-[11px] text-slate-500">订单完成按 5% 实时计入余额</p>
@@ -112,7 +113,7 @@
         <div class="card p-5">
             <div class="flex justify-between items-center mb-1">
                 <h3 class="text-[14px] font-bold text-slate-800">近 7 天返佣趋势</h3>
-                <span class="text-[11px] text-green-500 bg-green-50 px-1.5 py-0.5 rounded">较上周期 0%</span>
+                <span class="text-[11px] text-gray-500 bg-gray-50 px-1.5 py-0.5 rounded">较上周期 0%</span>
             </div>
             <div class="bar-chart">
                 <div class="bar-col"><div class="bar-fill" style="height: 4px;"></div><div class="bar-label">周五</div></div>
@@ -121,14 +122,14 @@
                 <div class="bar-col"><div class="bar-fill" style="height: 4px;"></div><div class="bar-label">周一</div></div>
                 <div class="bar-col"><div class="bar-fill" style="height: 4px;"></div><div class="bar-label">周二</div></div>
                 <div class="bar-col"><div class="bar-fill" style="height: 4px;"></div><div class="bar-label">周三</div></div>
-                <div class="bar-col"><div class="bar-fill" style="height: 4px; background: #3b82f6;"></div><div class="bar-label text-blue-500">今天</div></div>
+                <div class="bar-col"><div class="bar-fill" style="height: 4px; background: #3b82f6;"></div><div class="bar-label text-gray-900">今天</div></div>
             </div>
             <p class="text-center text-[11px] text-slate-400 mt-4">近 7 天暂无返佣入账，分享推广链接开始赚取佣金</p>
         </div>
 
         <!-- 明细数据 (Tab 切换) -->
         <div class="card">
-            <div class="flex border-b border-slate-100">
+            <div class="flex border-b border-gray-200">
                 <div class="tab-btn active" onclick="switchTab('invite')">邀请明细</div>
                 <div class="tab-btn" onclick="switchTab('commission')">返佣记录</div>
                 <div class="tab-btn" onclick="switchTab('withdraw')">提现记录</div>
@@ -157,9 +158,9 @@
 
         <!-- 底部操作与规则 -->
         <div class="text-center pb-8 space-y-4">
-            <a href="./withdraw.html" class="block w-full py-3 bg-blue-600 text-white font-bold rounded-xl text-[15px] active:opacity-80 transition shadow-sm">申请提现</a>
+            <a href="./withdraw.html" class="block w-full py-3 bg-black text-white font-bold rounded-lg text-[15px] active:opacity-80 transition shadow-sm">申请提现</a>
             
-            <div class="text-left bg-slate-50 p-4 rounded-xl border border-slate-100">
+            <div class="text-left bg-slate-50 p-4 rounded-lg border border-gray-200">
                 <p class="text-[12px] font-bold text-slate-700 mb-1">规则说明：</p>
                 <p class="text-[11px] text-slate-500 leading-relaxed">邀请好友注册并完成订单后，系统按订单实付金额的 5% 自动返佣（一级），多级推广与分站商户按平台规则另行计算；返佣实时计入余额，可直接消费或前往提现页申请提现；订单退款时对应返佣将同步扣回，返佣金额以后台实际入账为准。</p>
             </div>

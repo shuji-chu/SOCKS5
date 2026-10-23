@@ -20,9 +20,10 @@
         .nav-item.active .nav-dot { background: #2563eb; width: 16px; border-radius: 4px; }
         .nav-item.active { color: #2563eb; font-weight: bold; }
     </style>
+    <link rel="stylesheet" href="./style.css">
 </head>
-<body>
-    <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center gap-3 sticky top-0 z-50">
+<body class="bg-[#f8f9fa]">
+    <header class="bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-3 sticky top-0 z-50">
         <a href="./guide.html" class="text-slate-600 text-xl font-bold px-2">←</a>
         <h1 class="text-[17px] font-bold text-slate-800">查询接口 API</h1>
     </header>
@@ -33,14 +34,14 @@
             <h2 class="text-[26px] font-extrabold text-slate-800 mb-2 tracking-tight">聚合数据查询开发指南</h2>
             <p class="text-[14px] text-slate-500 mb-5 leading-relaxed">快速掌握账号、Key、请求参数与计费规则。底层直连 60+ 网关数据源。</p>
             <div class="flex flex-wrap gap-2">
-                <span class="bg-blue-50 text-blue-600 text-[12px] font-bold px-3 py-1 rounded-full">稳定网关服务</span>
-                <span class="bg-blue-50 text-blue-600 text-[12px] font-bold px-3 py-1 rounded-full">专属 Key 调用</span>
-                <span class="bg-blue-50 text-blue-600 text-[12px] font-bold px-3 py-1 rounded-full">单次价格透明</span>
+                <span class="bg-gray-50 text-black text-[12px] font-bold px-3 py-1 rounded-full">稳定网关服务</span>
+                <span class="bg-gray-50 text-black text-[12px] font-bold px-3 py-1 rounded-full">专属 Key 调用</span>
+                <span class="bg-gray-50 text-black text-[12px] font-bold px-3 py-1 rounded-full">单次价格透明</span>
             </div>
         </div>
 
         <!-- 导航锚点 -->
-        <div class="flex overflow-x-auto no-scrollbar gap-6 border-b border-slate-200 pb-3 mb-8 text-[13px] text-slate-500">
+        <div class="flex overflow-x-auto no-scrollbar gap-6 border-b border-gray-200 pb-3 mb-8 text-[13px] text-slate-500">
             <a href="#step1" class="nav-item active flex items-center whitespace-nowrap"><span class="nav-dot"></span>快速接入</a>
             <a href="#step2" class="nav-item flex items-center whitespace-nowrap"><span class="nav-dot"></span>账号与 Key</a>
             <a href="#step3" class="nav-item flex items-center whitespace-nowrap"><span class="nav-dot"></span>请求规范</a>
@@ -59,28 +60,28 @@
             
             <div class="space-y-3">
                 <div class="card p-4 flex gap-4 items-start">
-                    <div class="text-[12px] font-bold text-blue-500 bg-blue-50 px-2 py-1 rounded">01</div>
+                    <div class="text-[12px] font-bold text-gray-900 bg-gray-50 px-2 py-1 rounded">01</div>
                     <div>
                         <h4 class="text-[14px] font-bold text-slate-800 mb-1">注册并登录</h4>
                         <p class="text-[13px] text-slate-500">注册成功后默认进入登录状态，控制台会同步账号、余额和 API Key 信息。</p>
                     </div>
                 </div>
                 <div class="card p-4 flex gap-4 items-start">
-                    <div class="text-[12px] font-bold text-blue-500 bg-blue-50 px-2 py-1 rounded">02</div>
+                    <div class="text-[12px] font-bold text-gray-900 bg-gray-50 px-2 py-1 rounded">02</div>
                     <div>
                         <h4 class="text-[14px] font-bold text-slate-800 mb-1">选择查询接口</h4>
                         <p class="text-[13px] text-slate-500">在接口市场按分类筛选接口，进入详情页查看接口 ID 和参数说明。</p>
                     </div>
                 </div>
                 <div class="card p-4 flex gap-4 items-start">
-                    <div class="text-[12px] font-bold text-blue-500 bg-blue-50 px-2 py-1 rounded">03</div>
+                    <div class="text-[12px] font-bold text-gray-900 bg-gray-50 px-2 py-1 rounded">03</div>
                     <div>
                         <h4 class="text-[14px] font-bold text-slate-800 mb-1">申请专属 Key</h4>
                         <p class="text-[13px] text-slate-500">登录后在控制台查看或重置专属 API Key，正式调用时替换示例里的 demo key。</p>
                     </div>
                 </div>
                 <div class="card p-4 flex gap-4 items-start">
-                    <div class="text-[12px] font-bold text-blue-500 bg-blue-50 px-2 py-1 rounded">04</div>
+                    <div class="text-[12px] font-bold text-gray-900 bg-gray-50 px-2 py-1 rounded">04</div>
                     <div>
                         <h4 class="text-[14px] font-bold text-slate-800 mb-1">充值并调用</h4>
                         <p class="text-[13px] text-slate-500">余额充足后即可发起正式调用，每次按接口展示的单次价格扣费。</p>
@@ -99,28 +100,28 @@
             
             <div class="grid grid-cols-1 gap-3">
                 <div class="card p-4 flex gap-4 items-center">
-                    <div class="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center font-bold text-slate-500 text-lg">A</div>
+                    <div class="w-12 h-12 rounded-lg bg-slate-100 flex items-center justify-center font-bold text-slate-500 text-lg">A</div>
                     <div>
                         <h4 class="text-[14px] font-bold text-slate-800">平台账号</h4>
                         <p class="text-[13px] text-slate-500">用于管理余额、充值、消费记录和专属 API Key。</p>
                     </div>
                 </div>
                 <div class="card p-4 flex gap-4 items-center">
-                    <div class="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center font-bold text-slate-500 text-lg">ID</div>
+                    <div class="w-12 h-12 rounded-lg bg-slate-100 flex items-center justify-center font-bold text-slate-500 text-lg">ID</div>
                     <div>
                         <h4 class="text-[14px] font-bold text-slate-800">接口 ID</h4>
                         <p class="text-[13px] text-slate-500">每个接口详情页都会展示，调用时使用参数 id 传入。</p>
                     </div>
                 </div>
                 <div class="card p-4 flex gap-4 items-center">
-                    <div class="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center font-bold text-slate-500 text-sm">Key</div>
+                    <div class="w-12 h-12 rounded-lg bg-slate-100 flex items-center justify-center font-bold text-slate-500 text-sm">Key</div>
                     <div>
                         <h4 class="text-[14px] font-bold text-slate-800">专属 Key</h4>
                         <p class="text-[13px] text-slate-500">在控制台生成和维护，调用时使用参数 key 传入。</p>
                     </div>
                 </div>
             </div>
-            <p class="text-[12px] text-red-500 mt-3">⚠️ 不要把正式 Key 写进前端代码或公开仓库，服务端调用建议通过环境变量保存。</p>
+            <p class="text-[12px] text-black mt-3">⚠️ 不要把正式 Key 写进前端代码或公开仓库，服务端调用建议通过环境变量保存。</p>
         </div>
 
         <!-- 03 请求规范 -->
@@ -145,10 +146,10 @@
                 </div>
 
                 <ul class="text-[13px] text-slate-600 space-y-2 mt-4">
-                    <li><b class="text-blue-600">id</b>：必填。接口详情页展示的接口 ID。</li>
-                    <li><b class="text-blue-600">key</b>：必填。控制台申请的专属 sk_cx_ 开头的 API Key。</li>
-                    <li><b class="text-blue-600">业务参数</b>：按接口详情页参数表填写，不同接口参数不同（如二要素需传姓名和身份证）。</li>
-                    <li><b class="text-blue-600">返回格式</b>：以接口详情页展示为准，通常为 JSON。</li>
+                    <li><b class="text-black">id</b>：必填。接口详情页展示的接口 ID。</li>
+                    <li><b class="text-black">key</b>：必填。控制台申请的专属 sk_cx_ 开头的 API Key。</li>
+                    <li><b class="text-black">业务参数</b>：按接口详情页参数表填写，不同接口参数不同（如二要素需传姓名和身份证）。</li>
+                    <li><b class="text-black">返回格式</b>：以接口详情页展示为准，通常为 JSON。</li>
                 </ul>
             </div>
         </div>
@@ -166,11 +167,11 @@
                     <h4 class="text-[14px] font-bold text-slate-800 mb-1">单次价格</h4>
                     <p class="text-[13px] text-slate-500">接口市场和详情页展示单次价格，正式调用按单次价格从余额扣除。</p>
                 </div>
-                <div class="border-t border-slate-100 pt-3">
+                <div class="border-t border-gray-200 pt-3">
                     <h4 class="text-[14px] font-bold text-slate-800 mb-1">充值方式</h4>
                     <p class="text-[13px] text-slate-500">控制台支持 USDT、支付宝充值，到账后可直接用于接口调用。</p>
                 </div>
-                <div class="border-t border-slate-100 pt-3">
+                <div class="border-t border-gray-200 pt-3">
                     <h4 class="text-[14px] font-bold text-slate-800 mb-1">记录查询</h4>
                     <p class="text-[13px] text-slate-500">收支明细和消费记录按页展示，便于核对余额变化与调用结果。</p>
                 </div>
@@ -187,17 +188,17 @@
 
             <div class="space-y-3">
                 <div class="card p-4">
-                    <h4 class="text-[14px] font-bold text-slate-800 mb-1 text-red-500">缺少 id</h4>
+                    <h4 class="text-[14px] font-bold text-slate-800 mb-1 text-black">缺少 id</h4>
                     <p class="text-[13px] text-slate-600">请求里没有传接口 ID，或接口 ID 填错。</p>
                     <p class="text-[12px] text-slate-400 mt-1">解决办法：回到接口详情页复制正确的接口 ID。</p>
                 </div>
                 <div class="card p-4">
-                    <h4 class="text-[14px] font-bold text-slate-800 mb-1 text-red-500">缺少 key</h4>
+                    <h4 class="text-[14px] font-bold text-slate-800 mb-1 text-black">缺少 key</h4>
                     <p class="text-[13px] text-slate-600">请求里没有传专属 API Key。</p>
                     <p class="text-[12px] text-slate-400 mt-1">解决办法：登录控制台查看或申请 sk_cx_ 开头的 Key。</p>
                 </div>
                 <div class="card p-4">
-                    <h4 class="text-[14px] font-bold text-slate-800 mb-1 text-red-500">余额不足</h4>
+                    <h4 class="text-[14px] font-bold text-slate-800 mb-1 text-black">余额不足</h4>
                     <p class="text-[13px] text-slate-600">账户余额不够支付本次调用。</p>
                     <p class="text-[12px] text-slate-400 mt-1">解决办法：进入控制台完成充值后再试。</p>
                 </div>
@@ -222,11 +223,11 @@
                     <h4 class="text-[14px] font-bold text-slate-800 mb-1">注册后为什么要进入控制台？</h4>
                     <p class="text-[13px] text-slate-500">控制台用于申请 Key、充值、查看余额和消费记录。正式接口调用依赖您的专属 Key。</p>
                 </div>
-                <div class="border-t border-slate-100 pt-3">
+                <div class="border-t border-gray-200 pt-3">
                     <h4 class="text-[14px] font-bold text-slate-800 mb-1">接口参数在哪里看？</h4>
                     <p class="text-[13px] text-slate-500">请在 API 市场点击具体的接口进入详情页，里面详细列出了该接口所有的请求字段与返回示例。</p>
                 </div>
-                <div class="border-t border-slate-100 pt-3">
+                <div class="border-t border-gray-200 pt-3">
                     <h4 class="text-[14px] font-bold text-slate-800 mb-1">调用失败会不会扣费？</h4>
                     <p class="text-[13px] text-slate-500">通常只有成功返回业务数据的请求才会实际扣费。如果是缺少参数、余额不足或网络异常等失败情况，系统不会扣费。</p>
                 </div>

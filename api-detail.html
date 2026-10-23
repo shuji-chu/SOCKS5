@@ -23,9 +23,10 @@
         .input-flat { width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; font-size: 14px; outline: none; margin-bottom: 12px; transition: border 0.2s; }
         .input-flat:focus { border-color: #2563eb; background: #fff; }
     </style>
+    <link rel="stylesheet" href="./style.css">
 </head>
-<body>
-    <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
+<body class="bg-[#f8f9fa]">
+    <header class="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
         <div class="flex items-center gap-3">
             <a href="./api-market.html" class="text-slate-600 text-xl font-bold px-2">←</a>
             <h1 class="text-[17px] font-bold text-slate-800">接口详情</h1>
@@ -34,7 +35,7 @@
 
     <main class="max-w-lg mx-auto">
         <div class="px-4 py-3 text-[12px] text-slate-400 flex items-center gap-1">
-            <a href="./api-market.html" class="hover:text-blue-500">API Market</a>
+            <a href="./api-market.html" class="hover:text-gray-900">API Market</a>
             <span>/</span>
             <span class="text-slate-600" id="breadcrumb-category">加载中...</span>
         </div>
@@ -42,11 +43,11 @@
         <div class="px-4 mb-4">
             <div class="card p-5">
                 <div class="flex items-start gap-3 mb-3">
-                    <div id="api-icon-container" class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border border-slate-100"></div>
+                    <div id="api-icon-container" class="w-12 h-12 rounded-lg flex items-center justify-center shrink-0 border border-gray-200"></div>
                     <div class="flex-1 pt-1">
                         <h1 class="text-[20px] font-extrabold text-slate-900 leading-tight mb-2" id="api-name">加载中...</h1>
                         <div class="flex flex-wrap gap-2 mt-1">
-                            <span class="bg-blue-50 text-blue-600 text-[11px] px-2 py-0.5 rounded border border-blue-100">正常接口</span>
+                            <span class="bg-gray-50 text-black text-[11px] px-2 py-0.5 rounded border border-blue-100">正常接口</span>
                             <span class="bg-slate-100 text-slate-600 text-[11px] px-2 py-0.5 rounded" id="api-method">POST</span>
                             <span class="bg-slate-100 text-slate-600 text-[11px] px-2 py-0.5 rounded">JSON</span>
                             <span class="bg-slate-100 text-slate-600 text-[11px] px-2 py-0.5 rounded" id="api-category">分类</span>
@@ -56,20 +57,20 @@
                 
                 <p class="text-[14px] text-slate-600 leading-relaxed mb-4" id="api-desc">...</p>
                 
-                <div class="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl mb-4 border border-slate-100">
+                <div class="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-lg mb-4 border border-gray-200">
                     <div>
                         <p class="text-[12px] text-slate-400 mb-1">接口 ID</p>
                         <p class="text-[16px] font-bold text-slate-800 font-mono" id="api-id">0</p>
                     </div>
                     <div>
                         <p class="text-[12px] text-slate-400 mb-1">调用价格</p>
-                        <p class="text-[18px] font-bold text-orange-500 font-mono" id="api-price">$0.00<span class="text-[12px] font-sans font-normal text-slate-400">/次</span></p>
+                        <p class="text-[18px] font-bold text-gray-900 font-mono" id="api-price">$0.00<span class="text-[12px] font-sans font-normal text-slate-400">/次</span></p>
                     </div>
                 </div>
 
                 <div class="flex gap-3 mt-2">
-                    <a href="./user-api.html" class="flex-1 py-2.5 bg-blue-600 text-white font-bold rounded-lg text-[14px] text-center active:opacity-80">申请 Key / 充值</a>
-                    <a href="javascript:void(0)" onclick="switchDetailTab('docs', document.querySelectorAll('.tab-btn')[1])" class="flex-1 py-2.5 bg-slate-100 text-slate-600 font-bold rounded-lg text-[14px] text-center border border-slate-200 active:bg-slate-200">查看开发指南</a>
+                    <a href="./user-api.html" class="flex-1 py-2.5 bg-black text-white font-bold rounded-lg text-[14px] text-center active:opacity-80">申请 Key / 充值</a>
+                    <a href="javascript:void(0)" onclick="switchDetailTab('docs', document.querySelectorAll('.tab-btn')[1])" class="flex-1 py-2.5 bg-slate-100 text-slate-600 font-bold rounded-lg text-[14px] text-center border border-gray-200 active:bg-slate-200">查看开发指南</a>
                 </div>
             </div>
         </div>
@@ -85,12 +86,12 @@
                     <!-- JS 注入 -->
                 </div>
                 
-                <button onclick="runTest()" id="btn-test" class="w-full py-3.5 bg-slate-800 text-white font-bold rounded-xl text-[15px] active:opacity-80 transition shadow-sm mt-2">立即在线测试</button>
+                <button onclick="runTest()" id="btn-test" class="w-full py-3.5 bg-slate-800 text-white font-bold rounded-lg text-[15px] active:opacity-80 transition shadow-sm mt-2">立即在线测试</button>
                 
                 <!-- 测试结果展示区 (默认隐藏) -->
                 <div id="test-result-area" class="mt-4 hidden">
                     <p class="text-[13px] font-bold text-slate-700 mb-2 flex items-center gap-2">
-                        <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         请求响应结果 (JSON)
                     </p>
                     <div class="code-block" id="result-json"></div>
@@ -101,12 +102,12 @@
         <div class="px-4 mb-4">
             <div class="card p-4">
                 <h3 class="text-[15px] font-bold text-slate-800 mb-3 flex items-center gap-2">
-                    <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <svg class="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     接口使用信息
                 </h3>
                 <div class="grid grid-cols-2 gap-3">
-                    <div class="bg-slate-50 p-3 rounded-lg flex items-center gap-3 border border-slate-100">
-                        <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
+                    <div class="bg-slate-50 p-3 rounded-lg flex items-center gap-3 border border-gray-200">
+                        <div class="w-8 h-8 rounded-full bg-gray-100 text-black flex items-center justify-center">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                         </div>
                         <div>
@@ -114,7 +115,7 @@
                             <p class="text-[15px] font-bold text-slate-800" id="stat-apps">0 个</p>
                         </div>
                     </div>
-                    <div class="bg-slate-50 p-3 rounded-lg flex items-center gap-3 border border-slate-100">
+                    <div class="bg-slate-50 p-3 rounded-lg flex items-center gap-3 border border-gray-200">
                         <div class="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
                         </div>
@@ -134,7 +135,7 @@
 
         <div class="px-4 mb-6">
             <div class="card overflow-hidden">
-                <div class="flex border-b border-slate-100 bg-slate-50/50">
+                <div class="flex border-b border-gray-200 bg-slate-50/50">
                     <div class="tab-btn active" onclick="switchDetailTab('intro', this)">介绍</div>
                     <div class="tab-btn" onclick="switchDetailTab('docs', this)">API 文档</div>
                     <div class="tab-btn" onclick="switchDetailTab('scenes', this)">应用场景</div>
@@ -154,7 +155,7 @@
                         <p class="text-[12px] text-slate-500 font-mono mb-4" id="api-endpoint">POST https://web.lynli.me/api/v1/query</p>
                         
                         <h4 class="font-bold text-slate-800 mb-1">请求参数</h4>
-                        <div class="border border-slate-200 rounded-lg overflow-hidden mb-4">
+                        <div class="border border-gray-200 rounded-lg overflow-hidden mb-4">
                             <table class="api-table" id="api-params-table"></table>
                         </div>
 
@@ -186,9 +187,9 @@
         };
 
         const categoryColors = {
-            '手机号码': 'text-blue-600 bg-blue-50', '实名认证': 'text-green-600 bg-green-50', '交通与车辆': 'text-orange-600 bg-orange-50',
-            '企业工商': 'text-indigo-600 bg-indigo-50', '生活服务': 'text-teal-600 bg-teal-50', '网站域名': 'text-purple-600 bg-purple-50',
-            '金融风险': 'text-red-600 bg-red-50', '默认': 'text-slate-600 bg-slate-50'
+            '手机号码': 'text-black bg-gray-50', '实名认证': 'text-green-600 bg-gray-50', '交通与车辆': 'text-orange-600 bg-gray-50',
+            '企业工商': 'text-indigo-600 bg-gray-50', '生活服务': 'text-teal-600 bg-teal-50', '网站域名': 'text-purple-600 bg-gray-50',
+            '金融风险': 'text-red-600 bg-gray-50', '默认': 'text-slate-600 bg-slate-50'
         };
 
         let currentApiData = null;
@@ -218,9 +219,9 @@
             document.getElementById('api-category').innerText = currentApiData.category;
             document.getElementById('api-id').innerText = currentApiData.id;
             document.getElementById('api-method').innerText = currentApiData.method;
-            document.getElementById('api-icon-container').className = `w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border border-slate-100 ${colorClass}`;
+            document.getElementById('api-icon-container').className = `w-12 h-12 rounded-lg flex items-center justify-center shrink-0 border border-gray-200 ${colorClass}`;
             document.getElementById('api-icon-container').innerHTML = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">${iconPath}</svg>`;
-            document.getElementById('api-price').innerHTML = isFree ? '<span class="text-green-500 font-bold">免费</span>' : `$${currentApiData.price}<span class="text-[12px] font-sans font-normal text-slate-400">/次</span>`;
+            document.getElementById('api-price').innerHTML = isFree ? '<span class="text-gray-500 font-bold">免费</span>' : `$${currentApiData.price}<span class="text-[12px] font-sans font-normal text-slate-400">/次</span>`;
             
             document.getElementById('stat-apps').innerText = (currentApiData.id * 3 + 5) + ' 个';
             document.getElementById('stat-calls').innerText = (currentApiData.id * 113 + 24) + ' 次';
@@ -239,7 +240,7 @@
             // 渲染场景
             const scenes = currentApiData.scenes || ['业务接入场景测试', '风控审核数据支撑'];
             document.getElementById('scenes-list').innerHTML = scenes.map((text, i) => `
-                <div class="flex gap-3 ${i !== 0 ? 'border-t border-slate-100 pt-3' : ''}">
+                <div class="flex gap-3 ${i !== 0 ? 'border-t border-gray-200 pt-3' : ''}">
                     <span class="text-[18px] font-bold text-blue-300">0${i+1}</span>
                     <p class="text-[13px] text-slate-600 leading-relaxed">${text}</p>
                 </div>
@@ -260,12 +261,12 @@
             let related = apisData.filter(a => a.category === currentApiData.category && a.id !== currentApiData.id).slice(0, 4);
             if(related.length < 4) related = related.concat(apisData.filter(a => a.id !== currentApiData.id && a.category !== currentApiData.category).slice(0, 4 - related.length));
             relatedList.innerHTML = related.map(a => `
-                <a href="./api-detail.html?id=${a.id}" class="block w-52 shrink-0 bg-white p-3 rounded-xl border border-slate-100 shadow-sm active:bg-slate-50">
+                <a href="./api-detail.html?id=${a.id}" class="block w-52 shrink-0 bg-white p-3 rounded-lg border border-gray-200 shadow-sm active:bg-slate-50">
                     <h4 class="text-[13px] font-bold text-slate-800 line-clamp-1 mb-1">${a.title}</h4>
                     <p class="text-[11px] text-slate-500 line-clamp-2 mb-2 leading-relaxed h-8">${a.desc}</p>
                     <div class="flex justify-between items-center text-[11px]">
-                        <span class="text-orange-500 font-bold">${a.price === '免费' ? '免费' : '$' + a.price}</span>
-                        <span class="text-blue-500">查看 →</span>
+                        <span class="text-gray-900 font-bold">${a.price === '免费' ? '免费' : '$' + a.price}</span>
+                        <span class="text-gray-900">查看 →</span>
                     </div>
                 </a>
             `).join('');

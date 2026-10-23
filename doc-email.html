@@ -27,9 +27,10 @@
         
         .highlight-box { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 16px; margin-bottom: 20px; color: #1e40af; font-size: 13px; line-height: 1.6; }
     </style>
+    <link rel="stylesheet" href="./style.css">
 </head>
-<body>
-    <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center gap-3 sticky top-0 z-50">
+<body class="bg-[#f8f9fa]">
+    <header class="bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-3 sticky top-0 z-50">
         <a href="./guide.html" class="text-slate-600 text-xl font-bold px-2">←</a>
         <h1 class="text-[17px] font-bold text-slate-800">邮箱推送 API</h1>
     </header>
@@ -40,14 +41,14 @@
             <h2 class="text-[26px] font-extrabold text-slate-800 mb-2 tracking-tight">全托管邮件推送服务</h2>
             <p class="text-[14px] text-slate-500 mb-5 leading-relaxed">无需折腾复杂的协议与服务器配置。绑定域名，提交内容，剩下的交给我们。</p>
             <div class="flex flex-wrap gap-2">
-                <span class="bg-green-50 text-green-600 text-[12px] font-bold px-3 py-1 rounded-full">零配置一键接入</span>
-                <span class="bg-green-50 text-green-600 text-[12px] font-bold px-3 py-1 rounded-full">自动核实绑定</span>
-                <span class="bg-green-50 text-green-600 text-[12px] font-bold px-3 py-1 rounded-full">99% 极高送达率</span>
+                <span class="bg-gray-50 text-green-600 text-[12px] font-bold px-3 py-1 rounded-full">零配置一键接入</span>
+                <span class="bg-gray-50 text-green-600 text-[12px] font-bold px-3 py-1 rounded-full">自动核实绑定</span>
+                <span class="bg-gray-50 text-green-600 text-[12px] font-bold px-3 py-1 rounded-full">99% 极高送达率</span>
             </div>
         </div>
 
         <!-- 导航锚点 -->
-        <div class="flex overflow-x-auto no-scrollbar gap-6 border-b border-slate-200 pb-3 mb-8 text-[13px] text-slate-500">
+        <div class="flex overflow-x-auto no-scrollbar gap-6 border-b border-gray-200 pb-3 mb-8 text-[13px] text-slate-500">
             <a href="#step1" class="nav-item active flex items-center whitespace-nowrap"><span class="nav-dot"></span>快速接入</a>
             <a href="#step2" class="nav-item flex items-center whitespace-nowrap"><span class="nav-dot"></span>零配置绑定</a>
             <a href="#step3" class="nav-item flex items-center whitespace-nowrap"><span class="nav-dot"></span>推送接口</a>
@@ -65,21 +66,21 @@
             
             <div class="space-y-3">
                 <div class="card p-4 flex gap-4 items-start">
-                    <div class="text-[12px] font-bold text-blue-500 bg-blue-50 px-2 py-1 rounded">01</div>
+                    <div class="text-[12px] font-bold text-gray-900 bg-gray-50 px-2 py-1 rounded">01</div>
                     <div>
                         <h4 class="text-[14px] font-bold text-slate-800 mb-1">提交您的域名或网站/APP</h4>
                         <p class="text-[13px] text-slate-500">在控制台填入您的品牌域名（或 APP 官网地址），系统将自动识别并配置。</p>
                     </div>
                 </div>
                 <div class="card p-4 flex gap-4 items-start">
-                    <div class="text-[12px] font-bold text-blue-500 bg-blue-50 px-2 py-1 rounded">02</div>
+                    <div class="text-[12px] font-bold text-gray-900 bg-gray-50 px-2 py-1 rounded">02</div>
                     <div>
                         <h4 class="text-[14px] font-bold text-slate-800 mb-1">系统全自动核实</h4>
                         <p class="text-[13px] text-slate-500">后台自动验证您的归属权，核实通过后，自动为您完成所有底层发信协议的绑定推送。</p>
                     </div>
                 </div>
                 <div class="card p-4 flex gap-4 items-start">
-                    <div class="text-[12px] font-bold text-blue-500 bg-blue-50 px-2 py-1 rounded">03</div>
+                    <div class="text-[12px] font-bold text-gray-900 bg-gray-50 px-2 py-1 rounded">03</div>
                     <div>
                         <h4 class="text-[14px] font-bold text-slate-800 mb-1">调用 API 发送内容</h4>
                         <p class="text-[13px] text-slate-500">传入收件人和邮件标题/正文，我们以您的专属前缀瞬间代发。</p>
@@ -123,7 +124,7 @@
             
             <div class="card p-5">
                 <div class="flex items-center mb-3">
-                    <span class="bg-green-50 text-green-600 px-2 py-1 rounded text-[11px] font-bold border border-green-200 mr-2">POST</span>
+                    <span class="bg-gray-50 text-green-600 px-2 py-1 rounded text-[11px] font-bold border border-green-200 mr-2">POST</span>
                     <span class="font-mono text-[14px] font-bold text-slate-800">/email/send</span>
                 </div>
                 <p class="text-[12px] text-slate-500 mb-4">请求地址：<code>https://web.lynli.me/api/v1/email/send</code></p>
@@ -178,7 +179,7 @@
                     <h4 class="text-[14px] font-bold text-slate-800 mb-1">按量计费 (发送成功才扣费)</h4>
                     <p>发信时产生费用，若发送失败或退信，系统将自动返还额度。</p>
                 </div>
-                <div class="border-t border-slate-100 pt-3">
+                <div class="border-t border-gray-200 pt-3">
                     <h4 class="text-[14px] font-bold text-slate-800 mb-1">域名绑定月租费</h4>
                     <p>为确保通道不被恶意滥用，绑定独立域名需按年/月缴纳基础维护费，同时赠送额外发信额度。</p>
                 </div>
@@ -193,7 +194,7 @@
             
             <div class="card p-5">
                 <div class="flex items-center mb-3">
-                    <span class="bg-blue-50 text-blue-600 px-2 py-1 rounded text-[11px] font-bold border border-blue-200 mr-2">GET</span>
+                    <span class="bg-gray-50 text-black px-2 py-1 rounded text-[11px] font-bold border border-blue-200 mr-2">GET</span>
                     <span class="font-mono text-[14px] font-bold text-slate-800">/email/logs</span>
                 </div>
                 <p class="text-[12px] text-slate-500 mb-4">请求地址：<code>https://web.lynli.me/api/v1/email/logs</code></p>

@@ -17,9 +17,10 @@
         .modal-overlay.active { display: flex; }
         .modal-box { background: #fff; width: 100%; max-width: 340px; border-radius: 20px; padding: 24px; text-align: center; }
     </style>
+    <link rel="stylesheet" href="./style.css">
 </head>
-<body class="pb-12">
-    <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
+<body class="pb-12 bg-[#f8f9fa]">
+    <header class="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
         <div class="flex items-center gap-3">
             <a href="./console.html" class="text-slate-600 text-xl font-bold px-2">←</a>
             <h1 class="text-[17px] font-bold text-slate-800">在线充值</h1>
@@ -36,10 +37,10 @@
             <div>
                 <label class="text-[14px] font-bold text-slate-700 mb-3 block">选择充值方式</label>
                 <div class="grid grid-cols-2 gap-3">
-                    <div onclick="selectPayType('alipay')" id="btn-alipay" class="border-2 border-blue-500 bg-blue-50 p-4 rounded-xl cursor-pointer text-center transition">
-                        <span class="text-[15px] font-bold text-blue-600">支付宝 (推荐)</span>
+                    <div onclick="selectPayType('alipay')" id="btn-alipay" class="border-2 border-blue-500 bg-gray-50 p-4 rounded-lg cursor-pointer text-center transition">
+                        <span class="text-[15px] font-bold text-black">支付宝 (推荐)</span>
                     </div>
-                    <div onclick="selectPayType('usdt')" id="btn-usdt" class="border border-slate-200 p-4 rounded-xl cursor-pointer text-center transition bg-white">
+                    <div onclick="selectPayType('usdt')" id="btn-usdt" class="border border-gray-200 p-4 rounded-lg cursor-pointer text-center transition bg-white">
                         <span class="text-[15px] font-bold text-slate-600">USDT (TRC20)</span>
                     </div>
                 </div>
@@ -54,17 +55,17 @@
                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-[20px]" id="unit-symbol">¥</span>
                     <input type="number" id="recharge-amount" class="input-flat pl-10" placeholder="最低 10 元" value="100" oninput="calcEstimate()">
                 </div>
-                <p class="text-[13px] text-blue-600 mt-2 text-right font-medium" id="estimate-text">预估到账: 12.50 USDT</p>
+                <p class="text-[13px] text-black mt-2 text-right font-medium" id="estimate-text">预估到账: 12.50 USDT</p>
             </div>
 
             <div class="grid grid-cols-4 gap-2">
-                <button onclick="setAmount(50)" class="py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-[14px] font-bold text-slate-600 active:bg-slate-100">50</button>
-                <button onclick="setAmount(100)" class="py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-[14px] font-bold text-slate-600 active:bg-slate-100">100</button>
-                <button onclick="setAmount(500)" class="py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-[14px] font-bold text-slate-600 active:bg-slate-100">500</button>
-                <button onclick="setAmount(1000)" class="py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-[14px] font-bold text-slate-600 active:bg-slate-100">1000</button>
+                <button onclick="setAmount(50)" class="py-2.5 bg-slate-50 border border-gray-200 rounded-lg text-[14px] font-bold text-slate-600 active:bg-slate-100">50</button>
+                <button onclick="setAmount(100)" class="py-2.5 bg-slate-50 border border-gray-200 rounded-lg text-[14px] font-bold text-slate-600 active:bg-slate-100">100</button>
+                <button onclick="setAmount(500)" class="py-2.5 bg-slate-50 border border-gray-200 rounded-lg text-[14px] font-bold text-slate-600 active:bg-slate-100">500</button>
+                <button onclick="setAmount(1000)" class="py-2.5 bg-slate-50 border border-gray-200 rounded-lg text-[14px] font-bold text-slate-600 active:bg-slate-100">1000</button>
             </div>
 
-            <button onclick="submitRecharge()" class="w-full py-4 bg-blue-600 text-white font-bold rounded-xl text-[16px] active:opacity-80 transition shadow-lg shadow-blue-500/30">立即充值</button>
+            <button onclick="submitRecharge()" class="w-full py-4 bg-black text-white font-bold rounded-lg text-[16px] active:opacity-80 transition shadow-sm shadow-blue-500/30">立即充值</button>
         </div>
     </main>
 
@@ -73,16 +74,16 @@
         <div class="modal-box">
             <h3 class="text-[18px] font-bold text-slate-800 mb-2">扫码支付</h3>
             <p class="text-[13px] text-slate-500 mb-5" id="pay-tip">请使用支付宝扫码付款</p>
-            <div class="w-48 h-48 bg-slate-50 mx-auto rounded-xl flex items-center justify-center mb-5 border border-slate-100 shadow-inner">
+            <div class="w-48 h-48 bg-slate-50 mx-auto rounded-lg flex items-center justify-center mb-5 border border-gray-200 shadow-inner">
                 <img id="pay-qrcode" src="" class="w-full h-full object-contain hidden">
             </div>
             <p class="text-[12px] text-slate-400 mb-1">需支付金额</p>
-            <p class="text-[28px] font-extrabold text-red-500 mb-5" id="pay-amount">¥ 100.00</p>
-            <div id="usdt-box" class="hidden bg-slate-50 border border-slate-200 rounded-lg p-3 mb-5 text-left">
+            <p class="text-[28px] font-extrabold text-black mb-5" id="pay-amount">¥ 100.00</p>
+            <div id="usdt-box" class="hidden bg-slate-50 border border-gray-200 rounded-lg p-3 mb-5 text-left">
                 <p class="text-[11px] text-slate-500 mb-1">TRC20 收款地址 (长按复制)</p>
                 <p class="text-[13px] font-mono text-slate-700 break-all select-all">TYu8x9ZqP3vK2mN4wL5jR6tB7cV8bA9sD0</p>
             </div>
-            <button onclick="closeModal()" class="w-full py-3.5 bg-slate-100 text-slate-600 font-bold rounded-xl text-[15px]">我已完成支付</button>
+            <button onclick="closeModal()" class="w-full py-3.5 bg-slate-100 text-slate-600 font-bold rounded-lg text-[15px]">我已完成支付</button>
         </div>
     </div>
 
@@ -97,15 +98,15 @@
             const usdt = document.getElementById('btn-usdt');
             const unit = document.getElementById('unit-symbol');
             if (type === 'alipay') {
-                alipay.className = 'border-2 border-blue-500 bg-blue-50 p-4 rounded-xl cursor-pointer text-center transition';
-                alipay.querySelector('span').className = 'text-[15px] font-bold text-blue-600';
-                usdt.className = 'border border-slate-200 p-4 rounded-xl cursor-pointer text-center transition bg-white';
+                alipay.className = 'border-2 border-blue-500 bg-gray-50 p-4 rounded-lg cursor-pointer text-center transition';
+                alipay.querySelector('span').className = 'text-[15px] font-bold text-black';
+                usdt.className = 'border border-gray-200 p-4 rounded-lg cursor-pointer text-center transition bg-white';
                 usdt.querySelector('span').className = 'text-[15px] font-bold text-slate-600';
                 unit.innerText = '¥';
             } else {
-                usdt.className = 'border-2 border-blue-500 bg-blue-50 p-4 rounded-xl cursor-pointer text-center transition';
-                usdt.querySelector('span').className = 'text-[15px] font-bold text-blue-600';
-                alipay.className = 'border border-slate-200 p-4 rounded-xl cursor-pointer text-center transition bg-white';
+                usdt.className = 'border-2 border-blue-500 bg-gray-50 p-4 rounded-lg cursor-pointer text-center transition';
+                usdt.querySelector('span').className = 'text-[15px] font-bold text-black';
+                alipay.className = 'border border-gray-200 p-4 rounded-lg cursor-pointer text-center transition bg-white';
                 alipay.querySelector('span').className = 'text-[15px] font-bold text-slate-600';
                 unit.innerText = '$';
             }

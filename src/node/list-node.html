@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>代理节点 - TGX Store</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#f8f9fa] text-gray-900 font-sans antialiased pb-16">
+    <header class="bg-white px-4 py-4 sticky top-0 z-10 border-b border-gray-100 flex items-center">
+        <a href="./index.html" class="text-gray-500 mr-3">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+        </a>
+        <h1 class="text-lg font-bold">代理节点</h1>
+    </header>
+
+    <main class="px-4 py-4">
+        <div id="product-list" class="grid grid-cols-1 gap-3">
+            <div class="text-center py-10 text-gray-400 text-sm">正在加载商品...</div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const res = await fetch("https://lynli.kz.ci/api/products");
+                const data = await res.json();
+                let products = Array.isArray(data) ? data : (data.data || []);
+                
+                // 过滤出代理节点
+                products = products.filter(p => p.category === '代理节点' || p.title.toLowerCase().includes('节点') || p.title.toLowerCase().includes('机场'));
+
+                const list = document.getElementById('product-list');
+                if (products.length === 0) {
+                    list.innerHTML = '<div class="text-center py-10 text-gray-400 text-sm">暂无节点商品</div>';
+                    return;
+                }
+
+                list.innerHTML = products.map(p => `
+                    <a href="../product/product-detail.html?id=${p.id}" class="block bg-white rounded-xl border border-gray-200 p-4 active:bg-gray-50 transition">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-[15px] font-semibold text-gray-900 leading-snug line-clamp-2 pr-4">${p.title}</h3>
+                            <span class="text-[11px] text-gray-400 whitespace-nowrap mt-0.5">库存 ${p.stock}</span>
+                        </div>
+                        <div class="flex flex-wrap gap-1.5 mb-3">
+                            ${(p.tags || []).map(t => `<span class="text-[10px] bg-gray-50 text-gray-500 px-1.5 py-0.5 rounded border border-gray-100">${t}</span>`).join('')}
+                        </div>
+                        <div class="flex items-end justify-between mt-2 pt-3 border-t border-gray-50">
+                            <div class="flex items-baseline">
+                                <span class="text-[18px] font-bold text-gray-900">¥${p.price}</span>
+                            </div>
+                            <span class="text-[12px] font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded">立即购买</span>
+                        </div>
+                    </a>
+                `).join('');
+            } catch (e) {
+                console.error(e);
+            }
+        });
+    </script>
+</body>
+</html>

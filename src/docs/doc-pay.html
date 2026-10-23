@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>支付接口文档 - SOCKS5</title>
+    <link rel="icon" href="../assets/logo.jpg" type="image/jpeg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #f8fafc; color: #1e293b; scroll-behavior: smooth; }
+        .card { background: #ffffff; border-radius: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); border: 1px solid #f1f5f9; }
+        .num-box { width: 28px; height: 28px; background: #eff6ff; color: #2563eb; font-weight: bold; font-size: 14px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .code-wrapper { position: relative; margin: 12px 0 20px 0; }
+        .code-block { background: #1e293b; color: #e2e8f0; padding: 16px; border-radius: 10px; font-family: 'Courier New', Courier, monospace; font-size: 13px; overflow-y: auto; max-height: 300px; line-height: 1.6; white-space: pre-wrap; word-wrap: break-word; }
+        .copy-btn { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.1); color: #cbd5e1; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-family: sans-serif; cursor: pointer; transition: all 0.2s; }
+        .copy-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
+        
+        .nav-dot { width: 6px; height: 6px; border-radius: 50%; background: #cbd5e1; display: inline-block; margin-right: 8px; transition: all 0.2s; }
+        .nav-item.active .nav-dot { background: #2563eb; width: 16px; border-radius: 4px; }
+        .nav-item.active { color: #2563eb; font-weight: bold; }
+        
+        /* 接口字段表格样式 */
+        .api-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 13px; }
+        .api-table th { text-align: left; padding: 10px 12px; background: #f1f5f9; color: #475569; font-weight: bold; border-bottom: 1px solid #e2e8f0; }
+        .api-table td { padding: 12px; border-bottom: 1px solid #e2e8f0; color: #1e293b; background: #fff; line-height: 1.5; }
+        .api-table td:first-child { font-family: 'Courier New', Courier, monospace; color: #2563eb; font-weight: bold; }
+    </style>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="bg-[#f8f9fa]">
+    <header class="bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-3 sticky top-0 z-50">
+        <a href="./guide.html" class="text-slate-600 text-xl font-bold px-2">←</a>
+        <h1 class="text-[17px] font-bold text-slate-800">支付接口 API</h1>
+    </header>
+
+    <main class="px-4 py-6 pb-24 max-w-2xl mx-auto">
+        <!-- Hero 区域 -->
+        <div class="mb-8">
+            <h2 class="text-[26px] font-extrabold text-slate-800 mb-2 tracking-tight">支付网关接入规范</h2>
+            <p class="text-[14px] text-slate-500 mb-5 leading-relaxed">为您提供稳定、合规的代收通道。支持 SHA256WithRSA 高级别加密验签，保障商户资金安全。</p>
+            <div class="flex flex-wrap gap-2">
+                <span class="bg-gray-50 text-black text-[12px] font-bold px-3 py-1 rounded-full">SHA256WithRSA 签名</span>
+                <span class="bg-gray-50 text-black text-[12px] font-bold px-3 py-1 rounded-full">JSON 数据格式</span>
+                <span class="bg-gray-50 text-black text-[12px] font-bold px-3 py-1 rounded-full">毫秒级异步回调</span>
+            </div>
+        </div>
+
+        <!-- 导航锚点 -->
+        <div class="flex overflow-x-auto no-scrollbar gap-6 border-b border-gray-200 pb-3 mb-8 text-[13px] text-slate-500">
+            <a href="#step1" class="nav-item active flex items-center whitespace-nowrap"><span class="nav-dot"></span>统一下单</a>
+            <a href="#step2" class="nav-item flex items-center whitespace-nowrap"><span class="nav-dot"></span>订单查询</a>
+            <a href="#step3" class="nav-item flex items-center whitespace-nowrap"><span class="nav-dot"></span>关闭订单</a>
+            <a href="#step4" class="nav-item flex items-center whitespace-nowrap"><span class="nav-dot"></span>支付回调</a>
+            <a href="#step5" class="nav-item flex items-center whitespace-nowrap"><span class="nav-dot"></span>签名规则</a>
+            <a href="#step6" class="nav-item flex items-center whitespace-nowrap"><span class="nav-dot"></span>商户接口</a>
+            <a href="#step7" class="nav-item flex items-center whitespace-nowrap"><span class="nav-dot"></span>SDK下载</a>
+        </div>
+
+        <!-- 01 统一下单 -->
+        <div id="step1" class="mb-12 scroll-mt-20">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="num-box">01</div>
+                <h3 class="text-[18px] font-bold text-slate-800">统一下单接口</h3>
+            </div>
+            <p class="text-[13px] text-slate-500 mb-4">用于服务器后端创建订单，并返回收银台链接。</p>
+            
+            <div class="card p-5">
+                <div class="flex items-center mb-3">
+                    <span class="bg-gray-50 text-green-600 px-2 py-1 rounded text-[11px] font-bold border border-green-200 mr-2">POST</span>
+                    <span class="font-mono text-[14px] font-bold text-slate-800">/api/pay/create</span>
+                </div>
+                <p class="text-[12px] text-slate-500 mb-4">请求地址：<code>https://web.lynli.me/api/pay/create</code><br>提交格式：<code>application/x-www-form-urlencoded</code></p>
+
+                <p class="text-[13px] font-bold text-slate-700 mb-2">请求参数：</p>
+                <table class="api-table">
+                    <tr><th>参数名</th><th>必填</th><th>说明</th></tr>
+                    <tr><td>pid</td><td>是</td><td>商户 ID</td></tr>
+                    <tr><td>type</td><td>是</td><td>支付方式：alipay 或 usdt</td></tr>
+                    <tr><td>out_trade_no</td><td>是</td><td>商户订单号，需保持唯一</td></tr>
+                    <tr><td>notify_url</td><td>是</td><td>服务器异步通知地址</td></tr>
+                    <tr><td>return_url</td><td>是</td><td>支付后页面跳转地址</td></tr>
+                    <tr><td>name</td><td>是</td><td>商品名称</td></tr>
+                    <tr><td>money</td><td>是</td><td>订单金额，单位元，最多 2 位小数</td></tr>
+                    <tr><td>param</td><td>否</td><td>业务扩展参数，支付后原样返回</td></tr>
+                    <tr><td>clientip</td><td>否</td><td>用户 IP，不传则使用请求 IP</td></tr>
+                    <tr><td>timestamp</td><td>是</td><td>10 位秒级时间戳</td></tr>
+                    <tr><td>sign</td><td>是</td><td>RSA 签名（见下方说明）</td></tr>
+                    <tr><td>sign_type</td><td>是</td><td>固定传 RSA</td></tr>
+                </table>
+
+                <p class="text-[13px] font-bold text-slate-700 mb-2 mt-4">返回示例：</p>
+                <div class="code-wrapper">
+                    <div class="copy-btn" onclick="copyCode(this)">复制</div>
+                    <div class="code-block">{
+  "code": 0,
+  "msg": "success",
+  "trade_no": "202606130001000001",
+  "out_trade_no": "M202606130001",
+  "pay_type": "jump",
+  "payurl": "https://web.lynli.me/cashier/202606130001000001",
+  "qrcode": "https://web.lynli.me/cashier/202606130001000001",
+  "timestamp": "1781270400",
+  "sign_type": "RSA",
+  "sign": "..."
+}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 02 订单查询 -->
+        <div id="step2" class="mb-12 scroll-mt-20">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="num-box">02</div>
+                <h3 class="text-[18px] font-bold text-slate-800">订单查询接口</h3>
+            </div>
+            
+            <div class="card p-5">
+                <div class="flex items-center mb-3">
+                    <span class="bg-gray-50 text-green-600 px-2 py-1 rounded text-[11px] font-bold border border-green-200 mr-2">POST</span>
+                    <span class="font-mono text-[14px] font-bold text-slate-800">/api/pay/query</span>
+                </div>
+                <p class="text-[12px] text-slate-500 mb-4">请求地址：<code>https://web.lynli.me/api/pay/query</code></p>
+
+                <p class="text-[13px] font-bold text-slate-700 mb-2">请求参数：</p>
+                <table class="api-table">
+                    <tr><th>参数名</th><th>必填</th><th>说明</th></tr>
+                    <tr><td>pid</td><td>是</td><td>商户 ID</td></tr>
+                    <tr><td>timestamp</td><td>是</td><td>10 位秒级时间戳，有效期约 5 分钟</td></tr>
+                    <tr><td>sign</td><td>是</td><td>RSA 签名</td></tr>
+                    <tr><td>sign_type</td><td>是</td><td>固定传 RSA</td></tr>
+                    <tr><td>trade_no</td><td>二选一</td><td>平台订单号</td></tr>
+                    <tr><td>out_trade_no</td><td>二选一</td><td>商户订单号</td></tr>
+                </table>
+
+                <p class="text-[13px] font-bold text-slate-700 mb-2 mt-4">返回字段：</p>
+                <table class="api-table">
+                    <tr><th>字段名</th><th>说明</th></tr>
+                    <tr><td>code</td><td>0 为成功</td></tr>
+                    <tr><td>trade_no</td><td>平台订单号</td></tr>
+                    <tr><td>out_trade_no</td><td>商户订单号</td></tr>
+                    <tr><td>status</td><td>1 为已支付，0 为未支付</td></tr>
+                    <tr><td>money</td><td>订单金额</td></tr>
+                    <tr><td>type</td><td>支付方式</td></tr>
+                    <tr><td>addtime</td><td>创建时间</td></tr>
+                    <tr><td>endtime</td><td>支付完成时间</td></tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- 03 关闭订单 -->
+        <div id="step3" class="mb-12 scroll-mt-20">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="num-box">03</div>
+                <h3 class="text-[18px] font-bold text-slate-800">关闭订单接口</h3>
+            </div>
+            
+            <div class="card p-5">
+                <div class="flex items-center mb-3">
+                    <span class="bg-gray-50 text-green-600 px-2 py-1 rounded text-[11px] font-bold border border-green-200 mr-2">POST</span>
+                    <span class="font-mono text-[14px] font-bold text-slate-800">/api/pay/close</span>
+                </div>
+                <p class="text-[12px] text-slate-500 mb-4">请求地址：<code>https://web.lynli.me/api/pay/close</code></p>
+
+                <p class="text-[13px] font-bold text-slate-700 mb-2">请求参数：</p>
+                <table class="api-table">
+                    <tr><th>参数名</th><th>必填</th><th>说明</th></tr>
+                    <tr><td>pid</td><td>是</td><td>商户 ID</td></tr>
+                    <tr><td>timestamp</td><td>是</td><td>10 位秒级时间戳，请求有效期约 5 分钟</td></tr>
+                    <tr><td>sign</td><td>是</td><td>RSA 签名</td></tr>
+                    <tr><td>sign_type</td><td>是</td><td>固定传 RSA</td></tr>
+                    <tr><td>trade_no</td><td>二选一</td><td>平台订单号</td></tr>
+                    <tr><td>out_trade_no</td><td>二选一</td><td>商户订单号</td></tr>
+                </table>
+                <p class="text-[12px] text-amber-600 bg-amber-50 p-2 rounded mt-2 border border-amber-100">说明：仅未支付订单可关闭。</p>
+            </div>
+        </div>
+
+        <!-- 04 支付结果通知 -->
+        <div id="step4" class="mb-12 scroll-mt-20">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="num-box">04</div>
+                <h3 class="text-[18px] font-bold text-slate-800">支付结果通知</h3>
+            </div>
+            <p class="text-[13px] text-slate-500 mb-4">订单支付成功后，平台会向商户传入的 <code>notify_url</code> 发起 GET 通知。</p>
+            
+            <div class="card p-5">
+                <div class="bg-gray-50 border border-blue-100 rounded-lg p-3 text-[13px] text-blue-700 mb-4">
+                    💡 <b>通知签名说明：</b><br>
+                    通知签名跟随下单接口：V2接口使用 <b>RSA</b>；V1兼容接口使用 <b>MD5</b>。
+                </div>
+
+                <p class="text-[13px] font-bold text-slate-700 mb-2">通知参数：</p>
+                <table class="api-table">
+                    <tr><th>字段名</th><th>说明</th></tr>
+                    <tr><td>pid</td><td>商户 ID</td></tr>
+                    <tr><td>trade_no</td><td>平台订单号</td></tr>
+                    <tr><td>out_trade_no</td><td>商户订单号</td></tr>
+                    <tr><td>type</td><td>支付方式</td></tr>
+                    <tr><td>name</td><td>商品名称</td></tr>
+                    <tr><td>money</td><td>订单金额</td></tr>
+                    <tr><td>trade_status</td><td>支付成功固定为 TRADE_SUCCESS</td></tr>
+                    <tr><td>param</td><td>业务扩展参数</td></tr>
+                    <tr><td>sign/sign_type</td><td>V2为RSA验签参数；V1为MD5验签参数</td></tr>
+                    <tr><td>timestamp</td><td>仅V2 RSA通知携带</td></tr>
+                </table>
+
+                <div class="bg-amber-50 border border-amber-100 rounded-lg p-3 text-[13px] text-amber-700 mt-4">
+                    ⚠️ <b>处理规则：</b>商户系统验签成功并确认订单状态后，必须返回纯文本 <code>success</code>，否则平台将判定通知失败并重复发送。
+                </div>
+            </div>
+        </div>
+
+        <!-- 05 签名规则 -->
+        <div id="step5" class="mb-10 scroll-mt-20">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="num-box">05</div>
+                <h3 class="text-[18px] font-bold text-slate-800">RSA 签名规则 (V2)</h3>
+            </div>
+            
+            <div class="card p-5 text-[13px] text-slate-600 leading-relaxed space-y-4">
+                <div>
+                    <h4 class="font-bold text-slate-800 mb-1">生成签名 (请求)</h4>
+                    <p>1. 取所有非空普通参数，排除 <code>sign</code>、<code>sign_type</code> 和数组参数。</p>
+                    <p>2. 按参数名 ASCII 升序排序。</p>
+                    <p>3. 拼接为 <code>key=value&key2=value2</code> 格式。</p>
+                    <p>4. 使用<b>商户私钥</b>执行 <code>SHA256WithRSA</code> 签名，将结果进行 Base64 编码。</p>
+                </div>
+                <div class="border-t border-gray-200 pt-3">
+                    <h4 class="font-bold text-slate-800 mb-1">验证签名 (回调/返回)</h4>
+                    <p>接口返回、异步通知均使用平台私钥签名。商户系统按同样规则拼接待签名字符串，再用<b>平台公钥</b>验签。</p>
+                </div>
+                <div class="border-t border-gray-200 pt-3">
+                    <h4 class="font-bold text-slate-800 mb-1">待签名串示例</h4>
+                    <div class="code-wrapper">
+                        <div class="copy-btn" onclick="copyCode(this)">复制</div>
+                        <div class="code-block">money=1.00&name=支付测试&notify_url=https://merchant.example.com/notify_url.php&out_trade_no=202606130001&pid=1001&return_url=https://merchant.example.com/return_url.php&timestamp=1781270400&type=alipay</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="step6" class="mb-12 scroll-mt-20">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="num-box">06</div>
+                <h3 class="text-[18px] font-bold text-slate-800">商户相关接口 (补充)</h3>
+            </div>
+            
+            <div class="card p-5">
+                <div class="flex items-center mb-3">
+                    <span class="bg-gray-50 text-black px-2 py-1 rounded text-[11px] font-bold border border-blue-200 mr-2">GET</span>
+                    <span class="font-mono text-[14px] font-bold text-slate-800">/api/merchant/balance</span>
+                </div>
+                <p class="text-[13px] text-slate-500 mb-4">查询当前商户可提现余额与待结算资金。</p>
+                <p class="text-[13px] font-bold text-slate-700 mb-2">返回示例：</p>
+                <div class="code-wrapper">
+                    <div class="copy-btn" onclick="copyCode(this)">复制</div>
+                    <div class="code-block">{
+  "code": 0,
+  "data": {
+    "balance": "1000.00",
+    "pending": "50.00"
+  }
+}</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="step7" class="mb-10 scroll-mt-20">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="num-box">07</div>
+                <h3 class="text-[18px] font-bold text-slate-800">SDK 工具包下载</h3>
+            </div>
+            
+            <div class="card p-5">
+                <p class="text-[13px] text-slate-600 mb-4">为降低您的开发成本，我们提供了封装好 RSA 签名算法的官方 SDK。请下载后修改 <code>epay.config.php</code>，填入商户 ID 与私钥即可使用。</p>
+                
+                <div class="flex flex-col gap-3">
+                    <a href="./sdk.zip" class="flex items-center justify-between p-3 border border-gray-200 rounded-lg active:bg-slate-50">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded bg-gray-50 text-indigo-600 flex items-center justify-center font-bold">PHP</div>
+                            <div>
+                                <p class="text-[14px] font-bold text-slate-800">PHP-SDK.zip (V2.1)</p>
+                                <p class="text-[11px] text-slate-500">适配 ThinkPHP / Laravel 等主流框架</p>
+                            </div>
+                        </div>
+                        <span class="text-[12px] text-gray-900 font-bold">下载</span>
+                    </a>
+                    <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg bg-slate-50 opacity-60">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded bg-slate-200 text-slate-500 flex items-center justify-center font-bold">JAVA</div>
+                            <div>
+                                <p class="text-[14px] font-bold text-slate-500">Java-SDK.zip</p>
+                                <p class="text-[11px] text-slate-400">正在整理中...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function copyCode(btn) {
+            const textToCopy = btn.nextElementSibling.innerText;
+            if(navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    btn.innerText = '已复制!'; btn.style.color = '#10b981';
+                    setTimeout(() => { btn.innerText = '复制'; btn.style.color = '#cbd5e1'; }, 2000);
+                });
+            }
+        }
+
+        // 滚动监听高亮导航
+        const sections = document.querySelectorAll('div[id^="step"]');
+        const navItems = document.querySelectorAll('.nav-item');
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (scrollY >= sectionTop - 100) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('href') === `#${current}`) {
+                    item.classList.add('active');
+                }
+            });
+        });
+    </script>
+
+<script src="../js/ai-widget.js"></script>
+
+<script src="../js/notice.js"></script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>我的订单 - SOCKS5</title>
+    <link rel="icon" href="../assets/logo.jpg" type="image/jpeg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #f8fafc; color: #1e293b; }
+        .card { background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; }
+        .tab-item { flex: 1; text-align: center; padding: 12px 0; font-size: 14px; font-weight: bold; color: #64748b; border-bottom: 2px solid transparent; cursor: pointer; }
+        .tab-item.active { color: #2563eb; border-bottom-color: #2563eb; }
+    </style>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="pb-12 bg-[#f8f9fa]">
+    <header class="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
+        <div class="flex items-center gap-3">
+            <a href="../auth/profile.html" class="text-slate-600 text-xl font-bold px-2">←</a>
+            <h1 class="text-[17px] font-bold text-slate-800">我的订单</h1>
+        </div>
+    </header>
+
+    <main class="max-w-lg mx-auto">
+        <div class="flex border-b border-gray-200 bg-white">
+            <div class="tab-item active">全部</div>
+            <div class="tab-item">待支付</div>
+            <div class="tab-item">已发货</div>
+        </div>
+
+        <div class="p-4 space-y-3">
+            <!-- 订单卡片 1 -->
+            <div class="card p-4">
+                <div class="flex justify-between items-center mb-3 pb-3 border-b border-slate-50">
+                    <span class="text-[12px] text-slate-400 font-mono">订单号: ORD20261022001</span>
+                    <span class="text-[12px] font-bold text-gray-500">已发货</span>
+                </div>
+                <div class="flex gap-3 mb-3">
+                    <div class="w-12 h-12 rounded bg-gray-50 text-gray-900 flex items-center justify-center">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-[14px] font-bold text-slate-800 line-clamp-1">[货号3965] Telegram飞机号 | +1美国</h3>
+                        <p class="text-[12px] text-slate-400 mt-1">数量: 1</p>
+                    </div>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-[12px] text-slate-400">实付: <b class="text-black text-[16px]">¥8.72</b></span>
+                    <a href="./order-detail.html?id=3965&order_no=ORD20261022001&qty=1" class="px-4 py-1.5 bg-gray-50 text-black font-bold rounded-lg text-[13px] active:bg-gray-100">查看卡密</a>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script src="../js/notice.js"></script>
+    <script src="../js/ai-widget.js"></script>
+</body>
+</html>

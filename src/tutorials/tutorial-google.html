@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Google 教程 - SOCKS5</title>
+    <link rel="icon" href="../assets/logo.jpg" type="image/jpeg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #f8fafc; color: #1e293b; padding-bottom: 20px; }
+        .card { background: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; margin-bottom: 16px; }
+        
+        .sub-tab { flex: 1; padding: 8px 0; text-align: center; font-size: 13px; font-weight: bold; color: #64748b; border-bottom: 2px solid transparent; cursor: pointer; white-space: nowrap; }
+        .sub-tab.active { color: #2563eb; border-bottom-color: #2563eb; }
+
+        .accordion-btn { width: 100%; text-align: left; padding: 16px; font-size: 15px; font-weight: bold; color: #1e293b; display: flex; justify-content: space-between; align-items: center; background: #fff; border-bottom: 1px solid #f1f5f9; }
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; background: #f8fafc; }
+        .accordion-content.active { max-height: 5000px; transition: max-height 0.4s ease-in; }
+        .rotate-180 { transform: rotate(180deg); }
+
+        .step-num { width: 24px; height: 24px; border-radius: 50%; background: #eff6ff; color: #2563eb; font-size: 13px; font-weight: bold; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .link-btn { display: inline-block; background: #eff6ff; color: #2563eb; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: bold; text-decoration: none; border: 1px solid #bfdbfe; }
+        
+        .alert-box { background: #fffbeb; border: 1px solid #fde68a; color: #b45309; font-size: 13px; padding: 12px; border-radius: 8px; line-height: 1.6; }
+        .danger-box { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; font-size: 13px; padding: 12px; border-radius: 8px; line-height: 1.6; }
+        
+        .ai-prompt-box { background: #1e293b; color: #e2e8f0; padding: 16px; border-radius: 8px; font-family: monospace; font-size: 12px; position: relative; margin-top: 12px; }
+        .copy-btn { position: absolute; top: 8px; right: 8px; background: #3b82f6; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; border: none; font-family: sans-serif; font-weight: bold;}
+    </style>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="bg-[#f8f9fa]">
+    <header class="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
+        <div class="flex items-center gap-3">
+            <a href="./tutorial.html" class="text-slate-600 text-xl font-bold px-2">←</a>
+            <h1 class="text-[17px] font-bold text-slate-800">Google 教程</h1>
+        </div>
+    </header>
+
+    <main class="px-4 py-4 max-w-lg mx-auto">
+        <div class="danger-box mb-4">
+            ⚠️ <b>防诈骗提醒：</b>符合售后政策的补号、换号均无需额外付费！请勿通过第三方小程序、私人账户或陌生链接付款。
+        </div>
+
+        <div class="mb-4">
+            <h2 class="text-[20px] font-bold text-slate-800" id="main-title">加载中...</h2>
+            <p class="text-[12px] text-slate-500 mt-1" id="main-subtitle">首次使用请仔细阅读对应平台的使用教程</p>
+        </div>
+
+        <!-- 内层 Tab 切换 (2个) -->
+        <div class="flex border-b border-gray-200 mb-4 bg-white rounded-lg p-1 shadow-sm">
+            <div class="sub-tab active" onclick="switchGoogleTab('email', this)">辅助邮箱登录教程</div>
+            <div class="sub-tab" onclick="switchGoogleTab('2fa', this)">身份验证器2FA登录教程</div>
+        </div>
+
+        <div id="tutorial-content"></div>
+        
+        <!-- 底部特别说明 -->
+        <div class="mt-6 mb-8 bg-gray-50 border border-blue-100 rounded-lg p-4 text-[13px] text-blue-800 leading-relaxed">
+            <b>💡 提示：</b>Gmail 老号权重高不易触发风控，建议绑定手机号并定期使用避免被回收。
+        </div>
+    </main>
+
+    <script src="./data-google.js"></script>
+    <script>
+        function renderSections(sections) {
+            renderAutoTutorial(sections, "tutorial-content");
+        }
+
+        
+
+        function switchGoogleTab(mode, el) {
+            document.querySelectorAll('.sub-tab').forEach(btn => btn.classList.remove('active'));
+            el.classList.add('active');
+            
+            // 因为截图里的完整流程涵盖了这两者，所以两边数据一样
+            renderSections(googleData.sections);
+        }
+
+        function copyAIPrompt(btn) {
+            const text = document.getElementById('ai-prompt-text-google').innerText;
+            if(navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => {
+                    btn.innerText = '已复制!';
+                    btn.style.background = '#10b981';
+                    setTimeout(() => {
+                        btn.innerText = '复制指令';
+                        btn.style.background = '#3b82f6';
+                    }, 2000);
+                });
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('main-title').innerText = googleData.title;
+            document.getElementById('main-subtitle').innerText = googleData.subtitle;
+            renderSections(googleData.sections);
+        });
+    </script>
+    
+    <script src="../js/ai-widget.js"></script>
+<script src="../js/notice.js"></script>
+<script src="../js/tutorial-engine.js"></script>
+</body>
+</html>

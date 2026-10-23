@@ -8,39 +8,39 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .scrollbar-hide::-webkit-scrollbar { display: none; }
-        .text-gradient { background: linear-gradient(to right, #8B5CF6, #3B82F6); -webkit-background-clip: text; color: transparent; }
-        .bg-gradient-main { background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%); }
-        .bg-gradient-btn { background: linear-gradient(90deg, #d946ef 0%, #8b5cf6 100%); }
-        .bg-hero-glow { background: radial-gradient(circle at top center, #e9d5ff 0%, #f8f9fa 50%); }
+        .text-gradient { background: linear-gradient(to right, #0284c7, #2563eb); -webkit-background-clip: text; color: transparent; }
+        .bg-gradient-main { background: linear-gradient(135deg, #38bdf8 0%, #2563eb 100%); }
+        .bg-gradient-btn { background: linear-gradient(90deg, #0ea5e9 0%, #3b82f6 100%); }
+        .bg-hero-glow { background: radial-gradient(circle at top center, #e0f2fe 0%, #f8fafc 60%); }
     </style>
 </head>
-<body class="bg-[#f8f9fa] text-gray-900 font-sans antialiased pb-16">
+<body class="bg-[#f8fafc] text-gray-900 font-sans antialiased pb-16">
 
     <!-- 顶部导航 -->
-    <header class="bg-white px-4 py-3 sticky top-0 z-50 flex items-center justify-between shadow-sm">
+    <header class="bg-white/80 backdrop-blur-md px-4 py-3 sticky top-0 z-50 flex items-center justify-between shadow-sm border-b border-gray-100">
         <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-lg bg-gradient-main flex items-center justify-center text-white font-bold italic text-xl">T</div>
+            <div class="w-8 h-8 rounded-lg bg-gradient-main flex items-center justify-center text-white font-bold italic text-xl shadow-md">T</div>
             <h1 class="text-lg font-bold text-gray-800">TGX <span class="text-gradient">Account</span></h1>
         </div>
         <div class="flex items-center gap-2">
-            <button class="px-3 py-1.5 text-sm font-medium border border-gray-200 rounded-lg text-gray-600">登录</button>
-            <button class="px-3 py-1.5 text-sm font-medium text-white bg-gradient-btn rounded-lg shadow-md">注册</button>
+            <a href="./login.html" class="px-3 py-1.5 text-sm font-medium border border-gray-200 rounded-lg text-gray-600 bg-white">登录</a>
+            <a href="./register.html" class="px-3 py-1.5 text-sm font-medium text-white bg-gradient-btn rounded-lg shadow-md">注册</a>
             <svg class="w-6 h-6 text-gray-700 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
         </div>
     </header>
 
     <!-- 跑马灯公告 -->
-    <div class="bg-purple-50 px-4 py-2 flex items-center gap-2 overflow-hidden">
-        <div class="bg-purple-600 text-white rounded-full p-1 shrink-0">
+    <div class="bg-blue-50 px-4 py-2 flex items-center gap-2 overflow-hidden border-b border-blue-100/50">
+        <div class="bg-blue-600 text-white rounded-full p-1 shrink-0">
             <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z"></path></svg>
         </div>
-        <p class="text-xs text-purple-800 truncate">通过支付渠道回复相关信息。如有订单问题、售后需求或...</p>
+        <p class="text-xs text-blue-800 truncate">通过支付渠道回复相关信息。如有订单问题、售后需求或...</p>
     </div>
 
     <!-- 在线状态 -->
-    <div class="bg-[#f3e8ff] px-4 py-1.5 flex items-center gap-2">
+    <div class="bg-[#eff6ff] px-4 py-1.5 flex items-center gap-2 border-b border-blue-100/50">
         <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-        <span class="text-xs font-medium text-purple-900">平台实时在线 · 即时发货</span>
+        <span class="text-xs font-medium text-blue-900">平台实时在线 · 即时发货</span>
     </div>
 
     <!-- Hero 区域 -->
@@ -50,27 +50,27 @@
             <span class="text-gray-800">海外社媒账号</span><br>
             <span class="text-gray-800">一站式购平台</span>
         </h2>
-        <p class="text-sm text-purple-700 font-medium mb-8">Telegram·Twitter·Tiktok·Facebook全品类账号供应</p>
+        <p class="text-sm text-blue-700 font-medium mb-8">Telegram·Twitter·Tiktok·Facebook全品类账号供应</p>
 
         <!-- 信任背书 -->
         <div class="flex justify-between px-2 mb-6">
             <div class="flex flex-col items-center">
-                <div class="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center text-purple-600 mb-2"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg></div>
+                <div class="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center text-blue-600 mb-2"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg></div>
                 <span class="text-xs font-bold text-gray-800">30,000+ 用户</span>
                 <span class="text-[10px] text-gray-400">累计服务用户</span>
             </div>
             <div class="flex flex-col items-center">
-                <div class="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center text-purple-600 mb-2"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg></div>
+                <div class="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center text-blue-600 mb-2"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg></div>
                 <span class="text-xs font-bold text-gray-800">安全保障</span>
                 <span class="text-[10px] text-gray-400">三年运营值得信赖</span>
             </div>
             <div class="flex flex-col items-center">
-                <div class="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center text-purple-600 mb-2"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg></div>
+                <div class="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center text-blue-600 mb-2"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg></div>
                 <span class="text-xs font-bold text-gray-800">即时发货</span>
                 <span class="text-[10px] text-gray-400">下单秒出无需等待</span>
             </div>
             <div class="flex flex-col items-center">
-                <div class="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center text-purple-600 mb-2"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path></svg></div>
+                <div class="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center text-blue-600 mb-2"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path></svg></div>
                 <span class="text-xs font-bold text-gray-800">售后支持</span>
                 <span class="text-[10px] text-gray-400">专业客服随时在线</span>
             </div>
@@ -79,35 +79,35 @@
 
     <!-- 搜索框 -->
     <div class="px-4 -mt-4 relative z-10 mb-6">
-        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 flex items-center p-2">
-            <svg class="w-6 h-6 text-gray-400 ml-2 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        <div class="bg-white rounded-2xl shadow-lg shadow-blue-500/10 border border-blue-50 flex items-center p-2">
+            <svg class="w-6 h-6 text-blue-400 ml-2 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
             <input type="text" placeholder="找账号，如 电报老号、推特高粉号..." class="flex-1 bg-transparent border-none focus:ring-0 text-sm py-2">
         </div>
     </div>
 
     <!-- 轮播主推位 -->
     <div class="px-4 mb-6">
-        <div class="bg-[#1e3a8a] rounded-2xl p-5 shadow-xl relative overflow-hidden text-white">
+        <div class="bg-[#0f172a] rounded-2xl p-5 shadow-xl shadow-blue-900/20 relative overflow-hidden text-white">
             <!-- 背景光效 -->
-            <div class="absolute right-0 top-0 w-32 h-32 bg-blue-500 rounded-full filter blur-3xl opacity-50"></div>
+            <div class="absolute right-0 top-0 w-32 h-32 bg-blue-500 rounded-full filter blur-3xl opacity-40"></div>
             <div class="text-center mb-4 relative z-10">
                 <p class="text-xs text-blue-200 tracking-widest mb-1">— FACEBOOK · AD ACCOUNTS</p>
                 <h3 class="text-xl font-bold">Facebook 广告账<br>号</h3>
             </div>
-            <div class="flex items-center justify-between bg-white/10 rounded-xl p-2 backdrop-blur-md relative z-10">
+            <div class="flex items-center justify-between bg-white/10 rounded-xl p-2 backdrop-blur-md relative z-10 border border-white/10">
                 <div class="pl-2">
                     <span class="text-2xl font-bold">$13.34</span><span class="text-xs text-blue-200">起</span>
                 </div>
-                <button class="bg-gradient-btn text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center shadow-lg">
+                <button class="bg-gradient-btn text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center shadow-lg shadow-blue-500/30">
                     选购广告账号 
                     <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                 </button>
             </div>
             <!-- 轮播点 -->
             <div class="flex justify-center gap-1 mt-3 relative z-10">
-                <div class="w-4 h-1 rounded-full bg-white"></div>
-                <div class="w-1 h-1 rounded-full bg-white/50"></div>
-                <div class="w-1 h-1 rounded-full bg-white/50"></div>
+                <div class="w-4 h-1 rounded-full bg-blue-400"></div>
+                <div class="w-1 h-1 rounded-full bg-white/30"></div>
+                <div class="w-1 h-1 rounded-full bg-white/30"></div>
             </div>
         </div>
     </div>
@@ -115,7 +115,7 @@
     <!-- 热卖商品 / 分类 -->
     <div class="px-4 pb-20">
         <div class="flex items-center gap-1 mb-4">
-            <div class="w-1.5 h-4 bg-purple-600 rounded-full"></div>
+            <div class="w-1.5 h-4 bg-blue-600 rounded-full"></div>
             <h2 class="text-lg font-bold text-gray-900">热卖商品</h2>
         </div>
         
@@ -135,6 +135,18 @@
         <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
     </div>
 
+    <!-- 底部导航 (去掉了“我的”，保留首页和查询) -->
+    <div class="fixed bottom-0 w-full bg-white border-t border-gray-100 flex justify-around py-2 z-50 pb-safe">
+        <a href="./index.html" class="flex flex-col items-center text-blue-600">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+            <span class="text-[10px] mt-1 font-bold">首页</span>
+        </a>
+        <a href="./console.html" class="flex flex-col items-center text-gray-400 hover:text-blue-600 transition">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            <span class="text-[10px] mt-1">查询/控制台</span>
+        </a>
+    </div>
+
     <script>
         let products = [];
         let currentCategory = '全部';
@@ -147,7 +159,7 @@
             container.innerHTML = allCats.map(cat => {
                 const isActive = currentCategory === cat;
                 return `
-                <button onclick="selectCategory('${cat}')" class="flex items-center gap-1 px-4 py-2 rounded-xl text-[13px] transition border ${isActive ? 'bg-purple-50 border-purple-600 text-purple-700 font-bold' : 'bg-white border-gray-200 text-gray-600'}">
+                <button onclick="selectCategory('${cat}')" class="flex items-center gap-1 px-4 py-2 rounded-xl text-[13px] transition border ${isActive ? 'bg-blue-50 border-blue-600 text-blue-700 font-bold' : 'bg-white border-gray-200 text-gray-600'}">
                     ${cat}
                 </button>
             `}).join('');
@@ -171,7 +183,7 @@
             list.innerHTML = filtered.map(p => `
                 <a href="./product-detail.html?id=${p.id}" class="block bg-white rounded-2xl p-4 shadow-sm border border-gray-100 active:scale-[0.98] transition">
                     <div class="flex gap-3">
-                        <div class="w-14 h-14 rounded-xl bg-purple-50 flex items-center justify-center shrink-0 text-purple-600">
+                        <div class="w-14 h-14 rounded-xl bg-blue-50 flex items-center justify-center shrink-0 text-blue-600">
                             <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                         </div>
                         <div class="flex-1">

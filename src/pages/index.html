@@ -1,98 +1,281 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TGX Account - Global Social Media Accounts</title>
+    <title>TGX Account - Global Accounts</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: { extend: { colors: { darkbg: '#111318', darkcard: '#1b1e27', primary: '#3b82f6' } } }
+        }
+    </script>
+    <!-- 引入 Alpine.js 处理弹窗和状态 -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        [x-cloak] { display: none !important; }
+        /* 隐藏滚动条 */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
+    </style>
 </head>
-<body class="bg-gray-50 text-gray-900 font-sans antialiased">
-    <!-- 1. 顶部导航 (Navbar) -->
-    <nav class="bg-white border-b border-gray-100 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <!-- Logo & 语言切换 -->
-                <div class="flex items-center gap-4">
-                    <a href="/" class="flex items-center gap-2">
-                        <img src="../assets/sok.png" alt="Logo" class="w-8 h-8 rounded-lg">
-                        <span class="font-bold text-xl tracking-tight">TGX<span class="text-blue-600">Account</span></span>
-                    </a>
-                    <select class="text-sm bg-transparent border-none text-gray-500 outline-none cursor-pointer">
-                        <option>English</option>
-                        <option>中文</option>
-                    </select>
-                </div>
-                <!-- 搜索框 -->
-                <div class="flex-1 max-w-md mx-8 hidden md:block">
-                    <div class="relative">
-                        <input type="text" placeholder="Search accounts..." class="w-full bg-gray-100 rounded-full py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50">
+<body class="bg-darkbg text-gray-300 font-sans antialiased" x-data="appStore()" x-cloak>
+
+    <!-- ================= 1. 顶部导航栏 (Navbar) ================= -->
+    <nav class="bg-darkcard border-b border-gray-800 sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            <!-- Logo -->
+            <a href="/" class="flex items-center gap-2">
+                <img src="../assets/sok.png" alt="Logo" class="w-8 h-8 rounded-lg">
+                <span class="font-bold text-xl text-white tracking-tight">TGX<span class="text-primary">Account</span></span>
+            </a>
+
+            <!-- 搜索框 (PC端) -->
+            <div class="hidden md:flex flex-1 max-w-md mx-8">
+                <input type="text" placeholder="Search accounts..." class="w-full bg-darkbg border border-gray-700 rounded-full py-2 px-4 text-sm text-white focus:outline-none focus:border-primary transition">
+            </div>
+
+            <!-- 右侧：用户区域 -->
+            <div class="flex items-center gap-4">
+                <!-- 未登录状态 -->
+                <template x-if="!isLoggedIn">
+                    <div class="flex items-center gap-3 text-sm font-medium">
+                        <button @click="openLogin()" class="text-gray-300 hover:text-white transition">Sign In</button>
+                        <button @click="openRegister()" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition shadow-lg shadow-primary/30">Register</button>
                     </div>
-                </div>
-                <!-- 登录/注册/钱包 -->
-                <div class="flex items-center gap-4 text-sm font-medium">
-                    <span class="text-gray-500 hidden sm:block">Balance: <span class="text-green-500">$0.00</span></span>
-                    <a href="#" class="text-gray-700 hover:text-black">Login</a>
-                    <a href="#" class="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition">Register</a>
-                </div>
+                </template>
+
+                <!-- 已登录状态 (用户抽屉触发点) -->
+                <template x-if="isLoggedIn">
+                    <div class="relative" @click.outside="isDrawerOpen = false">
+                        <button @click="isDrawerOpen = !isDrawerOpen" class="flex items-center gap-2 hover:opacity-80 transition">
+                            <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-primary to-blue-400 flex items-center justify-center text-white font-bold" x-text="user.username.charAt(0).toUpperCase()"></div>
+                            <span class="text-sm text-white font-medium hidden sm:block" x-text="user.username"></span>
+                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+
+                        <!-- 下拉抽屉 (小抽屉) -->
+                        <div x-show="isDrawerOpen" x-transition.opacity.duration.200ms class="absolute right-0 mt-2 w-64 bg-darkcard border border-gray-700 rounded-xl shadow-2xl overflow-hidden z-50">
+                            <!-- 用户信息头部 -->
+                            <div class="p-4 border-b border-gray-800 bg-[#151821]">
+                                <p class="text-sm text-gray-400 mb-1">Welcome back,</p>
+                                <p class="text-base font-bold text-white truncate" x-text="user.username"></p>
+                                <div class="mt-3 bg-darkbg rounded-lg p-2 flex justify-between items-center border border-gray-700">
+                                    <span class="text-xs text-gray-400">Wallet Balance</span>
+                                    <span class="text-green-400 font-bold" x-text="'$' + user.balance.toFixed(2)"></span>
+                                </div>
+                            </div>
+                            <!-- 菜单列表 -->
+                            <div class="p-2 space-y-1 text-sm">
+                                <a href="/dashboard" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-800 hover:text-white transition">Dashboard</a>
+                                <a href="/orders" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-800 hover:text-white transition">My Orders</a>
+                                <a href="/affiliate" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-800 hover:text-white transition">Affiliate Program</a>
+                                <a href="/wallet" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-800 hover:text-white transition">Wallet</a>
+                                <a href="/tickets" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-800 hover:text-white transition">Support Tickets</a>
+                            </div>
+                            <!-- 底部退出 -->
+                            <div class="p-2 border-t border-gray-800">
+                                <button @click="logout()" class="w-full text-left px-3 py-2 text-red-400 hover:bg-red-500/10 rounded-lg transition">Logout</button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
             </div>
         </div>
     </nav>
 
-    <!-- 2. Hero 横幅 -->
-    <div class="bg-white">
-        <div class="max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8 text-center">
-            <h1 class="text-4xl font-extrabold tracking-tight text-gray-900 mb-4">
-                Global Social Media Accounts <br>
-                <span class="text-blue-600">One-Stop Store</span>
-            </h1>
-            <p class="text-lg text-gray-500 mb-8">Telegram · Twitter · TikTok · Facebook All Categories Supply</p>
-            <div class="flex justify-center gap-8 text-sm text-gray-600 border-t border-gray-100 pt-8">
-                <div><span class="block text-xl font-bold text-gray-900">30,000+</span> Users</div>
-                <div><span class="block text-xl font-bold text-gray-900">3 Years</span> Safe Operation</div>
-                <div><span class="block text-xl font-bold text-gray-900">Instant</span> Delivery</div>
-                <div><span class="block text-xl font-bold text-gray-900">Pro</span> After-Sales</div>
-            </div>
-        </div>
-    </div>
+    <!-- ================= 2. 页面主体内容 ================= -->
+    <div class="max-w-7xl mx-auto px-4 py-12">
+        <h1 class="text-3xl font-bold text-white mb-6">Hot Products</h1>
+        
+        <!-- 测试权限拦截的按钮 -->
+        <button @click="checkAuthAndAction('/checkout')" class="bg-primary text-white px-6 py-3 rounded-lg mb-8 hover:bg-blue-600">
+            Go to Checkout (Requires Auth)
+        </button>
 
-    <!-- 3. 新品专区 (New Arrivals) -->
-    <div class="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
-        <h2 class="text-2xl font-bold mb-6">New Arrivals</h2>
-        <!-- 这里我们调用组件 -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <!-- 卡片占位 -->
-        </div>
-    </div>
-
-    <!-- 4. 热卖商品 (Hot Products) -->
-    <div class="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8 border-t border-gray-200">
-        <div class="flex justify-between items-end mb-6">
-            <h2 class="text-2xl font-bold">Hot Products</h2>
-            <a href="./category.html" class="text-sm text-blue-600 font-medium">View All -></a>
-        </div>
-        <!-- 商品网格 -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="hot-products">
-            <!-- 由 JS 渲染 -->
+            <!-- 商品JS渲染区 -->
         </div>
     </div>
 
-    <!-- 5. 分销联盟入口 (Affiliate) -->
-    <div class="bg-blue-600 py-16 mt-12">
-        <div class="max-w-4xl mx-auto px-4 text-center text-white">
-            <h2 class="text-3xl font-bold mb-4">Join TGX Affiliate Program</h2>
-            <p class="text-blue-100 mb-8 max-w-2xl mx-auto">Invite friends to register. Earn 5% commission on all their future orders. Withdrawable to your wallet instantly.</p>
-            <a href="./affiliate.html" class="inline-block bg-white text-blue-600 font-bold px-8 py-3 rounded-lg shadow-lg hover:bg-gray-50 transition">Join Now</a>
+    <!-- ================= 3. 登录弹窗 (Modal) ================= -->
+    <div x-show="isLoginOpen" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4" x-transition.opacity>
+        <div @click.outside="isLoginOpen = false" class="bg-darkcard w-full max-w-sm rounded-2xl shadow-2xl border border-gray-800 p-6 relative">
+            <button @click="isLoginOpen = false" class="absolute top-4 right-4 text-gray-400 hover:text-white">&times;</button>
+            <h2 class="text-2xl font-bold text-white mb-6 text-center">Sign In</h2>
+            
+            <form @submit.prevent="handleLogin()" class="space-y-4">
+                <div>
+                    <input type="text" x-model="loginForm.username" placeholder="Username / Email" class="w-full bg-darkbg border border-gray-700 rounded-lg py-2.5 px-3 text-white focus:border-primary outline-none">
+                </div>
+                <div class="relative">
+                    <input :type="showPassword ? 'text' : 'password'" x-model="loginForm.password" placeholder="Password" class="w-full bg-darkbg border border-gray-700 rounded-lg py-2.5 px-3 text-white focus:border-primary outline-none">
+                    <button type="button" @click="showPassword = !showPassword" class="absolute right-3 top-3 text-xs text-gray-400">Show</button>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" x-model="loginForm.remember" class="rounded bg-darkbg border-gray-700 text-primary focus:ring-primary">
+                    <span class="text-sm text-gray-400">Remember Me</span>
+                </div>
+
+                <!-- 错误提示 -->
+                <div x-show="loginError" x-text="loginError" class="text-red-500 text-sm text-center bg-red-500/10 py-2 rounded"></div>
+
+                <button type="submit" :disabled="isLoggingIn" class="w-full bg-primary text-white font-bold py-2.5 rounded-lg hover:bg-blue-600 transition disabled:opacity-50 flex justify-center items-center gap-2">
+                    <span x-show="isLoggingIn" class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
+                    <span x-text="isLoggingIn ? 'Signing In...' : 'Sign In'"></span>
+                </button>
+            </form>
+            
+            <p class="text-center text-sm text-gray-500 mt-4">Don't have an account? <button @click="openRegister()" class="text-primary hover:underline">Register</button></p>
         </div>
     </div>
 
-    <!-- 6. 页脚 -->
-    <footer class="bg-gray-900 text-gray-400 py-12 text-center text-sm">
-        <p>&copy; 2024-2026 TGX Account. All rights reserved.</p>
-    </footer>
+    <!-- ================= 4. 注册弹窗 (Modal) ================= -->
+    <div x-show="isRegisterOpen" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4" x-transition.opacity>
+        <div @click.outside="isRegisterOpen = false" class="bg-darkcard w-full max-w-sm rounded-2xl shadow-2xl border border-gray-800 p-6 relative">
+            <button @click="isRegisterOpen = false" class="absolute top-4 right-4 text-gray-400 hover:text-white">&times;</button>
+            <h2 class="text-2xl font-bold text-white mb-6 text-center">Create Account</h2>
+            
+            <form @submit.prevent="handleRegister()" class="space-y-4">
+                <input type="text" x-model="regForm.username" placeholder="Username" class="w-full bg-darkbg border border-gray-700 rounded-lg py-2.5 px-3 text-white focus:border-primary outline-none">
+                <input type="email" x-model="regForm.email" placeholder="Email" class="w-full bg-darkbg border border-gray-700 rounded-lg py-2.5 px-3 text-white focus:border-primary outline-none">
+                <input type="password" x-model="regForm.password" placeholder="Password (min 8 chars)" class="w-full bg-darkbg border border-gray-700 rounded-lg py-2.5 px-3 text-white focus:border-primary outline-none">
+                <input type="password" x-model="regForm.confirm" placeholder="Confirm Password" class="w-full bg-darkbg border border-gray-700 rounded-lg py-2.5 px-3 text-white focus:border-primary outline-none">
+                
+                <div class="flex items-start gap-2">
+                    <input type="checkbox" x-model="regForm.agree" class="mt-1 rounded bg-darkbg border-gray-700 text-primary focus:ring-primary">
+                    <span class="text-xs text-gray-400">I agree to Terms of Service</span>
+                </div>
 
-    <!-- 引入业务逻辑 -->
-    <script src="../js/main.js"></script>
+                <div x-show="regError" x-text="regError" class="text-red-500 text-sm text-center bg-red-500/10 py-2 rounded"></div>
+
+                <button type="submit" :disabled="isRegistering" class="w-full bg-primary text-white font-bold py-2.5 rounded-lg hover:bg-blue-600 transition disabled:opacity-50 flex justify-center items-center gap-2">
+                    <span x-show="isRegistering" class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
+                    <span x-text="isRegistering ? 'Registering...' : 'Register'"></span>
+                </button>
+            </form>
+            
+            <p class="text-center text-sm text-gray-500 mt-4">Already have an account? <button @click="openLogin()" class="text-primary hover:underline">Sign In</button></p>
+        </div>
+    </div>
+
+    <!-- ================= 5. Alpine.js 状态逻辑 ================= -->
+    <script>
+        function appStore() {
+            return {
+                // 状态
+                isLoggedIn: localStorage.getItem('tgx_token') ? true : false,
+                user: { username: 'Guest', balance: 0 },
+                
+                isDrawerOpen: false,
+                isLoginOpen: false,
+                isRegisterOpen: false,
+                showPassword: false,
+
+                // 登录表单
+                loginForm: { username: '', password: '', remember: false },
+                loginError: '',
+                isLoggingIn: false,
+
+                // 注册表单
+                regForm: { username: '', email: '', password: '', confirm: '', agree: false },
+                regError: '',
+                isRegistering: false,
+
+                init() {
+                    // 页面加载时，如果有token，恢复用户信息
+                    if(this.isLoggedIn) {
+                        this.user = { username: 'TestUser', balance: 25.50 };
+                    }
+                },
+
+                // 打开登录弹窗
+                openLogin() {
+                    this.isRegisterOpen = false;
+                    this.isLoginOpen = true;
+                    this.loginError = '';
+                },
+
+                // 打开注册弹窗
+                openRegister() {
+                    this.isLoginOpen = false;
+                    this.isRegisterOpen = true;
+                    this.regError = '';
+                },
+
+                // 处理登录
+                handleLogin() {
+                    this.loginError = '';
+                    if(!this.loginForm.username || !this.loginForm.password) {
+                        this.loginError = 'Please fill in all fields';
+                        return;
+                    }
+                    this.isLoggingIn = true;
+                    
+                    // 模拟请求
+                    setTimeout(() => {
+                        if(this.loginForm.password === '123456') { // 模拟密码错误
+                            this.loginError = 'Invalid username or password';
+                            this.isLoggingIn = false;
+                        } else {
+                            // 登录成功
+                            localStorage.setItem('tgx_token', 'mock_jwt_token');
+                            this.isLoggedIn = true;
+                            this.user = { username: this.loginForm.username, balance: 10.00 };
+                            this.isLoginOpen = false;
+                            this.isLoggingIn = false;
+                        }
+                    }, 1000);
+                },
+
+                // 处理注册
+                handleRegister() {
+                    this.regError = '';
+                    if(!this.regForm.username || !this.regForm.email || !this.regForm.password) {
+                        this.regError = 'All fields are required'; return;
+                    }
+                    if(this.regForm.password.length < 8) {
+                        this.regError = 'Password must be at least 8 characters'; return;
+                    }
+                    if(this.regForm.password !== this.regForm.confirm) {
+                        this.regError = 'Passwords do not match'; return;
+                    }
+                    if(!this.regForm.agree) {
+                        this.regError = 'You must agree to the Terms'; return;
+                    }
+
+                    this.isRegistering = true;
+                    setTimeout(() => {
+                        // 注册成功直接登录
+                        localStorage.setItem('tgx_token', 'mock_jwt_token');
+                        this.isLoggedIn = true;
+                        this.user = { username: this.regForm.username, balance: 0.00 };
+                        this.isRegisterOpen = false;
+                        this.isRegistering = false;
+                    }, 1000);
+                },
+
+                // 退出登录
+                logout() {
+                    localStorage.removeItem('tgx_token');
+                    this.isLoggedIn = false;
+                    this.isDrawerOpen = false;
+                    this.user = { username: 'Guest', balance: 0 };
+                },
+
+                // 全局权限拦截测试
+                checkAuthAndAction(url) {
+                    if(!this.isLoggedIn) {
+                        alert('Please Sign In first to continue.');
+                        this.openLogin();
+                    } else {
+                        window.location.href = url;
+                    }
+                }
+            }
+        }
+    </script>
 </body>
 </html>

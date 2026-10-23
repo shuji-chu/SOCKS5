@@ -10,50 +10,62 @@
 </head>
 <body class="bg-[#f8fafc] text-gray-900 font-sans antialiased pb-16 overflow-x-hidden">
 
-    <!-- 顶部导航 (由 JS 动态注入) -->
     <div id="app-header"></div>
 
-    <!-- 跑马灯公告 -->
     <div class="bg-[#eff6ff] border-b border-blue-100 py-2 overflow-hidden flex whitespace-nowrap">
         <div class="marquee inline-block text-xs text-blue-800 font-medium">
-            ⚠️ 订单卡密仅保留 30 天，逾期系统自动清除且无法恢复，请及时备份！ ⚠️【防诈骗提醒】符合售后政策的补号、换号均无需额外付费！请勿通过第三方小程序、私人账户或陌生链接付款，谨防假冒客服诈骗。
+            ⚠️ 订单卡密仅保留 30 天，逾期系统自动清除且无法恢复，请及时备份！ ⚠️【防诈骗提醒】符合售后政策的补号、换号均无需额外付费！
         </div>
     </div>
 
-    <!-- 实时在线 -->
-    <div class="bg-blue-50 px-4 py-1 flex items-center justify-center gap-2">
-        <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-        <span class="text-[11px] font-bold text-blue-900 tracking-wide">平台实时在线 · 即时发货</span>
-    </div>
-
-    <!-- Hero 区域 -->
-    <div class="bg-hero-glow px-4 pt-8 pb-8 text-center">
-        <h2 class="text-[34px] font-black leading-tight mb-2 text-gray-900 tracking-tight">
-            <span class="text-blue-600">socks5</span> 海外社媒账号<br>一站式购平台
-        </h2>
-        <p class="text-sm text-gray-500 font-medium mb-6">Telegram·Twitter·Tiktok·Facebook全品类账号供应</p>
-        
-        <div class="bg-white rounded-2xl shadow-lg shadow-blue-500/10 border border-blue-50 flex items-center p-2 mb-4">
-            <svg class="w-6 h-6 text-blue-400 ml-2 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-            <input type="text" placeholder="找账号，如 电报老号、节点订阅..." class="flex-1 bg-transparent border-none focus:ring-0 text-sm py-2">
+    <!-- 数据与为什么选择我们 (修复左侧数字对齐) -->
+    <div class="py-10 px-4">
+        <h2 class="text-[22px] font-black text-gray-900 mb-6 text-center leading-snug">海外账号购买市场鱼龙混杂<br><span class="text-blue-600">为什么选择我们？</span></h2>
+        <div class="space-y-5">
+            <div class="flex gap-4">
+                <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 font-bold text-lg leading-none pt-0.5">1</div>
+                <div>
+                    <h3 class="font-bold text-gray-900 text-[15px] mb-1">品类覆盖最全面</h3>
+                    <p class="text-[13px] text-gray-500">Telegram、Twitter、TikTok 等8大平台50+账号类型一站采购。</p>
+                </div>
+            </div>
+            <div class="flex gap-4">
+                <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 font-bold text-lg leading-none pt-0.5">2</div>
+                <div>
+                    <h3 class="font-bold text-gray-900 text-[15px] mb-1">供货稳定不断档</h3>
+                    <p class="text-[13px] text-gray-500">拥有全球多渠道供应链，支持跨境电商团队、MCN机构大规模持续采购。</p>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- 热卖商品 -->
-    <div class="px-4 pb-8">
-        <div class="flex items-center gap-1 mb-3">
-            <div class="w-1.5 h-4 bg-blue-600 rounded-full"></div>
-            <h2 class="text-lg font-bold text-gray-900">热卖商品</h2>
+    <!-- 真实客户评价 (修复字体行高和断行) -->
+    <div class="bg-blue-50/50 py-10 px-4">
+        <h2 class="text-[20px] font-black text-gray-900 mb-6 text-center">30,000+ 用户的真实反馈</h2>
+        <div class="space-y-4">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg">L</div>
+                    <div>
+                        <div class="text-[15px] font-bold text-gray-900">Leo</div>
+                        <div class="text-[11px] text-gray-400 mt-0.5">Telegram电报账号 · 批量采购</div>
+                    </div>
+                </div>
+                <p class="text-[13px] text-gray-600 leading-relaxed text-justify">"我们团队做海外私域运营，每个月需要大量电报账号。之前经常遇到账号质量参差不齐、发货慢的问题。后来找到 socks5，从满月号到多年老号都有现货，发货速度很快，合作半年多供货一直稳定。"</p>
+            </div>
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-full bg-purple-600 text-white flex items-center justify-center font-bold text-lg">S</div>
+                    <div>
+                        <div class="text-[15px] font-bold text-gray-900">Sarah</div>
+                        <div class="text-[11px] text-gray-400 mt-0.5">Twitter推特高粉号 · Web3项目推广</div>
+                    </div>
+                </div>
+                <p class="text-[13px] text-gray-600 leading-relaxed text-justify">"我们负责多个Web3项目的海外社区运营，需要高粉推特号。在 socks5 买了几个万粉号，粉丝真实活跃，互动率明显比新号好很多。客服响应也很专业。"</p>
+            </div>
         </div>
-        <div class="flex gap-2 overflow-x-auto whitespace-nowrap scrollbar-hide pb-3">
-            <button class="px-4 py-1.5 rounded-full bg-blue-600 text-white text-sm font-bold shadow-md shadow-blue-500/30">全部商品</button>
-            <button class="px-4 py-1.5 rounded-full bg-white border border-gray-200 text-gray-600 text-sm">Telegram</button>
-        </div>
-        <!-- 动态商品列表挂载点 -->
-        <div class="mt-4 grid grid-cols-1 gap-3" id="product-list"></div>
     </div>
 
-    <!-- 底部导航 & 悬浮客服 (由 JS 动态注入) -->
     <div id="app-footer"></div>
 
     <script src="./js/layout.js"></script>

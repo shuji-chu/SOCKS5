@@ -16,7 +16,7 @@
 </head>
 <body class="bg-[#f8fafc] text-gray-900 font-sans antialiased pb-16">
 
-    <!-- 顶部导航 -->
+    <!-- 1. 顶部导航 -->
     <header class="bg-white/80 backdrop-blur-md px-4 py-3 sticky top-0 z-50 flex items-center justify-between shadow-sm border-b border-gray-100">
         <div class="flex items-center gap-2">
             <img src="./assets/sok.png" class="w-9 h-9 rounded-xl shadow-md" alt="socks5">
@@ -25,25 +25,24 @@
         <div class="flex items-center gap-2">
             <a href="./auth/login.html" class="px-3 py-1.5 text-sm font-medium border border-gray-200 rounded-lg text-gray-600 bg-white">登录</a>
             <a href="./auth/register.html" class="px-3 py-1.5 text-sm font-medium text-white bg-gradient-btn rounded-lg shadow-md">注册</a>
-            <svg class="w-6 h-6 text-gray-700 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
         </div>
     </header>
 
-    <!-- 跑马灯公告 -->
+    <!-- 2. 跑马灯公告 -->
     <div class="bg-blue-50 px-4 py-2 flex items-center gap-2 overflow-hidden border-b border-blue-100/50">
         <div class="bg-blue-600 text-white rounded-full p-1 shrink-0">
             <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z"></path></svg>
         </div>
-        <p class="text-xs text-blue-800 truncate">通过支付渠道回复相关信息。如有订单问题、售后需求或...</p>
+        <p class="text-xs text-blue-800 truncate">⚠️ 订单卡密仅保留30天，逾期清除。符合售后政策的补号无需额外付费，谨防假冒客服诈骗。</p>
     </div>
 
-    <!-- 在线状态 -->
+    <!-- 3. 在线状态 -->
     <div class="bg-[#eff6ff] px-4 py-1.5 flex items-center gap-2 border-b border-blue-100/50">
         <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
         <span class="text-xs font-medium text-blue-900">平台实时在线 · 即时发货</span>
     </div>
 
-    <!-- Hero 区域 -->
+    <!-- 4. Hero 区域与信任背书 -->
     <div class="bg-hero-glow px-4 pt-8 pb-6 text-center">
         <h2 class="text-[32px] font-black leading-tight mb-2 uppercase">
             <span class="text-gradient tracking-wide">SOCKS5</span><br>
@@ -52,17 +51,16 @@
         </h2>
         <p class="text-sm text-blue-700 font-medium mb-8">Telegram·Twitter·Tiktok·Socks5 全品类数字资产供应</p>
 
-        <!-- 信任背书 -->
         <div class="flex justify-between px-2 mb-6">
             <div class="flex flex-col items-center">
                 <div class="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center text-blue-600 mb-2"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg></div>
-                <span class="text-xs font-bold text-gray-800">30,000+ 用户</span>
+                <span class="text-xs font-bold text-gray-800">30,000+</span>
                 <span class="text-[10px] text-gray-400">累计服务用户</span>
             </div>
             <div class="flex flex-col items-center">
                 <div class="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center text-blue-600 mb-2"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg></div>
                 <span class="text-xs font-bold text-gray-800">安全保障</span>
-                <span class="text-[10px] text-gray-400">三年运营值得信赖</span>
+                <span class="text-[10px] text-gray-400">稳定运营值得信赖</span>
             </div>
             <div class="flex flex-col items-center">
                 <div class="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center text-blue-600 mb-2"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg></div>
@@ -77,7 +75,7 @@
         </div>
     </div>
 
-    <!-- 搜索框 -->
+    <!-- 5. 搜索框 -->
     <div class="px-4 -mt-4 relative z-10 mb-6">
         <div class="bg-white rounded-2xl shadow-lg shadow-blue-500/10 border border-blue-50 flex items-center p-2">
             <svg class="w-6 h-6 text-blue-400 ml-2 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
@@ -85,23 +83,110 @@
         </div>
     </div>
 
-    <!-- 热卖商品 / 分类 -->
-    <div class="px-4 pb-20">
+    <!-- 6. 热卖商品与动态接口 -->
+    <div class="px-4 pb-10">
         <div class="flex items-center gap-1 mb-4">
             <div class="w-1.5 h-4 bg-blue-600 rounded-full"></div>
             <h2 class="text-lg font-bold text-gray-900">热卖商品</h2>
         </div>
         
-        <!-- 分类滑动 -->
         <div class="flex gap-2 overflow-x-auto whitespace-nowrap scrollbar-hide pb-2" id="filter-options">
             <!-- JS 动态渲染 -->
         </div>
 
-        <!-- 商品列表 -->
         <div class="mt-4 space-y-3" id="product-list">
             <!-- JS 动态渲染 -->
         </div>
     </div>
+
+    <!-- 7. 平台核心数据 -->
+    <div class="bg-white py-10 border-y border-gray-100">
+        <div class="px-4 text-center">
+            <h2 class="text-xl font-black text-gray-900 mb-1">核心数据 · 真实可查</h2>
+            <p class="text-xs text-gray-400 mb-8">持续稳定供货，值得信赖</p>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-[#f8fafc] p-4 rounded-xl border border-gray-100">
+                    <div class="text-2xl font-black text-blue-600 mb-1">30,000+</div>
+                    <div class="text-xs text-gray-500">累计服务用户</div>
+                </div>
+                <div class="bg-[#f8fafc] p-4 rounded-xl border border-gray-100">
+                    <div class="text-2xl font-black text-blue-600 mb-1">8+</div>
+                    <div class="text-xs text-gray-500">覆盖主流平台</div>
+                </div>
+                <div class="bg-[#f8fafc] p-4 rounded-xl border border-gray-100">
+                    <div class="text-2xl font-black text-blue-600 mb-1">50+</div>
+                    <div class="text-xs text-gray-500">账号类型</div>
+                </div>
+                <div class="bg-[#f8fafc] p-4 rounded-xl border border-gray-100">
+                    <div class="text-2xl font-black text-blue-600 mb-1">24h</div>
+                    <div class="text-xs text-gray-500">自动发货</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 8. 核心服务矩阵 -->
+    <div class="py-10 px-4">
+        <h2 class="text-xl font-black text-gray-900 mb-6 text-center">海外账号核心服务</h2>
+        <div class="grid grid-cols-1 gap-4">
+            <!-- 电报 -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 bg-blue-50 text-blue-500 rounded-lg flex items-center justify-center font-bold">TG</div>
+                    <h3 class="text-base font-bold text-gray-900">Telegram 电报</h3>
+                </div>
+                <p class="text-xs text-gray-500 leading-relaxed mb-3">从促销号到多年老号，Session协议号、实名广告号均有现货。支持批量采购。</p>
+                <div class="flex gap-2">
+                    <span class="text-[10px] bg-gray-50 border border-gray-100 text-gray-500 px-2 py-1 rounded">满月号</span>
+                    <span class="text-[10px] bg-gray-50 border border-gray-100 text-gray-500 px-2 py-1 rounded">老号</span>
+                    <span class="text-[10px] bg-gray-50 border border-gray-100 text-gray-500 px-2 py-1 rounded">协议号</span>
+                </div>
+            </div>
+            <!-- 推特 -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 bg-blue-50 text-blue-500 rounded-lg flex items-center justify-center font-bold">X</div>
+                    <h3 class="text-base font-bold text-gray-900">Twitter / X</h3>
+                </div>
+                <p class="text-xs text-gray-500 leading-relaxed mb-3">新号、老号、高粉号全覆盖。粉丝真实活跃，适合品牌推广及矩阵运营。</p>
+            </div>
+            <!-- 节点 -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 bg-blue-50 text-blue-500 rounded-lg flex items-center justify-center font-bold">S5</div>
+                    <h3 class="text-base font-bold text-gray-900">Socks5 代理节点</h3>
+                </div>
+                <p class="text-xs text-gray-500 leading-relaxed mb-3">全球高速节点，支持一键订阅。满足跨境浏览与业务需求。</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 9. FAQ 常见问题 -->
+    <div class="bg-white py-10 px-4 border-t border-gray-100">
+        <h2 class="text-xl font-black text-gray-900 mb-6 text-center">常见问题解答</h2>
+        <div class="space-y-3">
+            <div class="border border-gray-100 rounded-xl p-4 bg-[#f8fafc]">
+                <div class="font-bold text-sm text-gray-800 mb-2">购买的账号会不会很快被封？</div>
+                <div class="text-xs text-gray-500">账号封禁受使用环境影响较大。我们保证首发登录正常，请遵守平台规则，合理养号，避免批量同IP操作。</div>
+            </div>
+            <div class="border border-gray-100 rounded-xl p-4 bg-[#f8fafc]">
+                <div class="font-bold text-sm text-gray-800 mb-2">支持哪些支付方式？</div>
+                <div class="text-xs text-gray-500">支持微信、支付宝、USDT-TRC20、TRX 等主流支付方式，支付后系统自动发货。</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 10. 底部说明与版权 -->
+    <footer class="bg-[#0f172a] text-white py-8 px-4 text-center">
+        <div class="flex justify-center items-center gap-2 mb-4">
+            <img src="./assets/sok.png" class="w-8 h-8 rounded-lg shadow-md" alt="socks5">
+            <h2 class="text-xl font-black">socks5</h2>
+        </div>
+        <p class="text-xs text-gray-400 leading-relaxed mb-6">专业的海外账号购买与批发平台。提供 Telegram、Twitter、节点等资源，满足跨境电商及个人用户需求。</p>
+        <div class="text-[10px] text-gray-500 border-t border-gray-800 pt-4">
+            © 2024-2026 socks5. All rights reserved.
+        </div>
+    </footer>
 
     <!-- 悬浮客服 -->
     <div class="fixed bottom-20 right-4 w-12 h-12 bg-[#0ea5e9] rounded-full flex items-center justify-center shadow-lg shadow-blue-500/50 z-50 text-white">
@@ -127,7 +212,7 @@
 
         function renderFilterOptions() {
             const container = document.getElementById('filter-options');
-            const defaultCategories = ['全部', 'Telegram', 'Twitter / X', 'Facebook', 'TG账号', '代理节点'];
+            const defaultCategories = ['全部', 'Telegram', 'Twitter / X', 'Socks5节点', 'TG账号'];
             const allCats = [...new Set([...defaultCategories, ...products.map(p => p.category)])];
 
             container.innerHTML = allCats.map(cat => {

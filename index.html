@@ -2,289 +2,160 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>SOCKS5 - 账号购买中心</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TGX Store - 专业数字资产平台</title>
     <link rel="icon" href="./logo.jpg" type="image/jpeg">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: #f8fafc; color: #1e293b; padding-bottom: 80px; }
-        
-        /* 底部 Tab 专属样式 */
-        .bottom-tab { position: fixed; bottom: 0; width: 100%; background: #ffffff; border-top: 1px solid #f1f5f9; display: flex; height: 56px; padding-bottom: env(safe-area-inset-bottom); z-index: 50; }
-        .tab-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: #94a3b8; text-decoration: none; }
-        .tab-item.active { color: #2563eb; }
-        .tab-text { font-size: 10px; font-weight: bold; }
-
-        /* 筛选抽屉 */
-        .drawer-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.5); backdrop-filter: blur(2px); z-index: 9999; display: none; opacity: 0; transition: opacity 0.3s; }
-        .drawer-overlay.active { display: block; opacity: 1; }
-        .drawer-panel { position: fixed; bottom: -100%; left: 0; right: 0; background: #fff; border-radius: 20px 20px 0 0; z-index: 10000; transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding-bottom: env(safe-area-inset-bottom); }
-        .drawer-panel.active { bottom: 0; }
-
-        /* 动画 */
-        .fade-in { animation: fadeIn 0.3s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* 隐藏滚动条 */
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body>
-    <!-- 顶部公告条 -->
-    <div class="bg-gray-900 text-white text-[11px] text-center py-2 px-4">
-      ⚠️ 订单卡密仅保留30天，逾期自动清除，请及时备份！ | 平台实时在线 · 即时发货
+<body class="bg-[#f8f9fa] text-gray-900 font-sans antialiased pb-16">
+    
+    <!-- 顶部公告 -->
+    <div class="bg-black text-white text-[11px] text-center py-2 tracking-wide">
+        ⚠️ 订单卡密仅保留30天，逾期自动清除，请及时备份！ | 平台实时在线 · 即时发货
     </div>
-    <header class="bg-white px-4 py-4 flex justify-between items-center sticky top-0 z-50">
-        <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+
+    <!-- 顶部 Header -->
+    <header class="bg-white px-4 py-4 sticky top-0 z-20 border-b border-gray-100">
+        <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-black text-white flex items-center justify-center font-bold text-lg">T</div>
+                <h1 class="text-xl font-bold tracking-tight">TGX Store</h1>
             </div>
-            <h1 class="text-[20px] font-bold text-slate-800 tracking-wide">SOCKS5</h1>
+            <a href="./profile.html" class="text-gray-500">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+            </a>
         </div>
-        <div class="relative cursor-pointer">
-            <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
-            <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+        
+        <!-- 搜索框 -->
+        <div class="relative">
+            <input type="text" id="search-input" oninput="handleSearch()" placeholder="搜索 Telegram, Gmail, 节点..." class="w-full bg-gray-100 border-none rounded-lg py-2.5 pl-10 pr-4 text-sm focus:ring-1 focus:ring-black focus:bg-white transition">
+            <svg class="w-4 h-4 text-gray-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
         </div>
     </header>
 
-    <main class="max-w-lg mx-auto">
-        <!-- Hero 区域 -->
-        <div class="px-5 pt-4 pb-6">
-            <h2 class="text-[26px] font-extrabold text-slate-900 mb-2 leading-tight">SOCKS5 账号购买中心</h2>
-            <p class="text-[14px] text-slate-500 mb-3">专业社交媒体及数字资产出售平台</p>
-            <p class="text-[13px] text-slate-400 leading-relaxed">提供高质量 Telegram 账号、稳定代理节点、纯净接码服务。支持免费赠送子域名，全自动发货。</p>
-        </div>
+    <!-- 信任背书 -->
+    <div class="grid grid-cols-3 gap-2 text-center text-[11px] text-gray-500 py-3 bg-white border-b border-gray-100">
+        <div><span class="block text-sm font-bold text-gray-900">30,000+</span>累计服务用户</div>
+        <div><span class="block text-sm font-bold text-gray-900">即时发货</span>下单秒出</div>
+        <div><span class="block text-sm font-bold text-gray-900">安全保障</span>专业售后</div>
+    </div>
 
-        <!-- 六大金刚 -->
-        <div class="grid grid-cols-3 gap-y-6 gap-x-2 px-5 mb-8">
-            <a href="./email-market.html" class="flex flex-col items-center gap-2 active:opacity-60">
-                <div class="w-14 h-14 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg></div>
-                <span class="text-[13px] font-medium text-slate-700">TG账号</span>
-            </a>
-            <a href="./product-detail.html?id=node1" class="flex flex-col items-center gap-2 active:opacity-60">
-                <div class="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-500 flex items-center justify-center"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg></div>
-                <span class="text-[13px] font-medium text-slate-700">代理节点</span>
-            </a>
-            <a href="./sms.html" class="flex flex-col items-center gap-2 active:opacity-60">
-                <div class="w-14 h-14 rounded-2xl bg-green-50 text-green-500 flex items-center justify-center"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg></div>
-                <span class="text-[13px] font-medium text-slate-700">接码服务</span>
-            </a>
-            <a href="./domain.html" class="flex flex-col items-center gap-2 active:opacity-60">
-                <div class="w-14 h-14 rounded-2xl bg-orange-50 text-orange-500 flex items-center justify-center"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg></div>
-                <span class="text-[13px] font-medium text-slate-700">免费域名</span>
-            </a>
-            <a href="./api-market.html" class="flex flex-col items-center gap-2 active:opacity-60">
-                <div class="w-14 h-14 rounded-2xl bg-purple-50 text-purple-500 flex items-center justify-center"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></div>
-                <span class="text-[13px] font-medium text-slate-700">数据查询</span>
-            </a>
-            <a href="./email-market.html" class="flex flex-col items-center gap-2 active:opacity-60">
-                <div class="w-14 h-14 rounded-2xl bg-pink-50 text-pink-500 flex items-center justify-center"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg></div>
-                <span class="text-[13px] font-medium text-slate-700">邮箱账号</span>
-            </a>
-        </div>
+    <!-- 横向分类滑动 -->
+    <div class="bg-white px-4 py-3 mb-2 sticky top-[105px] z-10 border-b border-gray-100 overflow-x-auto whitespace-nowrap scrollbar-hide" id="filter-options">
+        <!-- 由 JS 动态生成 -->
+    </div>
 
-        <!-- 搜索与筛选栏 -->
-        <div class="px-4 flex gap-2 mb-4 sticky top-[68px] z-40 bg-slate-50 py-2">
-            <div class="flex-1 bg-white rounded-xl flex items-center px-3 py-2.5 border border-slate-200 shadow-sm focus-within:border-blue-500 transition-colors">
-                <svg class="w-5 h-5 text-slate-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                <input type="text" id="search-input" oninput="handleSearch()" placeholder="搜索 TG, Gmail, 节点..." class="bg-transparent outline-none text-[14px] w-full text-slate-700">
-            </div>
-            <button onclick="openFilterDrawer()" class="bg-white border border-slate-200 px-4 py-2.5 rounded-xl text-[14px] font-bold text-slate-600 shadow-sm active:bg-slate-100 transition">
-                筛选
-            </button>
-        </div>
-
-        <!-- 商品列表容器 -->
-        <div id="product-list" class="px-4 pb-12 space-y-3">
-            <!-- 骨架屏加载动画 -->
-            <div class="animate-pulse flex space-x-4 p-4 bg-white rounded-xl border border-slate-100">
-                <div class="rounded-xl bg-slate-200 h-12 w-12"></div>
-                <div class="flex-1 space-y-3 py-1">
-                    <div class="h-4 bg-slate-200 rounded w-3/4"></div>
-                    <div class="h-3 bg-slate-200 rounded w-1/2"></div>
-                </div>
-            </div>
+    <!-- 商品列表 -->
+    <main class="px-4 mt-2">
+        <div id="product-list" class="grid grid-cols-1 gap-3">
+            <!-- 由 JS 动态生成 -->
         </div>
     </main>
 
-    <!-- 筛选抽屉 -->
-    <div id="filter-overlay" class="drawer-overlay" onclick="closeFilterDrawer(event)"></div>
-    <div id="filter-panel" class="drawer-panel">
-        <div class="p-4 border-b border-slate-100 flex justify-between items-center">
-            <h3 class="text-[16px] font-bold text-slate-800">商品分类筛选</h3>
-            <button onclick="closeFilterDrawer()" class="text-slate-400 p-1"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
-        </div>
-        <div class="p-4 grid grid-cols-2 gap-3" id="filter-options">
-            <!-- JS 动态渲染 -->
-        </div>
-    </div>
-
-    <!-- 底部 Tab -->
-    
-        <div class="mt-8 mb-4 px-4 bg-white rounded-xl p-4 border border-slate-100 shadow-sm">
-            <div class="grid grid-cols-3 gap-2 text-center">
-                <a href="./landing.html" class="text-[13px] text-slate-600 font-bold active:text-blue-500">关于平台</a>
-                <a href="./blog.html" class="text-[13px] text-slate-600 font-bold active:text-blue-500">博客资讯</a>
-                <a href="./guide.html" class="text-[13px] text-slate-600 font-bold active:text-blue-500">帮助中心</a>
-            </div>
-        </div>
-<div class="bottom-tab">
-        <a href="./index.html" class="tab-item active">
-            <svg class="w-[22px] h-[22px]" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
-            <span class="tab-text">首页</span>
+    <!-- 底部导航 -->
+    <div class="fixed bottom-0 w-full bg-white border-t border-gray-100 flex justify-around py-2 z-50">
+        <a href="./index.html" class="flex flex-col items-center text-black">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+            <span class="text-[10px] mt-1 font-medium">首页</span>
         </a>
-        <a href="./profile.html" class="tab-item">
-            <svg class="w-[22px] h-[22px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-            <span class="tab-text">我的</span>
+        <a href="./profile.html" class="flex flex-col items-center text-gray-400">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+            <span class="text-[10px] mt-1">我的</span>
         </a>
     </div>
 
     <script>
-        // 图标库
-        const icons = {
-            tg: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>',
-            gmail: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>',
-            node: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>',
-            sms: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>',
-            domain: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path>',
-            api: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>'
-        };
-
-        let mockProducts = [];
+        let products = [];
         let currentCategory = '全部';
         let searchQuery = '';
 
-        // 渲染商品列表
-        function renderProducts() {
-            const list = document.getElementById('product-list');
-            
-            const filtered = mockProducts.filter(p => {
-                const matchCategory = currentCategory === '全部' || p.category === currentCategory;
-                const matchSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase()) || p.category.toLowerCase().includes(searchQuery.toLowerCase());
-                return matchCategory && matchSearch;
-            });
-
-            if (filtered.length === 0) {
-                list.innerHTML = '<div class="text-center py-10 text-slate-400 text-[14px]">没有找到相关商品</div>';
-                return;
-            }
-
-            list.innerHTML = filtered.map(p => `
-                <a href="${p.category === '接码服务' ? '/sms.html' : (p.category === '数据查询' ? '/api-market.html' : '/product-detail.html?id=' + p.id)}" class="block bg-white rounded-lg border border-gray-200 p-5 hover:shadow-md transition-shadow">
-                    <div class="flex items-center gap-2 mb-3">
-                        <span class="inline-flex items-center justify-center w-8 h-8 rounded-md bg-gray-100 text-gray-600">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">${icons[p.icon] || icons.tg}</svg>
-                        </span>
-                        <span class="text-[11px] font-medium text-gray-500 uppercase tracking-wide">${p.category}</span>
-                    </div>
-                    <h3 class="text-[15px] font-bold text-gray-900 mb-2 leading-snug line-clamp-2">${p.title}</h3>
-                    <div class="flex flex-wrap gap-1.5 mb-4">
-                        ${(p.tags || []).map(t => `<span class="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded">${t}</span>`).join('')}
-                    </div>
-                    <div class="flex items-end justify-between">
-                        <div>
-                            <span class="text-xl font-bold text-gray-900">${p.currency === 'USDT' ? '$' : '¥'}${p.price}</span>
-                            <span class="text-[10px] text-gray-400 ml-1">起</span>
-                        </div>
-                        <span class="text-[11px] text-gray-400">${p.category === '接码服务' || p.category === '数据查询' ? '进入控制台' : '库存 <span class="text-green-600 font-medium">' + p.stock + '</span>'}</span>
-                    </div>
-                </a>
-            `).join('');
-        }
-
-        function handleSearch() {
-            searchQuery = document.getElementById('search-input').value.trim();
-            renderProducts();
-        }
-
-        // 筛选逻辑
-        const defaultCategories = ['全部', 'TG账号', '邮箱账号', '代理节点', '接码服务', '域名服务', '数据查询'];
-        
         function renderFilterOptions() {
             const container = document.getElementById('filter-options');
-            // 动态合并预设分类和实际商品里有的分类
-            const dbCategories = [...new Set(mockProducts.map(p => p.category))];
-            const allCats = [...new Set([...defaultCategories, ...dbCategories])];
+            const defaultCategories = ['全部', 'TG账号', '邮箱账号', '代理节点', '接码服务'];
+            const allCats = [...new Set([...defaultCategories, ...products.map(p => p.category)])];
 
             container.innerHTML = allCats.map(cat => `
-                <div onclick="selectCategory('${cat}')" class="py-2.5 text-center text-[14px] font-medium rounded-lg border ${currentCategory === cat ? 'border-blue-500 bg-blue-50 text-blue-600' : 'border-slate-200 text-slate-600'} active:bg-slate-100 transition cursor-pointer">
+                <button onclick="selectCategory('${cat}')" class="px-4 py-1.5 rounded-full text-[13px] mr-2 transition ${currentCategory === cat ? 'bg-black text-white font-medium' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}">
                     ${cat}
-                </div>
+                </button>
             `).join('');
         }
 
         function selectCategory(cat) {
             currentCategory = cat;
             renderFilterOptions();
-            closeFilterDrawer();
             renderProducts();
         }
 
-        function openFilterDrawer() {
-            document.getElementById('filter-overlay').classList.add('active');
-            document.getElementById('filter-panel').classList.add('active');
-        }
-        function closeFilterDrawer(e) {
-            if(e && e.target !== e.currentTarget && e.target.tagName !== 'BUTTON') return;
-            document.getElementById('filter-overlay').classList.remove('active');
-            document.getElementById('filter-panel').classList.remove('active');
+        function handleSearch() {
+            searchQuery = document.getElementById('search-input').value.trim().toLowerCase();
+            renderProducts();
         }
 
-        // 保存搜索和筛选状态
-        function saveState() {
-            sessionStorage.setItem('home_search', searchQuery);
-            sessionStorage.setItem('home_category', currentCategory);
-            sessionStorage.setItem('home_scroll', window.scrollY);
-        }
+        function renderProducts() {
+            const list = document.getElementById('product-list');
+            const filtered = products.filter(p => {
+                const matchCategory = currentCategory === '全部' || p.category === currentCategory;
+                const matchSearch = p.title.toLowerCase().includes(searchQuery) || p.category.toLowerCase().includes(searchQuery);
+                return matchCategory && matchSearch;
+            });
 
-        // 恢复搜索和筛选状态
-        function restoreState() {
-            const savedSearch = sessionStorage.getItem('home_search');
-            const savedCategory = sessionStorage.getItem('home_category');
-            const savedScroll = sessionStorage.getItem('home_scroll');
-
-            if (savedSearch) {
-                searchQuery = savedSearch;
-                document.getElementById('search-input').value = savedSearch;
+            if (filtered.length === 0) {
+                list.innerHTML = '<div class="text-center py-10 text-gray-400 text-sm">没有找到相关商品</div>';
+                return;
             }
-            if (savedCategory) {
-                currentCategory = savedCategory;
-            }
-            return savedScroll;
+
+            list.innerHTML = filtered.map(p => `
+                <a href="./product-detail.html?id=${p.id}" class="block bg-white rounded-xl border border-gray-200 p-4 active:bg-gray-50 transition">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-[15px] font-semibold text-gray-900 leading-snug line-clamp-2 pr-4">${p.title}</h3>
+                        <span class="text-[11px] text-gray-400 whitespace-nowrap mt-0.5">库存 ${p.stock}</span>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-1.5 mb-3">
+                        ${(p.tags || []).map(t => `<span class="text-[10px] bg-gray-50 text-gray-500 px-1.5 py-0.5 rounded border border-gray-100">${t}</span>`).join('')}
+                    </div>
+                    
+                    <div class="flex items-end justify-between mt-2 pt-3 border-t border-gray-50">
+                        <div class="flex items-baseline">
+                            <span class="text-[18px] font-bold text-gray-900">¥${p.price}</span>
+                            <span class="text-[10px] text-gray-400 ml-1">起</span>
+                        </div>
+                        <span class="text-[12px] font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded">立即购买</span>
+                    </div>
+                </a>
+            `).join('');
         }
 
-        // 监听点击商品时的状态保存
-        document.addEventListener('click', (e) => {
-            const productLink = e.target.closest('a[href^="/product-detail.html"]');
-            if (productLink) {
-                saveState();
-            }
-        });
-
-        // ================= 核心初始化：真实读取 JSON =================
         document.addEventListener('DOMContentLoaded', async () => {
             try {
-                // 请求存放在根目录的 products.json 文件
                 const res = await fetch("https://lynli.kz.ci/api/products");
-                mockProducts = await res.json();
+                const data = await res.json();
                 
-                // 恢复之前的状态
-                const savedScroll = restoreState();
-                
+                if (Array.isArray(data)) {
+                    products = data;
+                } else if (data && Array.isArray(data.data)) {
+                    products = data.data;
+                } else if (data && Array.isArray(data.list)) {
+                    products = data.list;
+                } else {
+                    products = [];
+                }
+
                 renderFilterOptions();
                 renderProducts();
-
-                // 恢复滚动位置
-                if (savedScroll) {
-                    setTimeout(() => { window.scrollTo(0, parseInt(savedScroll)); }, 100);
-                }
             } catch(e) {
-                console.error('获取商品数据失败，请检查 JSON 格式或网络:', e);
-                document.getElementById('product-list').innerHTML = '<div class="text-center py-10 text-red-400 text-[14px]">商品数据加载失败，请刷新重试</div>';
+                console.error('获取数据失败:', e);
+                document.getElementById('product-list').innerHTML = '<div class="text-center py-10 text-red-500 text-sm">网络加载失败，请刷新重试</div>';
             }
         });
     </script>
     <script src="./ai-widget.js"></script>
-    
-
-<script src="./notice.js"></script>
+    <script src="./notice.js"></script>
 </body>
 </html>

@@ -84,19 +84,24 @@
             toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
         }
         
-        const WORKER_URL = 'https://sendmail.lynli.me';
-        
+        const API_BASE = '/api';
         document.getElementById('send-code-btn').addEventListener('click', async function() {
             const email = document.getElementById('email').value;
             if(!email || !email.includes('@')) { showToast('请输入正确邮箱'); return; }
             this.disabled = true; this.innerText = '发送中...';
-            const myCode = Math.floor(100000 + Math.random() * 900000).toString();
-            localStorage.setItem('my_verify_code', myCode);
             try {
-                const res = await fetch(WORKER_URL, {
-                    method: 'POST', headers: {'Content-Type': 'application/json'}, 
-                    body: JSON.stringify({ email: email, code: myCode })
+                const res = await fetch(API_BASE + '/auth/send-code', {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ email: email })
                 });
+                const data = await res.json();
+                if (data.ok) {
+                    showToast('验证码已发送');
+                    let cd = 60; const btn = this;
+                    const timer = setInterval(() => { cd--; btn.innerText = `${cd}s`; if(cd <= 0) { clearInterval(timer); btn.disabled = false; btn.innerText = '获取验证码'; } }, 1000);
+                } else { showToast(data.message || '发送失败'); this.disabled = false; this.innerText = '获取验证码'; }
+            } catch (e) { showToast('网络错误'); this.disabled = false; this.innerText = '获取验证码'; }
+        });
                 if (res.ok) {
                     showToast('验证码已发送');
                     let cd = 60; const btn = this;
@@ -111,15 +116,27 @@
             const btn = document.getElementById('submit-btn');
             const email = document.getElementById('email').value;
             const code = document.getElementById('code').value;
-            if(code !== localStorage.getItem('my_verify_code')) { showToast('验证码错误'); return; }
+            const password = document.getElementById('password').value;
+            if(!code) { showToast('请输入验证码'); return; }
             btn.innerText = '正在进入...'; btn.disabled = true;
-            
             try {
-                // 存入 D1 数据库
-                const res = await fetch(`${WORKER_URL}/register`, {
-                    method: 'POST', headers: {'Content-Type': 'application/json'}, 
-                    body: JSON.stringify({ email: email })
+                const res = await fetch(API_BASE + '/auth/register', {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ email: email, code: code, password: password })
                 });
+                const data = await res.json();
+                if (data.ok && data.token) {
+                    localStorage.setItem('tgx_token', data.token);
+                    localStorage.setItem('tgx_user', JSON.stringify(data.user));
+                    showToast('注册成功');
+                    setTimeout(() => { window.location.href = '../index.html'; }, 600);
+                } else {
+                    showToast(data.message || '注册异常'); btn.innerText = '立即注册'; btn.disabled = false;
+                }
+            } catch (err) {
+                showToast('网络错误'); btn.innerText = '立即注册'; btn.disabled = false;
+            }
+        });
                 const data = await res.json();
                 if (res.ok && data.data) {
                     localStorage.setItem('socks5_email', data.data.email);

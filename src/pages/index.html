@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,8 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
-            darkMode: 'class',
-            theme: { extend: { colors: { darkbg: '#111318', darkcard: '#1b1e27', primary: '#3b82f6' } } }
+            theme: { extend: { colors: { primary: '#2563eb' } } }
         }
     </script>
     <!-- 引入 Alpine.js 处理弹窗和状态 -->
@@ -20,20 +19,20 @@
         ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
     </style>
 </head>
-<body class="bg-darkbg text-gray-300 font-sans antialiased" x-data="appStore()" x-cloak>
+<body class="bg-[#f8fafc] text-slate-700 font-sans antialiased" x-data="appStore()" x-cloak>
 
     <!-- ================= 1. 顶部导航栏 (Navbar) ================= -->
-    <nav class="bg-darkcard border-b border-gray-800 sticky top-0 z-40">
+    <nav class="bg-white border-b border-gray-200 sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
             <!-- Logo -->
             <a href="/" class="flex items-center gap-2">
                 <img src="../assets/sok.png" alt="Logo" class="w-8 h-8 rounded-lg">
-                <span class="font-bold text-xl text-white tracking-tight">TGX<span class="text-primary">Account</span></span>
+                <span class="font-bold text-xl text-slate-900 tracking-tight">TGX<span class="text-primary">Account</span></span>
             </a>
 
             <!-- 搜索框 (PC端) -->
             <div class="hidden md:flex flex-1 max-w-md mx-8">
-                <input type="text" placeholder="Search accounts..." class="w-full bg-darkbg border border-gray-700 rounded-full py-2 px-4 text-sm text-white focus:outline-none focus:border-primary transition">
+                <input type="text" placeholder="Search accounts..." class="w-full bg-[#f8fafc] border border-gray-200 rounded-full py-2 px-4 text-sm text-slate-900 focus:outline-none focus:border-primary transition">
             </div>
 
             <!-- 右侧：用户区域 -->
@@ -41,8 +40,8 @@
                 <!-- 未登录状态 -->
                 <template x-if="!isLoggedIn">
                     <div class="flex items-center gap-3 text-sm font-medium">
-                        <button @click="openLogin()" class="text-gray-300 hover:text-white transition">Sign In</button>
-                        <button @click="openRegister()" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition shadow-lg shadow-primary/30">Register</button>
+                        <button @click="openLogin()" class="text-slate-700 hover:text-slate-900 transition">Sign In</button>
+                        <button @click="openRegister()" class="bg-primary text-slate-900 px-4 py-2 rounded-lg hover:bg-blue-600 transition shadow-lg shadow-primary/30">Register</button>
                     </div>
                 </template>
 
@@ -50,32 +49,32 @@
                 <template x-if="isLoggedIn">
                     <div class="relative" @click.outside="isDrawerOpen = false">
                         <button @click="isDrawerOpen = !isDrawerOpen" class="flex items-center gap-2 hover:opacity-80 transition">
-                            <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-primary to-blue-400 flex items-center justify-center text-white font-bold" x-text="user.username.charAt(0).toUpperCase()"></div>
-                            <span class="text-sm text-white font-medium hidden sm:block" x-text="user.username"></span>
-                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-primary to-blue-400 flex items-center justify-center text-slate-900 font-bold" x-text="user.username.charAt(0).toUpperCase()"></div>
+                            <span class="text-sm text-slate-900 font-medium hidden sm:block" x-text="user.username"></span>
+                            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                         </button>
 
                         <!-- 下拉抽屉 (小抽屉) -->
-                        <div x-show="isDrawerOpen" x-transition.opacity.duration.200ms class="absolute right-0 mt-2 w-64 bg-darkcard border border-gray-700 rounded-xl shadow-2xl overflow-hidden z-50">
+                        <div x-show="isDrawerOpen" x-transition.opacity.duration.200ms class="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-xl shadow-2xl overflow-hidden z-50">
                             <!-- 用户信息头部 -->
-                            <div class="p-4 border-b border-gray-800 bg-[#151821]">
-                                <p class="text-sm text-gray-400 mb-1">Welcome back,</p>
-                                <p class="text-base font-bold text-white truncate" x-text="user.username"></p>
-                                <div class="mt-3 bg-darkbg rounded-lg p-2 flex justify-between items-center border border-gray-700">
-                                    <span class="text-xs text-gray-400">Wallet Balance</span>
-                                    <span class="text-green-400 font-bold" x-text="'$' + user.balance.toFixed(2)"></span>
+                            <div class="p-4 border-b border-gray-200 bg-gray-50">
+                                <p class="text-sm text-gray-500 mb-1">Welcome back,</p>
+                                <p class="text-base font-bold text-slate-900 truncate" x-text="user.username"></p>
+                                <div class="mt-3 bg-[#f8fafc] rounded-lg p-2 flex justify-between items-center border border-gray-200">
+                                    <span class="text-xs text-gray-500">Wallet Balance</span>
+                                    <span class="text-green-600 font-bold" x-text="'$' + user.balance.toFixed(2)"></span>
                                 </div>
                             </div>
                             <!-- 菜单列表 -->
                             <div class="p-2 space-y-1 text-sm">
-                                <a href="/dashboard" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-800 hover:text-white transition">Dashboard</a>
-                                <a href="/orders" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-800 hover:text-white transition">My Orders</a>
-                                <a href="/affiliate" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-800 hover:text-white transition">Affiliate Program</a>
-                                <a href="/wallet" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-800 hover:text-white transition">Wallet</a>
-                                <a href="/tickets" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-800 hover:text-white transition">Support Tickets</a>
+                                <a href="/dashboard" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 hover:text-slate-900 transition">Dashboard</a>
+                                <a href="/orders" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 hover:text-slate-900 transition">My Orders</a>
+                                <a href="/affiliate" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 hover:text-slate-900 transition">Affiliate Program</a>
+                                <a href="/wallet" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 hover:text-slate-900 transition">Wallet</a>
+                                <a href="/tickets" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 hover:text-slate-900 transition">Support Tickets</a>
                             </div>
                             <!-- 底部退出 -->
-                            <div class="p-2 border-t border-gray-800">
+                            <div class="p-2 border-t border-gray-200">
                                 <button @click="logout()" class="w-full text-left px-3 py-2 text-red-400 hover:bg-red-500/10 rounded-lg transition">Logout</button>
                             </div>
                         </div>
@@ -87,10 +86,10 @@
 
     <!-- ================= 2. 页面主体内容 ================= -->
     <div class="max-w-7xl mx-auto px-4 py-12">
-        <h1 class="text-3xl font-bold text-white mb-6">Hot Products</h1>
+        <h1 class="text-3xl font-bold text-slate-900 mb-6">Hot Products</h1>
         
         <!-- 测试权限拦截的按钮 -->
-        <button @click="checkAuthAndAction('/checkout')" class="bg-primary text-white px-6 py-3 rounded-lg mb-8 hover:bg-blue-600">
+        <button @click="checkAuthAndAction('/checkout')" class="bg-primary text-slate-900 px-6 py-3 rounded-lg mb-8 hover:bg-blue-600">
             Go to Checkout (Requires Auth)
         </button>
 
@@ -101,28 +100,28 @@
 
     <!-- ================= 3. 登录弹窗 (Modal) ================= -->
     <div x-show="isLoginOpen" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4" x-transition.opacity>
-        <div @click.outside="isLoginOpen = false" class="bg-darkcard w-full max-w-sm rounded-2xl shadow-2xl border border-gray-800 p-6 relative">
-            <button @click="isLoginOpen = false" class="absolute top-4 right-4 text-gray-400 hover:text-white">&times;</button>
-            <h2 class="text-2xl font-bold text-white mb-6 text-center">Sign In</h2>
+        <div @click.outside="isLoginOpen = false" class="bg-white w-full max-w-sm rounded-2xl shadow-2xl border border-gray-200 p-6 relative">
+            <button @click="isLoginOpen = false" class="absolute top-4 right-4 text-gray-500 hover:text-slate-900">&times;</button>
+            <h2 class="text-2xl font-bold text-slate-900 mb-6 text-center">Sign In</h2>
             
             <form @submit.prevent="handleLogin()" class="space-y-4">
                 <div>
-                    <input type="text" x-model="loginForm.username" placeholder="Username / Email" class="w-full bg-darkbg border border-gray-700 rounded-lg py-2.5 px-3 text-white focus:border-primary outline-none">
+                    <input type="text" x-model="loginForm.username" placeholder="Username / Email" class="w-full bg-[#f8fafc] border border-gray-200 rounded-lg py-2.5 px-3 text-slate-900 focus:border-primary outline-none">
                 </div>
                 <div class="relative">
-                    <input :type="showPassword ? 'text' : 'password'" x-model="loginForm.password" placeholder="Password" class="w-full bg-darkbg border border-gray-700 rounded-lg py-2.5 px-3 text-white focus:border-primary outline-none">
-                    <button type="button" @click="showPassword = !showPassword" class="absolute right-3 top-3 text-xs text-gray-400">Show</button>
+                    <input :type="showPassword ? 'text' : 'password'" x-model="loginForm.password" placeholder="Password" class="w-full bg-[#f8fafc] border border-gray-200 rounded-lg py-2.5 px-3 text-slate-900 focus:border-primary outline-none">
+                    <button type="button" @click="showPassword = !showPassword" class="absolute right-3 top-3 text-xs text-gray-500">Show</button>
                 </div>
                 
                 <div class="flex items-center gap-2">
-                    <input type="checkbox" x-model="loginForm.remember" class="rounded bg-darkbg border-gray-700 text-primary focus:ring-primary">
-                    <span class="text-sm text-gray-400">Remember Me</span>
+                    <input type="checkbox" x-model="loginForm.remember" class="rounded bg-[#f8fafc] border-gray-200 text-primary focus:ring-primary">
+                    <span class="text-sm text-gray-500">Remember Me</span>
                 </div>
 
                 <!-- 错误提示 -->
                 <div x-show="loginError" x-text="loginError" class="text-red-500 text-sm text-center bg-red-500/10 py-2 rounded"></div>
 
-                <button type="submit" :disabled="isLoggingIn" class="w-full bg-primary text-white font-bold py-2.5 rounded-lg hover:bg-blue-600 transition disabled:opacity-50 flex justify-center items-center gap-2">
+                <button type="submit" :disabled="isLoggingIn" class="w-full bg-primary text-slate-900 font-bold py-2.5 rounded-lg hover:bg-blue-600 transition disabled:opacity-50 flex justify-center items-center gap-2">
                     <span x-show="isLoggingIn" class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
                     <span x-text="isLoggingIn ? 'Signing In...' : 'Sign In'"></span>
                 </button>
@@ -134,24 +133,27 @@
 
     <!-- ================= 4. 注册弹窗 (Modal) ================= -->
     <div x-show="isRegisterOpen" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4" x-transition.opacity>
-        <div @click.outside="isRegisterOpen = false" class="bg-darkcard w-full max-w-sm rounded-2xl shadow-2xl border border-gray-800 p-6 relative">
-            <button @click="isRegisterOpen = false" class="absolute top-4 right-4 text-gray-400 hover:text-white">&times;</button>
-            <h2 class="text-2xl font-bold text-white mb-6 text-center">Create Account</h2>
+        <div @click.outside="isRegisterOpen = false" class="bg-white w-full max-w-sm rounded-2xl shadow-2xl border border-gray-200 p-6 relative">
+            <button @click="isRegisterOpen = false" class="absolute top-4 right-4 text-gray-500 hover:text-slate-900">&times;</button>
+            <h2 class="text-2xl font-bold text-slate-900 mb-6 text-center">Create Account</h2>
             
             <form @submit.prevent="handleRegister()" class="space-y-4">
-                <input type="text" x-model="regForm.username" placeholder="Username" class="w-full bg-darkbg border border-gray-700 rounded-lg py-2.5 px-3 text-white focus:border-primary outline-none">
-                <input type="email" x-model="regForm.email" placeholder="Email" class="w-full bg-darkbg border border-gray-700 rounded-lg py-2.5 px-3 text-white focus:border-primary outline-none">
-                <input type="password" x-model="regForm.password" placeholder="Password (min 8 chars)" class="w-full bg-darkbg border border-gray-700 rounded-lg py-2.5 px-3 text-white focus:border-primary outline-none">
-                <input type="password" x-model="regForm.confirm" placeholder="Confirm Password" class="w-full bg-darkbg border border-gray-700 rounded-lg py-2.5 px-3 text-white focus:border-primary outline-none">
+                <input type="email" x-model="regForm.email" placeholder="Email" class="w-full bg-[#f8fafc] border border-gray-200 rounded-lg py-2.5 px-3 text-slate-900 focus:border-primary outline-none">
+                <div class="flex gap-2">
+                    <input type="text" x-model="regForm.code" placeholder="6-digit verification code" class="flex-1 bg-[#f8fafc] border border-gray-200 rounded-lg py-2.5 px-3 text-slate-900 focus:border-primary outline-none">
+                    <button type="button" @click="sendRegCode()" x-text="regCodeBtn" class="px-4 bg-gray-100 text-gray-600 text-sm font-bold rounded-lg whitespace-nowrap hover:bg-gray-200 transition"></button>
+                </div>
+                <input type="password" x-model="regForm.password" placeholder="Password (min 8 chars)" class="w-full bg-[#f8fafc] border border-gray-200 rounded-lg py-2.5 px-3 text-slate-900 focus:border-primary outline-none">
+                <input type="password" x-model="regForm.confirm" placeholder="Confirm Password" class="w-full bg-[#f8fafc] border border-gray-200 rounded-lg py-2.5 px-3 text-slate-900 focus:border-primary outline-none">
                 
                 <div class="flex items-start gap-2">
-                    <input type="checkbox" x-model="regForm.agree" class="mt-1 rounded bg-darkbg border-gray-700 text-primary focus:ring-primary">
-                    <span class="text-xs text-gray-400">I agree to Terms of Service</span>
+                    <input type="checkbox" x-model="regForm.agree" class="mt-1 rounded bg-[#f8fafc] border-gray-200 text-primary focus:ring-primary">
+                    <span class="text-xs text-gray-500">I agree to Terms of Service</span>
                 </div>
 
                 <div x-show="regError" x-text="regError" class="text-red-500 text-sm text-center bg-red-500/10 py-2 rounded"></div>
 
-                <button type="submit" :disabled="isRegistering" class="w-full bg-primary text-white font-bold py-2.5 rounded-lg hover:bg-blue-600 transition disabled:opacity-50 flex justify-center items-center gap-2">
+                <button type="submit" :disabled="isRegistering" class="w-full bg-primary text-slate-900 font-bold py-2.5 rounded-lg hover:bg-blue-600 transition disabled:opacity-50 flex justify-center items-center gap-2">
                     <span x-show="isRegistering" class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
                     <span x-text="isRegistering ? 'Registering...' : 'Register'"></span>
                 </button>
@@ -180,14 +182,23 @@
                 isLoggingIn: false,
 
                 // 注册表单
-                regForm: { username: '', email: '', password: '', confirm: '', agree: false },
+                regForm: { username: '', email: '', code: '', password: '', confirm: '', agree: false },
                 regError: '',
                 isRegistering: false,
+                regCodeBtn: 'Get Code',
 
                 init() {
-                    // 页面加载时，如果有token，恢复用户信息
+                    // 页面加载时，如果有token，拉取真实用户信息
                     if(this.isLoggedIn) {
-                        this.user = { username: 'TestUser', balance: 25.50 };
+                        fetch('/api/auth/me', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('tgx_token') } })
+                            .then(r => r.json()).then(data => {
+                                if (data.ok && data.user) {
+                                    this.user = data.user;
+                                    localStorage.setItem('tgx_user', JSON.stringify(data.user));
+                                } else {
+                                    this.logout();
+                                }
+                            }).catch(() => {});
                     }
                 },
 
@@ -205,6 +216,28 @@
                     this.regError = '';
                 },
 
+                sendRegCode() {
+                    const email = this.regForm.email;
+                    if(!email || !email.includes('@')) { this.regError = 'Please enter email first'; return; }
+                    fetch('/api/auth/send-code', {
+                        method: 'POST', headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ email: email })
+                    }).then(r => r.json()).then(data => {
+                        if (data.ok) {
+                            this.regError = '';
+                            let cd = 60;
+                            this.regCodeBtn = cd + 's';
+                            const t = setInterval(() => {
+                                cd--;
+                                if(cd <= 0) { clearInterval(t); this.regCodeBtn = 'Get Code'; }
+                                else { this.regCodeBtn = cd + 's'; }
+                            }, 1000);
+                        } else {
+                            this.regError = data.message || 'Send failed';
+                        }
+                    }).catch(() => { this.regError = 'Network error'; });
+                },
+
                 // 处理登录
                 handleLogin() {
                     this.loginError = '';
@@ -213,27 +246,28 @@
                         return;
                     }
                     this.isLoggingIn = true;
-                    
-                    // 模拟请求
-                    setTimeout(() => {
-                        if(this.loginForm.password === '123456') { // 模拟密码错误
-                            this.loginError = 'Invalid username or password';
-                            this.isLoggingIn = false;
-                        } else {
-                            // 登录成功
-                            localStorage.setItem('tgx_token', 'mock_jwt_token');
+                    const email = this.loginForm.username;
+                    fetch('/api/auth/login', {
+                        method: 'POST', headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ email: email, password: this.loginForm.password })
+                    }).then(r => r.json()).then(data => {
+                        if (data.ok && data.token) {
+                            localStorage.setItem('tgx_token', data.token);
+                            localStorage.setItem('tgx_user', JSON.stringify(data.user));
                             this.isLoggedIn = true;
-                            this.user = { username: this.loginForm.username, balance: 10.00 };
+                            this.user = data.user;
                             this.isLoginOpen = false;
-                            this.isLoggingIn = false;
+                        } else {
+                            this.loginError = data.message || 'Invalid username or password';
                         }
-                    }, 1000);
+                        this.isLoggingIn = false;
+                    }).catch(() => { this.loginError = 'Network error'; this.isLoggingIn = false; });
                 },
 
                 // 处理注册
                 handleRegister() {
                     this.regError = '';
-                    if(!this.regForm.username || !this.regForm.email || !this.regForm.password) {
+                    if(!this.regForm.email || !this.regForm.password || !this.regForm.code) {
                         this.regError = 'All fields are required'; return;
                     }
                     if(this.regForm.password.length < 8) {
@@ -247,14 +281,21 @@
                     }
 
                     this.isRegistering = true;
-                    setTimeout(() => {
-                        // 注册成功直接登录
-                        localStorage.setItem('tgx_token', 'mock_jwt_token');
-                        this.isLoggedIn = true;
-                        this.user = { username: this.regForm.username, balance: 0.00 };
-                        this.isRegisterOpen = false;
+                    fetch('/api/auth/register', {
+                        method: 'POST', headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ email: this.regForm.email, code: this.regForm.code, password: this.regForm.password })
+                    }).then(r => r.json()).then(data => {
+                        if (data.ok && data.token) {
+                            localStorage.setItem('tgx_token', data.token);
+                            localStorage.setItem('tgx_user', JSON.stringify(data.user));
+                            this.isLoggedIn = true;
+                            this.user = data.user;
+                            this.isRegisterOpen = false;
+                        } else {
+                            this.regError = data.message || 'Registration failed';
+                        }
                         this.isRegistering = false;
-                    }, 1000);
+                    }).catch(() => { this.regError = 'Network error'; this.isRegistering = false; });
                 },
 
                 // 退出登录

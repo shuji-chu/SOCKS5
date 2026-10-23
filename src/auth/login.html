@@ -156,6 +156,7 @@
         }
 
         // 通用倒计时逻辑
+        const API_BASE = '/api';
         function sendCode(type) {
             let email = '';
             let btn = null;
@@ -171,19 +172,26 @@
             if(!email) { showTip('请先输入邮箱地址'); return; }
             
             btn.disabled = true;
-            let count = 60;
-            btn.innerText = `${count}s 后重发`;
-            const timer = setInterval(() => {
-                count--;
-                if(count <= 0) {
-                    clearInterval(timer);
-                    btn.innerText = '获取验证码';
-                    btn.disabled = false;
-                } else {
-                    btn.innerText = `${count}s 后重发`;
-                }
-            }, 1000);
-            showTip('验证码已发送至您的邮箱，请查收');
+            btn.innerText = '发送中...';
+            fetch(API_BASE + '/auth/send-code', {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ email: email })
+            }).then(r => r.json()).then(data => {
+                if (!data.ok) { showTip(data.message || '发送失败'); btn.disabled = false; btn.innerText = '获取验证码'; return; }
+                let count = 60;
+                btn.innerText = `${count}s 后重发`;
+                const timer = setInterval(() => {
+                    count--;
+                    if(count <= 0) {
+                        clearInterval(timer);
+                        btn.innerText = '获取验证码';
+                        btn.disabled = false;
+                    } else {
+                        btn.innerText = `${count}s 后重发`;
+                    }
+                }, 1000);
+                showTip('验证码已发送至您的邮箱，请查收');
+            }).catch(() => { showTip('网络错误'); btn.disabled = false; btn.innerText = '获取验证码'; });
         }
 
         // 登录/注册逻辑
@@ -193,24 +201,43 @@
             
             if(!email || !pass) { showTip('请输入完整的邮箱和密码'); return; }
 
+            const btn = document.getElementById('btn-submit');
+            btn.disabled = true; btn.innerText = '提交中...';
+
             if (currentMode === 'register') {
                 const code = document.getElementById('auth-code').value;
-                if(!code) { showTip('请输入验证码'); return; }
-                localStorage.setItem('user_id', '1000' + Math.floor(Math.random()*100));
-                localStorage.setItem('user_email', email);
-                localStorage.setItem('user_role', 'user');
-                window.location.href = '/profile.html';
+                if(!code) { showTip('请输入验证码'); btn.disabled = false; btn.innerText = '立即注册'; return; }
+                fetch(API_BASE + '/auth/register', {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ email: email, code: code, password: pass })
+                }).then(r => r.json()).then(data => {
+                    if (data.ok && data.token) {
+                        localStorage.setItem('tgx_token', data.token);
+                        localStorage.setItem('tgx_user', JSON.stringify(data.user));
+                        showTip('注册成功，即将进入');
+                        setTimeout(() => { window.location.href = '../index.html'; }, 800);
+                    } else {
+                        showTip(data.message || '注册失败');
+                        btn.disabled = false; btn.innerText = '立即注册';
+                    }
+                }).catch(() => { showTip('网络错误'); btn.disabled = false; btn.innerText = '立即注册'; });
             } else {
-                if (email === 'boss@lynli.me') {
-                    localStorage.setItem('user_id', '10001');
-                    localStorage.setItem('user_email', email);
-                    localStorage.setItem('user_role', 'boss');
-                } else {
-                    localStorage.setItem('user_id', '10002');
-                    localStorage.setItem('user_email', email);
-                    localStorage.setItem('user_role', 'user');
-                }
-                window.location.href = '/profile.html';
+                fetch(API_BASE + '/auth/login', {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ email: email, password: pass })
+                }).then(r => r.json()).then(data => {
+                    if (data.ok && data.token) {
+                        localStorage.setItem('tgx_token', data.token);
+                        localStorage.setItem('tgx_user', JSON.stringify(data.user));
+                        showTip('登录成功，即将进入');
+                        setTimeout(() => { window.location.href = '../index.html'; }, 800);
+                    } else {
+                        showTip(data.message || '登录失败');
+                        btn.disabled = false; btn.innerText = '立即登录';
+                    }
+                }).catch(() => { showTip('网络错误'); btn.disabled = false; btn.innerText = '立即登录'; });
+            }
+        }                window.location.href = '/profile.html';
             }
         }
 
@@ -230,6 +257,18 @@
                 showTip('请填写完整的重置信息'); return;
             }
 
+            fetch(API_BASE + '/auth/reset', {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ email: email, code: code, password: newPass })
+            }).then(r => r.json()).then(data => {
+                if (data.ok) {
+                    closeModal('forgot-modal');
+                    showTip('密码重置成功，请使用新密码登录');
+                } else {
+                    showTip(data.message || '重置失败');
+                }
+            }).catch(() => { showTip('网络错误'); });
+        }
             // 模拟提交成功
             closeModal('forgot-modal');
             showTip('密码重置成功，请使用新密码登录');

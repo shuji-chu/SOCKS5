@@ -2,257 +2,80 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>开发者控制台 - SOCKS5</title>
-    <link rel="icon" href="./logo.jpg" type="image/jpeg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>业务查询 - TGX Store</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: #f8fafc; color: #1e293b; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
-        .accordion-content.active { max-height: 2500px; transition: max-height 0.4s ease-in; }
-        .rotate-180 { transform: rotate(180deg); }
-        .status-btn { display: inline-flex; align-items: center; justify-content: center; padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
-        .status-pending { background: #eff6ff; color: #2563eb; }
-        .status-review { background: #fffbeb; color: #d97706; cursor: default; }
-        .status-active { background: #ecfdf5; color: #059669; cursor: default; }
-        .key-card { transition: all 0.2s; border: 1px solid #f1f5f9; }
-        .key-body { display: none; }
-        .key-card.expanded .key-body { display: block; }
-        .key-card.expanded .arrow-icon { transform: rotate(180deg); }
-        #toast { visibility: hidden; min-width: 200px; background-color: #334155; color: #fff; text-align: center; border-radius: 8px; padding: 10px 16px; position: fixed; z-index: 10000; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 13px; opacity: 0; transition: opacity 0.3s; }
-        #toast.show { visibility: visible; opacity: 1; }
-        .btn-press { transition: transform 0.1s, background-color 0.2s; }
-        .btn-press:active { transform: scale(0.97); background-color: #f1f5f9; }
-        
-        /* 弹窗样式 */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 0 16px; }
-        .modal-overlay.active { display: flex; }
-        .modal-box { background: #fff; width: 100%; max-width: 340px; border-radius: 16px; padding: 20px; text-align: left; transform: scale(0.95); transition: transform 0.2s; opacity: 0; }
-        .modal-overlay.active .modal-box { transform: scale(1); opacity: 1; }
-    </style>
 </head>
-<body>
-    <header class="bg-white border-b border-slate-100 px-4 py-3 flex items-center gap-3 sticky top-0 z-50">
-        <button onclick="window.history.back()" class="text-slate-600 text-xl font-bold px-2">←</button>
-        <h1 class="text-[17px] font-bold text-slate-800">开发者控制台</h1>
+<body class="bg-[#f8f9fa] text-gray-900 font-sans antialiased min-h-screen flex flex-col">
+    <!-- 顶部导航 -->
+    <header class="bg-white px-4 py-4 sticky top-0 z-10 border-b border-gray-100 flex items-center justify-between">
+        <div class="flex items-center">
+            <a href="./index.html" class="text-gray-500 mr-3">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+            </a>
+            <h1 class="text-lg font-bold tracking-tight">控制台 / 查询</h1>
+        </div>
     </header>
 
-    <main class="pb-12">
-        <!-- 头部 -->
-        <div class="bg-white px-5 py-6 flex items-center justify-between">
-            <div class="flex items-center gap-4">
-                <div id="user-avatar-container" class="w-[52px] h-[52px] rounded-full bg-slate-100 flex items-center justify-center border border-slate-200 overflow-hidden"><span class="text-blue-500 font-bold text-xl">B</span></div>
-                <div>
-                    <h2 class="text-[19px] font-bold text-slate-800">boss</h2>
-                    <p class="text-[12px] text-slate-400 mt-0.5">ID: 10001</p>
-                </div>
-            </div>
-            <div class="bg-blue-50 px-4 py-2 rounded-xl text-right min-w-[100px]">
-                <p class="text-[11px] text-blue-500 mb-0.5">当前余额</p>
-                <p class="text-[20px] font-bold text-blue-600" id="real-balance">¥ 120.00</p>
-            </div>
+    <!-- 主体内容 -->
+    <main class="flex-1 px-4 py-6 max-w-md mx-auto w-full">
+        <!-- 提示卡片 -->
+        <div class="bg-blue-50 text-blue-800 rounded-xl p-4 mb-6 text-sm leading-relaxed border border-blue-100">
+            请在下方输入您的 <strong>订单号</strong> 或 <strong>API Key</strong> 进行查询。节点业务请前往用户中心获取订阅链接。
         </div>
 
-        <!-- 工作台 -->
-        <div class="bg-white mt-2 pt-5 pb-6">
-            <div class="px-5 mb-4"><h3 class="text-[16px] font-bold text-slate-800">账户工作台</h3></div>
-            <div class="grid grid-cols-2 gap-3 px-5">
-                <div class="bg-white rounded-xl p-4 border border-slate-100 shadow-sm cursor-pointer btn-press"><p class="text-[13px] text-slate-500">今日消费</p><p class="text-[22px] font-bold text-slate-800">¥ 0.00</p></div>
-                <div class="bg-white rounded-xl p-4 border border-slate-100 shadow-sm cursor-pointer btn-press"><p class="text-[13px] text-slate-500">今日充值</p><p class="text-[22px] font-bold text-slate-800">¥ 0.00</p></div>
-                <div class="bg-white rounded-xl p-4 border border-slate-100 shadow-sm"><p class="text-[13px] text-slate-500">调用资格</p><p class="text-[18px] font-bold mt-1 text-green-600" id="dash-call-status">可以调用</p></div>
-                <div class="bg-white rounded-xl p-4 border border-slate-100 shadow-sm"><p class="text-[13px] text-slate-500">专属 Key</p><p class="text-[18px] font-bold mt-1 text-green-600" id="dash-key-status">启用中</p></div>
+        <!-- 查询表单 -->
+        <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm mb-6">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">查询凭证</label>
+            <div class="relative mb-4">
+                <input type="text" id="query-input" placeholder="输入订单号 / 卡密 / API Key" class="w-full bg-gray-50 border border-gray-200 rounded-lg py-3 px-4 text-[15px] focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition">
             </div>
-            
-            <div class="grid grid-cols-2 gap-3 px-5 mt-4">
-                <button onclick="window.location.href='/recharge.html'" class="py-2.5 bg-blue-600 text-white font-bold rounded-xl text-[14px]">+ 在线充值</button>
-                <a href="./guide.html" class="py-2.5 bg-slate-50 text-slate-600 font-bold rounded-xl text-[14px] flex items-center justify-center border border-slate-200">开发文档</a>
-            </div>
-
-            <!-- 账号与秘钥直达入口 -->
-            <div class="px-5 mt-3">
-                <a href="./user-api.html" class="w-full bg-white rounded-xl p-4 border border-slate-100 shadow-sm flex justify-between items-center active:scale-95 transition-transform">
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-full bg-indigo-50 text-indigo-500 flex items-center justify-center">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
-                        </div>
-                        <div>
-                            <h3 class="text-[14px] font-bold text-slate-800">账号与秘钥管理</h3>
-                            <p class="text-[11px] text-slate-500 mt-0.5">查看接口权限、秘钥与 IP 白名单</p>
-                        </div>
-                    </div>
-                    <svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                </a>
-            </div>
+            <button onclick="doQuery()" class="w-full bg-black hover:bg-gray-800 text-white font-bold py-3 rounded-lg transition-colors">
+                立即查询
+            </button>
         </div>
 
-        <!-- 账单与请求记录 (带完整分页) -->
-        <div id="bill-tab-container" class="bg-white mt-2">
-            <div class="flex border-b border-slate-100">
-                <button onclick="switchBillTab('bill')" id="tab-btn-bill" class="flex-1 py-3.5 text-[14px] font-bold text-blue-600 border-b-2 border-blue-600 bg-white">收支明细</button>
-                <button onclick="switchBillTab('request')" id="tab-btn-request" class="flex-1 py-3.5 text-[14px] font-bold text-slate-500 border-b-2 border-transparent bg-slate-50">消费记录</button>
-            </div>
-            
-            <div class="bg-white">
-                <!-- 注意这里的 class：默认展示 bill，隐藏 request -->
-                <div id="bill-list-container" class="text-left w-full"></div>
-                <div id="request-list-container" class="text-left hidden w-full"></div>
-            </div>
-            
-            <!-- 分页控制区 -->
-            <div class="flex justify-between items-center p-4 border-t border-slate-100 bg-slate-50/50">
-                <button onclick="changePage(-1)" id="btn-prev-page" class="px-4 py-1.5 bg-white border border-slate-200 text-slate-600 text-[13px] rounded-lg active:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition">上一页</button>
-                <span class="text-[12px] text-slate-500 font-medium" id="page-info">第 1 页 / 共 1 页</span>
-                <button onclick="changePage(1)" id="btn-next-page" class="px-4 py-1.5 bg-white border border-slate-200 text-slate-600 text-[13px] rounded-lg active:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition">下一页</button>
+        <!-- 结果展示区 (默认隐藏) -->
+        <div id="result-box" class="hidden bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+            <h3 class="text-sm font-bold text-gray-900 mb-4 pb-2 border-b border-gray-100">查询结果</h3>
+            <div id="result-content" class="text-sm text-gray-600 break-all space-y-2">
+                <!-- 动态填充 -->
             </div>
         </div>
     </main>
 
-    <div id="toast">提示内容</div>
-
     <script>
-        // ==== 模拟数据生成 ====
-        const mockBills = Array.from({length: 12}).map((_, i) => ({
-            id: `BL20261022${String(i).padStart(4, '0')}`,
-            type: i % 3 === 0 ? '在线充值' : (i % 3 === 1 ? '手机号二要素认证 接口消费' : '退款入账'),
-            amount: i % 3 === 0 ? '+800.00' : (i % 3 === 1 ? '-0.0455' : '+8.00'),
-            isPositive: i % 3 !== 1,
-            balanceAfter: `¥ ${(120 - i * 1.5).toFixed(4)}`,
-            time: `2026-10-22 15:${String(30+i).padStart(2,'0')}`
-        }));
-
-        const mockRequests = Array.from({length: 18}).map((_, i) => ({
-            apiName: i % 2 === 0 ? '手机号二要素认证' : '全网手机号三要素验证',
-            uuid: `req_${i}abc-d82k-4a1b`,
-            amount: i % 3 === 0 ? '0.0000' : '0.0455',
-            status: i % 3 === 0 ? 'fail' : 'success',
-            reason: i % 3 === 0 ? '余额不足，请先充值' : '',
-            time: `2026-10-21 16:59:${String(40+i).padStart(2,'0')}`
-        }));
-
-        // ==== 分页与渲染状态 ====
-        let currentTab = 'bill';
-        let currentPage = { bill: 1, request: 1 };
-        const pageSize = 5;
-
-        // ==== 核心渲染逻辑 ====
-        function renderList() {
-            const billCont = document.getElementById('bill-list-container');
-            const reqCont = document.getElementById('request-list-container');
-            const pageInfo = document.getElementById('page-info');
-            const btnPrev = document.getElementById('btn-prev-page');
-            const btnNext = document.getElementById('btn-next-page');
-
-            const data = currentTab === 'bill' ? mockBills : mockRequests;
-            const page = currentPage[currentTab];
-            const totalPage = Math.ceil(data.length / pageSize) || 1;
+        function doQuery() {
+            const val = document.getElementById('query-input').value.trim();
+            if (!val) return alert('请输入查询内容');
             
-            // 截取当前页数据
-            const start = (page - 1) * pageSize;
-            const displayData = data.slice(start, start + pageSize);
+            const btn = event.target;
+            btn.innerText = '查询中...';
+            btn.disabled = true;
 
-            if (currentTab === 'bill') {
-                // 强制清空另一个容器的数据，确保不会串台
-                reqCont.innerHTML = '';
-                billCont.innerHTML = displayData.map(item => `
-                    <div class="flex justify-between items-start px-4 py-3 border-b border-slate-50 last:border-0 hover:bg-slate-50 transition">
-                        <div class="flex flex-col gap-1 pr-4">
-                            <span class="text-[13px] font-bold text-slate-800 line-clamp-1">${item.type}</span>
-                            <span class="text-[11px] text-slate-400">${item.id}</span>
-                            <span class="text-[11px] text-slate-400">变更后: ${item.balanceAfter}</span>
-                        </div>
-                        <div class="flex flex-col items-end gap-1 shrink-0">
-                            <span class="text-[14px] font-bold ${item.isPositive ? 'text-green-600' : 'text-slate-800'}">${item.amount}</span>
-                            <span class="text-[11px] text-slate-400">${item.time.split(' ')[0]}</span>
-                            <span class="text-[11px] text-slate-400">${item.time.split(' ')[1]}</span>
+            // 模拟请求 (将来替换为真实的 /api/query 接口)
+            setTimeout(() => {
+                document.getElementById('result-box').classList.remove('hidden');
+                document.getElementById('result-content').innerHTML = `
+                    <div class="flex justify-between border-b border-gray-50 pb-2">
+                        <span class="text-gray-500">查询状态</span>
+                        <span class="font-medium text-green-600">查询成功</span>
+                    </div>
+                    <div class="flex justify-between border-b border-gray-50 pb-2 pt-2">
+                        <span class="text-gray-500">凭证内容</span>
+                        <span class="font-mono text-gray-900">${val}</span>
+                    </div>
+                    <div class="pt-2">
+                        <span class="text-gray-500 block mb-1">提取结果</span>
+                        <div class="bg-gray-50 p-3 rounded font-mono text-xs text-gray-800">
+                            tg://proxy?server=8.210.xx.xx&port=443&secret=xxxxxx
                         </div>
                     </div>
-                `).join('');
-            } else {
-                // 强制清空另一个容器的数据
-                billCont.innerHTML = '';
-                reqCont.innerHTML = displayData.map(item => `
-                    <div class="flex justify-between items-start px-4 py-3 border-b border-slate-50 last:border-0 hover:bg-slate-50 transition">
-                        <div class="flex flex-col gap-1 pr-4">
-                            <span class="text-[13px] font-bold text-slate-800 line-clamp-1">${item.apiName}</span>
-                            <span class="text-[11px] text-slate-400 truncate w-40">${item.uuid}</span>
-                        </div>
-                        <div class="flex flex-col items-end gap-1 shrink-0">
-                            <span class="text-[13px] font-bold text-slate-800">- $${item.amount}</span>
-                            <span class="text-[11px] ${item.status === 'success' ? 'text-green-500' : 'text-red-500'}">${item.status === 'success' ? '成功' : '失败: ' + item.reason}</span>
-                            <span class="text-[11px] text-slate-400">${item.time}</span>
-                        </div>
-                    </div>
-                `).join('');
-            }
-
-            // 更新分页文本
-            pageInfo.innerText = `第 ${page} 页 / 共 ${totalPage} 页`;
-
-            // 按钮状态控制
-            btnPrev.disabled = page <= 1;
-            btnNext.disabled = page >= totalPage;
+                `;
+                btn.innerText = '立即查询';
+                btn.disabled = false;
+            }, 800);
         }
-
-        function changePage(step) {
-            const data = currentTab === 'bill' ? mockBills : mockRequests;
-            const totalPage = Math.ceil(data.length / pageSize) || 1;
-            const newPage = currentPage[currentTab] + step;
-            
-            if (newPage >= 1 && newPage <= totalPage) {
-                currentPage[currentTab] = newPage;
-                renderList();
-            }
-        }
-
-        function switchBillTab(tab) {
-            currentTab = tab;
-            const btnBill = document.getElementById('tab-btn-bill');
-            const btnReq = document.getElementById('tab-btn-request');
-            const contBill = document.getElementById('bill-list-container');
-            const contReq = document.getElementById('request-list-container');
-
-            if (tab === 'bill') {
-                // 亮起收支明细
-                btnBill.className = 'flex-1 py-3.5 text-[14px] font-bold text-blue-600 border-b-2 border-blue-600 bg-white';
-                btnReq.className = 'flex-1 py-3.5 text-[14px] font-bold text-slate-500 border-b-2 border-transparent bg-slate-50';
-                // 切换内容
-                contBill.classList.remove('hidden');
-                contReq.classList.add('hidden');
-            } else {
-                // 亮起消费记录
-                btnReq.className = 'flex-1 py-3.5 text-[14px] font-bold text-blue-600 border-b-2 border-blue-600 bg-white';
-                btnBill.className = 'flex-1 py-3.5 text-[14px] font-bold text-slate-500 border-b-2 border-transparent bg-slate-50';
-                // 切换内容
-                contReq.classList.remove('hidden');
-                contBill.classList.add('hidden');
-            }
-            
-            renderList(); 
-        }
-
-        // ==== 工具函数 ====
-        function showToast(msg) { const t = document.getElementById('toast'); t.innerText = msg; t.className = 'show'; setTimeout(() => t.className = '', 2000); }
-        function openRechargeModal() { showToast('在线充值开发中'); }
-
-        // ==== 页面加载初始化 ====
-        document.addEventListener('DOMContentLoaded', () => {
-            // 初次加载时，强制默认选中收支明细
-            switchBillTab('bill');
-        });
-    </script>
-
-<script src="./ai-widget.js"></script>
-
-<script src="./notice.js"></script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const balance = localStorage.getItem('user_balance') || '120.00';
-            const el = document.getElementById('real-balance');
-            if(el) el.innerText = '¥ ' + balance;
-        });
     </script>
 </body>
 </html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart - TGX Account</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config = { darkMode: 'class', theme: { extend: { colors: { darkbg: '#111318', darkcard: '#1b1e27', primary: '#3b82f6' } } } }</script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="bg-darkbg text-gray-300 font-sans min-h-screen" x-data>
+    <!-- 导航栏简版 -->
+    <nav class="bg-darkcard border-b border-gray-800 px-4 py-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="./index.html" class="text-white font-bold text-xl">TGX Account</a>
+            <a href="./index.html" class="text-sm text-primary hover:underline">&larr; Continue Shopping</a>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8" x-init="$store.app.requireAuth('/cart.html')">
+        
+        <!-- 左侧：购物车列表 -->
+        <div class="lg:col-span-2">
+            <h1 class="text-2xl font-bold text-white mb-6">Shopping Cart</h1>
+            
+            <!-- 空状态 -->
+            <template x-if="$store.app.cart.length === 0">
+                <div class="bg-darkcard rounded-xl p-12 text-center border border-gray-800">
+                    <div class="text-4xl mb-4">🛒</div>
+                    <p class="text-gray-400 mb-6">Your cart is empty</p>
+                    <a href="./index.html" class="bg-primary text-white px-6 py-2 rounded-lg">Browse Products</a>
+                </div>
+            </template>
+
+            <!-- 列表 -->
+            <template x-if="$store.app.cart.length > 0">
+                <div class="space-y-4">
+                    <template x-for="item in $store.app.cart" :key="item.id">
+                        <div class="bg-darkcard rounded-xl p-4 border border-gray-800 flex items-center gap-4">
+                            <div class="text-3xl" x-text="item.icon"></div>
+                            <div class="flex-1">
+                                <h3 class="text-white font-bold text-sm" x-text="item.title"></h3>
+                                <p class="text-xs text-gray-500 mt-1">Stock: <span :class="item.qty > item.stock ? 'text-red-500' : 'text-green-500'" x-text="item.stock"></span></p>
+                                <p class="text-xs text-red-400 mt-1" x-show="item.qty > item.stock">Not enough stock available</p>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="flex items-center bg-darkbg border border-gray-700 rounded-lg">
+                                    <button @click="if(item.qty>1) {item.qty--; $store.app.saveCart()}" class="px-3 py-1 text-white hover:bg-gray-800">-</button>
+                                    <span class="px-3 text-white text-sm" x-text="item.qty"></span>
+                                    <button @click="if(item.qty<item.stock) {item.qty++; $store.app.saveCart()}" class="px-3 py-1 text-white hover:bg-gray-800">+</button>
+                                </div>
+                                <div class="w-20 text-right font-bold text-white" x-text="'$' + (item.price * item.qty).toFixed(2)"></div>
+                                <button @click="if(confirm('Are you sure to remove this item?')) $store.app.removeFromCart(item.id)" class="text-red-500 hover:text-red-400 text-sm">Remove</button>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </template>
+        </div>
+
+        <!-- 右侧：结算卡片 -->
+        <div>
+            <div class="bg-darkcard rounded-xl p-6 border border-gray-800 sticky top-24">
+                <h2 class="text-lg font-bold text-white mb-4">Order Summary</h2>
+                <div class="flex justify-between text-sm mb-2"><span>Subtotal</span><span x-text="'$' + $store.app.cartTotal.toFixed(2)"></span></div>
+                <div class="flex justify-between text-sm mb-4"><span>Tax</span><span>$0.00</span></div>
+                <div class="border-t border-gray-800 pt-4 flex justify-between font-bold text-white mb-6">
+                    <span>Total</span><span x-text="'$' + $store.app.cartTotal.toFixed(2)"></span>
+                </div>
+                <a href="./checkout.html" class="block text-center w-full bg-primary text-white font-bold py-3 rounded-lg hover:bg-blue-600" :class="{'opacity-50 pointer-events-none': $store.app.cart.length === 0 || $store.app.cart.some(i => i.qty > i.stock)}">
+                    Proceed to Checkout
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

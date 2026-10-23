@@ -263,7 +263,7 @@
         document.addEventListener('DOMContentLoaded', async () => {
             try {
                 // 请求存放在根目录的 products.json 文件
-                const res = await fetch('./products.json');
+                const res = await fetch("https://lynli.kz.ci/api/products");
                 mockProducts = await res.json();
                 
                 // 恢复之前的状态

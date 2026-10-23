@@ -1,7 +1,5 @@
-
-body { background-color: #f8f9fa !important; color: #111827 !important; -webkit-font-smoothing: antialiased; }
-.card, .bg-white { border-radius: 8px !important; border: 1px solid #e5e7eb !important; box-shadow: none !important; }
-button, .btn, [type="submit"] { background-color: #000 !important; color: #fff !important; border-radius: 6px !important; font-weight: 600 !important; border: none !important; }
-input, select, textarea { background-color: #f3f4f6 !important; border: 1px solid #e5e7eb !important; border-radius: 6px !important; color: #111 !important; }
-input:focus { outline: none !important; border-color: #000 !important; background-color: #fff !important; }
-a { text-decoration: none !important; }
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.bg-gradient-btn { background: linear-gradient(90deg, #0ea5e9 0%, #3b82f6 100%); }
+.bg-hero-glow { background: radial-gradient(circle at top center, #e0f2fe 0%, #f8fafc 60%); }
+.marquee { animation: marquee 25s linear infinite; }
+@keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }

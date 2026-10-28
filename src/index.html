@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TGX Account - Global Digital Shop</title>
+    <title>SOSKS5 · 数字商品与节点服务</title>
+    <link rel="icon" type="image/png" href="./assets/sok.png">
+    <link rel="apple-touch-icon" href="./assets/sok.png">
+    <meta name="theme-color" content="#edf6ff">
+    <meta name="description" content="SOSKS5 数字商品、节点服务、用户中心与开发者 API。">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = { theme: { extend: { colors: { primary: '#2563eb', primarylight: '#3b82f6' } } } }
@@ -17,7 +21,7 @@
         <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
             <a href="#/" class="flex items-center gap-2 cursor-pointer">
                 <img src="./assets/sok.png" alt="Logo" class="w-8 h-8 rounded-lg" onerror="this.src='https://via.placeholder.com/32/2563eb/ffffff?text=T'">
-                <span class="font-bold text-xl text-slate-900 tracking-tight">TGX<span class="text-primary">Account</span></span>
+                <span class="font-bold text-xl text-slate-900 tracking-tight">SOSKS5<span class="text-primary"> Store</span></span>
             </a>
 
             <div class="hidden md:flex items-center gap-1 text-sm font-medium">
@@ -25,6 +29,7 @@
                 <a href="#/products" class="px-3 py-2 rounded-lg hover:bg-gray-100 transition">Products</a>
                 <a href="#/query" class="px-3 py-2 rounded-lg hover:bg-gray-100 transition">Query</a>
                 <a href="#/nodes" class="px-3 py-2 rounded-lg hover:bg-gray-100 transition">Nodes</a>
+                <a href="./docs/" class="px-3 py-2 rounded-lg hover:bg-gray-100 transition">开发者文档</a>
             </div>
 
             <div class="hidden md:flex flex-1 max-w-xs mx-8">
@@ -73,5 +78,6 @@
     <div id="toast" class="hidden fixed bottom-10 left-1/2 -translate-x-1/2 z-[110] px-6 py-3 rounded-lg shadow-xl text-white font-bold bg-green-600"></div>
 
     <script src="./js/app.js"></script>
+    <script src="./js/ai-chat.js"></script>
 </body>
 </html>

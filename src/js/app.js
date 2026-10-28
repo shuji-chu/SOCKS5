@@ -1,4 +1,4 @@
-// TGXAccount SPA - real API backend
+// SOSKS5Account SPA - real API backend
 const API_BASE = '/api';
 
 const App = {

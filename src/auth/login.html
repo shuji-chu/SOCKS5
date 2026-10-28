@@ -212,8 +212,8 @@
                     body: JSON.stringify({ email: email, code: code, password: pass })
                 }).then(r => r.json()).then(data => {
                     if (data.ok && data.token) {
-                        localStorage.setItem('tgx_token', data.token);
-                        localStorage.setItem('tgx_user', JSON.stringify(data.user));
+                        localStorage.setItem('sosks5_token', data.token);
+                        localStorage.setItem('sosks5_user', JSON.stringify(data.user));
                         showTip('注册成功，即将进入');
                         setTimeout(() => { window.location.href = '../index.html'; }, 800);
                     } else {
@@ -227,8 +227,8 @@
                     body: JSON.stringify({ email: email, password: pass })
                 }).then(r => r.json()).then(data => {
                     if (data.ok && data.token) {
-                        localStorage.setItem('tgx_token', data.token);
-                        localStorage.setItem('tgx_user', JSON.stringify(data.user));
+                        localStorage.setItem('sosks5_token', data.token);
+                        localStorage.setItem('sosks5_user', JSON.stringify(data.user));
                         showTip('登录成功，即将进入');
                         setTimeout(() => { window.location.href = '../index.html'; }, 800);
                     } else {

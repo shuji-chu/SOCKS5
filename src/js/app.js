@@ -78,31 +78,41 @@ const App = {
     views: {
         home() {
             const featured = App.state.products.slice(0, 8);
-            const cards = featured.length ? featured.map(p => App.productCard(p)).join('') : '<div class="text-center py-10 text-gray-400 col-span-4">Loading products...</div>';
+            const cards = featured.length ? featured.map(p => App.productCard(p)).join('') : '<div class="s5-loading">商品数据加载中；请稍后刷新</div>';
             return `
-            <div class="rounded-2xl bg-gradient-to-br from-slate-950 via-blue-950 to-sky-900 text-white p-8 md:p-10 mb-7 shadow-xl border border-sky-900">
-                <div class="text-xs tracking-[.25em] text-sky-300 font-bold mb-3">SOSKS5 · DIGITAL SERVICES</div>
-                <h1 class="text-3xl md:text-5xl font-black mb-3">账号 · 节点 · 引流</h1>
-                <p class="text-sky-100 text-sm md:text-base leading-7 mb-6 max-w-2xl">数字服务一站式入口。浏览账号商品、查看可用节点，或进入引流广场发现和分享实用资源。</p>
-                <div class="flex flex-wrap gap-2 text-xs"><span class="bg-white/10 border border-white/15 rounded-full px-3 py-1">账号商品</span><span class="bg-white/10 border border-white/15 rounded-full px-3 py-1">节点服务</span><span class="bg-white/10 border border-white/15 rounded-full px-3 py-1">资源发现</span></div>
+            <section class="s5-hero">
+              <div class="s5-hero-stars"></div><div class="s5-planet"></div>
+              <div class="s5-hero-copy">
+                <div class="s5-eyebrow">GLOBAL DIGITAL SERVICE PLATFORM</div>
+                <h1>SOSKS5</h1><h2>全球账号 · 高速节点 · 引流服务</h2>
+                <p>安全、稳定、专业的一站式数字商品与网络服务平台</p>
+                <div class="s5-hero-tags"><span>✦ 海量数字资源</span><span>◷ 订单状态可查询</span><span>⬡ 专业服务支持</span></div>
+                <div class="s5-hero-actions"><a href="#/products" class="s5-primary-btn">探索账号商城 →</a><a href="#/nodes" class="s5-ghost-btn">浏览节点中心</a></div>
+              </div>
+              <div class="s5-astronaut" aria-label="漂浮宇航员动画"><div class="s5-orbit"></div><div class="s5-astronaut-body">🧑‍🚀</div><span class="s5-star s5-star-a">✦</span><span class="s5-star s5-star-b">✧</span></div>
+              <div class="s5-hero-contact"><b>在线业务支持</b><span>Telegram：@qingtian_Boss</span><span>邮箱：boss@lynli.me</span><span>支付方式：支付宝 / USDT</span></div>
+              <div class="s5-slider-dots"><i></i><i></i><i></i></div>
+            </section>
+            <section class="s5-promo" id="s5-promo"><div><small>SOCKS5 · SERVICE NOTICE</small><h2 id="s5-promo-title">账号、节点、引流，一站式管理</h2><p id="s5-promo-desc">浏览商品与服务说明，购买前请确认商品详情及适用范围。</p></div><a id="s5-promo-link" href="#/products">立即查看 →</a></section>
+            <section class="s5-categories">
+              <a href="#/products" class="s5-category"><span>🌐</span><b>账号商城</b><small>社交媒体 · 邮箱 · 流媒体 · AI账号</small></a>
+              <a href="#/nodes" class="s5-category"><span>🛰️</span><b>节点中心</b><small>高速节点 · 订阅服务 · 连接教程</small></a>
+              <a href="#/traffic" class="s5-category"><span>📈</span><b>引流广场</b><small>推广工具 · 资源分享 · 营销教程</small></a>
+              <a href="./docs/" class="s5-category"><span>🧩</span><b>开发者 API</b><small>业务接口说明 · 接入指南</small></a>
+            </section>
+            <div class="s5-section-head"><div><h2>🔥 热门商品</h2><p>商品图标按分类显示 · 具体库存与价格以实时商品数据为准</p></div><a href="#/products">查看全部 →</a></div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 s5-product-grid">${cards}</div>
+            <section class="s5-section-head s5-tutorial-head"><div><h2>📚 新手教程中心</h2><p>从注册、登录到下单与售后，快速上手</p></div><a href="#/tutorials">全部教程 →</a></section>
+            <div class="s5-tutorials">
+              <a href="#/tutorials#register"><span>🔐</span><b>注册与登录</b><small>账号安全与登录排查</small></a>
+              <a href="#/tutorials#buy"><span>🛒</span><b>购买与交付</b><small>下单、订单、自动交付</small></a>
+              <a href="#/tutorials#account"><span>🧭</span><b>账号使用教程</b><small>首次登录与安全设置</small></a>
+              <a href="#/tutorials#health"><span>🌱</span><b>账号维护指南</b><small>合规使用与风险防护</small></a>
+              <a href="#/tutorials#sms"><span>📩</span><b>接码服务教程</b><small>适用范围与隐私提示</small></a>
+              <a href="#/tutorials#keys"><span>🎟️</span><b>卡密使用教程</b><small>兑换、查询与常见问题</small></a>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-9">
-                <a href="#/products" class="block rounded-2xl border border-blue-100 bg-white p-5 hover:shadow-lg transition"><div class="text-xs text-blue-600 font-bold mb-2">01 / ACCOUNTS</div><h2 class="text-xl font-black text-slate-900 mb-2">账号商城</h2><p class="text-sm text-slate-500 leading-6">浏览现有商品、查看库存与价格，加入购物车并提交订单。</p><div class="mt-4 text-sm font-bold text-blue-600">浏览账号 →</div></a>
-                <a href="#/nodes" class="block rounded-2xl border border-cyan-100 bg-white p-5 hover:shadow-lg transition"><div class="text-xs text-cyan-700 font-bold mb-2">02 / NODES</div><h2 class="text-xl font-black text-slate-900 mb-2">节点中心</h2><p class="text-sm text-slate-500 leading-6">读取现有节点列表，查看连接信息并复制订阅链接或 TG 代理链接。</p><div class="mt-4 text-sm font-bold text-cyan-700">查看节点 →</div></a>
-                <a href="#/traffic" class="block rounded-2xl border border-indigo-100 bg-white p-5 hover:shadow-lg transition"><div class="text-xs text-indigo-600 font-bold mb-2">03 / DISCOVERY</div><h2 class="text-xl font-black text-slate-900 mb-2">引流广场</h2><p class="text-sm text-slate-500 leading-6">发现工具、教程、资源和服务，搜索内容或登录后发布自己的分享。</p><div class="mt-4 text-sm font-bold text-indigo-600">进入引流 →</div></a>
-            </div>
-            <div class="flex justify-between items-center mb-6">
-                <h1 class="text-2xl font-bold text-slate-900">Hot Products</h1>
-                <a href="#/products" class="text-primary text-sm font-medium hover:underline">View All →</a>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">${cards}</div>
-            <div class="mt-10 rounded-2xl bg-white border border-gray-200 p-6 flex flex-col md:flex-row items-center justify-between gap-4">
-                <div>
-                    <h2 class="text-lg font-bold text-slate-900">TGX Affiliate Program</h2>
-                    <p class="text-sm text-gray-500 mt-1">Invite friends, earn <span class="text-primary font-bold">5% commission</span> on all their orders. Auto-tracked, withdraw anytime.</p>
-                </div>
-                <a href="#/dashboard" class="bg-primary hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg text-sm font-bold transition shrink-0">Join Now</a>
-            </div>`;
+            <section class="s5-payment-strip"><b>🔒 内部订单与支付</b><span>支付宝</span><span>USDT</span><span>订单状态查询</span><span>自动交付能力需由服务端支付回调启用</span></section>
+            <section class="s5-affiliate"><div><h2>让每一次服务都有清晰的路径</h2><p>查看商品、阅读教程、查询订单，或联系官方客服获取帮助。</p></div><a href="https://t.me/qingtian_Boss" target="_blank" rel="noopener">联系官方客服 ↗</a></section>`;
         },
 
         products() {
@@ -258,11 +268,13 @@ const App = {
     productCard(p) {
         const soldOut = p.stock <= 0;
         const tags = (p.tags || []).map(t => `<span class="text-[10px] bg-blue-50 text-primary px-1.5 py-0.5 rounded border border-blue-100">${t}</span>`).join('');
+        const categoryText = String(p.category || p.title || '商品').toLowerCase();
+        const icon = /telegram|tg|电报/.test(categoryText) ? '✈️' : /whatsapp/.test(categoryText) ? '🟢' : /facebook|meta/.test(categoryText) ? 'ⓕ' : /instagram/.test(categoryText) ? '📸' : /tiktok/.test(categoryText) ? '♪' : /youtube/.test(categoryText) ? '▶️' : /netflix/.test(categoryText) ? '🎬' : /openai|chatgpt|ai/.test(categoryText) ? '🤖' : /email|邮箱|gmail|outlook/.test(categoryText) ? '✉️' : /node|proxy|节点|代理|v2ray|ss/.test(categoryText) ? '🛰️' : /sms|接码|phone|手机/.test(categoryText) ? '📱' : /key|卡密|兑换/.test(categoryText) ? '🎟️' : /stream|流媒体/.test(categoryText) ? '📺' : '🌐';
         return `
-        <div class="bg-white rounded-xl border border-gray-200 p-5 flex flex-col justify-between shadow-sm hover:shadow-md transition">
+        <div class="s5-product-card bg-white rounded-xl border border-gray-200 p-5 flex flex-col justify-between shadow-sm hover:shadow-md transition">
             <div>
                 <div class="flex justify-between items-start mb-3">
-                    <div class="w-10 h-10 rounded-lg bg-gray-50 border border-gray-200 flex items-center justify-center text-primary text-xl font-bold">${p.category[0]}</div>
+                    <div class="s5-product-icon">${icon}</div>
                     <span class="text-xs bg-blue-50 text-primary px-2 py-1 rounded border border-blue-100">${p.category}</span>
                 </div>
                 <h3 class="text-sm font-bold text-slate-900 line-clamp-2">${p.title}</h3>

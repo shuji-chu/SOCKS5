@@ -17,7 +17,7 @@ document.addEventListener('alpine:init', () => {
         init() {
             if (this.isLoggedIn) {
                 // 模拟拉取用户信息
-                this.user = { username: 'ProUser', balance: 150.00, email: 'test@tgx.com' };
+                this.user = { username: 'ProUser', balance: 150.00, email: 'test@SOSKS5.com' };
             }
         },
 

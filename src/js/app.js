@@ -3,9 +3,9 @@ const API_BASE = '/api';
 
 const App = {
     state: {
-        token: localStorage.getItem('tgx_token') || null,
-        user: JSON.parse(localStorage.getItem('tgx_user')) || null,
-        cart: JSON.parse(localStorage.getItem('tgx_cart')) || [],
+        token: localStorage.getItem('sosks5_token') || null,
+        user: JSON.parse(localStorage.getItem('sosks5_user')) || null,
+        cart: JSON.parse(localStorage.getItem('sosks5_cart')) || [],
         products: [],
         nodes: []
     },
@@ -32,7 +32,7 @@ const App = {
             const r = await this.api('/auth/me');
             if (r.ok) {
                 this.state.user = r.user;
-                localStorage.setItem('tgx_user', JSON.stringify(r.user));
+                localStorage.setItem('sosks5_user', JSON.stringify(r.user));
                 this.renderNav();
             } else {
                 this.logout();
@@ -383,8 +383,8 @@ const App = {
             if (r.ok) {
                 this.state.token = r.token;
                 this.state.user = r.user;
-                localStorage.setItem('tgx_token', r.token);
-                localStorage.setItem('tgx_user', JSON.stringify(r.user));
+                localStorage.setItem('sosks5_token', r.token);
+                localStorage.setItem('sosks5_user', JSON.stringify(r.user));
                 this.closeModal();
                 this.renderNav();
                 this.showToast('Registration successful!');
@@ -406,8 +406,8 @@ const App = {
             if (r.ok) {
                 this.state.token = r.token;
                 this.state.user = r.user;
-                localStorage.setItem('tgx_token', r.token);
-                localStorage.setItem('tgx_user', JSON.stringify(r.user));
+                localStorage.setItem('sosks5_token', r.token);
+                localStorage.setItem('sosks5_user', JSON.stringify(r.user));
                 this.closeModal();
                 this.renderNav();
                 this.showToast('Logged in successfully!');
@@ -421,8 +421,8 @@ const App = {
     },
 
     logout() {
-        localStorage.removeItem('tgx_token');
-        localStorage.removeItem('tgx_user');
+        localStorage.removeItem('sosks5_token');
+        localStorage.removeItem('sosks5_user');
         this.state.token = null;
         this.state.user = null;
         this.renderNav();
@@ -441,14 +441,14 @@ const App = {
         } else {
             this.state.cart.push({ id, title, price, stock, qty: 1 });
         }
-        localStorage.setItem('tgx_cart', JSON.stringify(this.state.cart));
+        localStorage.setItem('sosks5_cart', JSON.stringify(this.state.cart));
         this.renderNav();
         this.showToast('Added to cart');
     },
 
     removeFromCart(id) {
         this.state.cart = this.state.cart.filter(x => x.id !== id);
-        localStorage.setItem('tgx_cart', JSON.stringify(this.state.cart));
+        localStorage.setItem('sosks5_cart', JSON.stringify(this.state.cart));
         this.renderNav();
         this.router();
     },
@@ -460,7 +460,7 @@ const App = {
             const r = await this.api('/orders', { method: 'POST', body: JSON.stringify({ items }) });
             if (r.ok) {
                 this.state.cart = [];
-                localStorage.setItem('tgx_cart', '[]');
+                localStorage.setItem('sosks5_cart', '[]');
                 this.renderNav();
                 this.showToast('Payment successful! Credentials delivered.');
                 setTimeout(() => { window.location.hash = '#/orders'; this.router(); }, 1000);

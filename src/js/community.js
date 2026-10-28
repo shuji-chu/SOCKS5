@@ -13,7 +13,7 @@
   document.head.appendChild(style);
 
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const token = () => localStorage.getItem('tgx_token') || '';
+  const token = () => localStorage.getItem('sosks5_token') || '';
   const api = async (path, opts = {}) => {
     const headers = { ...(opts.headers || {}) };
     if (token()) headers.Authorization = 'Bearer ' + token();
@@ -117,11 +117,11 @@
         const btn = document.getElementById('s5-profile-save'); btn.disabled = true; status.textContent = '正在保存…';
         try {
           const r = await api('/users/profile', {method:'PATCH', body:JSON.stringify({nickname,bio})});
-          if (r.user) { App.state.user = {...App.state.user,...r.user}; localStorage.setItem('tgx_user', JSON.stringify(App.state.user)); }
+          if (r.user) { App.state.user = {...App.state.user,...r.user}; localStorage.setItem('sosks5_user', JSON.stringify(App.state.user)); }
           if (avatarFile) {
             const form = new FormData(); form.append('avatar', avatarFile);
             const ar = await api('/users/avatar', {method:'POST', body:form});
-            if (ar.user) { App.state.user = {...App.state.user,...ar.user}; localStorage.setItem('tgx_user', JSON.stringify(App.state.user)); }
+            if (ar.user) { App.state.user = {...App.state.user,...ar.user}; localStorage.setItem('sosks5_user', JSON.stringify(App.state.user)); }
           }
           status.textContent = '保存成功。'; App.renderNav();
         } catch (e) { status.textContent = '暂时未能保存：' + e.message + '。请接通 PATCH /api/users/profile 和 POST /api/users/avatar。'; }

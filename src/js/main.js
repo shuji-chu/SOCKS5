@@ -2,11 +2,11 @@
 document.addEventListener('alpine:init', () => {
     Alpine.store('app', {
         // 1. 鉴权与用户状态
-        isLoggedIn: !!localStorage.getItem('tgx_token'),
+        isLoggedIn: !!localStorage.getItem('sosks5_token'),
         user: { username: 'Guest', balance: 0, email: '' },
         
         // 2. 购物车状态 (持久化到 localStorage 模拟后端)
-        cart: JSON.parse(localStorage.getItem('tgx_cart') || '[]'),
+        cart: JSON.parse(localStorage.getItem('sosks5_cart') || '[]'),
         
         // 3. 全局 UI 状态
         isLoginModalOpen: false,
@@ -51,7 +51,7 @@ document.addEventListener('alpine:init', () => {
         },
 
         saveCart() {
-            localStorage.setItem('tgx_cart', JSON.stringify(this.cart));
+            localStorage.setItem('sosks5_cart', JSON.stringify(this.cart));
         },
 
         get cartTotal() {
@@ -81,7 +81,7 @@ document.addEventListener('alpine:init', () => {
         },
 
         logout() {
-            localStorage.removeItem('tgx_token');
+            localStorage.removeItem('sosks5_token');
             this.isLoggedIn = false;
             this.user = { username: 'Guest', balance: 0 };
             window.location.href = './index.html';

@@ -80,15 +80,16 @@ const App = {
             const featured = App.state.products.slice(0, 8);
             const cards = featured.length ? featured.map(p => App.productCard(p)).join('') : '<div class="text-center py-10 text-gray-400 col-span-4">Loading products...</div>';
             return `
-            <div class="rounded-2xl bg-gradient-to-r from-blue-600 to-blue-400 text-white p-8 mb-8 shadow-lg">
-                <h1 class="text-3xl font-bold mb-2">Global Social Media Accounts Store</h1>
-                <p class="text-blue-100 text-sm mb-4">Telegram · Threads · ChatGPT · Apple ID · Gmail · Steam — instant digital delivery</p>
-                <div class="flex flex-wrap gap-2 text-xs">
-                    <span class="bg-white/20 rounded-full px-3 py-1">3+ Years Secure</span>
-                    <span class="bg-white/20 rounded-full px-3 py-1">Instant Delivery</span>
-                    <span class="bg-white/20 rounded-full px-3 py-1">12h Warranty</span>
-                    <span class="bg-white/20 rounded-full px-3 py-1">30,000+ Users</span>
-                </div>
+            <div class="rounded-2xl bg-gradient-to-br from-slate-950 via-blue-950 to-sky-900 text-white p-8 md:p-10 mb-7 shadow-xl border border-sky-900">
+                <div class="text-xs tracking-[.25em] text-sky-300 font-bold mb-3">SOSKS5 · DIGITAL SERVICES</div>
+                <h1 class="text-3xl md:text-5xl font-black mb-3">账号 · 节点 · 引流</h1>
+                <p class="text-sky-100 text-sm md:text-base leading-7 mb-6 max-w-2xl">数字服务一站式入口。浏览账号商品、查看可用节点，或进入引流广场发现和分享实用资源。</p>
+                <div class="flex flex-wrap gap-2 text-xs"><span class="bg-white/10 border border-white/15 rounded-full px-3 py-1">账号商品</span><span class="bg-white/10 border border-white/15 rounded-full px-3 py-1">节点服务</span><span class="bg-white/10 border border-white/15 rounded-full px-3 py-1">资源发现</span></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-9">
+                <a href="#/products" class="block rounded-2xl border border-blue-100 bg-white p-5 hover:shadow-lg transition"><div class="text-xs text-blue-600 font-bold mb-2">01 / ACCOUNTS</div><h2 class="text-xl font-black text-slate-900 mb-2">账号商城</h2><p class="text-sm text-slate-500 leading-6">浏览现有商品、查看库存与价格，加入购物车并提交订单。</p><div class="mt-4 text-sm font-bold text-blue-600">浏览账号 →</div></a>
+                <a href="#/nodes" class="block rounded-2xl border border-cyan-100 bg-white p-5 hover:shadow-lg transition"><div class="text-xs text-cyan-700 font-bold mb-2">02 / NODES</div><h2 class="text-xl font-black text-slate-900 mb-2">节点中心</h2><p class="text-sm text-slate-500 leading-6">读取现有节点列表，查看连接信息并复制订阅链接或 TG 代理链接。</p><div class="mt-4 text-sm font-bold text-cyan-700">查看节点 →</div></a>
+                <a href="#/traffic" class="block rounded-2xl border border-indigo-100 bg-white p-5 hover:shadow-lg transition"><div class="text-xs text-indigo-600 font-bold mb-2">03 / DISCOVERY</div><h2 class="text-xl font-black text-slate-900 mb-2">引流广场</h2><p class="text-sm text-slate-500 leading-6">发现工具、教程、资源和服务，搜索内容或登录后发布自己的分享。</p><div class="mt-4 text-sm font-bold text-indigo-600">进入引流 →</div></a>
             </div>
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-2xl font-bold text-slate-900">Hot Products</h1>
@@ -290,12 +291,12 @@ const App = {
             navArea.innerHTML = `
                 <a href="#/cart" class="text-slate-700 hover:text-primary mr-3 text-sm">Cart (${this.state.cart.length})</a>
                 <button onclick="App.toggleDrawer()" class="flex items-center gap-2">
-                    <div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-white font-bold">${this.state.user.username[0].toUpperCase()}</div>
-                    <span class="text-sm font-medium text-slate-900 hidden sm:block">${this.state.user.username}</span>
+                    <img src="${this.state.user.avatar_url || this.state.user.avatar || './assets/sok.png'}" alt="Avatar" class="w-9 h-9 rounded-full object-cover border border-blue-200">
+                    <span class="text-sm font-medium text-slate-900 hidden sm:block">${this.state.user.nickname || this.state.user.username || 'User'}</span>
                 </button>`;
             const du = document.getElementById('drawer-username');
             const db = document.getElementById('drawer-balance');
-            if (du) du.innerText = this.state.user.username;
+            if (du) du.innerText = this.state.user.nickname || this.state.user.username || 'User';
             if (db) db.innerText = `$${(this.state.user.balance || 0).toFixed(2)}`;
         } else {
             navArea.innerHTML = `

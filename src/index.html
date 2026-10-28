@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SOSKS5 · 数字商品与节点服务</title>
+    <title>SOSKS5｜全球账号 · 节点 · 引流服务平台</title>
     <link rel="icon" type="image/png" href="./assets/sok.png">
     <link rel="apple-touch-icon" href="./assets/sok.png">
     <meta name="theme-color" content="#edf6ff">
@@ -25,15 +25,15 @@
             </a>
 
             <div class="hidden md:flex items-center gap-1 text-sm font-medium">
-                <a href="#/" class="px-3 py-2 rounded-lg hover:bg-gray-100 transition">Home</a>
-                <a href="#/products" class="px-3 py-2 rounded-lg hover:bg-gray-100 transition">Products</a>
-                <a href="#/query" class="px-3 py-2 rounded-lg hover:bg-gray-100 transition">Query</a>
-                <a href="#/nodes" class="px-3 py-2 rounded-lg hover:bg-gray-100 transition">Nodes</a>
-                <a href="./docs/" class="px-3 py-2 rounded-lg hover:bg-gray-100 transition">开发者文档</a>
+                <a href="#/" class="px-3 py-2 rounded-lg hover:bg-gray-100 transition">首页</a>
+                <a href="#/products" class="px-3 py-2 rounded-lg hover:bg-gray-100 transition">账号商城</a>
+                <a href="#/query" class="px-3 py-2 rounded-lg hover:bg-gray-100 transition">订单查询</a>
+                <a href="#/nodes" class="px-3 py-2 rounded-lg hover:bg-gray-100 transition">节点中心</a>
+                <a href="./docs/" class="px-3 py-2 rounded-lg hover:bg-gray-100 transition">开发者 API</a>
             </div>
 
             <div class="hidden md:flex flex-1 max-w-xs mx-8">
-                <input type="text" id="global-search" placeholder="Search accounts..." class="w-full bg-gray-50 border border-gray-200 rounded-full py-2 px-4 text-sm text-slate-700 focus:outline-none focus:border-primary transition">
+                <input type="text" id="global-search" placeholder="搜索账号、节点、教程..." class="w-full bg-gray-50 border border-gray-200 rounded-full py-2 px-4 text-sm text-slate-700 focus:outline-none focus:border-primary transition">
             </div>
 
             <div id="nav-user-area" class="flex items-center gap-4 relative">
@@ -52,14 +52,14 @@
             </div>
         </div>
         <div class="p-2 space-y-1 text-sm">
-            <a href="#/dashboard" class="block px-3 py-2 rounded-lg hover:bg-gray-100 hover:text-slate-900 transition">Dashboard</a>
-            <a href="#/orders" class="block px-3 py-2 rounded-lg hover:bg-gray-100 hover:text-slate-900 transition">My Orders</a>
-            <a href="#/wallet" class="block px-3 py-2 rounded-lg hover:bg-gray-100 hover:text-slate-900 transition">Wallet</a>
-            <a href="#/query" class="block px-3 py-2 rounded-lg hover:bg-gray-100 hover:text-slate-900 transition">Query Console</a>
-            <a href="#/nodes" class="block px-3 py-2 rounded-lg hover:bg-gray-100 hover:text-slate-900 transition">Proxy Nodes</a>
+            <a href="#/dashboard" class="block px-3 py-2 rounded-lg hover:bg-gray-100 hover:text-slate-900 transition">用户中心</a>
+            <a href="#/orders" class="block px-3 py-2 rounded-lg hover:bg-gray-100 hover:text-slate-900 transition">我的订单</a>
+            <a href="#/wallet" class="block px-3 py-2 rounded-lg hover:bg-gray-100 hover:text-slate-900 transition">余额与支付</a>
+            <a href="#/query" class="block px-3 py-2 rounded-lg hover:bg-gray-100 hover:text-slate-900 transition">订单查询</a>
+            <a href="#/nodes" class="block px-3 py-2 rounded-lg hover:bg-gray-100 hover:text-slate-900 transition">节点中心</a>
         </div>
         <div class="p-2 border-t border-gray-100">
-            <button onclick="App.logout()" class="w-full text-left px-3 py-2 text-red-500 hover:bg-red-50 rounded-lg">Logout</button>
+            <button onclick="App.logout()" class="w-full text-left px-3 py-2 text-red-500 hover:bg-red-50 rounded-lg">退出登录</button>
         </div>
     </div>
 
@@ -80,5 +80,6 @@
     <script src="./js/app.js"></script>
     <script src="./js/community.js"></script>
     <script src="./js/ai-chat.js"></script>
+    <script src="./js/site-enhancements.js"></script>
 </body>
 </html>

@@ -126,8 +126,8 @@
                 });
                 const data = await res.json();
                 if (data.ok && data.token) {
-                    localStorage.setItem('tgx_token', data.token);
-                    localStorage.setItem('tgx_user', JSON.stringify(data.user));
+                    localStorage.setItem('sosks5_token', data.token);
+                    localStorage.setItem('sosks5_user', JSON.stringify(data.user));
                     showToast('注册成功');
                     setTimeout(() => { window.location.href = '../index.html'; }, 600);
                 } else {

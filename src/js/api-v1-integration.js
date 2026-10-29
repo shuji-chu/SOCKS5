@@ -241,7 +241,7 @@
           body: JSON.stringify({ plan_id: plan.id, period, payment: paymentChoice.value, protocol: $('s5-protocol').value })
         });
         const order = unwrap(orderResponse) || {};
-        const tradeNo = order.trade_no || order.tradeNo || order.order_no || order.orderNo;
+        const tradeNo = (typeof order === 'string' ? order : '') || order.trade_no || order.tradeNo || order.order_no || order.orderNo;
         if (!tradeNo) throw new Error(order.message || '订单已提交，但接口没有返回 trade_no');
         button.textContent = '正在获取支付方式…';
         const checkoutResponse = await request('/user/order/checkout', {
@@ -249,7 +249,7 @@
           body: JSON.stringify({ trade_no: tradeNo })
         });
         const checkout = unwrap(checkoutResponse) || {};
-        const payUrl = checkout.url || checkout.pay_url || checkout.payment_url || checkout.checkout_url || '';
+        const payUrl = (typeof checkout === 'string' ? checkout : '') || checkout.url || checkout.pay_url || checkout.payment_url || checkout.checkout_url || '';
         const qr = checkout.qrcode || checkout.qr_code || checkout.qrCode || checkout.qr_url || '';
         const html = '<div class="rounded-xl border border-slate-200 bg-slate-50 p-4"><p class="text-sm text-slate-500 mb-1">订单号</p><p class="font-mono font-bold text-slate-900 break-all">' + esc(tradeNo) + '</p></div>' +
           (qr ? '<div class="mt-4 text-center"><p class="mb-2 text-sm font-semibold">扫码支付</p><img alt="支付二维码" class="mx-auto max-h-64 rounded-xl border border-slate-200 bg-white p-2" src="' + esc(/^https?:\/\//i.test(qr) ? qr : '') + '"><p class="mt-2 break-all text-xs text-slate-500">' + esc(qr) + '</p></div>' : '') +

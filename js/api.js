@@ -64,11 +64,11 @@
     try { body = await response.json(); } catch (_) { throw new Error('服务端返回的 JSON 格式不正确，请稍后重试'); }
     const logicalStatus = body && body.http_status !== undefined ? Number(body.http_status) : null;
     const message = body && (body.message || body.msg || body.detail || body.error || body.error_message);
-    if (!response.ok) throw new Error(String(message || ('HTTP ' + response.status)));
+    if (!response.ok) throw new Error(safeUiMessage(String(message || ('请求未成功（HTTP ' + response.status + '）'))));
     // This API may wrap errors in HTTP 200; http_status is the authoritative business status.
-    if (logicalStatus !== null && logicalStatus !== 200) throw new Error(String(message || ('接口错误 HTTP ' + logicalStatus)));
-    if (body && (body.status === 'fail' || body.success === false || (typeof body.code === 'number' && body.code !== 200 && body.code !== 0 && body.data === undefined))) throw new Error(String(message || '请求未成功'));
-    if (body && body.error) throw new Error(String(message || body.error));
+    if (logicalStatus !== null && logicalStatus !== 200) throw new Error(safeUiMessage(String(message || ('接口请求未成功（HTTP ' + logicalStatus + '）'))));
+    if (body && (body.status === 'fail' || body.success === false || (typeof body.code === 'number' && body.code !== 200 && body.code !== 0 && body.data === undefined))) throw new Error(safeUiMessage(String(message || '请求未成功')));
+    if (body && body.error) throw new Error(safeUiMessage(String(message || body.error)));
     return body;
   }
 

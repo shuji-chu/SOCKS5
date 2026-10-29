@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🚀 终极公告系统已启动！');
+    // Production pages stay quiet; user-facing status belongs in the UI.
 
     // 1. 强行注入弹窗内容
     if (!document.getElementById('notice-modal')) {

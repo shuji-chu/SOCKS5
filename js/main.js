@@ -146,6 +146,7 @@
       const [infoResponse, statsResponse, customersResponse, botResponse] = await Promise.all([
         API.getUserInfo(), API.getInviteStats(), API.getInviteCustomers(), API.getBotStatus()
       ]);
+      const leaderboardResult = await Promise.allSettled([API.getReferralLeaderboard({period:'month',limit:10})]);
       const info = unwrap(infoResponse) || {};
       const user = info.user || info;
       const shortId = String(user.short_id || info.short_id || info.shortId || '');
@@ -171,11 +172,31 @@
       $('#bot-guide').textContent = bot.guide ? String(bot.guide).replaceAll('{short_id}',shortId) : '打开机器人后发送“绑定 ' + shortId + '”完成绑定。';
       $('#bot-entry').innerHTML = botUrl ? '<p class="bot-status">' + (bot.bound ? '已绑定 Telegram 账号' : '尚未绑定 Telegram 账号') + '</p><a class="button" href="' + esc(botUrl) + '" target="_blank" rel="noopener noreferrer">打开机器人并绑定</a>' : emptyState('后端暂未配置机器人入口，请联系管理员');
       const tbody = $('#invite-customer-rows');
-      const sorted = customers.slice().sort((a,b) => Number(b.commission || 0) - Number(a.commission || 0));
-      tbody.innerHTML = sorted.length ? sorted.map((c) => {
-        const date = dateValue(c.created_at || c.createdAt);
-        return '<tr><td>' + esc(c.nickname || ('用户 ' + (c.short_id || ''))) + '<small>' + esc(c.short_id || '') + '</small></td><td>' + (date ? esc(date.toLocaleDateString('zh-CN')) : '—') + '</td><td>' + esc(money(c.charge || 0,false)) + '</td><td>' + esc(money(c.commission || 0,false)) + '</td></tr>';
-      }).join('') : '<tr><td colspan="4">' + esc('暂无邀请客户数据') + '</td></tr>';
+      const leaderboardResponse = leaderboardResult[0].status === 'fulfilled' ? unwrap(leaderboardResult[0].value) : null;
+      const leaderboardRows = listFrom(leaderboardResponse);
+      if (leaderboardRows.length) {
+        const panelTitle = $('.panel .panel-heading h2');
+        if (panelTitle) panelTitle.textContent = '本月推广排行榜';
+        const headers = $('.rank-table thead th');
+        if (headers.length === 4) {
+          headers[0].textContent = '排名';
+          headers[1].textContent = '推广用户';
+          headers[2].textContent = '邀请人数';
+          headers[3].textContent = '预估奖励';
+        }
+        tbody.innerHTML = leaderboardRows.slice(0,10).map((row,index) => {
+          const name = row.nickname || row.username || row.name || ('用户 ' + (row.short_id || row.shortId || ''));
+          const count = row.invite_count ?? row.invites ?? row.count ?? row.total_invites ?? row.total ?? 0;
+          const reward = row.reward_yuan != null ? money(row.reward_yuan,true) : money(row.commission ?? row.reward ?? row.amount ?? 0,false);
+          return '<tr><td><span class="rank-medal">' + String(index+1).padStart(2,'0') + '</span></td><td><b>' + esc(name) + '</b><small>' + esc(row.short_id || row.shortId || '') + '</small></td><td>' + esc(fmtCount(count)) + '</td><td>' + esc(reward) + '</td></tr>';
+        }).join('');
+      } else {
+        const sorted = customers.slice().sort((a,b) => Number(b.commission || 0) - Number(a.commission || 0));
+        tbody.innerHTML = sorted.length ? sorted.map((c) => {
+          const date = dateValue(c.created_at || c.createdAt);
+          return '<tr><td>' + esc(c.nickname || ('用户 ' + (c.short_id || ''))) + '<small>' + esc(c.short_id || '') + '</small></td><td>' + (date ? esc(date.toLocaleDateString('zh-CN')) : '—') + '</td><td>' + esc(money(c.charge || 0,false)) + '</td><td>' + esc(money(c.commission || 0,false)) + '</td></tr>';
+        }).join('') : '<tr><td colspan="4">' + esc('暂无邀请客户数据') + '</td></tr>';
+      }
     } catch (error) {
       if (/401|unauth|登录|token/i.test(error.message || '')) {
         API.clearSession();

@@ -86,10 +86,10 @@ const App = {
                 <div class="s5-eyebrow">GLOBAL DIGITAL SERVICE PLATFORM</div>
                 <h1>SOSKS5</h1><h2>全球账号 · 高速节点 · 引流服务</h2>
                 <p>安全、稳定、专业的一站式数字商品与网络服务平台</p>
-                <div class="s5-hero-tags"><span>✦ 海量数字资源</span><span>◷ 订单状态可查询</span><span>⬡ 专业服务支持</span></div>
+                <div class="s5-hero-tags"><span>海量数字资源</span><span>◷ 订单状态可查询</span><span>⬡ 专业服务支持</span></div>
                 <div class="s5-hero-actions"><a href="#/products" class="s5-primary-btn">探索账号商城 →</a><a href="#/nodes" class="s5-ghost-btn">浏览节点中心</a></div>
               </div>
-              <div class="s5-astronaut" aria-label="漂浮宇航员动画"><div class="s5-orbit"></div><div class="s5-astronaut-body">🧑‍🚀</div><span class="s5-star s5-star-a">✦</span><span class="s5-star s5-star-b">✧</span></div>
+              <div class="s5-astronaut" aria-label="漂浮宇航员动画"><div class="s5-orbit"></div><div class="s5-astronaut-body" aria-hidden="true"></div></div>
               <div class="s5-hero-contact"><b>在线业务支持</b><span>Telegram：@qingtian_Boss</span><span>邮箱：boss@lynli.me</span><span>支付方式：支付宝 / USDT</span></div>
               <div class="s5-slider-dots"><i></i><i></i><i></i></div>
             </section>

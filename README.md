@@ -1,36 +1,102 @@
-# SOSKS5 | 全球数字资产与私域流量聚合平台
+# SOSKS5 | 综合数字商业平台
 
-SOSKS5 是面向全球数字业务场景的综合数字商业平台前端，聚焦三大核心业务：**海量账号资源商城、一键引流机器人矩阵、全球高速节点服务**。项目使用原生 HTML、CSS 与 JavaScript 多页面结构，首页、商城、引流中心和个人中心分别维护，便于独立扩展。
+SOSKS5 是一个采用深空视觉风格的综合数字商业平台前端，围绕全球高速节点、海外账号资源与引流机器人三条业务线组织页面。当前仓库以原生 HTML、CSS、JavaScript 构建，无需安装前端框架或依赖包。
 
-## 三大核心业务
-- **海量账号资源商城**：海外账号资源展示、分类浏览和商品入口。
-- **一键引流机器人矩阵**：机器人推广工具、自动化流程和分销入口。
-- **全球高速节点服务**：全球网络节点与服务套餐展示。
+## 技术栈
+
+- **HTML5**：多页面静态站点结构。
+- **CSS3**：深空 UI、响应式布局、页面与组件样式。
+- **原生 JavaScript**：轻量交互与提示，无需构建工具。
+- **SVG 本地资源**：品牌 Logo、商品插画、占位图和通用图标。
+- **GitHub Actions + GitHub Pages**：推送到 `main` 后自动部署根目录站点。
+
+## 三大业务线
+
+1. **全球高速节点服务**：节点套餐和网络服务展示，入口位于商城的“全球高速节点”区域。
+2. **海外账号资源商城**：账号类商品的分类和展示入口。
+3. **一键引流机器人矩阵**：机器人推广、引流工具和分销展示入口。
+
+> 说明：当前商品、价格、库存、订单、用户资料与推广数据均为静态演示内容。真实购买、账户和机器人功能需要后端接口接入。
 
 ## 项目目录
+
 ```text
 SOCKS5/
-├── index.html
-├── shop.html
-├── promo.html
-├── user.html
-├── README.md
+├── .github/
+│   └── workflows/
+│       └── deploy.yml       # 推送 main 后自动部署 GitHub Pages
+├── assets/
+│   ├── images/
+│   │   ├── logo.svg         # 本地品牌 Logo
+│   │   ├── placeholder.svg  # 默认占位插画
+│   │   ├── accounts.svg     # 账号商城插画
+│   │   ├── nodes.svg        # 全球节点插画
+│   │   └── automation.svg   # 引流自动化插画
+│   └── icons/
+│       ├── arrow-up-right.svg
+│       └── network.svg
 ├── css/
-│   ├── global.css
-│   ├── components.css
-│   └── pages.css
-└── js/
-    ├── api.js
-    ├── ui.js
-    └── main.js
+│   ├── global.css           # 全局基础样式
+│   ├── components.css       # 通用组件样式
+│   └── pages.css            # 页面样式
+├── js/
+│   ├── api.js               # 保留的旧 API 集成模块
+│   ├── ui.js                # 通用交互
+│   └── main.js              # 页面入口交互
+├── index.html               # 首页
+├── shop.html                # 账号与节点商城
+├── promo.html               # 引流机器人 / 分销中心
+├── user.html                # 个人中心
+├── .gitignore
+├── LICENSE
+└── README.md
 ```
 
-## 本地预览
-在项目根目录执行 `python -m http.server 8080`，然后打开 `http://localhost:8080/`。
+## 本地运行
 
-## 当前状态
-- 商品标题、价格、库存和排行榜为静态展示，不是实时后端数据。
-- 商城图片使用公开图片 CDN 作为视觉占位。
-- `js/api.js` 保留原有 API 集成文件内容，不会被静态页面入口自动加载。
-- 购买、订单、订阅导出和机器人任务需要接入真实业务后才能使用。
-- 不要提交 API 密钥、Token 或真实用户数据。
+### 方式一：Python 简易服务器
+
+在仓库根目录执行：
+
+```bash
+python -m http.server 8080
+```
+
+然后打开 <http://localhost:8080/>。
+
+### 方式二：直接打开
+
+也可以直接打开根目录的 `index.html`。若浏览器对本地文件资源或脚本有限制，建议使用方式一。
+
+## HTML 资源路径规范
+
+页面位于仓库根目录时，请使用相对根目录的路径：
+
+- CSS：`./css/global.css`、`./css/components.css`、`./css/pages.css`
+- JavaScript：`./js/ui.js`、`./js/main.js`
+- 图片：`./assets/images/logo.svg`、`./assets/images/placeholder.svg`
+- 图标：`./assets/icons/network.svg`
+
+例如：
+
+```html
+<img src="./assets/images/accounts.svg" alt="账号商城插画">
+<img src="./assets/icons/network.svg" alt="" aria-hidden="true">
+```
+
+请避免以 `/assets/...` 开头的绝对路径：项目发布在 GitHub Pages 的项目子路径下时，这种路径可能指向错误位置。
+
+## 自动部署到 GitHub Pages
+
+工作流文件：`.github/workflows/deploy.yml`
+
+1. 确认仓库默认分支为 `main`，推送到该分支会触发部署。
+2. 在 GitHub 仓库打开 **Settings → Pages**。
+3. 在 **Build and deployment → Source** 中选择 **GitHub Actions**。
+4. 打开 **Actions** 查看部署结果；也可手动运行 “Deploy static site to GitHub Pages”。
+
+工作流会把仓库根目录作为静态站点发布目录。不要把密钥、Token、真实用户资料或本地环境文件提交到仓库。
+
+## 开源协议
+
+本项目采用 MIT License，详见根目录的 `LICENSE` 文件。

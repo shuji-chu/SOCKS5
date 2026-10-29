@@ -1,0 +1,2 @@
+/* Payment display helpers. All displayed prices are CNY; USDT is informational at a fixed 1:8 rate. */
+(function(w){'use strict';function isUsdt(method){const s=String(method?.value??method?.label??method?.name??method??'').toLowerCase();return /usdt|tether|泰达币/.test(s)}function update(target,method,cny){if(!target)return;const on=isUsdt(method);target.hidden=!on;if(on){const amount=Number(cny);target.textContent='折合 '+(Number.isFinite(amount)?(amount/8).toFixed(2):'0.00')+' USDT（固定汇率 1:8）'}}w.PaymentDisplay={isUsdt,update};})(window);

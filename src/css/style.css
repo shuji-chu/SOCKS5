@@ -310,3 +310,18 @@ body.s5-rebuild{background:#030914!important;color:var(--s5-ink);overflow-x:hidd
  .s5-business-card>p{font-size:11px!important}
 }
 @media(prefers-reduced-motion:reduce){.s5-business-card,.s5-card-link svg{transition:none!important}}
+
+/* Three.js hero canvas + loading skeleton */
+.s5-webgl-hero{position:relative;isolation:isolate;overflow:hidden;background:radial-gradient(ellipse at 76% 35%,#103b65 0%,#081a31 43%,#040b17 100%)!important}
+.s5-webgl-hero #s5-webgl-cosmos{position:absolute;inset:0;width:100%;height:100%;z-index:0;display:block;pointer-events:none}
+.s5-webgl-hero .s5-hero-copy,.s5-webgl-hero .s5-hero-contact{position:relative;z-index:2}
+.s5-webgl-hero .s5-hero-copy h2{max-width:650px;font-size:clamp(30px,4.5vw,58px);line-height:1.08;letter-spacing:-1.6px;color:#f0f8ff;text-shadow:0 0 35px #4cbfff35}
+.s5-webgl-hero .s5-hero-copy p,.s5-webgl-hero .s5-hero-copy .s5-hero-tags{color:#b2cce6}
+#s5-first-paint{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:radial-gradient(ellipse at 50% 35%,#102f52,#050b16 72%);transition:opacity .35s ease,visibility .35s ease}
+#s5-first-paint.s5-loaded{opacity:0;visibility:hidden;pointer-events:none}
+.s5-skeleton-shell{width:min(920px,calc(100% - 40px));display:grid;grid-template-columns:1.1fr .9fr;gap:24px;align-items:center}
+.s5-skeleton-block{border-radius:18px;background:linear-gradient(100deg,#10233a 20%,#1c3c5b 38%,#10233a 56%);background-size:220% 100%;animation:s5SkeletonShimmer 1.4s ease-in-out infinite}
+.s5-skeleton-copy{height:22px;margin:15px 0}.s5-skeleton-copy.large{height:52px;width:90%}.s5-skeleton-art{height:300px;border-radius:28px}
+@keyframes s5SkeletonShimmer{to{background-position-x:-220%}}
+@media(max-width:680px){.s5-skeleton-shell{grid-template-columns:1fr}.s5-skeleton-art{height:120px}.s5-webgl-hero #s5-webgl-cosmos{opacity:.72}}
+@media(prefers-reduced-motion:reduce){.s5-skeleton-block{animation:none}}

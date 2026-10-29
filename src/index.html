@@ -1,137 +1,30 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SOSKS5｜全球账号 · 节点 · 引流服务平台</title>
-    <link rel="icon" type="image/png" href="./assets/sok.png">
-    <link rel="apple-touch-icon" href="./assets/sok.png">
-    <meta name="theme-color" content="#061326">
-    <meta name="description" content="SOSKS5 高端数字服务平台，提供节点中心、引流系统、账号商城与专业帮助中心。">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = { theme: { extend: { colors: { primary: '#2563eb', primarylight: '#3b82f6' } } } }
-    </script>
-    <link rel="stylesheet" href="./css/style.css">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#061326"><meta name="description" content="SOSKS5 数字服务平台">
+<title>SOSKS5｜全球数字服务</title>
+<link rel="icon" href="./assets/sok.png"><link rel="stylesheet" href="./css/global.css"><link rel="stylesheet" href="./css/components.css"><link rel="stylesheet" href="./css/page-index.css">
 </head>
-<body class="bg-[#f8fafc] text-slate-700 font-sans antialiased min-h-screen s5-rebuild">
-    <div id="s5-first-paint" aria-hidden="true"><div class="s5-skeleton-shell"><div><div class="s5-skeleton-block s5-skeleton-copy" style="width:140px"></div><div class="s5-skeleton-block s5-skeleton-copy large"></div><div class="s5-skeleton-block s5-skeleton-copy" style="width:78%"></div><div class="s5-skeleton-block s5-skeleton-copy" style="width:62%"></div></div><div class="s5-skeleton-block s5-skeleton-art"></div></div></div>
-
-    <!-- 全局导航栏 -->
-    <nav id="navbar" class="s5-nav sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-            <a href="#/" class="flex items-center gap-2 cursor-pointer">
-                <img src="./assets/sok.png" alt="Logo" class="w-8 h-8 rounded-lg" onerror="this.src='https://via.placeholder.com/32/2563eb/ffffff?text=T'">
-                <span class="font-bold text-xl text-slate-900 tracking-tight">SOSKS5<span class="text-primary"> Store</span></span>
-            </a>
-
-            <div class="hidden md:flex items-center gap-1 text-sm font-medium s5-nav-links">
-                <a href="#/" class="s5-nav-link">首页</a>
-                <a href="#/nodes" class="s5-nav-link">节点中心</a>
-                <a href="#/traffic" class="s5-nav-link">引流系统</a>
-                <a href="#/products" class="s5-nav-link">账号商城</a>
-                <a href="#/tutorials" class="s5-nav-link">帮助中心</a>
-            </div>
-
-            <div class="hidden lg:flex flex-1 max-w-xs mx-8">
-                <input type="text" id="global-search" placeholder="搜索商品与服务" class="w-full bg-gray-50 border border-gray-200 rounded-full py-2 px-4 text-sm text-slate-700 focus:outline-none focus:border-primary transition">
-            </div>
-
-            <div id="nav-user-area" class="flex items-center gap-4 relative">
-                <!-- 由 JS 动态渲染 -->
-            </div>
-        </div>
-    </nav>
-
-    <!-- 全局用户抽屉 -->
-    <div id="user-drawer" class="hidden absolute top-16 right-4 w-64 bg-white border border-gray-200 rounded-xl shadow-2xl z-50 mt-2">
-        <div class="p-4 border-b border-gray-100 bg-gray-50 rounded-t-xl">
-            <p class="text-sm font-bold text-slate-900" id="drawer-username">User</p>
-            <div class="mt-2 bg-white rounded-lg p-2 flex justify-between items-center border border-gray-200">
-                <span class="text-xs text-gray-500">Wallet</span>
-                <span class="text-green-600 font-bold" id="drawer-balance">$0.00</span>
-            </div>
-        </div>
-        <div class="p-2 space-y-1 text-sm">
-            <a href="#/dashboard" class="block px-3 py-2 rounded-lg hover:bg-gray-100 hover:text-slate-900 transition">用户中心</a>
-            <a href="#/orders" class="block px-3 py-2 rounded-lg hover:bg-gray-100 hover:text-slate-900 transition">我的订单</a>
-            <a href="#/wallet" class="block px-3 py-2 rounded-lg hover:bg-gray-100 hover:text-slate-900 transition">余额与支付</a>
-            <a href="#/query" class="block px-3 py-2 rounded-lg hover:bg-gray-100 hover:text-slate-900 transition">订单查询</a>
-            <a href="#/nodes" class="block px-3 py-2 rounded-lg hover:bg-gray-100 hover:text-slate-900 transition">节点中心</a>
-        </div>
-        <div class="p-2 border-t border-gray-100">
-            <button onclick="App.logout()" class="w-full text-left px-3 py-2 text-red-500 hover:bg-red-50 rounded-lg">退出登录</button>
-        </div>
-    </div>
-
-<!-- 运营公告横幅：仅展示后端真实发布内容，接口接入前不显示虚构公告 --><div id="s5-promo-marquee" class="hidden" style="position:relative;z-index:30;overflow:hidden;border-bottom:1px solid #39d8f455;background:linear-gradient(90deg,#06162b,#0b2b48,#07192e);color:#dff9ff"><div style="max-width:1280px;margin:auto;padding:10px 16px;display:flex;align-items:center;gap:12px"><span style="flex:none;color:#56e6ff;font-weight:800">✦ 公告</span><div id="s5-promo-text" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px">公告接口待接入</div><span style="flex:none;font-size:10px;color:#86a9c6">LIVE</span></div></div>
-    <!-- 页面主视图容器 -->
-    <main id="app-view" class="max-w-7xl mx-auto px-4 py-8"></main>
-
-    <!-- 全局模态框 (登录/注册) -->
-    <div id="modal-overlay" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-        <div class="bg-white w-full max-w-md rounded-2xl p-6 border border-gray-200 relative shadow-xl">
-            <button onclick="App.closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-slate-900">&times;</button>
-            <div id="modal-content"></div>
-        </div>
-    </div>
-
-<section id="s5-growth-modules" style="max-width:1280px;margin:0 auto;padding:0 16px 36px;color:#e8f4ff"><style>
-#s5-growth-modules .gm-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}#s5-growth-modules .gm-card{position:relative;overflow:hidden;padding:22px;border:1px solid #3b7ca577;border-radius:20px;background:linear-gradient(140deg,#0b2440ee,#071426f5);box-shadow:0 14px 40px #00101f55;backdrop-filter:blur(18px)}#s5-growth-modules .gm-card:before{content:"";position:absolute;inset:0 0 auto;height:1px;background:linear-gradient(90deg,transparent,#4ce8ff,transparent)}#s5-growth-modules .gm-eyebrow{font-size:10px;letter-spacing:2px;color:#6feaff;font-weight:800}#s5-growth-modules .gm-title{font-size:21px;font-weight:850;margin:8px 0}#s5-growth-modules .gm-muted{font-size:12px;line-height:1.7;color:#9bb4ce}#s5-growth-modules .gm-btn{border:1px solid #4285ad;background:linear-gradient(110deg,#164c77,#10566a);color:#e8fbff;padding:10px 14px;border-radius:10px;font-weight:700}#s5-growth-modules .gm-btn:disabled{opacity:.55;cursor:not-allowed}#s5-growth-modules .gm-prize{margin:16px 0;display:grid;place-items:center;min-height:105px;border:1px dashed #4b91b8;border-radius:15px;background:radial-gradient(circle,#153d5d,#07192c);font-size:35px;color:#74eaff}#s5-growth-modules .gm-table{width:100%;border-collapse:collapse;margin-top:14px;font-size:12px}#s5-growth-modules .gm-table th,#s5-growth-modules .gm-table td{text-align:left;padding:11px 8px;border-bottom:1px solid #2d4963}#s5-growth-modules .gm-table th{color:#8db1ce;font-weight:600}#s5-growth-modules .gm-status{display:inline-block;padding:4px 8px;border-radius:99px;background:#47371e;color:#ffd88b;font-size:10px}@keyframes s5Spin{0%{transform:rotate(0) scale(1)}50%{transform:rotate(180deg) scale(1.08)}100%{transform:rotate(360deg) scale(1)}}#s5-growth-modules .spinning{animation:s5Spin .75s ease-in-out}@media(max-width:700px){#s5-growth-modules .gm-grid{grid-template-columns:1fr}#s5-growth-modules .gm-card{padding:18px}}</style>
-<div class="gm-card" style="margin-bottom:16px;padding:12px 16px">✦ <strong>运营中心</strong>　<span class="gm-muted" id="s5-announcement-note">全站公告接口待后端接入；当前没有已发布公告。</span></div><div class="gm-grid"><article class="gm-card"><div class="gm-eyebrow">DAILY REWARD / BLIND BOX</div><h2 class="gm-title">每日盲盒</h2><p class="gm-muted">流量包 · 折扣券 · 续费奖励。抽奖资格、中奖概率、库存和奖励发放必须由服务器确认。</p><div id="s5-blindbox-icon" class="gm-prize">◇</div><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><span id="s5-blindbox-status" class="gm-status">待后端接入 · 不会产生真实抽奖</span><button id="s5-blindbox-button" class="gm-btn">开启每日盲盒</button></div></article><article class="gm-card"><div class="gm-eyebrow">REFERRAL / COMMUNITY</div><h2 class="gm-title">本月推广排行榜</h2><p class="gm-muted">仅展示服务端确认的推广数据，short_id 将脱敏处理。</p><div id="s5-referral-status" class="gm-muted" style="padding:22px 0;text-align:center">排行榜 API 待后端接入，暂不展示虚构排名。</div><table id="s5-referral-table" class="gm-table hidden"><thead><tr><th>排名</th><th>推广达人</th><th>邀请人数</th><th>分红奖励</th></tr></thead><tbody></tbody></table></article></div></section>
-<script>(function(){const b=document.getElementById('s5-blindbox-button'),icon=document.getElementById('s5-blindbox-icon'),status=document.getElementById('s5-blindbox-status');if(b)b.addEventListener('click',()=>{if(b.dataset.busy)return;b.dataset.busy='1';b.disabled=true;icon.classList.add('spinning');icon.textContent='✧';status.textContent='正在检查服务端抽奖接口…';setTimeout(()=>{icon.classList.remove('spinning');icon.textContent='◇';status.textContent='待后端接入 · 未抽奖、未发奖';b.disabled=false;delete b.dataset.busy;alert('盲盒接口尚未接入，未产生抽奖结果。不会展示虚构奖品。')},800)});})();</script>
-    <!-- Toast 通知 -->
-    <div id="toast" class="hidden fixed bottom-10 left-1/2 -translate-x-1/2 z-[110] px-6 py-3 rounded-lg shadow-xl text-white font-bold bg-green-600"></div>
-
-    <script>try{[['sosks5_token','tgx_token'],['sosks5_user','tgx_user'],['sosks5_cart','tgx_cart']].forEach(([n,o])=>{if(!localStorage.getItem(n)&&localStorage.getItem(o))localStorage.setItem(n,localStorage.getItem(o));});}catch(e){}</script>
-    <script src="./js/app.js"></script>
-    <script src="./js/community.js"></script>
-    <script src="./js/ai-chat.js"></script>
-    <script src="./js/site-enhancements.js"></script>
-    <script src="./js/api-v1-integration.js"></script>
-    <script src="./js/advanced-console.js"></script>
-    <script src="./js/legal-modal.js"></script>
-    <script type="module" src="./js/three-hero.js"></script>
-    <script>(function(){const hide=()=>{const e=document.getElementById("s5-first-paint");if(e)e.classList.add("s5-loaded")};window.addEventListener("load",()=>setTimeout(hide,180),{once:true});setTimeout(hide,4500)})();</script>
-<script>
-/* 中文商业界面文案校正：保留品牌名、协议标识、邮箱与商品原始名称 */
-(function(){
- const dict={
- "GLOBAL DIGITAL SERVICE PLATFORM":"全球数字服务枢纽","SOCKS5 · SERVICE NOTICE":"服务公告",
- "DAILY REWARD / BLIND BOX":"每日福利 / 惊喜盲盒","REFERRAL / COMMUNITY":"推广与社群",
- "LIVE SERVICE CATALOG":"实时服务目录","AVAILABLE PLANS":"可选服务套餐",
- "Sign In":"登录","Sign in":"登录","Register":"注册","Login":"登录","Logout":"退出登录",
- "All Products":"全部商品","Shopping Cart":"购物车","Your cart is empty":"购物车还是空的",
- "Browse Products":"浏览商品","Checkout":"确认订单","Order Summary":"订单摘要",
- "Payment Method":"支付方式","Wallet Balance":"钱包余额","Available Balance":"可用余额",
- "Place Order":"提交订单","My Orders":"我的订单","User Dashboard":"用户中心",
- "Member Since":"注册时间","Wallet":"钱包","Query":"查询","Nodes":"节点中心",
- "Order / Node Query":"订单 / 节点查询","Credential":"查询凭证","Query Now":"立即查询",
- "Loading...":"正在加载…","Back Home":"返回首页","Remove":"移除","Total":"合计",
- "Proceed to Checkout":"前往结算","Email":"邮箱","Password":"密码",
- "Please sign in to view your cart.":"请先登录后查看购物车。",
- "Instant delivery of global digital accounts & proxy nodes.":"全球数字商品与网络服务，交付状态清晰可查。",
- "DAILY REWARD / BLIND BOX":"每日福利 / 惊喜盲盒",
- "System Settings":"系统设置","Settings":"设置","Overview":"总览",
- "Dashboard":"控制台","User Management":"用户管理","Product Management":"商品管理",
- "Order Management":"订单管理","Node Management":"节点管理","Bot Management":"机器人管理",
- "Sign out":"退出登录","Search":"搜索","Refresh":"刷新","Save":"保存","Cancel":"取消",
- "Create":"创建","Delete":"删除","Edit":"编辑","Status":"状态","Actions":"操作",
- "Total Users":"用户总数","Total Orders":"订单总数","Revenue":"营收",
- "UI Preview 0.1":"界面预览版 0.1","API Connection":"接口连接",
- "SERVICE NOTICE":"服务公告","LIVE":"运行状态","PREVIEW":"预览"
- };
- const translate=root=>{
-  const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);const nodes=[];
-  while(walker.nextNode())nodes.push(walker.currentNode);
-  nodes.forEach(n=>{const s=n.nodeValue.trim();if(dict[s])n.nodeValue=n.nodeValue.replace(s,dict[s]);});
-  root.querySelectorAll("input[placeholder],textarea[placeholder]").forEach(el=>{if(dict[el.placeholder])el.placeholder=dict[el.placeholder]});
-  root.querySelectorAll("[aria-label],[title]").forEach(el=>["aria-label","title"].forEach(a=>{const v=el.getAttribute(a);if(dict[v])el.setAttribute(a,dict[v])}));
- };
- const run=()=>translate(document.body);
- if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run,{once:true});else run();
- new MutationObserver(()=>translate(document.body)).observe(document.documentElement,{subtree:true,childList:true,characterData:true});
-})();
-</script>
-</body>
-</html>
+<body class="home-page">
+<header class="site-header"><a class="brand" href="./index.html"><img src="./assets/sok.png" alt="" onerror="this.style.display='none'"><span>SOSKS5 <i>STORE</i></span></a><nav class="main-nav"><a class="active" href="./index.html">首页</a><a href="#products">精选商品</a><a href="./promo.html">引流分销</a><a href="./user.html">个人中心</a></nav><a class="button button-small" href="./user.html">我的账户 ↗</a></header>
+<main>
+<section class="space-hero">
+<div class="space-orbit orbit-one"></div><div class="space-orbit orbit-two"></div><div class="hero-copy"><span class="eyebrow"><b></b> DIGITAL SERVICE ECOSYSTEM</span><h1>探索数字世界的<br><em>无限可能</em></h1><p>账号 · 节点 · 引流服务，一站式数字产品体验。</p><div class="hero-actions"><a class="button" href="#products">探索精选商品 <span>↗</span></a><a class="button button-ghost" href="./user.html">进入用户中心</a></div><div class="hero-stats"><div><strong>24<span>/7</span></strong><small>全天候服务</small></div><div><strong>3<span>+</span></strong><small>核心业务领域</small></div><div><strong>SECURE</strong><small>专注体验与安全</small></div></div></div>
+<div class="hero-planet" aria-hidden="true"><div class="planet-glow"></div><div class="planet"><span class="planet-ring"></span><span class="planet-core"></span></div><div class="planet-label label-top">ORBITAL NETWORK <b>● ONLINE</b></div><div class="planet-label label-bottom">SYSTEM STATUS <b>STABLE</b></div></div>
+<div class="hero-bottomline"><span>01 / WELCOME TO SOSKS5</span><span>SCROLL TO DISCOVER ↓</span></div>
+</section>
+<section class="content-section"><div class="section-heading"><div><span class="eyebrow">OUR ECOSYSTEM</span><h2>一个平台，<em>多种可能</em></h2></div><p>围绕你的数字需求，提供清晰、便捷的服务入口。</p></div>
+<div class="business-grid"><a class="business-card" href="#products"><span class="card-index">01 / ACCOUNT</span><span class="business-icon">◈</span><h3>精选账号</h3><p>多种数字账号与服务资源，信息清晰，一目了然。</p><span class="card-link">浏览账号 <b>↗</b></span></a><a class="business-card" href="#products"><span class="card-index">02 / NETWORK</span><span class="business-icon">⌁</span><h3>节点服务</h3><p>连接与订阅管理入口，便于查看和整理你的服务。</p><span class="card-link">了解节点 <b>↗</b></span></a><a class="business-card" href="./promo.html"><span class="card-index">03 / GROWTH</span><span class="business-icon">✳</span><h3>引流分销</h3><p>邀请好友、查看推广数据，让每一次分享更有价值。</p><span class="card-link">查看推广 <b>↗</b></span></a></div>
+</section>
+<section id="products" class="content-section products-section"><div class="section-heading"><div><span class="eyebrow">CURATED FOR YOU</span><h2>本周<em>精选</em></h2></div><span class="section-note">DEMO SHOWCASE · 示例展示</span></div><div class="product-grid">
+<article class="product-card"><div class="product-art art-blue"><span>01</span><b>ACCOUNT<br>ACCESS</b><i>◈</i></div><div class="product-info"><span class="product-tag">数字账号</span><h3>精选账号体验包</h3><p>适合入门体验的数字服务组合</p><div class="product-buy"><strong>¥ 29.00</strong><button class="button button-small" data-toast="当前为静态展示，购买功能尚未接入">查看详情</button></div></div></article>
+<article class="product-card"><div class="product-art art-purple"><span>02</span><b>NETWORK<br>PLUS</b><i>⌁</i></div><div class="product-info"><span class="product-tag">节点服务</span><h3>网络服务月包</h3><p>简洁清晰的订阅服务占位商品</p><div class="product-buy"><strong>¥ 39.00</strong><button class="button button-small" data-toast="当前为静态展示，购买功能尚未接入">查看详情</button></div></div></article>
+<article class="product-card"><div class="product-art art-cyan"><span>03</span><b>GROWTH<br>TOOLKIT</b><i>✳</i></div><div class="product-info"><span class="product-tag">推广工具</span><h3>推广工具体验包</h3><p>面向推广场景的服务示例卡片</p><div class="product-buy"><strong>¥ 19.00</strong><button class="button button-small" data-toast="当前为静态展示，购买功能尚未接入">查看详情</button></div></div></article>
+<article class="product-card"><div class="product-art art-orange"><span>04</span><b>MEMBER<br>PRIME</b><i>✧</i></div><div class="product-info"><span class="product-tag">会员服务</span><h3>会员进阶体验包</h3><p>展示会员服务的价格与产品信息</p><div class="product-buy"><strong>¥ 59.00</strong><button class="button button-small" data-toast="当前为静态展示，购买功能尚未接入">查看详情</button></div></div></article>
+</div></section>
+<section class="blindbox-wrap"><div class="blindbox"><div class="blindbox-symbol">?</div><div class="blindbox-copy"><span class="eyebrow">DAILY SURPRISE</span><h2>每日盲盒 <em>· 今日好运待开启</em></h2><p>每天一份小惊喜。此处为静态活动展示，奖励内容以正式活动上线为准。</p></div><button class="button" data-toast="盲盒活动暂未开放，敬请期待">开启今日盲盒 ↗</button></div></section>
+<section class="announcement"><span class="announcement-badge">公告</span><div class="announcement-track"><span>欢迎来到 SOSKS5 数字服务平台 · 页面目前展示静态样例内容</span><span>欢迎来到 SOSKS5 数字服务平台 · 页面目前展示静态样例内容</span></div><a href="./user.html">了解更多 ↗</a></section>
+</main><footer class="site-footer"><a class="brand" href="./index.html">SOSKS5 <i>STORE</i></a><span>© 2026 SOSKS5 · 静态 UI 展示版本</span><div><a href="./user.html">个人中心</a><a href="./promo.html">引流分销</a></div></footer>
+<div id="toast" class="toast" role="status" aria-live="polite"></div><script src="./js/common.js" defer></script><script src="./js/app-index.js" defer></script>
+</body></html>

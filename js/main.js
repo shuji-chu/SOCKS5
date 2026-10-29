@@ -6,7 +6,14 @@
   const $ = (selector, root) => (root || document).querySelector(selector);
   const $$ = (selector, root) => Array.from((root || document).querySelectorAll(selector));
   const esc = (value) => String(value == null ? '' : value).replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const toast = (message) => UI && UI.toast ? UI.toast(message) : console.warn('[SOSKS5]', message);
+  const safeUiMessage = (value) => String(value == null ? '操作未完成' : value)
+    .replace(/Bearer\s+\S+/gi, '[凭据已隐藏]')
+    .replace(/https?:\/\/[^\s"'<>]+/gi, '[链接已隐藏]')
+    .replace(/\b(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}(?::\d+)?\b/gi, '[地址已隐藏]')
+    .replace(/\b(?:\d{1,3}\.){3}\d{1,3}(?::\d+)?\b/g, '[地址已隐藏]')
+    .replace(/(?:^|\n)\s*at\s+[^\n]+/g, '')
+    .replace(/\s{2,}/g, ' ').trim().slice(0, 240) || '操作未完成，请稍后重试。';
+  const toast = (message) => UI && UI.toast ? UI.toast(safeUiMessage(message)) : undefined;
   const unwrap = (response) => API.unwrap(response);
   const listFrom = (value) => Array.isArray(value) ? value : (value && (value.list || value.items || value.products || value.plans || value.data || value.rows)) || [];
   const money = (value, alreadyYuan) => {

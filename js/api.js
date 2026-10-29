@@ -330,7 +330,7 @@
     const image = p.image_url || p.image || p.cover_url || p.thumbnail || p.oss_url || platformIcon(p);
     const description = p.detail_description || p.details || p.content_zh || p.description_zh || p.chinese_description || p.description_cn || p.content || p.description || p.introduction || "暂未提供详细说明，请联系客服了解商品规格、交付方式与适用范围。";
     showModal("商品详情", '<div class="s5-clone-detail">' +
-      (image ? '<img class="s5-clone-detail-image" src="' + esc(image) + '" alt="' + esc(title) + '">' : "") +
+      '<img class="s5-clone-detail-image" src="' + esc(image) + '" alt="' + esc(title) + '" onerror="this.onerror=null;this.src=\'./assets/images/accounts.svg\'">' +
       '<h3>' + esc(title) + '</h3><p>' + esc(description) + '</p><div class="s5-clone-detail-price">' + esc(cloneMoney(p)) + '</div>' +
       '<a class="s5-clone-buy" href="https://t.me/qingtian_Boss" target="_blank" rel="noopener noreferrer">立即购买 / 联系客服</a></div>');
   }
@@ -348,10 +348,11 @@
       box.innerHTML = '<div class="s5-clone-heading"><div><span class="s5-section-label">全球精选</span><h2>海外精选数字商品</h2><p class="s5-clone-intro">精选数字商品 · 中文商品说明 · 价格以商品详情为准</p></div><span class="s5-clone-count">' + products.length + ' 件商品</span></div>' +
         (products.length ? '<div class="s5-clone-grid">' + products.map((p, index) => {
           const title = p.name || p.title || p.product_name || "数字商品 " + (index + 1);
-          const image = p.image_url || p.image || p.cover_url || p.thumbnail || p.oss_url || "";
+          const fallback = platformIcon(p);
+          const image = p.image_url || p.image || p.cover_url || p.thumbnail || p.oss_url || fallback;
           const desc = p.description_zh || p.chinese_description || p.description_cn || p.summary_zh || p.description || p.summary || "查看商品详情，了解规格、交付方式与适用范围。";
           return '<button type="button" class="s5-clone-card" data-clone-index="' + index + '">' +
-            '<img loading="lazy" src="' + esc(image) + '" alt="' + esc(title) + '" class="s5-clone-image" onerror="this.onerror=null;this.src=\'./assets/images/accounts.svg\'">' +
+            '<img loading="lazy" src="' + esc(image) + '" alt="' + esc(title) + '" class="s5-clone-image" onerror="this.onerror=null;this.src=\''+esc(fallback)+'\'">' +
             '<span class="s5-clone-card-body"><span class="s5-clone-name">' + esc(title) + '</span><span class="s5-clone-desc">' + esc(desc) + '</span><span class="s5-clone-card-foot"><strong>' + esc(cloneMoney(p)) + '</strong><span>查看详情 ↗</span></span></span></button>';
         }).join("") + '</div>' : '<div class="s5-clone-empty">当前暂无已发布商品，请稍后再来查看。</div>');
       box.querySelectorAll("[data-clone-index]").forEach((card) => card.addEventListener("click", () => {

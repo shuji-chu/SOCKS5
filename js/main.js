@@ -175,7 +175,7 @@
       const leaderboardResponse = leaderboardResult[0].status === 'fulfilled' ? unwrap(leaderboardResult[0].value) : null;
       const leaderboardRows = listFrom(leaderboardResponse);
       if (leaderboardRows.length) {
-        const panelTitle = $('.panel .panel-heading h2');
+        const panelTitle = $('.panel .panel-heading h2')[1];
         if (panelTitle) panelTitle.textContent = '本月推广排行榜';
         const headers = $('.rank-table thead th');
         if (headers.length === 4) {

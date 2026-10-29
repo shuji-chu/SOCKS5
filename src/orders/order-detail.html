@@ -171,10 +171,10 @@
         const created=first(order,['created_at','created_time','create_time','created','add_time']);
         const paidAt=first(order,['paid_at','pay_time','paid_time']);
         const status=String(first(order,['status_text','status_label','status','trade_status','pay_status'])??'未知');
-        const paid= /paid|success|completed|已支付|已完成/i.test(status)||Number(first(order,['paid','is_paid','pay_status']))===1;
+        const paid= /paid|success|completed|已支付|已完成/i.test(status)||Number(status)===1||Number(first(order,['paid','is_paid','pay_status']))===1;
         const deliveryStatus=String(first(order,['delivery_status','deliver_status','shipping_status','is_delivered'])??'未返回');
         const amount=first(order,['total_amount','amount','total','actual_amount','pay_amount','price']);
-        const unit=Number(first(order,['unit_price','price']));
+        const unitRaw=first(order,['unit_price','price']);const unit=unitRaw==null?NaN:Number(unitRaw);
         set('o-title',title);set('o-no',no);set('o-time',dateTime(created));set('o-price',Number.isFinite(unit)?money(unit):'—');set('o-qty',first(order,['quantity','qty'])??1);set('o-total',money(amount));set('o-paytype',first(order,['payment_method','payment','pay_type','method'])||'—');set('o-paystatus',status);set('o-deliverstatus',deliveryStatus);
         const paidBadge=$('o-paystatus');if(paidBadge)paidBadge.className='status-badge '+(paid?'status-success':'');
         const detail=$('deliveryCard');const content=first(order,['delivery_content','deliver_content','delivery_data','card_key','license_key','subscription_url','subscribe_url','config_yaml','credential']);const delivered= /delivered|shipped|已发货|已交付/i.test(deliveryStatus)||Number(first(order,['is_delivered','delivered']))===1;

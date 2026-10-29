@@ -2,7 +2,7 @@
 const API_ROOT='https://web.lynli.me';
 const API_V1='https://web.lynli.me/api/v1';
 const STATIC_CATALOGS=[];
-let liveProducts=[],activeKind='全部',searchTerm='',paymentMethods=[];
+let liveProducts=[],activeKind=new URLSearchParams(location.search).get('category')||'全部',searchTerm='',paymentMethods=[];
 const escHtml=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const safeUiMessage=value=>String(value??'操作未完成').replace(/Bearer\s+\S+/gi,'[凭据已隐藏]').replace(/\b(access[_-]?token|refresh[_-]?token|api[_-]?key|secret|password|authorization)\s*[:=]\s*["']?[^,\s"';&]+/gi,'$1=[凭据已隐藏]').replace(/(?:\b[0-9a-f]{1,4}:){2,}[0-9a-f:.]{1,}/gi,'[IP地址已隐藏]').replace(/https?:\/\/[^\s"'<>]+/gi,'[链接已隐藏]').replace(/\b(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}(?::\d+)?\b/gi,'[地址已隐藏]').replace(/\b(?:\d{1,3}\.){3}\d{1,3}(?::\d+)?\b/g,'[地址已隐藏]').replace(/(?:^|\n)\s*at\s+[^\n]+/g,'').replace(/\s{2,}/g,' ').trim().slice(0,240)||'操作未完成，请稍后重试。';window.safeUiMessage=safeUiMessage;
 function toast(message){
@@ -59,11 +59,11 @@ async function loadCatalogs(){
   liveProducts=[...nodeRows.map((p,i)=>normalize(p,i,'node')),...accountRows.map((p,i)=>normalize(p,i,'account'))];
   renderProducts();
  }catch(e){
-  liveProducts=[];root.innerHTML='<div class="error-state"><b>真实商品目录暂不可用</b><p>'+escHtml(safeUiMessage(e.message))+'</p><button class="btn" type="button" onclick="loadCatalogs()">重新加载</button></div>';
+  liveProducts=[];toast('商品目录加载失败，请检查网络后重试');root.innerHTML='<div class="error-state"><b>真实商品目录暂不可用</b><p>'+escHtml(safeUiMessage(e.message))+'</p><button class="btn" type="button" onclick="loadCatalogs()">重新加载</button></div>';
   document.getElementById('resultCount').textContent='真实接口暂不可用';
  }finally{root.removeAttribute('aria-busy')}
 }
-document.querySelectorAll('[data-kind]').forEach(b=>b.addEventListener('click',()=>{activeKind=b.dataset.kind;document.querySelectorAll('[data-kind]').forEach(x=>x.className='btn ghost');b.className='btn primary';renderProducts()}));
+document.querySelectorAll('[data-kind]').forEach(b=>{b.className=b.dataset.kind===activeKind?'btn primary':'btn ghost';b.addEventListener('click',()=>{activeKind=b.dataset.kind;document.querySelectorAll('[data-kind]').forEach(x=>x.className='btn ghost');b.className='btn primary';renderProducts()})});
 document.getElementById('globalSearch').addEventListener('input',e=>{searchTerm=e.target.value.trim();renderProducts()});
 function nodeConfigPanel(p){if(!p)return '';const isNode=p._kind==='节点';return '<section class="node-config-panel" id="nodeConfigPanel"><div class="archive-head"><div><div class="eyebrow">OPTIONAL ADD-ONS</div><h4>增值服务（可选）</h4></div><span class="archive-stamp">按月加价</span></div><div class="addon-list"><label class="addon-option" for="addonDomain"><input type="checkbox" id="addonDomain" value="dedicated_domain" aria-controls="addonDomainField"><span class="addon-copy"><b>绑定专属域名</b><small>+¥2.00 / 月</small></span></label><div class="field addon-field" id="addonDomainField" hidden><label for="addonDomainValue">专属域名</label><input class="input" id="addonDomainValue" placeholder="例如 node.example.com" autocomplete="url" inputmode="url" aria-describedby="addonDomainError"><p class="addon-error" id="addonDomainError" role="alert" hidden></p></div><label class="addon-option" for="addonIp"><input type="checkbox" id="addonIp" value="dedicated_ip" aria-controls="addonIpField"><span class="addon-copy"><b>使用独立 IP</b><small>+¥3.00 / 月</small></span></label><div class="field addon-field" id="addonIpField" hidden><label for="addonIpValue">独立 IP 地址</label><input class="input" id="addonIpValue" placeholder="例如 203.0.113.10 或 IPv6" autocomplete="off" inputmode="url" aria-describedby="addonIpError"><p class="addon-error" id="addonIpError" role="alert" hidden></p></div></div><div class="addon-total" aria-live="polite"><span>价格明细</span><div class="price-breakdown"><div><span>基础套餐</span><b id="addonBasePrice">¥0.00</b></div><div><span>专属域名</span><b id="addonDomainPrice">¥0.00</b></div><div><span>独立 IP</span><b id="addonIpPrice">¥0.00</b></div><div class="breakdown-total"><span>每月合计</span><strong id="addonTotal">¥0.00</strong></div></div><small id="addonBreakdown">基础套餐价格 + 已选增值服务</small></div><p class="archive-note">基础套餐价格不变；仅对已勾选的增值服务加价。实际结算金额以服务端为准。</p></section>'+(isNode?'<p class="archive-note">支持协议</p>'+protocolBadges(p):'')}function merchantDashboard(p){return window.ShopRender?window.ShopRender.merchantDashboard(p):'';}
 

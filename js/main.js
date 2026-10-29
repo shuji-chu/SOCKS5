@@ -110,7 +110,7 @@
   }
   async function fetchCatalog() {
     if (!requireApi()) return {nodes: [], accounts: []};
-    const results = await Promise.allSettled([API.getPlans(), API.getClonedProducts()]);
+    const results = await Promise.allSettled([API.getPlans(), API.getClonedProducts(), (async()=>{const base=String(window.SOSKS5_PUBLIC_API_BASE||'https://api.lynli.me').replace(/\/+$/,'');const response=await fetch(base+'/api/v1/public/catalog/account-overrides',{headers:{Accept:'application/json'},signal:AbortSignal.timeout?AbortSignal.timeout(5000):undefined});if(!response.ok)throw Error('catalog overrides unavailable');return response.json()})()]);
     const nodesResponse = results[0].status === 'fulfilled' ? unwrap(results[0].value) : [];
     const accountResponse = results[1].status === 'fulfilled' ? unwrap(results[1].value) : [];
     if (results[0].status === 'rejected') toast('节点商品加载失败：' + results[0].reason.message);
@@ -127,7 +127,10 @@
       const words = [p.name,p.title,p.content,p.description,p.type,p.protocol,p.node_protocol].join(' ').toLowerCase();
       return kind === 'node' || kind === 'nodes' || kind === 'proxy' || /节点|proxy|vpn|订阅|vless|vmess|hysteria|trojan|shadowsocks|socks5|wireguard|tuic|network/.test(words);
     });
-    const combined = listFrom(accountResponse).concat(plans.filter(isAccountPlan));
+    const overridePayload = results[2].status === 'fulfilled' ? results[2].value : [];
+    const overrideRows = listFrom(unwrap(overridePayload));
+    const overrideMap = new Map(overrideRows.filter((item) => item && item.id != null).map((item) => [String(item.id), item]));
+    const combined = listFrom(accountResponse).concat(plans.filter(isAccountPlan)).map((item) => Object.assign({}, item, overrideMap.get(String(item.id)) || {}));
     const seen = new Set();
     const accounts = combined.filter((item) => {
       const key = item.id != null ? 'id:' + String(item.id) : 'name:' + String(item.name || item.title || item.product_name || '');

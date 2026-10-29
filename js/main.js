@@ -70,6 +70,12 @@
     const match = icons.find(([pattern]) => pattern.test(name));
     return match ? './assets/images/' + match[1] : (type === 'node' ? './assets/images/nodes.svg' : './assets/images/accounts.svg');
   }
+  function accountCategoryName(item) {
+    const name = [item && item.account_category,item && item.platform,item && item.name,item && item.title,item && item.product_name].filter(Boolean).join(' ').toLowerCase();
+    const entries = [[/facebook|脸书|fb账号/,'Facebook'],[/instagram|ins账号/,'Instagram'],[/tiktok|tik tok|抖音海外/,'TikTok'],[/twitter|推特|x账号/,'X / Twitter'],[/telegram|电报|tg账号/,'Telegram'],[/google|gmail|谷歌/,'Google / Gmail'],[/whatsapp|wa账号/,'WhatsApp'],[/discord/,'Discord'],[/youtube|油管/,'YouTube'],[/reddit/,'Reddit']];
+    const found = entries.find(([pattern]) => pattern.test(name));
+    return found ? found[1] : '海外账号资源';
+  }
   function imageUrl(item, fallback) {
     const url = item && (item.image_url || item.image || item.cover_url || item.thumbnail || item.oss_url || item.picture || item.img);
     return url && /^https?:\/\//i.test(String(url)) ? String(url) : (fallback || './assets/images/placeholder.svg');
@@ -98,7 +104,7 @@
     const fallbackImage = productIconPath(item, type);
     const image = imageUrl(item, fallbackImage);
     const price = type === 'node' ? planPrice(item) : clonePrice(item);
-    const tag = type === 'node' ? (item.protocol || item.node_protocol || '全球高速节点') : (item.account_category || item.platform || '海外账号资源');
+    const tag = type === 'node' ? (item.protocol || item.node_protocol || '全球高速节点') : accountCategoryName(item);
     const detail = item.id != null ? ' data-product-id="' + esc(item.id) + '"' : '';
     return '<article class="product-card live-product-card"><img class="product-photo" src="' + esc(image) + '" alt="' + esc(title) + '" loading="lazy" onerror="this.onerror=null;this.src=\''+esc(fallbackImage)+'\'"><div class="product-info"><span class="product-tag">' + tag + '</span><h3>' + esc(title) + '</h3><p>' + esc(description) + '</p><div class="product-buy"><strong>' + esc(price) + '</strong>' + (type === 'node' ? '<button class="button button-small" type="button"' + detail + '>查看套餐</button>' : '<a class="button button-small" href="' + esc(item.detail_url || item.url || 'https://t.me/qingtian_Boss') + '" target="_blank" rel="noopener noreferrer">咨询购买</a>') + '</div></div></article>';
   }
@@ -115,7 +121,8 @@
       const words = [p.name,p.title,p.content,p.description,p.type].join(' ').toLowerCase();
       return kind === 'node' || kind === 'nodes' || kind === 'proxy' || /节点|proxy|vpn|订阅|vless|vmess|hysteria|trojan|shadowsocks|socks5|wireguard|tuic|network/.test(words);
     });
-    return {nodes, accounts: listFrom(accountResponse)};
+    const accounts = listFrom(accountResponse).map((item) => Object.assign({}, item, {category: '账号服务', product_type: 'account', account_category: item.account_category || item.platform || accountCategoryName(item)}));
+    return {nodes, accounts};
   }
 
   async function loadHome() {
@@ -125,8 +132,10 @@
       setBusy(grid, '正在加载精选商品…');
       try {
         const catalog = await fetchCatalog();
-        const featured = catalog.accounts.slice(0, 3).map((p) => ({item:p,type:'account'}))
-          .concat(catalog.nodes.slice(0, 3).map((p) => ({item:p,type:'node'}))).slice(0, 3);
+        const featured = catalog.accounts.slice(0, 2).map((p) => ({item:p,type:'account'}))
+          .concat(catalog.nodes.slice(0, 1).map((p) => ({item:p,type:'node'})))
+          .concat(catalog.accounts.slice(2).map((p) => ({item:p,type:'account'})))
+          .concat(catalog.nodes.slice(1).map((p) => ({item:p,type:'node'}))).slice(0, 3);
         grid.innerHTML = featured.length ? featured.map((entry) => card(entry.item, entry.type)).join('') : emptyState('当前暂无可展示商品');
       } catch (error) {
         grid.innerHTML = emptyState('商品暂时无法加载，请稍后重试');

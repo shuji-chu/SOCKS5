@@ -122,36 +122,19 @@
         function submitRecharge() {
             const val = parseFloat(document.getElementById('recharge-amount').value) || 0;
             if (val < 10) { alert('最低充值 10 元'); return; }
-            const modal = document.getElementById('pay-modal');
-            const tip = document.getElementById('pay-tip');
-            const amtText = document.getElementById('pay-amount');
-            const qrImg = document.getElementById('pay-qrcode');
-            const usdtBox = document.getElementById('usdt-box');
-            if (currentType === 'alipay') {
-                tip.innerText = '请使用支付宝扫码付款';
-                amtText.innerText = `¥ ${val.toFixed(2)}`;
-                usdtBox.classList.add('hidden');
-                qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=alipay_mock_' + val;
-            } else {
-                tip.innerText = '请转账至以下 TRC20 地址';
-                amtText.innerText = `${val.toFixed(2)} USDT`;
-                usdtBox.classList.remove('hidden');
-                qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=TYu8x9ZqP3vK2mN4wL5jR6tB7cV8bA9sD0';
-            }
-            qrImg.classList.remove('hidden');
-            modal.classList.add('active');
+            alert('充值接口尚未接入，未创建真实充值订单，也未到账。请勿向页面中的演示地址转账。');
         }
-        function closeModal() { 
-            document.getElementById('pay-modal').classList.remove('active'); 
-            // 给余额加钱
-            const val = parseFloat(document.getElementById('recharge-amount').value) || 0;
-            let balance = parseFloat(localStorage.getItem('user_balance') || '120.00');
-            balance += val;
-            localStorage.setItem('user_balance', balance.toFixed(2));
-            
-            alert('充值成功！已到账 ' + val + ' 元');
-            window.location.href = '/console.html'; 
+        function closeModal() {
+            document.getElementById('pay-modal').classList.remove('active');
         }
     </script>
+<script id="safe-ui-notice-policy">
+(function(){
+ function clean(v){return String(v??'操作未完成').replace(/Bearer\s+\S+/gi,'[凭据已隐藏]').replace(/https?:\/\/[^\s"'<>]+/gi,'[链接已隐藏]').replace(/\b(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}(?::\d+)?\b/gi,'[地址已隐藏]').replace(/\b(?:\d{1,3}\.){3}\d{1,3}(?::\d+)?\b/g,'[地址已隐藏]').replace(/(?:^|\n)\s*at\s+[^\n]+/g,'').replace(/\s{2,}/g,' ').trim().slice(0,240)||'操作未完成，请稍后重试。'}
+ window.safeUiMessage=clean;
+ window.alert=function(message){var n=document.getElementById('safe-ui-notice');if(!n){n=document.createElement('div');n.id='safe-ui-notice';n.setAttribute('role','status');n.setAttribute('aria-live','polite');n.style.cssText='position:fixed;z-index:100001;left:50%;bottom:24px;transform:translateX(-50%);max-width:calc(100vw - 32px);padding:12px 16px;border-radius:12px;background:#142b43;color:#fff;box-shadow:0 12px 36px #0005';document.body.appendChild(n)}n.textContent=clean(message);n.hidden=false;clearTimeout(window.__safeUiNoticeTimer);window.__safeUiNoticeTimer=setTimeout(function(){n.hidden=true},4200)};
+ var nativeConfirm=window.confirm.bind(window);window.confirm=function(message){return nativeConfirm(clean(message))};
+})();
+</script>
 </body>
 </html>

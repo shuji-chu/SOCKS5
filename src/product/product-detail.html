@@ -179,7 +179,7 @@
                 
                 updateTotal();
             } catch (e) {
-                console.error('商品加载失败', e);
+                // Production UI keeps raw network errors out of the console.
                 document.getElementById('p-title').innerText = '商品加载失败';
             }
         });
@@ -283,45 +283,12 @@
         // ================= 真实后端支付对接区 =================
         async function mockPaySuccess() {
             clearInterval(timer);
-            
-            // 获取订单信息
-            const qty = document.getElementById('buy-qty').value;
-            const orderNo = 'ORD' + Date.now() + Math.floor(Math.random() * 1000);
-            const amountStr = document.getElementById('total-amount').innerText.replace(/[^0-9.]/g, '');
-            const amount = parseFloat(amountStr);
-            
-            try {
-                // 【老板请注意】这里是你后端对接的真实入口
-                /*
-                const response = await fetch('./api/pay/notify/check', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        order_no: orderNo,
-                        amount: amount,
-                        product_id: currentProduct.id
-                    })
-                });
-                const resData = await response.json();
-                if(resData.code !== 200) {
-                    alert('支付确认失败：' + resData.msg);
-                    return;
-                }
-                */
-                
-                // 前端模拟成功状态
-                document.getElementById('pay-step-1').classList.remove('active');
-                document.getElementById('pay-step-2').classList.add('active');
-                
-                const finalBtn = document.getElementById('btn-go-order');
-                finalBtn.innerText = '查看订单并提取';
-                finalBtn.onclick = () => {
-                    window.location.href = '/order-detail.html?id=' + currentProduct.id + '&order_no=' + orderNo + '&qty=' + qty;
-                };
-                
-            } catch(e) {
-                alert('网络异常，请稍后重试');
-            }
+            const notice = document.createElement('div');
+            notice.setAttribute('role','status');
+            notice.className = 'mx-4 my-3 rounded-xl border border-amber-300 bg-amber-50 p-4 text-amber-900';
+            notice.textContent = '支付确认接口尚未接通，当前未确认支付成功，也未生成真实订单。请勿将此页面视为付款凭证。';
+            const modal = document.getElementById('pay-modal');
+            (modal || document.querySelector('main') || document.body).appendChild(notice);
         }
 
     </script>
@@ -329,5 +296,13 @@
     
 
 <script src="../js/notice.js"></script>
+<script id="safe-ui-notice-policy">
+(function(){
+ function clean(v){return String(v??'操作未完成').replace(/Bearer\s+\S+/gi,'[凭据已隐藏]').replace(/https?:\/\/[^\s"'<>]+/gi,'[链接已隐藏]').replace(/\b(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}(?::\d+)?\b/gi,'[地址已隐藏]').replace(/\b(?:\d{1,3}\.){3}\d{1,3}(?::\d+)?\b/g,'[地址已隐藏]').replace(/(?:^|\n)\s*at\s+[^\n]+/g,'').replace(/\s{2,}/g,' ').trim().slice(0,240)||'操作未完成，请稍后重试。'}
+ window.safeUiMessage=clean;
+ window.alert=function(message){var n=document.getElementById('safe-ui-notice');if(!n){n=document.createElement('div');n.id='safe-ui-notice';n.setAttribute('role','status');n.setAttribute('aria-live','polite');n.style.cssText='position:fixed;z-index:100001;left:50%;bottom:24px;transform:translateX(-50%);max-width:calc(100vw - 32px);padding:12px 16px;border-radius:12px;background:#142b43;color:#fff;box-shadow:0 12px 36px #0005';document.body.appendChild(n)}n.textContent=clean(message);n.hidden=false;clearTimeout(window.__safeUiNoticeTimer);window.__safeUiNoticeTimer=setTimeout(function(){n.hidden=true},4200)};
+ var nativeConfirm=window.confirm.bind(window);window.confirm=function(message){return nativeConfirm(clean(message))};
+})();
+</script>
 </body>
 </html>

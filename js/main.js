@@ -253,14 +253,47 @@
     document.head.appendChild(style);
   }
 
+  function loadLogin() {
+    const form = $('#login-form');
+    if (!form || !API) return;
+    if (API.readToken()) {
+      const existingRedirect = new URLSearchParams(location.search).get('redirect');
+      location.replace(existingRedirect === 'promo.html' ? './promo.html' : existingRedirect === 'shop.html' ? './shop.html' : './user.html');
+      return;
+    }
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const email = $('#login-email').value.trim();
+      const password = $('#login-password').value;
+      const button = $('#login-submit');
+      if (!email || !password) { toast('请输入邮箱和密码'); return; }
+      button.disabled = true;
+      button.textContent = '正在登录…';
+      try {
+        const response = await API.request('/passport/auth/login', {method:'POST',body:JSON.stringify({email,password})});
+        const data = unwrap(response) || {};
+        const token = data.token || data.auth_data || data.access_token;
+        if (!token) throw new Error(data.message || data.msg || '登录接口未返回 Token');
+        API.saveToken(token);
+        const redirect = new URLSearchParams(location.search).get('redirect');
+        location.replace(redirect === 'promo.html' ? './promo.html' : redirect === 'shop.html' ? './shop.html' : redirect === 'index.html' ? './index.html' : './user.html');
+      } catch (error) {
+        toast('登录失败：' + (error.message || '请稍后重试'));
+        button.disabled = false;
+        button.textContent = '登录';
+      }
+    });
+  }
+
   async function boot() {
     installStyles();
-    addGlobalNavigation();
     if (!API) { toast('API 模块未加载'); return; }
+    if (currentPath !== 'login.html') addGlobalNavigation();
     if (currentPath === 'index.html') return loadHome();
     if (currentPath === 'shop.html') return loadShop().catch((error) => toast('商城加载失败：' + error.message));
     if (currentPath === 'promo.html') return loadPromo();
     if (currentPath === 'user.html') return loadUser();
+    if (currentPath === 'login.html') return loadLogin();
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);

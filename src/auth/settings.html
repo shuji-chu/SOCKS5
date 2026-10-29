@@ -36,7 +36,7 @@
     <!-- 修改密码半屏弹窗 (因为修改密码是独立操作) -->
     <div id="password-modal" class="fixed inset-0 bg-black/50 hidden items-end justify-center z-[9999]">
         <div class="bg-white w-full rounded-t-3xl p-6">
-            <div class="flex justify-between items-center border-b pb-3 mb-4"><h3 class="text-lg font-bold">修改密码</h3><button onclick="document.getElementById('password-modal').classList.add('hidden')" class="text-slate-400 text-xl">✕</button></div>
+            <div class="flex justify-between items-center border-b pb-3 mb-4"><h3 class="text-lg font-bold">修改密码</h3><button onclick="document.getElementById('password-modal').classList.add('hidden')" class="text-slate-400 text-xl"><img src="../../assets/icons/close.svg" alt="" aria-hidden="true" style="width:16px;height:16px;vertical-align:middle"></button></div>
             <input type="password" id="old-pwd" placeholder="当前密码" class="w-full px-4 py-2 bg-slate-50 border rounded-lg mb-3">
             <div class="flex gap-2 mb-3">
                 <input type="text" id="pwd-code" placeholder="验证码" class="flex-1 px-4 py-2 bg-slate-50 border rounded-lg">

@@ -6,7 +6,7 @@
   const API_BASE = String(window.SOSKS5_API_BASE || 'https://web.lynli.me').replace(/\/+$/, '');
   const TOKEN_KEYS = ['sosks5_token', 'tgx_token'];
   const USER_KEYS = ['sosks5_user', 'tgx_user'];
-  const PAYMENT_IDS = Object.assign({ alipay: 'alipay', usdt: 'usdt' }, window.SOSKS5_PAYMENT_IDS || {});
+  let paymentChannels = [];
   const $ = (id) => document.getElementById(id);
   const esc = (v) => String(v == null ? '' : v).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const readToken = () => localStorage.getItem('sosks5_token') || localStorage.getItem('tgx_token') || '';
@@ -22,12 +22,46 @@
     const headers = Object.assign({ Accept: 'application/json', 'Content-Type': 'application/json' }, opts.headers || {});
     const token = readToken();
     if (token) headers.Authorization = 'Bearer ' + token;
-    const response = await fetch(API_BASE + '/api/v1' + path, Object.assign({}, opts, { headers }));
+    let response;
+    try {
+      response = await fetch(API_BASE + '/api/v1' + path, Object.assign({}, opts, { headers }));
+    } catch (error) {
+      throw new Error('接口请求失败，可能是跨域或后端未启动：' + (error && error.message ? error.message : '网络连接失败'));
+    }
     let body;
     try { body = await response.json(); } catch (_) { body = {}; }
-    if (!response.ok) throw new Error((body && (body.message || body.msg || body.error)) || ('请求失败 HTTP ' + response.status));
-    if (body && (body.error || (body.status === 'fail'))) throw new Error(body.message || body.msg || body.error || '接口请求失败');
+    if (!response.ok) throw new Error((body && body.message) || ('HTTP ' + response.status + (body && body.msg ? '：' + body.msg : '')));
+    if (body && body.status === 'fail') throw new Error(body.message !== undefined ? String(body.message) : '接口返回 status: fail');
+    if (body && body.error) throw new Error(body.message !== undefined ? String(body.message) : String(body.error));
     return body;
+  }
+
+  function normalizeChannels(config) {
+    const d = unwrap(config) || {};
+    const candidates = d.payment_methods || d.payments || d.payment || d.pay_method || d.payments_list || d.methods || [];
+    const list = Array.isArray(candidates) ? candidates : Object.keys(candidates || {}).map((key) => {
+      const v = candidates[key];
+      return typeof v === 'object' ? Object.assign({ key }, v) : { key, value: v, name: key };
+    });
+    paymentChannels = list.map((item) => {
+      if (typeof item === 'string') return { value: item, label: item.toLowerCase().includes('usdt') ? 'USDT' : item.toLowerCase().includes('ali') ? '支付宝' : item, enabled: true };
+      const key = item.key || item.type || item.name || item.code || item.method || item.value || item.id;
+      const label = item.label || item.title || item.name || (String(key).toLowerCase().includes('usdt') ? 'USDT' : String(key).toLowerCase().includes('ali') ? '支付宝' : String(key));
+      return { value: item.value !== undefined ? item.value : (item.code !== undefined ? item.code : (item.id !== undefined ? item.id : key)), key: key, label: label, enabled: item.enabled !== false && item.status !== 0 && item.status !== 'disabled' };
+    }).filter((x) => x.enabled && x.value !== undefined && x.value !== null && x.value !== '');
+    return paymentChannels;
+  }
+
+  async function loadConfig() {
+    try {
+      const config = await request('/config', { method: 'GET' });
+      normalizeChannels(config);
+    } catch (error) {
+      paymentChannels = [];
+      console.error('[SOSKS5] /config failed:', error);
+      // Do not invent payment IDs; disable checkout choices until backend config is available.
+    }
+    return paymentChannels;
   }
 
   function normalizePlan(raw) {
@@ -173,19 +207,27 @@
       showError('该套餐没有可购买的周期价格');
       return;
     }
+    if (!paymentChannels.length) {
+      showError('暂时无法获取支付通道配置，请稍后重试。');
+      loadConfig();
+      return;
+    }
     const periodHtml = periods.map((p, i) => '<option value="' + esc(p.value) + '"' + (i === 0 ? ' selected' : '') + '>' + esc(p.label) + ' · ' + esc((p.price / 100).toFixed(2)) + '</option>').join('');
-    showModal('确认购买 · ' + (plan.name || plan.title || '套餐'), '<form id="s5-purchase-form"><label class="block text-sm font-semibold mb-2">套餐周期</label><select id="s5-period" class="w-full rounded-xl border border-slate-200 p-3 mb-4">' + periodHtml + '</select><label class="block text-sm font-semibold mb-2">支付方式</label><div class="grid grid-cols-2 gap-3 mb-5"><label class="flex items-center gap-2 rounded-xl border border-slate-200 p-3 cursor-pointer"><input type="radio" name="s5-payment" value="alipay" checked><span>支付宝</span></label><label class="flex items-center gap-2 rounded-xl border border-slate-200 p-3 cursor-pointer"><input type="radio" name="s5-payment" value="usdt"><span>USDT</span></label></div><button id="s5-create-order" class="w-full rounded-xl bg-blue-600 py-3 font-bold text-white" type="submit">确认支付</button><p class="mt-3 text-xs text-slate-400">订单与支付结果以服务器返回为准。</p></form>');
+    const paymentHtml = paymentChannels.map((p, i) => '<label class="flex items-center gap-2 rounded-xl border border-slate-200 p-3 cursor-pointer"><input type="radio" name="s5-payment" value="' + esc(i) + '"' + (i === 0 ? ' checked' : '') + '><span>' + esc(p.label) + '</span></label>').join('');
+    showModal('确认购买 · ' + (plan.name || plan.title || '套餐'), '<form id="s5-purchase-form"><label class="block text-sm font-semibold mb-2">套餐周期</label><select id="s5-period" class="w-full rounded-xl border border-slate-200 p-3 mb-4">' + periodHtml + '</select><label class="block text-sm font-semibold mb-2">支付方式</label><div class="grid grid-cols-2 gap-3 mb-5">' + paymentHtml + '</div><button id="s5-create-order" class="w-full rounded-xl bg-blue-600 py-3 font-bold text-white" type="submit">确认支付</button><p class="mt-3 text-xs text-slate-400">支付方式来自服务器配置。</p></form>');
     $('s5-purchase-form').addEventListener('submit', async (event) => {
       event.preventDefault();
       const button = $('s5-create-order');
       button.disabled = true;
       button.textContent = '正在创建订单…';
       try {
-        const paymentChoice = document.querySelector('input[name="s5-payment"]:checked').value;
+        const paymentIndex = Number(document.querySelector('input[name="s5-payment"]:checked').value);
+        const paymentChoice = paymentChannels[paymentIndex];
+        if (!paymentChoice) throw new Error('请选择有效支付方式');
         const period = $('s5-period').value;
         const orderResponse = await request('/user/order/save', {
           method: 'POST',
-          body: JSON.stringify({ plan_id: plan.id, period, payment: PAYMENT_IDS[paymentChoice] })
+          body: JSON.stringify({ plan_id: plan.id, period, payment: paymentChoice.value })
         });
         const order = unwrap(orderResponse) || {};
         const tradeNo = order.trade_no || order.tradeNo || order.order_no || order.orderNo;
@@ -209,6 +251,19 @@
         button.textContent = '重试';
       }
     });
+  }
+
+  async function loadClonedProducts() {
+    const box = $('s5-cloned-products');
+    if (!box) return;
+    try {
+      const response = await request('/user/cloned_products', { method: 'GET' });
+      const data = unwrap(response);
+      const products = Array.isArray(data) ? data : (data && (data.list || data.products || data.data)) || [];
+      box.innerHTML = '<h2>克隆商城</h2><div class="s5-clone-grid">' + (products.length ? products.map((p) => '<article class="s5-clone-card">' + (p.image_url ? '<img loading="lazy" src="' + esc(p.image_url) + '" alt="' + esc(p.name || '商品') + '">' : '') + '<h3>' + esc(p.name || '未命名商品') + '</h3><p>' + esc(p.description || '') + '</p><strong>¥' + (Number(p.price || 0) / 100).toFixed(2) + '</strong></article>').join('') : '<p>暂无克隆商品。</p>') + '</div>';
+    } catch (error) {
+      box.innerHTML = '<h2>克隆商城</h2><div class="s5-clone-grid"><div class="s5-skeleton">商品服务暂不可用</div><div class="s5-skeleton">商品服务暂不可用</div><div class="s5-skeleton">商品服务暂不可用</div></div><p class="s5-clone-error">' + esc(error.message) + '</p>';
+    }
   }
 
   function install() {
@@ -275,7 +330,9 @@
       const sold = Number(p.stock) <= 0;
       return '<article class="s5-glass-card s5-product-card"><div class="s5-product-top"><div class="s5-product-symbol">◈</div><span class="s5-product-category">' + esc(p.category || title) + '</span></div><h3>' + esc(p.name || p.title) + '</h3><p class="s5-product-desc">' + esc(p.content || p.description || '套餐规格与有效期以服务端信息为准。') + '</p><div class="s5-product-bottom"><div><small>起售价</small><strong>¥' + price.toFixed(2) + '</strong></div><button type="button" class="s5-small-cta" data-product-id="' + esc(p.id) + '"' + (sold ? ' disabled' : '') + '>' + (sold ? '暂不可购' : '立即购买') + '</button></div></article>';
     }).join('') : '<div class="s5-empty-state">该分类暂无可购买套餐。套餐目录由服务端实时提供，请稍后刷新。</div>';
-    return '<section class="s5-subpage-hero"><div class="s5-subpage-copy"><span class="s5-section-label">LIVE SERVICE CATALOG</span><h1>' + title + '</h1><p>' + subtitle + ' · 套餐、价格与可购买状态来自实时接口。</p></div></section><section class="s5-subpage-content"><div class="s5-section-heading"><div><span class="s5-section-label">AVAILABLE PLANS</span><h2>' + title + '套餐</h2><p>下单前请确认套餐周期、价格与支付方式。</p></div></div><div class="s5-product-grid">' + cards + '</div></section>';
+    const docs = '<footer class="s5-developer-docs"><a href="#" aria-label="开发者文档">开发者文档（即将上线）</a></footer>';
+    const clonePanel = kind === 'traffic' ? '<section id="s5-cloned-products" class="s5-clone-products"><h2>克隆商城</h2><div class="s5-clone-grid"><div class="s5-skeleton">正在加载商品…</div><div class="s5-skeleton">正在加载商品…</div><div class="s5-skeleton">正在加载商品…</div></div></section>' : '';
+    return '<section class="s5-subpage-hero"><div class="s5-subpage-copy"><span class="s5-section-label">LIVE SERVICE CATALOG</span><h1>' + title + '</h1><p>' + subtitle + ' · 套餐、价格与可购买状态来自实时接口。</p></div></section><section class="s5-subpage-content"><div class="s5-section-heading"><div><span class="s5-section-label">AVAILABLE PLANS</span><h2>' + title + '套餐</h2><p>下单前请确认套餐周期、价格与支付方式。</p></div></div><div class="s5-product-grid">' + cards + '</div></section>' + clonePanel + docs;
   }
 
     const originalRouter = App.router.bind(App);
@@ -288,6 +345,7 @@
         if (view) view.innerHTML = renderPlanPage(kind);
       }
       if (hash === '#/dashboard') setTimeout(addSubscriptionPanel, 0);
+      if (hash === '#/traffic') setTimeout(loadClonedProducts, 0);
     };
 
     // Purchase buttons from the redesigned product cards take over the legacy cart flow.
@@ -320,6 +378,8 @@
       ta.remove();
     }
 
+    // Load payment-channel configuration before purchases; also verify session.
+    loadConfig();
     // Restore and verify session on every page load.
     if (readToken()) fetchUserInfo().then(setUserNav).catch(() => {
       TOKEN_KEYS.forEach((key) => localStorage.removeItem(key));

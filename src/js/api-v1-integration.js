@@ -9,6 +9,37 @@
   let paymentChannels = [];
   const $ = (id) => document.getElementById(id);
   const esc = (v) => String(v == null ? '' : v).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const safeUiMessage = (value) => String(value == null ? '操作未完成' : value)
+    .replace(/Bearer\s+\S+/gi, '[凭据已隐藏]')
+    .replace(/https?:\/\/[^\s"'<>]+/gi, '[链接已隐藏]')
+    .replace(/\b(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}(?::\d+)?\b/gi, '[地址已隐藏]')
+    .replace(/\b(?:\d{1,3}\.){3}\d{1,3}(?::\d+)?\b/g, '[地址已隐藏]')
+    .replace(/(?:^|\n)\s*at\s+[^\n]+/g, '')
+    .replace(/\s{2,}/g, ' ').trim().slice(0, 240) || '操作未完成，请稍后重试。';
+  window.safeUiMessage = safeUiMessage;
+  if (!window.__safeDialogPolicy) {
+    window.__safeDialogPolicy = true;
+    window.alert = function(message) {
+      const text = safeUiMessage(message);
+      if (window.App && typeof window.App.showToast === 'function') {
+        window.App.showToast(text, 'bg-red-600');
+        return;
+      }
+      let n = document.getElementById('safe-user-notice');
+      if (!n) {
+        n = document.createElement('div');
+        n.id = 'safe-user-notice';
+        n.setAttribute('role', 'status');
+        n.style.cssText = 'position:fixed;right:16px;bottom:16px;z-index:100000;max-width:calc(100vw - 32px);padding:12px 16px;border-radius:12px;background:#172b40;color:#fff;box-shadow:0 12px 36px #0003';
+        document.body.appendChild(n);
+      }
+      n.textContent = text; n.hidden = false;
+      clearTimeout(window.__safeUserNoticeTimer);
+      window.__safeUserNoticeTimer = setTimeout(() => { n.hidden = true; }, 4200);
+    };
+    const nativeConfirm = window.confirm.bind(window);
+    window.confirm = (message) => nativeConfirm(safeUiMessage(message));
+  }
   const readToken = () => localStorage.getItem('sosks5_token') || localStorage.getItem('tgx_token') || '';
   const unwrap = (r) => r && r.data !== undefined ? r.data : r;
   const isSuccess = (r) => !!r && (r.status === 'success' || r.success === true || r.code === 200 || r.code === 0 || r.data !== undefined || r.ok === true);
@@ -101,8 +132,9 @@
   }
 
   function showError(message) {
-    if (window.App && typeof App.showToast === 'function') App.showToast(message || '操作失败', 'bg-red-600');
-    else window.alert(message || '操作失败');
+    const safeMessage = safeUiMessage(message || '操作失败');
+    if (window.App && typeof App.showToast === 'function') App.showToast(safeMessage, 'bg-red-600');
+    else window.alert(safeMessage);
   }
 
   function showModal(title, html) {

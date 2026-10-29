@@ -312,8 +312,8 @@ const App = {
             if (db) db.innerText = `$${(this.state.user.balance || 0).toFixed(2)}`;
         } else {
             navArea.innerHTML = `
-                <button onclick="App.openModal('login')" class="text-slate-700 text-sm hover:text-primary mr-4">Sign In</button>
-                <button onclick="App.openModal('register')" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700">Register</button>`;
+                <button onclick="App.openModal('login')" class="text-slate-700 text-sm hover:text-primary mr-4">登录</button>
+                <button onclick="App.openModal('register')" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700">注册</button>`;
         }
     },
 
@@ -331,22 +331,22 @@ const App = {
         const content = document.getElementById('modal-content');
         if (type === 'login') {
             content.innerHTML = `
-                <h2 class="text-xl font-bold text-slate-900 mb-4">Sign In</h2>
-                <input type="email" id="login-email" placeholder="Email" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-slate-900 mb-3 focus:outline-none focus:border-primary">
-                <input type="password" id="login-pass" placeholder="Password" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-slate-900 mb-4 focus:outline-none focus:border-primary">
-                <button onclick="App.doLogin()" class="w-full bg-primary text-white font-bold py-2.5 rounded-lg mb-2 hover:bg-blue-700">Sign In</button>
-                <p class="text-center text-xs text-gray-400">Don't have an account? <a href="#" onclick="App.openModal('register')" class="text-primary">Register</a></p>`;
+                <h2 class="text-xl font-bold text-slate-900 mb-4">登录</h2>
+                <input type="email" id="login-email" placeholder="请输入邮箱地址" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-slate-900 mb-3 focus:outline-none focus:border-primary">
+                <input type="password" id="login-pass" placeholder="请输入密码" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-slate-900 mb-4 focus:outline-none focus:border-primary">
+                <button onclick="App.doLogin()" class="w-full bg-primary text-white font-bold py-2.5 rounded-lg mb-2 hover:bg-blue-700">登录</button>
+                <p class="text-center text-xs text-gray-400">没有账号？ <a href="#" onclick="App.openModal('register')" class="text-primary">Register</a></p>`;
         } else {
             content.innerHTML = `
-                <h2 class="text-xl font-bold text-slate-900 mb-4">Register</h2>
-                <input type="email" id="reg-email" placeholder="Email" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-slate-900 mb-3 focus:outline-none focus:border-primary">
+                <h2 class="text-xl font-bold text-slate-900 mb-4">注册</h2>
+                <input type="email" id="reg-email" placeholder="请输入邮箱地址" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-slate-900 mb-3 focus:outline-none focus:border-primary">
                 <div class="flex gap-2 mb-3">
-                    <input type="text" id="reg-code" placeholder="6-digit code" class="flex-1 bg-gray-50 border border-gray-200 rounded-lg p-3 text-slate-900 focus:outline-none focus:border-primary">
-                    <button onclick="App.sendCode()" id="btn-send-code" class="px-4 bg-gray-100 text-slate-600 text-sm font-bold rounded-lg hover:bg-gray-200 transition whitespace-nowrap">Get Code</button>
+                    <input type="text" id="reg-code" placeholder="请输入邮箱验证码" class="flex-1 bg-gray-50 border border-gray-200 rounded-lg p-3 text-slate-900 focus:outline-none focus:border-primary">
+                    <button onclick="App.sendCode()" id="btn-send-code" class="px-4 bg-gray-100 text-slate-600 text-sm font-bold rounded-lg hover:bg-gray-200 transition whitespace-nowrap">获取验证码</button>
                 </div>
-                <input type="password" id="reg-pass" placeholder="Password (min 6 chars)" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-slate-900 mb-4 focus:outline-none focus:border-primary">
-                <button onclick="App.doRegister()" class="w-full bg-primary text-white font-bold py-2.5 rounded-lg mb-2 hover:bg-blue-700">Register</button>
-                <p class="text-center text-xs text-gray-400">Already have an account? <a href="#" onclick="App.openModal('login')" class="text-primary">Sign In</a></p>`;
+                <input type="password" id="reg-pass" placeholder="请输入密码（至少 6 位）" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-slate-900 mb-4 focus:outline-none focus:border-primary">
+                <button onclick="App.doRegister()" class="w-full bg-primary text-white font-bold py-2.5 rounded-lg mb-2 hover:bg-blue-700">注册</button>
+                <p class="text-center text-xs text-gray-400">已有账号？ <a href="#" onclick="App.openModal('login')" class="text-primary">登录</a></p>`;
         }
     },
 
@@ -357,19 +357,19 @@ const App = {
     // ---------- Auth Actions ----------
     async sendCode() {
         const email = document.getElementById('reg-email').value.trim();
-        if (!email || !email.includes('@')) return this.showToast('Please enter a valid email', 'bg-red-600');
+        if (!email || !email.includes('@')) return this.showToast('请输入有效邮箱地址', 'bg-red-600');
         const btn = document.getElementById('btn-send-code');
-        btn.disabled = true; btn.innerText = 'Sending...';
+        btn.disabled = true; btn.innerText = '正在发送…';
         try {
             const r = await this.api('/auth/send-code', { method: 'POST', body: JSON.stringify({ email }) });
-            this.showToast(r.message || 'Code sent', r.ok ? 'bg-green-600' : 'bg-red-600');
+            this.showToast(r.message || '验证码已发送', r.ok ? 'bg-green-600' : 'bg-red-600');
             if (r.ok) {
                 let cd = 60;
-                const t = setInterval(() => { cd--; btn.innerText = `${cd}s`; if (cd <= 0) { clearInterval(t); btn.disabled = false; btn.innerText = 'Get Code'; } }, 1000);
-            } else { btn.disabled = false; btn.innerText = 'Get Code'; }
+                const t = setInterval(() => { cd--; btn.innerText = `${cd}s`; if (cd <= 0) { clearInterval(t); btn.disabled = false; btn.innerText = '获取验证码'; } }, 1000);
+            } else { btn.disabled = false; btn.innerText = '获取验证码'; }
         } catch (e) {
             this.showToast('Network error', 'bg-red-600');
-            btn.disabled = false; btn.innerText = 'Get Code';
+            btn.disabled = false; btn.innerText = '获取验证码';
         }
     },
 

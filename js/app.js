@@ -23,7 +23,7 @@ function moneyOf(p){let v=p.price_yuan??p.sale_price_yuan??p.price??p.sale_price
 function normalize(p,i,source){
  const icon=p.icon_url||p.brand_icon_url||p.protocol_icon_url||'';
  let image=p.image_url||p.cover_url||p.image||p.cover||p.thumbnail||p.thumb||p.logo||'';
- const resolveAsset=u=>{if(!u)return '';u=String(u);if(u.startsWith('http://')||u.startsWith('https://')||u.startsWith('data:'))return u;const path=u.startsWith('/')?u:'/'+(u.startsWith('./')?u.slice(2):u);return assetBase()?assetBase()+path:API_ROOT+path};
+ const resolveAsset=u=>{if(!u)return '';u=String(u);if(u.startsWith('data:'))return u;const cdn=assetBase();if(/^https?:\/\//i.test(u)){if(cdn){try{const parsed=new URL(u),apiHost=new URL(API_ROOT).hostname;if(parsed.hostname===apiHost)return cdn+parsed.pathname+parsed.search+parsed.hash}catch(_){}}return u}const path=u.startsWith('/')?u:'/'+(u.startsWith('./')?u.slice(2):u);return cdn?cdn+path:API_ROOT+path};
  const merchant=p.merchant_attrs||p.merchantAttrs||p.attributes||{};
  const rawStock=p.available_stock??p.stock_available??p.stock??p.inventory??p.quantity??p.count??null;
  const premium=source==='node'&&(/singapore|新加坡|sgp|\bsg\b/i.test([p.region,p.country,p.area,p.name,p.title,p.location].filter(Boolean).join(' '))||p.premium===true||p.is_premium===true);
@@ -38,7 +38,7 @@ function protocolBadges(p){
  const raw=p.protocols||p.supported_protocols||[p.protocol||p.node_protocol||p.type].filter(Boolean);
  const items=Array.isArray(raw)?raw:String(raw).split(/[,，|]/);
  const iconMap=p.protocol_icons||p.protocol_icon_urls||{};
- return '<div class="protocol-badges">'+items.map(item=>{const name=typeof item==='object'?(item.name||item.protocol||item.type||'协议'):item;const key=String(name).toLowerCase().replace(/[^a-z0-9]/g,'');const icon=(typeof item==='object'&&(item.icon_url||item.icon))||(typeof iconMap==='object'&&(iconMap[name]||iconMap[key]))||p.icon_url||p.protocol_icon_url||p._icon||'';return '<span class="protocol-badge">'+(icon?'<img loading="lazy" src="'+escHtml(icon.startsWith('http')?icon:(assetBase()?assetBase()+(icon.startsWith('/')?icon:'/'+icon):(API_ROOT+(icon.startsWith('/')?icon:'/'+icon))) )+'" alt="" onerror="this.hidden=true">':'')+escHtml(name)+'</span>'}).join('')+'</div>';
+ return '<div class="protocol-badges">'+items.map(item=>{const name=typeof item==='object'?(item.name||item.protocol||item.type||'协议'):item;const key=String(name).toLowerCase().replace(/[^a-z0-9]/g,'');const icon=(typeof item==='object'&&(item.icon_url||item.icon))||(typeof iconMap==='object'&&(iconMap[name]||iconMap[key]))||p.icon_url||p.protocol_icon_url||p._icon||'';const iconSrc=icon?resolveAsset(icon):'';return '<span class="protocol-badge">'+(iconSrc?'<img loading="lazy" src="'+escHtml(iconSrc)+'" alt="" onerror="this.hidden=true">':'')+escHtml(name)+'</span>'}).join('')+'</div>';
 }
 function productImage(p){
  const initial=escHtml((p._title||'?').trim().charAt(0).toUpperCase());

@@ -2,6 +2,13 @@
 const API_ROOT='https://web.lynli.me';
 const API_V1='https://web.lynli.me/api/v1';
 const STATIC_CATALOGS=[];
+function demoCatalogs(){
+ const protocols=['VLESS','VMess','Trojan','Hysteria2','Shadowsocks','SOCKS5','WireGuard'];
+ const nodes=Array.from({length:14},(_,i)=>{const sg=i<4,proto=protocols[i%protocols.length];return {id:'demo-node-'+(i+1),name:(sg?'新加坡尊享':'全球高速')+'节点 '+String(i+1).padStart(2,'0'),title:(sg?'新加坡尊享':'全球高速')+'节点 '+String(i+1).padStart(2,'0'),category:'节点',region:sg?'Singapore':'Global',country:sg?'Singapore':'Global',premium:sg,price_yuan:sg?[29.9,39.9,49.9,59.9][i]:[9.9,12.9,15.9,18.9,22.9][i%5],price_unit:'yuan',stock:sg?18:60+i*3,sales:120+i*17,period_name:'月付',protocols:[proto,protocols[(i+2)%protocols.length]],description:'高可用线路演示商品，展示协议、地区与套餐规格。当前为本地演示目录，不代表实时库存。',notice:'演示数据：下单前请确认线上真实商品目录已恢复。',is_mock:true};});
+ const categories=['Facebook','Instagram','TikTok','X / Twitter','Telegram','Google / Gmail','WhatsApp','Discord','YouTube','Reddit','ChatGPT','Apple ID','Microsoft','游戏账号','邮箱账号','社媒老号','企业账号','开发者账号','创作者账号','电商账号','论坛账号','音乐账号','视频账号','云服务账号','教育账号','工具账号','其他账号'];
+ const accounts=categories.map((category,i)=>({id:'demo-account-'+(i+1),name:category+' 账号 · '+(['基础版','老号','高权重'][i%3]),category:'账号',product_type:'account',account_category:category,price_yuan:[12,18,25,32,39,49,59,69,79][i%9],price_unit:'yuan',stock:8+(i%17),sales:32+i*9,image_url:'',merchant_attrs:{registration_year:String(2018+i%9),two_fa:i%3!==0?'已开启':'未开启',registration_region:['美国','新加坡','英国','日本','加拿大'][i%5],device_lock:i%4===0?'已绑定':'未绑定'},description:'账号商品演示卡片，具体登录方式、地区与交付范围以商品真实资料为准。',notice:'演示数据：不代表实际可售库存或账号状态。',is_mock:true}));
+ return {nodes,accounts};
+}
 let liveProducts=[],activeKind=new URLSearchParams(location.search).get('category')||'全部',searchTerm='',paymentMethods=[];
 const escHtml=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const safeModalText=v=>String(v??'').replace(/https?:\/\/[^\s"'<>]+/gi,'[链接已隐藏]').replace(/\b(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}(?::\d+)?\b/gi,'[地址已隐藏]');
@@ -60,8 +67,13 @@ async function loadCatalogs(){
   liveProducts=[...nodeRows.map((p,i)=>normalize(p,i,'node')),...accountRows.map((p,i)=>normalize(p,i,'account'))];const breakdown=document.getElementById('catalogBreakdown');if(breakdown){const premium=nodeRows.filter(p=>/singapore|新加坡|sgp|\\bsg\\b/i.test([p.region,p.country,p.area,p.name,p.title,p.location].filter(Boolean).join(' '))||p.premium===true||p.is_premium===true).length;breakdown.textContent='节点 '+nodeRows.length+' SKU · 新加坡高端 '+premium+' 款 · 账号 '+accountRows.length+' 件';}
   renderProducts();
  }catch(e){
-  liveProducts=[];toast('商品目录加载失败，请检查网络后重试');root.innerHTML='<div class="error-state"><b>真实商品目录暂不可用</b><p>'+escHtml(safeUiMessage(e.message))+'</p><button class="btn" type="button" onclick="loadCatalogs()">重新加载</button></div>';
-  document.getElementById('resultCount').textContent='真实接口暂不可用';
+  const demo=demoCatalogs();
+  liveProducts=[...demo.nodes.map((p,i)=>normalize(p,i,'node')),...demo.accounts.map((p,i)=>normalize(p,i,'account'))];
+  const breakdown=document.getElementById('catalogBreakdown');
+  if(breakdown)breakdown.textContent='演示目录 · 节点 14 SKU（含新加坡溢价 4 款） · 账号 27 件';
+  const hint=document.getElementById('resultCount');if(hint)hint.textContent='演示数据 · 真实商品接口暂不可用';
+  toast('当前展示完整演示商品目录，真实下单需以线上目录为准');
+  renderProducts();
  }finally{root.removeAttribute('aria-busy')}
 }
 document.querySelectorAll('[data-kind]').forEach(b=>{b.className=b.dataset.kind===activeKind?'btn primary':'btn ghost';b.addEventListener('click',()=>{activeKind=b.dataset.kind;document.querySelectorAll('[data-kind]').forEach(x=>x.className='btn ghost');b.className='btn primary';renderProducts()})});

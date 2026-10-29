@@ -53,6 +53,23 @@
   function emptyState(message) {
     return '<div class="live-state">' + esc(message) + '</div>';
   }
+  function productIconPath(item, type) {
+    const name = [item && item.account_category, item && item.platform, item && item.name, item && item.title, item && item.product_name, item && item.product_type].filter(Boolean).join(' ').toLowerCase();
+    const icons = [
+      [/facebook|脸书|fb账号/, 'platform-facebook.svg'],
+      [/instagram|ins账号/, 'platform-instagram.svg'],
+      [/tiktok|抖音海外|tik tok/, 'platform-tiktok.svg'],
+      [/twitter|(^|[^a-z])x账号|推特/, 'platform-x.svg'],
+      [/telegram|电报|tg账号/, 'platform-telegram.svg'],
+      [/google|gmail|谷歌/, 'platform-google.svg'],
+      [/whatsapp|wa账号/, 'platform-whatsapp.svg'],
+      [/discord/, 'platform-discord.svg'],
+      [/youtube|油管/, 'platform-youtube.svg'],
+      [/reddit/, 'platform-reddit.svg']
+    ];
+    const match = icons.find(([pattern]) => pattern.test(name));
+    return match ? './assets/images/' + match[1] : (type === 'node' ? './assets/images/nodes.svg' : './assets/images/accounts.svg');
+  }
   function imageUrl(item, fallback) {
     const url = item && (item.image_url || item.image || item.cover_url || item.thumbnail || item.oss_url || item.picture || item.img);
     return url && /^https?:\/\//i.test(String(url)) ? String(url) : (fallback || './assets/images/placeholder.svg');
@@ -78,11 +95,12 @@
   function card(item, type) {
     const title = productName(item);
     const description = productDescription(item);
-    const image = imageUrl(item, type === 'node' ? './assets/images/nodes.svg' : './assets/images/accounts.svg');
+    const fallbackImage = productIconPath(item, type);
+    const image = imageUrl(item, fallbackImage);
     const price = type === 'node' ? planPrice(item) : clonePrice(item);
-    const tag = type === 'node' ? '全球高速节点' : '海外账号资源';
+    const tag = type === 'node' ? (item.protocol || item.node_protocol || '全球高速节点') : (item.account_category || item.platform || '海外账号资源');
     const detail = item.id != null ? ' data-product-id="' + esc(item.id) + '"' : '';
-    return '<article class="product-card live-product-card"><img class="product-photo" src="' + esc(image) + '" alt="' + esc(title) + '" loading="lazy" onerror="this.onerror=null;this.src=\'./assets/images/placeholder.svg\'"><div class="product-info"><span class="product-tag">' + tag + '</span><h3>' + esc(title) + '</h3><p>' + esc(description) + '</p><div class="product-buy"><strong>' + esc(price) + '</strong>' + (type === 'node' ? '<button class="button button-small" type="button"' + detail + '>查看套餐</button>' : '<a class="button button-small" href="' + esc(item.detail_url || item.url || 'https://t.me/qingtian_Boss') + '" target="_blank" rel="noopener noreferrer">咨询购买</a>') + '</div></div></article>';
+    return '<article class="product-card live-product-card"><img class="product-photo" src="' + esc(image) + '" alt="' + esc(title) + '" loading="lazy" onerror="this.onerror=null;this.src=\''+esc(fallbackImage)+'\'"><div class="product-info"><span class="product-tag">' + tag + '</span><h3>' + esc(title) + '</h3><p>' + esc(description) + '</p><div class="product-buy"><strong>' + esc(price) + '</strong>' + (type === 'node' ? '<button class="button button-small" type="button"' + detail + '>查看套餐</button>' : '<a class="button button-small" href="' + esc(item.detail_url || item.url || 'https://t.me/qingtian_Boss') + '" target="_blank" rel="noopener noreferrer">咨询购买</a>') + '</div></div></article>';
   }
   async function fetchCatalog() {
     if (!requireApi()) return {nodes: [], accounts: []};
@@ -95,7 +113,7 @@
     const nodes = plans.filter((p) => {
       const kind = String(p.product_type || p.product_category || p.service_type || '').toLowerCase();
       const words = [p.name,p.title,p.content,p.description,p.type].join(' ').toLowerCase();
-      return kind === 'node' || kind === 'nodes' || kind === 'proxy' || /节点|proxy|vpn|订阅|vless|vmess|hysteria|trojan|network/.test(words);
+      return kind === 'node' || kind === 'nodes' || kind === 'proxy' || /节点|proxy|vpn|订阅|vless|vmess|hysteria|trojan|shadowsocks|socks5|wireguard|tuic|network/.test(words);
     });
     return {nodes, accounts: listFrom(accountResponse)};
   }

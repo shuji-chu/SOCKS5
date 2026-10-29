@@ -108,7 +108,7 @@
     const detail = item.id != null ? ' data-product-id="' + esc(item.id) + '"' : '';
     return '<article class="product-card live-product-card"><img class="product-photo" src="' + esc(image) + '" alt="' + esc(title) + '" loading="lazy" onerror="this.onerror=null;this.src=\''+esc(fallbackImage)+'\'"><div class="product-info"><span class="product-tag">' + tag + '</span><h3>' + esc(title) + '</h3><p>' + esc(description) + '</p><div class="product-buy"><strong>' + esc(price) + '</strong>' + (type === 'node' ? '<button class="button button-small" type="button"' + detail + '>查看套餐</button>' : '<a class="button button-small" href="' + esc(item.detail_url || item.url || 'https://t.me/qingtian_Boss') + '" target="_blank" rel="noopener noreferrer">咨询购买</a>') + '</div></div></article>';
   }
-  function groupedNodeRows(response){
+    function groupedNodeRows(response){
    const root=unpack(response);
    const findGrouped=(value,depth=0)=>{if(!value||typeof value!=='object'||depth>5)return null;if(Object.prototype.hasOwnProperty.call(value,'grouped'))return value.grouped;for(const key of ['data','result','payload','response']){const found=findGrouped(value[key],depth+1);if(found!==null&&found!==undefined)return found;}return null};
    const grouped=findGrouped(root)??root;
@@ -119,16 +119,19 @@
     ['sku_id','skuId','product_id','productId','sku_name','skuName','product_name','productName','price','price_cents','price_yuan','sale_price','month_price','monthly_price','protocol','node_protocol','product_type'].some(k=>row[k]!==undefined&&row[k]!==null)||
     ((row.name||row.title)&&(['id','uuid','stock','available_stock','description','content'].some(k=>row[k]!==undefined&&row[k]!==null)))
    );
-   const regionOf=(obj,fallback)=>String(obj.region_name||obj.region||obj.area||obj.country||obj.location||obj.group_name||obj.zone||fallback||'');
+   const regionOf=(obj,fallback)=>String(obj.region_name||obj.region||obj.area||obj.country||obj.location||obj.group_name||obj.zone||obj.name||fallback||'');
    const visit=(value,region='',depth=0)=>{
     if(value==null||depth>12)return;
     if(Array.isArray(value)){value.forEach(item=>visit(item,region,depth+1));return;}
     if(typeof value!=='object'||seenObjects.has(value))return;
     seenObjects.add(value);
     const regionName=regionOf(value,region);
+    const rowContainers=['items','plans','nodes','skus','sku_list','skuList','sku_items','skuItems','products','list','rows','records','children','regions','groups','data','result','sku','sku_data','skuData','product_list','productList','node_list','nodeList'];
+    const hasRows=rowContainers.some(key=>value[key]&&typeof value[key]==='object');
+    if(hasRows){for(const key of rowContainers){const child=value[key];if(child&&typeof child==='object')visit(child,regionName||region,depth+1);}return;}
     if(isSku(value)){out.push({...value,_region:String(value._region||regionName||region||'')});return;}
     let traversed=false;
-    for(const key of containers){const child=value[key];if(child&&typeof child==='object'){visit(child,regionName||region,depth+1);traversed=true;}}
+    for(const key of ['variants','goods','data','result']){const child=value[key];if(child&&typeof child==='object'){visit(child,regionName||region,depth+1);traversed=true;}}
     if(!traversed)for(const [key,child] of Object.entries(value)){if(metaKeys.has(key)||!child||typeof child!=='object')continue;visit(child,regionName||region||key,depth+1);}
    };
    visit(grouped,'',0);
@@ -136,7 +139,8 @@
    out.forEach((row,index)=>{const id=row.sku_id??row.skuId??row.product_id??row.productId??row.id??row.uuid;const key=id!=null?'id:'+String(id):'row:'+String(row._region)+'|'+String(row.sku_name||row.name||row.title||row.product_name||index)+'|'+String(row.price??row.price_yuan??row.month_price??'');if(!unique.has(key))unique.set(key,row);});
    return Array.from(unique.values());
   }
-  async function fetchCatalog() {
+  
+async function fetchCatalog() {
     if (!requireApi()) return {nodes: [], accounts: []};
     const results = await Promise.allSettled([API.getPlans(), API.getClonedProducts(), (async()=>{const base=String(window.SOSKS5_PUBLIC_API_BASE||'https://api.lynli.me').replace(/\/+$/,'');const response=await fetch(base+'/api/v1/public/catalog/account-overrides',{headers:{Accept:'application/json'},signal:AbortSignal.timeout?AbortSignal.timeout(5000):undefined});if(!response.ok)throw Error('catalog overrides unavailable');return response.json()})()]);
     const nodesResponse = results[0].status === 'fulfilled' ? unwrap(results[0].value) : [];

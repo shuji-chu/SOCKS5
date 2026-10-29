@@ -24,12 +24,13 @@
     if (token) headers.Authorization = 'Bearer ' + token;
     let response;
     try {
-      response = await fetch(API_BASE + '/api/v1' + path, Object.assign({}, opts, { headers }));
+      response = await fetch(API_BASE + '/api/v1' + path, Object.assign({}, opts, { headers, signal: opts.signal || (typeof AbortSignal !== 'undefined' && AbortSignal.timeout ? AbortSignal.timeout(12000) : undefined) }));
     } catch (error) {
-      throw new Error('接口请求失败，可能是跨域或后端未启动：' + (error && error.message ? error.message : '网络连接失败'));
+      const timeout = error && (error.name === 'TimeoutError' || error.name === 'AbortError');
+      throw new Error(timeout ? '请求超时，请检查网络后重试' : '网络异常，请检查连接后重试');
     }
     let body;
-    try { body = await response.json(); } catch (_) { body = {}; }
+    try { body = await response.json(); } catch (_) { throw new Error('服务端返回的 JSON 格式不正确，请稍后重试'); }
     const logicalStatus = body && body.http_status !== undefined ? Number(body.http_status) : null;
     const message = body && (body.message || body.msg || body.detail || body.error || body.error_message);
     if (!response.ok) throw new Error(String(message || ('HTTP ' + response.status)));
@@ -422,9 +423,16 @@
       const email = $('reg-email') && $('reg-email').value.trim();
       const code = $('reg-code') && $('reg-code').value.trim();
       const password = $('reg-pass') && $('reg-pass').value;
+      const confirmPassword = $('reg-pass-confirm') && $('reg-pass-confirm').value;
       const params = new URLSearchParams(location.search);
-      const inviteCode = (params.get('invite_code') || params.get('invite') || '').trim().toUpperCase();
-      if (!email || !code || !password) return showError('请填写邮箱、验证码和密码');
+      const inviteCode = ($('reg-invite')?.value.trim() || params.get('invite_code') || params.get('invite') || '').trim().toUpperCase();
+      const emailEl=$('reg-email'),codeEl=$('reg-code'),passEl=$('reg-pass'),confirmEl=$('reg-pass-confirm'),inviteEl=$('reg-invite');
+      [emailEl,codeEl,passEl,confirmEl,inviteEl].forEach(el=>el?.classList.remove('invalid'));
+      if (!email || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {emailEl?.classList.add('invalid');return authError(email?'邮箱格式不正确':'请输入邮箱地址')}
+      if (!code) {codeEl?.classList.add('invalid');return authError('请输入邮箱验证码')}
+      if (!password || password.length < 6) {passEl?.classList.add('invalid');return authError('密码至少需要 6 位')}
+      if (password !== confirmPassword) {confirmEl?.classList.add('invalid');return authError('两次输入的密码不一致')}
+      if (inviteCode && !/^[A-Za-z0-9_-]{5,64}$/.test(inviteCode)) {inviteEl?.classList.add('invalid');return authError('邀请码格式不正确')}
       try {
         const response = await request('/passport/auth/register', { method: 'POST', body: JSON.stringify({ email, code, password, invite_code: inviteCode }) });
         const data = unwrap(response) || {};
@@ -441,7 +449,10 @@
     App.doLogin = async function () {
       const email = $('login-email') && $('login-email').value.trim();
       const password = $('login-pass') && $('login-pass').value;
-      if (!email || !password) return showError('请输入邮箱和密码');
+      const emailEl=$('login-email'),passEl=$('login-pass');
+      [emailEl,passEl].forEach(el=>el?.classList.remove('invalid'));
+      if (!email || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {emailEl?.classList.add('invalid');return authError(email?'邮箱格式不正确':'请输入邮箱地址')}
+      if (!password) {passEl?.classList.add('invalid');return authError('请输入密码')}
       const button = document.querySelector('#modal-content button[onclick="App.doLogin()"]');
       if (button) { button.disabled = true; button.textContent = '登录中…'; }
       try {
@@ -466,6 +477,7 @@
         const style = document.createElement('style');
         style.id = 's5-auth-style';
         style.textContent = `
+          .s5-auth-input.invalid{border-color:#ff647f!important;box-shadow:0 0 0 3px rgba(255,100,127,.18),0 0 20px rgba(255,100,127,.2)!important}.s5-auth-field:has(.s5-auth-input.invalid)>span{color:#ff9baa!important}.s5-auth-error{border-color:rgba(255,100,127,.65)!important;box-shadow:0 0 16px rgba(255,100,127,.1)}.s5-auth-input,.s5-auth-code-btn,.s5-auth-primary,.s5-auth-tab{min-height:44px;touch-action:manipulation}
           #modal-overlay.s5-auth-overlay{background:radial-gradient(ellipse at 15% 15%,#164e8a66,transparent 42%),rgba(2,8,23,.82);backdrop-filter:blur(16px);padding:18px;overflow:auto}
           #modal-overlay.s5-auth-overlay>div{max-width:960px!important;width:min(960px,100%)!important;padding:0!important;background:transparent!important;border:0!important;box-shadow:none!important;border-radius:28px!important}
           #modal-overlay.s5-auth-overlay>div>button:first-child{z-index:5;top:18px;right:18px;color:#a9c7e8;font-size:28px}
@@ -504,7 +516,7 @@
           .s5-auth-consent input:checked:after{content:"";position:absolute;left:5px;top:2px;width:5px;height:9px;border:solid #031526;border-width:0 2px 2px 0;transform:rotate(45deg)}
           .s5-auth-consent input:focus-visible{outline:2px solid #00f0ff;outline-offset:3px}.s5-auth-consent button{color:#7be7ff;text-decoration:none;border-bottom:1px solid rgba(123,231,255,.35)}
           .s5-auth-security{margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.06);line-height:1.8}
-          @media(max-width:700px){#modal-overlay.s5-auth-overlay{align-items:start;padding:8px;padding-top:max(8px,env(safe-area-inset-top));padding-bottom:max(8px,env(safe-area-inset-bottom));height:100vh;height:100dvh;overflow-y:auto}#modal-overlay.s5-auth-overlay>div{width:100%!important;max-width:500px!important;margin:auto}.s5-auth-shell{display:flex;flex-direction:column;min-height:0;border-radius:23px}.s5-auth-visual{min-height:0;padding:16px 20px 13px;gap:14px}.s5-auth-logo-mark{width:34px;height:34px;border-radius:11px}.s5-auth-headline{font-size:23px;margin:7px 0 3px}.s5-auth-copy,.s5-auth-orbit,.s5-auth-side-note{display:none}.s5-auth-formpane{padding:21px 20px 22px}.s5-auth-tabs{margin-bottom:20px}.s5-auth-field{margin-top:13px}.s5-auth-primary{margin-top:18px}.s5-auth-security{margin-top:14px}#modal-overlay.s5-auth-overlay>div>button:first-child{top:12px;right:12px}.s5-auth-code-row{grid-template-columns:minmax(0,1fr) auto}.s5-auth-code-btn{padding:0 9px;font-size:10px}}
+          @media(max-width:700px){#modal-overlay.s5-auth-overlay{align-items:flex-end;padding:8px;padding-top:max(8px,env(safe-area-inset-top));padding-bottom:max(8px,env(safe-area-inset-bottom));height:100vh;height:100dvh;overflow-y:auto}#modal-overlay.s5-auth-overlay>div{width:100%!important;max-width:500px!important;margin:auto}.s5-auth-shell{display:flex;flex-direction:column;min-height:0;border-radius:23px}.s5-auth-visual{min-height:0;padding:16px 20px 13px;gap:14px}.s5-auth-logo-mark{width:34px;height:34px;border-radius:11px}.s5-auth-headline{font-size:23px;margin:7px 0 3px}.s5-auth-copy,.s5-auth-orbit,.s5-auth-side-note{display:none}.s5-auth-formpane{padding:21px 20px 22px}.s5-auth-tabs{margin-bottom:20px}.s5-auth-field{margin-top:13px}.s5-auth-primary{margin-top:18px}.s5-auth-security{margin-top:14px}#modal-overlay.s5-auth-overlay>div>button:first-child{top:12px;right:12px}.s5-auth-code-row{grid-template-columns:minmax(0,1fr) auto}.s5-auth-code-btn{padding:0 9px;font-size:10px}}
           @media(max-height:720px) and (max-width:700px){.s5-auth-visual{padding:12px 18px 8px}.s5-auth-formpane{padding-top:16px;padding-bottom:16px}.s5-auth-field{margin-top:10px}.s5-auth-tabs{margin-bottom:14px}.s5-auth-security{display:none}}
           #modal-overlay.s5-auth-overlay #modal-content{width:100%!important;max-width:1000px!important;box-sizing:border-box!important;margin:0!important;padding:0!important;background:transparent!important;color:#eaf7ff!important;border:0!important;border-radius:30px!important;box-shadow:none!important}
            .s5-auth-shell{border:1px solid #00F0FF!important;background:linear-gradient(135deg,rgba(5,20,39,.94),rgba(2,9,24,.96))!important;backdrop-filter:blur(20px) saturate(145%)!important;-webkit-backdrop-filter:blur(20px) saturate(145%)!important;box-shadow:0 28px 90px rgba(0,0,0,.68),0 0 26px rgba(0,240,255,.16),inset 0 0 28px rgba(0,0,0,.28)!important}
@@ -573,6 +585,7 @@
         if (box) { box.textContent = message || '请求失败'; box.hidden = false; }
         if (typeof App.showToast === 'function') App.showToast(message || '请求失败', 'bg-red-600');
       }
+      document.addEventListener('input',function(e){if(e.target&&e.target.classList&&e.target.classList.contains('s5-auth-input'))e.target.classList.remove('invalid')});
       function busy(button, label, yes) {
         if (!button) return;
         button.disabled = !!yes || (!yes && button.id === 's5-auth-submit' && !$('s5-auth-consent')?.checked);

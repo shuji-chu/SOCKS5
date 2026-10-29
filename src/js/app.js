@@ -69,6 +69,7 @@ const App = {
         else if (hash === '#/wallet') html = this.views.wallet();
         else if (hash === '#/query') html = this.views.query();
         else if (hash === '#/nodes') html = this.views.nodes();
+        else if (hash === '#/traffic') html = this.views.traffic();
         else html = `<div class="text-center py-20"><h1 class="text-4xl text-slate-900 font-bold mb-4">404 Not Found</h1><a href="#/" class="text-primary">Back Home</a></div>`;
         view.innerHTML = html;
         this.toggleDrawer(false);
@@ -77,42 +78,40 @@ const App = {
     // ---------- Views ----------
     views: {
         home() {
-            const featured = App.state.products.slice(0, 8);
-            const cards = featured.length ? featured.map(p => App.productCard(p)).join('') : '<div class="s5-loading">商品数据加载中；请稍后刷新</div>';
+            const demoProducts = [
+              {icon:'✦',tone:'cyan',title:'全球社媒账号精选',desc:'多平台数字账号 · 适用范围清晰',price:'¥ 18.00',tag:'热销推荐'},
+              {icon:'◈',tone:'violet',title:'高速专线体验包',desc:'稳定连接 · 多端使用指引',price:'¥ 12.00',tag:'人气套餐'},
+              {icon:'⬡',tone:'blue',title:'数字工具入门套装',desc:'精选工具与使用说明',price:'¥ 25.00',tag:'精选好物'},
+              {icon:'✧',tone:'gold',title:'增长资源体验包',desc:'推广素材 · 新手使用指南',price:'¥ 9.90',tag:'限时体验'}
+            ];
             return `
             <section class="s5-hero">
               <div class="s5-hero-stars"></div><div class="s5-planet"></div>
-              <div class="s5-hero-copy">
-                <div class="s5-eyebrow">GLOBAL DIGITAL SERVICE PLATFORM</div>
-                <h1>SOSKS5</h1><h2>探索无界网络，极速全球节点</h2>
-                <p>安全、稳定、专业的一站式数字商品与网络服务平台</p>
-                <div class="s5-hero-tags"><span>全球数字服务</span><span>◷ 订单状态实时可查</span><span>⬡ 安全可靠的服务体验</span></div>
-                <div class="s5-hero-actions"><a href="#/products" class="s5-primary-btn">探索账号商城 →</a><a href="#/nodes" class="s5-ghost-btn">浏览节点中心</a></div>
-              </div>
+              <div class="s5-hero-copy"><div class="s5-eyebrow">全球数字服务枢纽</div><h1>SOSKS5</h1><h2>探索无界网络，极速全球节点</h2><p>安全、稳定、专业的一站式数字商品与网络服务平台</p>
+                <div class="s5-hero-tags"><span>全球数字服务</span><span>◷ 订单清晰可查</span><span>⬡ 安全可靠的服务体验</span></div>
+                <div class="s5-hero-actions"><a href="#/products" class="s5-primary-btn">探索账号商城 →</a><a href="#/nodes" class="s5-ghost-btn">浏览节点中心</a></div></div>
               <div class="s5-astronaut" aria-label="漂浮宇航员动画"><div class="s5-orbit"></div><div class="s5-astronaut-body" aria-hidden="true"></div></div>
-              <div class="s5-hero-contact"><b>在线业务支持</b><span>Telegram：@qingtian_Boss</span><span>邮箱：boss@lynli.me</span><span>支付方式：支付宝 / USDT</span></div>
-              <div class="s5-slider-dots"><i></i><i></i><i></i></div>
+              <div class="s5-hero-contact"><b>在线业务支持</b><span>Telegram：@qingtian_Boss</span><span>邮箱：客服联系入口</span><span>服务时间：每日在线</span></div><div class="s5-slider-dots"><i></i><i></i><i></i></div>
             </section>
-            <section class="s5-promo" id="s5-promo"><div><small>SOCKS5 · SERVICE NOTICE</small><h2 id="s5-promo-title">账号、节点、引流，一站式管理</h2><p id="s5-promo-desc">浏览商品与服务说明，购买前请确认商品详情及适用范围。</p></div><a id="s5-promo-link" href="#/products">立即查看 →</a></section>
-            <section class="s5-categories">
-              <a href="#/products" class="s5-category"><span>🌐</span><b>账号商城</b><small>社交媒体 · 邮箱 · 流媒体 · AI账号</small></a>
-              <a href="#/nodes" class="s5-category"><span>🛰️</span><b>节点中心</b><small>高速节点 · 订阅服务 · 连接教程</small></a>
-              <a href="#/traffic" class="s5-category"><span>📈</span><b>引流广场</b><small>推广工具 · 资源分享 · 营销教程</small></a>
-              <a href="./docs/" class="s5-category"><span>🧩</span><b>开发者 API</b><small>业务接口说明 · 接入指南</small></a>
+            <section class="s5-announcement"><span class="s5-live-dot"></span><b>平台公告</b><div class="s5-marquee"><span>欢迎来到 SOSKS5 数字服务空间　·　下单前请仔细阅读商品说明　·　如需帮助可联系在线客服　·　感谢你的支持</span></div><a href="#/notices">查看公告 →</a></section>
+            <section class="s5-categories s5-business-grid">
+              <a href="#/products" class="s5-category"><span>🌐</span><b>账号商城</b><small>社交平台 · 邮箱服务 · 数字工具</small><em>探索商品 ↗</em></a>
+              <a href="#/nodes" class="s5-category"><span>🛰️</span><b>节点中心</b><small>高速节点 · 订阅服务 · 使用指引</small><em>浏览节点 ↗</em></a>
+              <a href="#/traffic" class="s5-category"><span>📈</span><b>引流分销</b><small>邀请好友 · 推广奖励 · 排行榜</small><em>查看推广 ↗</em></a>
             </section>
-            <div class="s5-section-head"><div><h2>🔥 热门商品</h2><p>商品图标按分类显示 · 具体库存与价格以实时商品数据为准</p></div><a href="#/products">查看全部 →</a></div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 s5-product-grid">${cards}</div>
-            <section class="s5-section-head s5-tutorial-head"><div><h2>📚 新手教程中心</h2><p>从注册、登录到下单与售后，快速上手</p></div><a href="#/tutorials">全部教程 →</a></section>
-            <div class="s5-tutorials">
-              <a href="#/tutorials#register"><span>🔐</span><b>注册与登录</b><small>账号安全与登录排查</small></a>
-              <a href="#/tutorials#buy"><span>🛒</span><b>购买与交付</b><small>下单、订单、自动交付</small></a>
-              <a href="#/tutorials#account"><span>🧭</span><b>账号使用教程</b><small>首次登录与安全设置</small></a>
-              <a href="#/tutorials#health"><span>🌱</span><b>账号维护指南</b><small>合规使用与风险防护</small></a>
-              <a href="#/tutorials#sms"><span>📩</span><b>接码服务教程</b><small>适用范围与隐私提示</small></a>
-              <a href="#/tutorials#keys"><span>🎟️</span><b>卡密使用教程</b><small>兑换、查询与常见问题</small></a>
-            </div>
-            <section class="s5-payment-strip"><b>🔒 内部订单与支付</b><span>支付宝</span><span>USDT</span><span>订单状态查询</span><span>自动交付能力需由服务端支付回调启用</span></section>
-            <section class="s5-affiliate"><div><h2>让每一次服务都有清晰的路径</h2><p>查看商品、阅读教程、查询订单，或联系官方客服获取帮助。</p></div><a href="https://t.me/qingtian_Boss" target="_blank" rel="noopener">联系官方客服 ↗</a></section>`;
+            <section class="s5-blindbox"><div class="s5-blind-orb">✦</div><div class="s5-blind-copy"><span class="s5-mini-kicker">每日福利 · 惊喜盲盒</span><h2>今天的好运，等你开启</h2><p>每日惊喜主题卡片，静态展示示例。实际奖品与活动规则以后续公告为准。</p></div><a href="#/products" class="s5-blind-button">探索惊喜 <span>↗</span></a></section>
+            <div class="s5-section-head"><div><h2>✦ 热销商品</h2><p>精选数字服务与体验套餐 · 当前为界面展示示例</p></div><a href="#/products">查看全部 →</a></div>
+            <div class="s5-showcase-grid">${demoProducts.map((p,i)=>`<article class="s5-showcase-card"><div class="s5-showcase-image ${p.tone}"><span class="s5-product-badge">${p.tag}</span><div class="s5-product-art">${p.icon}</div><div class="s5-image-grid"></div></div><div class="s5-showcase-body"><div class="s5-showcase-kind">精选数字服务 · 0${i+1}</div><h3>${p.title}</h3><p>${p.desc}</p><div class="s5-showcase-foot"><strong>${p.price}</strong><a href="#/products" class="s5-buy-btn">查看详情</a></div></div></article>`).join('')}</div>
+            <section class="s5-home-bottom"><div><span class="s5-mini-kicker">为每一次连接做好准备</span><h2>从探索到使用，一切清晰简单</h2><p>浏览商品、查看订阅、管理订单，轻松进入你的数字服务空间。</p></div><a href="#/dashboard" class="s5-primary-btn">进入用户中心 →</a></section>`;
+        },
+
+        traffic() {
+            return `
+            <main class="s5-static-page s5-referral-page"><div class="s5-page-heading"><div><span class="s5-mini-kicker">邀请计划 · 推广中心</span><h1>分享好服务，收获更多可能</h1><p>邀请好友体验平台服务，查看你的推广资料与本月榜单。</p></div><span class="s5-status-pill"><i></i> 推广中心</span></div>
+            <section class="s5-referral-hero"><div class="s5-referral-copy"><span class="s5-mini-kicker">专属邀请链接</span><h2>让每一次分享都有价值</h2><p>将你的专属链接分享给朋友，帮助他们快速找到所需服务。</p><div class="s5-copy-field"><span>https://sosks5.example/invite/58317</span><button type="button" onclick="App.showToast('演示链接已复制')">复制链接</button></div><small>示例链接仅用于展示界面，不会产生真实推广记录。</small></div><div class="s5-referral-symbol"><div class="s5-referral-ring">↗</div><span>邀请同行 · 一起探索</span></div></section>
+            <div class="s5-referral-two"><section class="s5-panel s5-poster-panel"><div class="s5-panel-head"><div><h2>专属邀请海报</h2><p>适合分享至社交平台的视觉预览</p></div><span class="s5-poster-label">预览</span></div><div class="s5-poster"><div class="s5-poster-stars"></div><div class="s5-poster-brand">✦ SOSKS5</div><div class="s5-poster-orbit">S</div><span class="s5-mini-kicker">探索无界 · 连接未来</span><h3>你的数字服务<br>从这里开始</h3><p>扫码加入 · 体验专属服务空间</p><div class="s5-poster-code">58317</div><small>专属邀请编号</small></div><button type="button" class="s5-outline-wide" onclick="App.showToast('海报为静态预览')">查看海报样式</button></section>
+            <section class="s5-panel"><div class="s5-panel-head"><div><h2>本月推广概览</h2><p>静态示例数据</p></div></div><div class="s5-referral-stats"><div><span>累计邀请</span><b>28</b><small>位访客</small></div><div><span>有效转化</span><b>12</b><small>次体验</small></div><div><span>预计奖励</span><b>¥ 96</b><small>示例金额</small></div></div><div class="s5-referral-note">以上均为静态排版示例，不代表真实账户数据。</div></section></div>
+            <section class="s5-panel"><div class="s5-panel-head"><div><h2>本月推广排行榜</h2><p>看看大家的分享表现</p></div><span class="s5-month-chip">2026 年 10 月</span></div><div class="s5-table-wrap"><table class="s5-rank-table"><thead><tr><th>排名</th><th>推广用户</th><th>有效邀请</th><th>本月奖励</th><th>等级</th></tr></thead><tbody><tr><td><span class="s5-rank-medal gold">01</span></td><td><b>星云漫游者</b><small>ID：51824</small></td><td>128</td><td>¥ 860.00</td><td><span class="s5-rank-tag">星耀</span></td></tr><tr><td><span class="s5-rank-medal silver">02</span></td><td><b>蓝色彗星</b><small>ID：47291</small></td><td>96</td><td>¥ 620.00</td><td><span class="s5-rank-tag">星耀</span></td></tr><tr><td><span class="s5-rank-medal bronze">03</span></td><td><b>深空旅客</b><small>ID：58317</small></td><td>74</td><td>¥ 480.00</td><td><span class="s5-rank-tag">星轨</span></td></tr><tr><td><span class="s5-rank-medal">04</span></td><td><b>流光拾荒者</b><small>ID：31968</small></td><td>51</td><td>¥ 320.00</td><td><span class="s5-rank-tag">星轨</span></td></tr></tbody></table></div></section></main>`;
         },
 
         products() {
@@ -196,29 +195,14 @@ const App = {
         },
 
         dashboard() {
-            const u = App.state.user;
             return `
-            <h1 class="text-2xl font-bold text-slate-900 mb-6">User Dashboard</h1>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                    <h3 class="text-gray-500 text-sm mb-1">Wallet Balance</h3>
-                    <div class="text-2xl font-bold text-green-600">$${(u ? u.balance : 0).toFixed(2)}</div>
-                </div>
-                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                    <h3 class="text-gray-500 text-sm mb-1">Email</h3>
-                    <div class="text-lg font-bold text-slate-900 truncate">${u ? u.email : '-'}</div>
-                </div>
-                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                    <h3 class="text-gray-500 text-sm mb-1">Member Since</h3>
-                    <div class="text-lg font-bold text-slate-900">${u ? (u.created_at || '-').slice(0, 10) : '-'}</div>
-                </div>
-            </div>
-            <div class="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
-                <a href="#/orders" class="bg-primary text-white text-center py-3 rounded-lg font-bold text-sm hover:bg-blue-700">My Orders</a>
-                <a href="#/wallet" class="bg-white border border-gray-200 text-center py-3 rounded-lg font-bold text-sm text-slate-900 hover:bg-gray-50">Wallet</a>
-                <a href="#/query" class="bg-white border border-gray-200 text-center py-3 rounded-lg font-bold text-sm text-slate-900 hover:bg-gray-50">Query</a>
-                <a href="#/nodes" class="bg-white border border-gray-200 text-center py-3 rounded-lg font-bold text-sm text-slate-900 hover:bg-gray-50">Nodes</a>
-            </div>`;
+            <main class="s5-static-page">
+              <div class="s5-page-heading"><div><span class="s5-mini-kicker">个人空间 · 用户中心</span><h1>欢迎回来，星际旅人</h1><p>这里汇总你的账户资料、订阅服务与近期订单。</p></div><span class="s5-status-pill"><i></i> 账户状态：正常</span></div>
+              <section class="s5-profile-card"><div class="s5-avatar">星</div><div class="s5-profile-copy"><span class="s5-mini-kicker">会员账户</span><h2>星际访客 <span class="s5-level">普通会员</span></h2><p>邮箱：visitor@example.com</p><div class="s5-short-id">专属编号 <b>58317</b><button type="button" onclick="App.showToast('演示编号：58317')">复制编号</button></div></div><div class="s5-profile-decoration">✦</div></section>
+              <div class="s5-metric-grid"><article class="s5-metric-card"><span>账户余额</span><strong>¥ 128.00</strong><small>可用于购买服务</small><i>￥</i></article><article class="s5-metric-card"><span>可用流量</span><strong>86.4 <em>GB</em></strong><small>本周期剩余流量</small><i>◉</i></article><article class="s5-metric-card"><span>剩余有效期</span><strong>23 <em>天</em></strong><small>订阅服务有效期</small><i>◷</i></article></div>
+              <section class="s5-panel"><div class="s5-panel-head"><div><h2>我的订阅</h2><p>管理常用客户端配置与订阅地址</p></div><span class="s5-status-pill"><i></i> 服务运行中</span></div><div class="s5-subscription-card"><div class="s5-sub-icon">⌁</div><div class="s5-sub-main"><b>全球网络加速 · 月度套餐</b><span>下次到期：2026-11-21 · 剩余 23 天</span><code>https://subscribe.example.com/demo/58317</code></div><span class="s5-sub-state">有效</span></div><div class="s5-sub-actions"><button type="button" onclick="App.showToast('演示界面：Clash 订阅地址')">Clash 订阅</button><button type="button" onclick="App.showToast('演示界面：V2Ray 订阅地址')">V2Ray 订阅</button><button type="button" onclick="App.showToast('演示界面：配置已准备就绪')">导出配置</button></div></section>
+              <section class="s5-panel"><div class="s5-panel-head"><div><h2>我的订单</h2><p>查看购买记录与服务状态</p></div><a href="#/orders">全部订单 →</a></div><div class="s5-empty-state"><div class="s5-empty-icon">▤</div><b>这里暂时还没有订单</b><p>探索精选服务，找到适合你的数字商品。</p><a href="#/products" class="s5-primary-btn">浏览商品</a></div></section>
+            </main>`;
         },
 
         wallet() {

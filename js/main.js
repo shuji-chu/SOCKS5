@@ -288,7 +288,7 @@
   async function boot() {
     installStyles();
     if (!API) { toast('API 模块未加载'); return; }
-    if (currentPath !== 'login.html') addGlobalNavigation();
+    addGlobalNavigation();
     if (currentPath === 'index.html') return loadHome();
     if (currentPath === 'shop.html') return loadShop().catch((error) => toast('商城加载失败：' + error.message));
     if (currentPath === 'promo.html') return loadPromo();

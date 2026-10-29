@@ -24,3 +24,7 @@
 .sku-detail-btn img{display:inline-block;width:13px;height:13px;margin-left:5px;vertical-align:-2px}
 .protocol-badge img{width:15px;height:15px;object-fit:contain;flex:none}
 .status-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#5be2b1;box-shadow:0 0 10px #5be2b1;margin-right:6px}
+
+.bottom-nav a.active img,.home-bottom-nav a.active img,.mobile-tabbar a.active img{filter:brightness(0) saturate(100%) invert(85%) sepia(32%) saturate(1562%) hue-rotate(151deg) brightness(105%) contrast(102%)}
+.sku-pagination button img{display:inline-block;width:14px;height:14px;vertical-align:-3px;object-fit:contain}
+.modal-head button img{display:inline-block;width:16px;height:16px;vertical-align:middle}

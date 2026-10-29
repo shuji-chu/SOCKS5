@@ -265,16 +265,51 @@
     });
   }
 
+  function cloneMoney(p) {
+    const raw = p.price_yuan != null ? Number(p.price_yuan) : Number(p.price_cents ?? p.price_amount ?? p.price ?? p.amount ?? p.sale_price ?? 0);
+    if (!Number.isFinite(raw)) return "价格以客服确认为准";
+    const yuan = p.price_yuan != null ? raw : (raw >= 1000 ? raw / 100 : raw);
+    return "¥" + yuan.toFixed(2);
+  }
+
+  function renderCloneModal(p) {
+    const title = p.name || p.title || p.product_name || "数字商品";
+    const image = p.image_url || p.image || p.cover_url || p.thumbnail || p.oss_url || "";
+    const description = p.detail_description || p.details || p.content_zh || p.description_zh || p.chinese_description || p.description_cn || p.content || p.description || p.introduction || "暂未提供详细说明，请联系客服了解商品规格、交付方式与适用范围。";
+    showModal("商品详情", '<div class="s5-clone-detail">' +
+      (image ? '<img class="s5-clone-detail-image" src="' + esc(image) + '" alt="' + esc(title) + '">' : "") +
+      '<h3>' + esc(title) + '</h3><p>' + esc(description) + '</p><div class="s5-clone-detail-price">' + esc(cloneMoney(p)) + '</div>' +
+      '<a class="s5-clone-buy" href="https://t.me/qingtian_Boss" target="_blank" rel="noopener noreferrer">立即购买 / 联系客服</a></div>');
+  }
+
   async function loadClonedProducts() {
-    const box = $('s5-cloned-products');
-    if (!box) return;
+    const box = $("s5-cloned-products");
+    if (!box || box.dataset.loaded === "1") return;
+    box.dataset.loaded = "1";
     try {
-      const response = await request('/user/cloned_products', { method: 'GET' });
+      box.innerHTML = '<div class="s5-clone-heading"><div><h2>海外精选数字商品</h2><p class="s5-clone-intro">正在同步商品目录，请稍候…</p></div></div><div class="s5-clone-grid"><div class="s5-skeleton">正在加载</div><div class="s5-skeleton">正在加载</div><div class="s5-skeleton">正在加载</div></div>';
+      const response = await request("/user/cloned_products", { method: "GET" });
       const data = unwrap(response);
-      const products = Array.isArray(data) ? data : (data && (data.list || data.products || data.data)) || [];
-      box.innerHTML = '<h2>克隆商城</h2><div class="s5-clone-grid">' + (products.length ? products.map((p) => '<article class="s5-clone-card">' + (p.image_url ? '<img loading="lazy" src="' + esc(p.image_url) + '" alt="' + esc(p.name || '商品') + '">' : '') + '<h3>' + esc(p.name || '未命名商品') + '</h3><p>' + esc(p.description || '') + '</p><strong>¥' + (Number(p.price || 0) / 100).toFixed(2) + '</strong></article>').join('') : '<p>暂无克隆商品。</p>') + '</div>';
+      const products = Array.isArray(data) ? data : (data && (data.list || data.products || data.items || data.data)) || [];
+      box._cloneProducts = products;
+      box.innerHTML = '<div class="s5-clone-heading"><div><span class="s5-section-label">全球精选</span><h2>海外精选数字商品</h2><p class="s5-clone-intro">精选数字商品 · 中文商品说明 · 价格以商品详情为准</p></div><span class="s5-clone-count">' + products.length + ' 件商品</span></div>' +
+        (products.length ? '<div class="s5-clone-grid">' + products.map((p, index) => {
+          const title = p.name || p.title || p.product_name || "数字商品 " + (index + 1);
+          const image = p.image_url || p.image || p.cover_url || p.thumbnail || p.oss_url || "";
+          const desc = p.description_zh || p.chinese_description || p.description_cn || p.summary_zh || p.description || p.summary || "查看商品详情，了解规格、交付方式与适用范围。";
+          return '<button type="button" class="s5-clone-card" data-clone-index="' + index + '">' +
+            (image ? '<img loading="lazy" src="' + esc(image) + '" alt="' + esc(title) + '" class="s5-clone-image">' : '<span class="s5-clone-image s5-clone-image-empty">全球精选</span>') +
+            '<span class="s5-clone-card-body"><span class="s5-clone-name">' + esc(title) + '</span><span class="s5-clone-desc">' + esc(desc) + '</span><span class="s5-clone-card-foot"><strong>' + esc(cloneMoney(p)) + '</strong><span>查看详情 ↗</span></span></span></button>';
+        }).join("") + '</div>' : '<div class="s5-clone-empty">当前暂无已发布商品，请稍后再来查看。</div>');
+      box.querySelectorAll("[data-clone-index]").forEach((card) => card.addEventListener("click", () => {
+        const p = box._cloneProducts[Number(card.getAttribute("data-clone-index"))];
+        if (p) renderCloneModal(p);
+      }));
     } catch (error) {
-      box.innerHTML = '<h2>克隆商城</h2><div class="s5-clone-grid"><div class="s5-skeleton">商品服务暂不可用</div><div class="s5-skeleton">商品服务暂不可用</div><div class="s5-skeleton">商品服务暂不可用</div></div><p class="s5-clone-error">' + esc(error.message) + '</p>';
+      box.dataset.loaded = "0";
+      box.innerHTML = '<div class="s5-clone-heading"><div><h2>海外精选数字商品</h2><p class="s5-clone-intro">商品目录暂时无法读取，请稍后重试。</p></div></div><button type="button" class="s5-clone-retry">重新加载</button>';
+      box.querySelector(".s5-clone-retry")?.addEventListener("click", loadClonedProducts);
+      console.warn("[SOSKS5] cloned_products 请求失败：", error);
     }
   }
 
@@ -600,7 +635,7 @@
       return '<article class="s5-glass-card s5-product-card"><div class="s5-product-top"><div class="s5-product-symbol">◈</div><span class="s5-product-category">' + esc(p.category || title) + '</span></div><h3>' + esc(p.name || p.title) + '</h3><p class="s5-product-desc">' + esc(p.content || p.description || '套餐规格与有效期以服务端信息为准。') + '</p><div class="s5-product-bottom"><div><small>起售价</small><strong>¥' + price.toFixed(2) + '</strong></div><button type="button" class="s5-small-cta" data-product-id="' + esc(p.id) + '"' + (sold ? ' disabled' : '') + '>' + (sold ? '暂不可购' : '立即购买') + '</button></div></article>';
     }).join('') : '<div class="s5-empty-state">该分类暂无可购买套餐。套餐目录由服务端实时提供，请稍后刷新。</div>';
     const docs = '<footer class="s5-developer-docs"><a href="#" aria-label="开发者文档">开发者文档（即将上线）</a></footer>';
-    const clonePanel = kind === 'traffic' ? '<section id="s5-cloned-products" class="s5-clone-products"><h2>克隆商城</h2><div class="s5-clone-grid"><div class="s5-skeleton">正在加载商品…</div><div class="s5-skeleton">正在加载商品…</div><div class="s5-skeleton">正在加载商品…</div></div></section>' : '';
+    const clonePanel = kind === 'traffic' ? '<section id="s5-cloned-products" class="s5-clone-products"></section>' : '';
     return '<section class="s5-subpage-hero"><div class="s5-subpage-copy"><span class="s5-section-label">LIVE SERVICE CATALOG</span><h1>' + title + '</h1><p>' + subtitle + ' · 套餐、价格与可购买状态来自实时接口。</p></div></section><section class="s5-subpage-content"><div class="s5-section-heading"><div><span class="s5-section-label">AVAILABLE PLANS</span><h2>' + title + '套餐</h2><p>下单前请确认套餐周期、价格与支付方式。</p></div></div><div class="s5-product-grid">' + cards + '</div></section>' + clonePanel + docs;
   }
 
@@ -615,6 +650,7 @@
       }
       if (hash === '#/dashboard') setTimeout(addSubscriptionPanel, 0);
       if (hash === '#/traffic') setTimeout(loadClonedProducts, 0);
+      if (hash === '#/' || hash === '') { const view = $('app-view'); if (view && !view.querySelector('#s5-cloned-products')) { const panel = document.createElement('section'); panel.id = 's5-cloned-products'; panel.className = 's5-clone-products'; const promo = view.querySelector('#s5-promo'); if (promo) promo.insertAdjacentElement('afterend', panel); else view.appendChild(panel); } setTimeout(loadClonedProducts, 0); }
     };
 
     // Purchase buttons from the redesigned product cards take over the legacy cart flow.

@@ -40,7 +40,7 @@
     p.category = p.category || (/node|proxy|节点|代理|订阅|vpn|网络/.test(kind) ? '节点服务' : /traffic|引流|增长|推广|群发|机器人|growth/.test(kind) ? '引流服务' : '账号服务');
     const periods = periodOptions(p);
     const prices = periods.map(x => x.price).filter(x => Number.isFinite(x) && x >= 0);
-    p.price = prices.length ? Math.min.apply(null, prices) : Number(p.price || p.sale_price || 0);
+    p.price = prices.length ? Math.min.apply(null, prices) / 100 : Number(p.price || p.sale_price || 0);
     p.stock = p.stock === undefined ? (p.available === false ? 0 : 1) : Number(p.stock);
     p._rawPlan = raw;
     return p;
@@ -214,11 +214,6 @@
   function install() {
     if (!window.App) return;
     const originalFetchMe = App.fetchMe && App.fetchMe.bind(App);
-    App.api = async function (path, opts) {
-      const cleanPath = String(path || '');
-      if (cleanPath.indexOf('/api/v1/') === 0) return request(cleanPath.replace('/api/v1', ''), opts);
-      return request(cleanPath.charAt(0) === '/' ? cleanPath : '/' + cleanPath, opts);
-    };
     App.fetchMe = async function () {
       try { await fetchUserInfo(); setUserNav(); }
       catch (e) { TOKEN_KEYS.forEach((key) => localStorage.removeItem(key)); USER_KEYS.forEach((key) => localStorage.removeItem(key)); this.state.token = null; this.state.user = null; this.renderNav(); }
@@ -263,10 +258,36 @@
       return original + '<div id="s5-subscription-box"></div>';
     };
 
+
+  function renderPlanPage(kind) {
+    const all = (App.state.products || []).map(normalizePlan);
+    const matches = all.filter((p) => {
+      const text = [p.category, p.title, p.name, p.description].join(' ').toLowerCase();
+      if (kind === 'nodes') return /node|proxy|节点|代理|订阅|vpn|网络/.test(text);
+      if (kind === 'traffic') return /traffic|引流|增长|推广|群发|机器人|growth/.test(text);
+      return !/node|proxy|节点|代理|订阅|vpn|网络|traffic|引流|增长|推广|群发|机器人|growth/.test(text);
+    });
+    const title = kind === 'nodes' ? '节点中心' : kind === 'traffic' ? '引流系统' : '账号商城';
+    const subtitle = kind === 'nodes' ? '节点套餐与网络服务' : kind === 'traffic' ? '引流与增长服务套餐' : '账号与数字服务套餐';
+    const cards = matches.length ? matches.map((p) => {
+      const periods = periodOptions(p._rawPlan || p);
+      const price = periods.length ? Math.min.apply(null, periods.map((x) => x.price)) / 100 : Number(p.price || 0);
+      const sold = Number(p.stock) <= 0;
+      return '<article class="s5-glass-card s5-product-card"><div class="s5-product-top"><div class="s5-product-symbol">◈</div><span class="s5-product-category">' + esc(p.category || title) + '</span></div><h3>' + esc(p.name || p.title) + '</h3><p class="s5-product-desc">' + esc(p.content || p.description || '套餐规格与有效期以服务端信息为准。') + '</p><div class="s5-product-bottom"><div><small>起售价</small><strong>¥' + price.toFixed(2) + '</strong></div><button type="button" class="s5-small-cta" data-product-id="' + esc(p.id) + '"' + (sold ? ' disabled' : '') + '>' + (sold ? '暂不可购' : '立即购买') + '</button></div></article>';
+    }).join('') : '<div class="s5-empty-state">该分类暂无可购买套餐。套餐目录由服务端实时提供，请稍后刷新。</div>';
+    return '<section class="s5-subpage-hero"><div class="s5-subpage-copy"><span class="s5-section-label">LIVE SERVICE CATALOG</span><h1>' + title + '</h1><p>' + subtitle + ' · 套餐、价格与可购买状态来自实时接口。</p></div></section><section class="s5-subpage-content"><div class="s5-section-heading"><div><span class="s5-section-label">AVAILABLE PLANS</span><h2>' + title + '套餐</h2><p>下单前请确认套餐周期、价格与支付方式。</p></div></div><div class="s5-product-grid">' + cards + '</div></section>';
+  }
+
     const originalRouter = App.router.bind(App);
     App.router = function () {
       originalRouter();
-      if (location.hash === '#/dashboard') setTimeout(addSubscriptionPanel, 0);
+      const hash = location.hash || '#/';
+      if (hash === '#/products' || hash === '#/nodes' || hash === '#/traffic') {
+        const kind = hash === '#/nodes' ? 'nodes' : hash === '#/traffic' ? 'traffic' : 'products';
+        const view = $('app-view');
+        if (view) view.innerHTML = renderPlanPage(kind);
+      }
+      if (hash === '#/dashboard') setTimeout(addSubscriptionPanel, 0);
     };
 
     // Purchase buttons from the redesigned product cards take over the legacy cart flow.

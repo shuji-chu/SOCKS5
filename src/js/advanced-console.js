@@ -12,6 +12,14 @@ function linksFrom(text){
 function singbox(text){
  var list=linksFrom(text), out=[];
  list.forEach(function(link,i){try{
+  if(/^vmess:\/\//i.test(link)){
+   var payload=link.slice(8), obj=JSON.parse(decodeURIComponent(escape(atob(payload))));
+   var vm={type:'vmess',tag:obj.ps||('vmess-'+(i+1)),server:obj.add,server_port:Number(obj.port),uuid:obj.id,security:obj.scy||'auto'};
+   if(!vm.server||!vm.server_port||!vm.uuid)return;
+   if(obj.tls==='tls')vm.tls={enabled:true,server_name:obj.sni||obj.host||obj.add};
+   if(obj.net==='ws')vm.transport={type:'ws',path:obj.path||'/'};
+   out.push(vm);return;
+  }
   var u=new URL(link), scheme=u.protocol.replace(':',''), type=scheme==='hysteria2'?'hysteria2':scheme;
   if(!['vless','vmess','trojan','hysteria2','ss'].includes(type))return;
   var item={type:type,tag:decodeURIComponent(u.hash.slice(1)||type+'-'+(i+1)),server:u.hostname,server_port:Number(u.port||0)};

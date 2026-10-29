@@ -6,34 +6,34 @@
     <title>SOSKS5｜全球账号 · 节点 · 引流服务平台</title>
     <link rel="icon" type="image/png" href="./assets/sok.png">
     <link rel="apple-touch-icon" href="./assets/sok.png">
-    <meta name="theme-color" content="#edf6ff">
-    <meta name="description" content="SOSKS5 数字商品、节点服务、用户中心与开发者 API。">
+    <meta name="theme-color" content="#061326">
+    <meta name="description" content="SOSKS5 高端数字服务平台，提供节点中心、引流系统、账号商城与专业帮助中心。">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = { theme: { extend: { colors: { primary: '#2563eb', primarylight: '#3b82f6' } } } }
     </script>
     <link rel="stylesheet" href="./css/style.css">
 </head>
-<body class="bg-[#f8fafc] text-slate-700 font-sans antialiased min-h-screen">
+<body class="bg-[#f8fafc] text-slate-700 font-sans antialiased min-h-screen s5-rebuild">
 
     <!-- 全局导航栏 -->
-    <nav id="navbar" class="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
+    <nav id="navbar" class="s5-nav sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
             <a href="#/" class="flex items-center gap-2 cursor-pointer">
                 <img src="./assets/sok.png" alt="Logo" class="w-8 h-8 rounded-lg" onerror="this.src='https://via.placeholder.com/32/2563eb/ffffff?text=T'">
                 <span class="font-bold text-xl text-slate-900 tracking-tight">SOSKS5<span class="text-primary"> Store</span></span>
             </a>
 
-            <div class="hidden md:flex items-center gap-1 text-sm font-medium">
-                <a href="#/" class="px-3 py-2 rounded-lg hover:bg-gray-100 transition">首页</a>
-                <a href="#/products" class="px-3 py-2 rounded-lg hover:bg-gray-100 transition">账号商城</a>
-                <a href="#/query" class="px-3 py-2 rounded-lg hover:bg-gray-100 transition">订单查询</a>
-                <a href="#/nodes" class="px-3 py-2 rounded-lg hover:bg-gray-100 transition">节点中心</a>
-                <a href="./docs/" class="px-3 py-2 rounded-lg hover:bg-gray-100 transition">开发者 API</a>
+            <div class="hidden md:flex items-center gap-1 text-sm font-medium s5-nav-links">
+                <a href="#/" class="s5-nav-link">首页</a>
+                <a href="#/nodes" class="s5-nav-link">节点中心</a>
+                <a href="#/traffic" class="s5-nav-link">引流系统</a>
+                <a href="#/products" class="s5-nav-link">账号商城</a>
+                <a href="#/tutorials" class="s5-nav-link">帮助中心</a>
             </div>
 
-            <div class="hidden md:flex flex-1 max-w-xs mx-8">
-                <input type="text" id="global-search" placeholder="搜索账号、节点、教程..." class="w-full bg-gray-50 border border-gray-200 rounded-full py-2 px-4 text-sm text-slate-700 focus:outline-none focus:border-primary transition">
+            <div class="hidden lg:flex flex-1 max-w-xs mx-8">
+                <input type="text" id="global-search" placeholder="搜索商品与服务" class="w-full bg-gray-50 border border-gray-200 rounded-full py-2 px-4 text-sm text-slate-700 focus:outline-none focus:border-primary transition">
             </div>
 
             <div id="nav-user-area" class="flex items-center gap-4 relative">

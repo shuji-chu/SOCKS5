@@ -38,7 +38,7 @@ function protocolBadges(p){
  const raw=p.protocols||p.supported_protocols||[p.protocol||p.node_protocol||p.type].filter(Boolean);
  const items=Array.isArray(raw)?raw:String(raw).split(/[,，|]/);
  const iconMap=p.protocol_icons||p.protocol_icon_urls||{};
- return '<div class="protocol-badges">'+items.map(item=>{const name=typeof item==='object'?(item.name||item.protocol||item.type||'协议'):item;const key=String(name).toLowerCase().replace(/[^a-z0-9]/g,'');const icon=(typeof item==='object'&&(item.icon_url||item.icon))||(typeof iconMap==='object'&&(iconMap[name]||iconMap[key]))||p.icon_url||p.protocol_icon_url||p._icon||'';return '<span class="protocol-badge">'+(icon?'<img src="'+escHtml(icon.startsWith('http')?icon:(API_ROOT+(icon.startsWith('/')?icon:'/'+icon)) )+'" alt="" onerror="this.hidden=true">':'')+escHtml(name)+'</span>'}).join('')+'</div>';
+ return '<div class="protocol-badges">'+items.map(item=>{const name=typeof item==='object'?(item.name||item.protocol||item.type||'协议'):item;const key=String(name).toLowerCase().replace(/[^a-z0-9]/g,'');const icon=(typeof item==='object'&&(item.icon_url||item.icon))||(typeof iconMap==='object'&&(iconMap[name]||iconMap[key]))||p.icon_url||p.protocol_icon_url||p._icon||'';return '<span class="protocol-badge">'+(icon?'<img loading="lazy" src="'+escHtml(icon.startsWith('http')?icon:(assetBase()?assetBase()+(icon.startsWith('/')?icon:'/'+icon):(API_ROOT+(icon.startsWith('/')?icon:'/'+icon))) )+'" alt="" onerror="this.hidden=true">':'')+escHtml(name)+'</span>'}).join('')+'</div>';
 }
 function productImage(p){
  const initial=escHtml((p._title||'?').trim().charAt(0).toUpperCase());

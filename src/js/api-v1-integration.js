@@ -71,10 +71,10 @@
     p.name = p.name || p.title;
     p.description = p.content || p.description || p.description_text || '查看套餐规格、有效期和服务说明。';
     const kind = [p.name, p.content, p.tags, p.category, p.product_type, p.type].flat().join(' ').toLowerCase();
-    p.protocol = p.protocol || p.node_protocol || '';
+    p.protocol = p.protocol || p.node_protocol || (/^(vless|vmess|hysteria2|trojan)$/i.test(String(p.type || '')) ? p.type : '');
     p.protocols = Array.isArray(p.protocols) ? p.protocols : (p.protocol ? [p.protocol] : []);
     const productKind = String(p.product_type || p.product_category || p.service_type || '').toLowerCase();
-    p.category = p.category || (/traffic|引流|增长|推广|群发|机器人|growth/.test(productKind + ' ' + kind) ? '引流服务' : /node|proxy|节点|代理|订阅|vpn|网络/.test(productKind + ' ' + kind) ? '节点服务' : '账号服务');
+    p.category = p.category || (/traffic|引流|增长|推广|群发|机器人|growth/.test(productKind + ' ' + kind) ? '引流服务' : /node|proxy|节点|代理|订阅|vpn|网络|vless|vmess|hysteria2|trojan/.test(productKind + ' ' + kind) ? '节点服务' : '账号服务');
     const periods = periodOptions(p);
     const prices = periods.map(x => x.price).filter(x => Number.isFinite(x) && x >= 0);
     p.price = prices.length ? Math.min.apply(null, prices) / 100 : Number(p.price || p.sale_price || 0);
@@ -332,9 +332,9 @@
     const matches = all.filter((p) => {
       const text = [p.category, p.title, p.name, p.description, p.product_type].join(' ').toLowerCase();
       const productKind = String(p.product_type || p.product_category || '').toLowerCase();
-      if (kind === 'nodes') return productKind === 'node' || /node|proxy|节点|代理|订阅|vpn|网络/.test(text);
+      if (kind === 'nodes') return productKind === 'node' || /node|proxy|节点|代理|订阅|vpn|网络|vless|vmess|hysteria2|trojan/.test(text);
       if (kind === 'traffic') return productKind === 'traffic' || /traffic|引流|增长|推广|群发|机器人|growth/.test(text);
-      return productKind !== 'node' && productKind !== 'traffic' && !/node|proxy|节点|代理|订阅|vpn|网络|traffic|引流|增长|推广|群发|机器人|growth/.test(text);
+      return productKind !== 'node' && productKind !== 'traffic' && !/node|proxy|节点|代理|订阅|vpn|网络|vless|vmess|hysteria2|trojan|traffic|引流|增长|推广|群发|机器人|growth/.test(text);
     });
     const title = kind === 'nodes' ? '节点中心' : kind === 'traffic' ? '引流系统' : '账号商城';
     const subtitle = kind === 'nodes' ? '节点套餐与网络服务' : kind === 'traffic' ? '引流与增长服务套餐' : '账号与数字服务套餐';

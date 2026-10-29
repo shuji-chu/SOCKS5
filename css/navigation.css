@@ -28,3 +28,15 @@
 .bottom-nav a.active img,.home-bottom-nav a.active img,.mobile-tabbar a.active img{filter:brightness(0) saturate(100%) invert(85%) sepia(32%) saturate(1562%) hue-rotate(151deg) brightness(105%) contrast(102%)}
 .sku-pagination button img{display:inline-block;width:14px;height:14px;vertical-align:-3px;object-fit:contain}
 .modal-head button img{display:inline-block;width:16px;height:16px;vertical-align:middle}
+
+
+/* S5 unified primary header: identical geometry on Home, Shop and Account */
+.s5-global-header{position:sticky;top:0;z-index:120;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:16px;width:100%;height:calc(60px + env(safe-area-inset-top,0px));min-height:calc(60px + env(safe-area-inset-top,0px));padding:env(safe-area-inset-top,0px) 16px 0;border-bottom:1px solid rgba(85,232,255,.18);background:rgba(5,17,32,.96);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.s5-header-brand{display:flex;align-items:center;justify-content:flex-start;flex:0 0 40px;width:40px;height:40px;min-width:40px}
+.s5-header-brand img{display:block!important;width:40px!important;height:40px!important;max-width:40px!important;max-height:40px!important;object-fit:contain!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
+.s5-header-nav{position:absolute;left:50%;top:env(safe-area-inset-top,0px);height:60px;display:flex;align-items:center;justify-content:center;gap:clamp(12px,2vw,26px);transform:translateX(-50%);white-space:nowrap}
+.s5-header-nav a{display:inline-flex;align-items:center;height:60px;padding:0 2px;color:#9bb2ca;font-size:12px;font-weight:700;text-decoration:none;border-bottom:2px solid transparent}
+.s5-header-nav a.active{color:#eafaff;border-bottom-color:#55e8ff}
+.s5-account-button{box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;height:36px;min-height:36px;padding:0 14px;border:1px solid rgba(85,232,255,.38);border-radius:10px;background:linear-gradient(110deg,#087f9c,#2864c7);color:#fff!important;font-size:12px;font-weight:800;line-height:1;text-decoration:none;white-space:nowrap}
+@media(max-width:640px){.s5-global-header{padding-left:14px;padding-right:14px}.s5-header-nav{gap:14px}.s5-header-nav a{font-size:11px}.s5-account-button{height:34px;min-height:34px;padding:0 11px;font-size:11px}}
+@media(max-width:360px){.s5-header-nav{gap:9px}.s5-header-nav a{font-size:10px}.s5-account-button{padding:0 8px;font-size:10px}}

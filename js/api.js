@@ -428,7 +428,7 @@
       const inviteCode = ($('reg-invite')?.value.trim() || params.get('invite_code') || params.get('invite') || '').trim().toUpperCase();
       const emailEl=$('reg-email'),codeEl=$('reg-code'),passEl=$('reg-pass'),confirmEl=$('reg-pass-confirm'),inviteEl=$('reg-invite');
       [emailEl,codeEl,passEl,confirmEl,inviteEl].forEach(el=>el?.classList.remove('invalid'));
-      if (!email || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {emailEl?.classList.add('invalid');return showError(email?'邮箱格式不正确':'请输入邮箱地址')}
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {emailEl?.classList.add('invalid');return showError(email?'邮箱格式不正确':'请输入邮箱地址')}
       if (!code) {codeEl?.classList.add('invalid');return showError('请输入邮箱验证码')}
       if (!password || password.length < 6) {passEl?.classList.add('invalid');return showError('密码至少需要 6 位')}
       if (password !== confirmPassword) {confirmEl?.classList.add('invalid');return showError('两次输入的密码不一致')}
@@ -451,7 +451,7 @@
       const password = $('login-pass') && $('login-pass').value;
       const emailEl=$('login-email'),passEl=$('login-pass');
       [emailEl,passEl].forEach(el=>el?.classList.remove('invalid'));
-      if (!email || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {emailEl?.classList.add('invalid');return showError(email?'邮箱格式不正确':'请输入邮箱地址')}
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {emailEl?.classList.add('invalid');return showError(email?'邮箱格式不正确':'请输入邮箱地址')}
       if (!password) {passEl?.classList.add('invalid');return showError('请输入密码')}
       const button = document.querySelector('#modal-content button[onclick="App.doLogin()"]');
       if (button) { button.disabled = true; button.textContent = '登录中…'; }
@@ -595,7 +595,7 @@
       App.sendCode = async function() {
         const email = $('reg-email')?.value.trim() || '';
         const button = $('btn-send-code');
-        if (!email || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) return authError('请输入有效邮箱地址');
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return authError('请输入有效邮箱地址');
         if (button && button.disabled) return;
         if (button) { button.disabled = true; button.textContent = '正在发送…'; }
         try {

@@ -234,7 +234,7 @@
       $('#traffic-total').textContent = '总流量：' + traffic(total);
       const expiry = dateValue(sub.expired_at || info.expiredAt || info.expired_at);
       $('#account-expiry').textContent = expiry ? expiry.toLocaleDateString('zh-CN') : '未设置';
-      const subscribeUrl = String(sub && (sub.subscribe_url || sub.subscribeUrl || sub.url) || '订阅地址暂不可用（等待服务端返回）');
+      const subscribeUrl = String(sub && (sub.subscribe_url || sub.subscribeUrl || sub.url) || '');
       const subscriptionContent = $('#subscription-content');
       subscriptionContent.innerHTML = subscribeUrl ? '<div class="subscription-card"><div class="sub-copy"><b>个人订阅链接</b><span class="break-all">' + esc(subscribeUrl) + '</span></div><button class="button button-small" id="copy-subscription" type="button">复制订阅链接</button></div>' : emptyState('服务端未返回订阅链接');
       const copySub = $('#copy-subscription');

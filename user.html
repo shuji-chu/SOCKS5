@@ -89,7 +89,7 @@ function renderInviteContributors(payload){
 }
 function openMtpCheckin(data){
  const link=data?.mtp_link||data?.mtp_url||data?.proxy_url||data?.tg_proxy_url||data?.telegram_proxy||data?.link||data?.url||data?.data?.mtp_link||'';
- if(typeof link!=='string'||!/^tg:\/\\/proxy\?/i.test(link)){toast('签到已响应，但服务端未返回有效 tg://proxy 链接');return}
+ if(typeof link!=='string'||!/^tg:\/\/proxy\?/i.test(link)){toast('签到已响应，但服务端未返回有效 tg://proxy 链接');return}
  const modal=document.getElementById('mtpCheckinModal'),field=document.getElementById('mtpCheckinLink'),anchor=document.getElementById('mtpImportTelegram');
  field.value=link;anchor.href=link;anchor.textContent='一键导入 Telegram ↗';document.getElementById('mtpCheckinMessage').textContent=data?.message||data?.msg||'签到成功，MTP 免流链接已发放';modal.classList.add('show');
 }

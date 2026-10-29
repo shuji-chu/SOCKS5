@@ -107,7 +107,7 @@
     p.name = p.name || p.title;
     p.description = p.content || p.description || p.description_text || '查看套餐规格、有效期和服务说明。';
     const kind = [p.name, p.content, p.tags, p.category, p.product_type, p.type].flat().join(' ').toLowerCase();
-    p.protocol = p.protocol || p.node_protocol || (/^(vless|vmess|hysteria2|trojan)$/i.test(String(p.type || '')) ? p.type : '');
+    p.protocol = p.protocol || p.node_protocol || (/^(vless|vmess|hysteria2|trojan|shadowsocks|socks5|wireguard|tuic)$/i.test(String(p.type || '')) ? p.type : '');
     p.protocols = Array.isArray(p.protocols) ? p.protocols : (p.protocol ? [p.protocol] : []);
     const productKind = String(p.product_type || p.product_category || p.service_type || '').toLowerCase();
     const nodeProduct = /node|proxy|节点|代理|订阅|vpn|网络|vless|vmess|hysteria2|trojan|shadowsocks|socks5|wireguard|tuic/.test(productKind + ' ' + kind);

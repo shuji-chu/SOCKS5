@@ -17,3 +17,10 @@
  body{padding-bottom:calc(78px + env(safe-area-inset-bottom))!important}
 }
 @media(max-width:390px){.site-header,.header{gap:8px}.brand{gap:8px}.site-header .brand img,.header .brand img,.top .brand img,.dp-brand img{width:38px!important;height:38px!important}}
+
+#globalSearch{padding-left:42px!important;background-image:url('../assets/icons/search.svg');background-repeat:no-repeat;background-position:14px 50%;background-size:18px 18px}
+#networkError .symbol img{display:block;width:28px;height:28px;margin:0 auto 8px}
+#detailModal .modal-head button img{display:block;width:16px;height:16px}
+.sku-detail-btn img{display:inline-block;width:13px;height:13px;margin-left:5px;vertical-align:-2px}
+.protocol-badge img{width:15px;height:15px;object-fit:contain;flex:none}
+.status-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#5be2b1;box-shadow:0 0 10px #5be2b1;margin-right:6px}

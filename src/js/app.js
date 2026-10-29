@@ -84,9 +84,9 @@ const App = {
               <div class="s5-hero-stars"></div><div class="s5-planet"></div>
               <div class="s5-hero-copy">
                 <div class="s5-eyebrow">GLOBAL DIGITAL SERVICE PLATFORM</div>
-                <h1>SOSKS5</h1><h2>全球账号 · 高速节点 · 引流服务</h2>
+                <h1>SOSKS5</h1><h2>探索无界网络，极速全球节点</h2>
                 <p>安全、稳定、专业的一站式数字商品与网络服务平台</p>
-                <div class="s5-hero-tags"><span>海量数字资源</span><span>◷ 订单状态可查询</span><span>⬡ 专业服务支持</span></div>
+                <div class="s5-hero-tags"><span>全球数字服务</span><span>◷ 订单状态实时可查</span><span>⬡ 安全可靠的服务体验</span></div>
                 <div class="s5-hero-actions"><a href="#/products" class="s5-primary-btn">探索账号商城 →</a><a href="#/nodes" class="s5-ghost-btn">浏览节点中心</a></div>
               </div>
               <div class="s5-astronaut" aria-label="漂浮宇航员动画"><div class="s5-orbit"></div><div class="s5-astronaut-body" aria-hidden="true"></div></div>

@@ -373,7 +373,7 @@
       const email = $('reg-email') && $('reg-email').value.trim();
       if (!email || !email.includes('@')) return showError('请输入有效邮箱');
       const button = $('btn-send-code');
-      if (button) { button.disabled = true; button.textContent = '发送中…'; }
+      if (button) { button.disabled = true; button.textContent = '正在发送…'; }
       try {
         await request('/passport/auth/send-code', { method: 'POST', body: JSON.stringify({ email }) });
         if (typeof App.showToast === 'function') App.showToast('验证码已发送');
@@ -478,7 +478,18 @@
           .s5-auth-security{margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.06);line-height:1.8}
           @media(max-width:700px){#modal-overlay.s5-auth-overlay{align-items:start;padding:8px;padding-top:max(8px,env(safe-area-inset-top));padding-bottom:max(8px,env(safe-area-inset-bottom));height:100vh;height:100dvh;overflow-y:auto}#modal-overlay.s5-auth-overlay>div{width:100%!important;max-width:500px!important;margin:auto}.s5-auth-shell{display:flex;flex-direction:column;min-height:0;border-radius:23px}.s5-auth-visual{min-height:0;padding:16px 20px 13px;gap:14px}.s5-auth-logo-mark{width:34px;height:34px;border-radius:11px}.s5-auth-headline{font-size:23px;margin:7px 0 3px}.s5-auth-copy,.s5-auth-orbit,.s5-auth-side-note{display:none}.s5-auth-formpane{padding:21px 20px 22px}.s5-auth-tabs{margin-bottom:20px}.s5-auth-field{margin-top:13px}.s5-auth-primary{margin-top:18px}.s5-auth-security{margin-top:14px}#modal-overlay.s5-auth-overlay>div>button:first-child{top:12px;right:12px}.s5-auth-code-row{grid-template-columns:minmax(0,1fr) auto}.s5-auth-code-btn{padding:0 9px;font-size:10px}}
           @media(max-height:720px) and (max-width:700px){.s5-auth-visual{padding:12px 18px 8px}.s5-auth-formpane{padding-top:16px;padding-bottom:16px}.s5-auth-field{margin-top:10px}.s5-auth-tabs{margin-bottom:14px}.s5-auth-security{display:none}}
-          @media(prefers-reduced-motion:reduce){.s5-auth-tabs:before,.s5-auth-primary,.s5-auth-input{transition:none!important}}
+          #modal-overlay.s5-auth-overlay #modal-content{width:100%!important;max-width:1000px!important;box-sizing:border-box!important;margin:0!important;padding:0!important;background:transparent!important;color:#eaf7ff!important;border:0!important;border-radius:30px!important;box-shadow:none!important}
+           .s5-auth-shell{border:1px solid #00F0FF!important;background:linear-gradient(135deg,rgba(5,20,39,.94),rgba(2,9,24,.96))!important;backdrop-filter:blur(20px) saturate(145%)!important;-webkit-backdrop-filter:blur(20px) saturate(145%)!important;box-shadow:0 28px 90px rgba(0,0,0,.68),0 0 26px rgba(0,240,255,.16),inset 0 0 28px rgba(0,0,0,.28)!important}
+           .s5-auth-formpane{background:linear-gradient(145deg,rgba(6,18,34,.78),rgba(3,11,25,.88))!important;backdrop-filter:blur(20px)!important;-webkit-backdrop-filter:blur(20px)!important}
+           .s5-auth-primary{background:linear-gradient(110deg,#00b8d9 0%,#087ee8 52%,#555cff 100%)!important;box-shadow:0 10px 30px rgba(0,210,255,.22),0 0 22px rgba(0,240,255,.12),inset 0 1px rgba(255,255,255,.24)!important;cursor:pointer}
+           .s5-auth-primary:active{transform:translateY(1px) scale(.99)!important;filter:brightness(.96)}
+           .s5-auth-primary:disabled{opacity:.38!important;filter:saturate(.45)!important;box-shadow:none!important;cursor:not-allowed!important;transform:none!important}
+           .s5-auth-code-row{align-items:stretch!important}.s5-auth-code-row .s5-auth-input,.s5-auth-code-btn{height:48px!important;min-height:48px!important;box-sizing:border-box!important}
+           .s5-auth-code-btn{background:linear-gradient(135deg,rgba(0,190,220,.16),rgba(17,82,145,.35))!important;border-color:rgba(0,240,255,.45)!important;color:#9af5ff!important;border-radius:13px!important;font-size:12px!important}
+           .s5-auth-code-btn:hover:not(:disabled){box-shadow:0 0 18px rgba(0,240,255,.16);border-color:#00F0FF!important}
+           .s5-auth-consent button{cursor:pointer}
+           .s5-auth-switch button:hover{text-shadow:0 0 12px rgba(0,240,255,.7)}
+           @media(prefers-reduced-motion:reduce){.s5-auth-tabs:before,.s5-auth-primary,.s5-auth-input{transition:none!important}}
           @media(max-width:700px){#modal-overlay.s5-auth-overlay>div{max-width:480px!important}.s5-auth-shell{grid-template-columns:1fr;min-height:0}.s5-auth-visual{min-height:165px;padding:25px 24px}.s5-auth-headline{font-size:25px;margin:10px 0 6px}.s5-auth-copy{display:none}.s5-auth-orbit{width:160px;height:160px;right:-55px;bottom:-65px}.s5-auth-side-note{display:none}.s5-auth-formpane{padding:28px 24px 25px}.s5-auth-formpane h2{font-size:24px}}
         `;
         document.head.appendChild(style);
@@ -493,7 +504,7 @@
         overlay.classList.remove('hidden');
         const registering = type === 'register';
         const inviteFromUrl = (new URLSearchParams(location.search).get('short_id') || new URLSearchParams(location.search).get('invite_code') || new URLSearchParams(location.search).get('invite') || '').trim();
-        content.innerHTML = '<div class="s5-auth-shell"><section class="s5-auth-visual"><div class="s5-auth-logo"><span class="s5-auth-logo-mark">✦</span><span>SOSKS5 <span style="color:#69dcff">/ ACCESS</span></span></div><div><div class="s5-auth-kicker">SECURE DIGITAL EXPERIENCE</div><div class="s5-auth-headline">' + (registering ? '开启你的<br>数字服务空间' : '欢迎回到<br>深空控制台') + '</div><p class="s5-auth-copy">' + (registering ? '创建账户，连接你的服务、订阅与订单。安全验证由服务器实时处理。' : '登录后继续管理套餐、订单与个人服务。账户状态和登录结果均以服务器响应为准。') + '</p></div><div class="s5-auth-orbit"></div><div class="s5-auth-side-note">ENCRYPTED SESSION · LIVE API</div></section><section class="s5-auth-formpane"><div class="s5-auth-tabs ' + (registering ? 'is-register' : '') + '" role="tablist" aria-label="账户入口"><button type="button" class="s5-auth-tab" role="tab" aria-selected="' + (!registering) + '" onclick="App.openModal(\'login\')">登录</button><button type="button" class="s5-auth-tab" role="tab" aria-selected="' + registering + '" onclick="App.openModal(\'register\')">注册</button></div><div class="s5-auth-kicker">' + (registering ? 'CREATE ACCOUNT' : 'MEMBER SIGN IN') + '</div><h2>' + (registering ? '创建账户' : '登录账户') + '</h2><p class="s5-auth-muted">' + (registering ? '使用邮箱验证码完成注册' : '请输入你的账户凭证以继续') + '</p><div id="s5-auth-error" class="s5-auth-error" hidden></div><form id="s5-auth-form" onsubmit="event.preventDefault();' + (registering ? 'App.doRegister()' : 'App.doLogin()') + '"><label class="s5-auth-field"><span>邮箱地址</span><input class="s5-auth-input" type="email" id="' + (registering ? 'reg-email' : 'login-email') + '" placeholder="name@example.com" autocomplete="email" required></label>' + (registering ? '<label class="s5-auth-field"><span>邮箱验证码</span><div class="s5-auth-code-row"><input class="s5-auth-input" type="text" id="reg-code" placeholder="输入邮箱验证码" autocomplete="one-time-code" required><button type="button" class="s5-auth-code-btn" id="btn-send-code" onclick="App.sendCode()">发送验证码</button></div></label><label class="s5-auth-field"><span>设置密码</span><div class="s5-auth-input-wrap"><input class="s5-auth-input" type="password" id="reg-pass" placeholder="至少 6 位密码" autocomplete="new-password" minlength="6" required><button type="button" class="s5-auth-eye" data-s5-toggle-password="reg-pass" aria-label="显示密码" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></button></div></label><label class="s5-auth-field"><span>确认密码</span><div class="s5-auth-input-wrap"><input class="s5-auth-input" type="password" id="reg-pass-confirm" placeholder="再次输入密码" autocomplete="new-password" minlength="6" required><button type="button" class="s5-auth-eye" data-s5-toggle-password="reg-pass-confirm" aria-label="显示密码" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></button></div></label><label class="s5-auth-field"><span>邀请码（选填）</span><input class="s5-auth-input" type="text" id="reg-invite" placeholder="邀请码或 5 位 short_id" value="' + esc(inviteFromUrl) + '" maxlength="64" autocomplete="off"></label>' : '<label class="s5-auth-field"><span>密码</span><div class="s5-auth-input-wrap"><input class="s5-auth-input" type="password" id="login-pass" placeholder="输入账户密码" autocomplete="current-password" required><button type="button" class="s5-auth-eye" data-s5-toggle-password="login-pass" aria-label="显示密码" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></button></div></label>') + '<label class="s5-auth-consent"><input type="checkbox" id="s5-auth-consent"><span>我已阅读并同意 <button type="button" data-s5-legal>《用户服务协议》</button> 与 <button type="button" data-s5-legal>《隐私政策》</button></span></label><button type="submit" class="s5-auth-primary" id="s5-auth-submit"><span>' + (registering ? '创建账户' : '登录') + '</span></button></form><div class="s5-auth-switch">' + (registering ? '已有账户？' : '还没有账户？') + '<button type="button" onclick="App.openModal(\'' + (registering ? 'login' : 'register') + '\')">' + (registering ? '返回登录' : '立即注册') + '</button></div><div class="s5-auth-security">SECURE AUTHENTICATION · 不会在前端伪造登录状态；所有凭证由真实接口验证。</div></section></div>';
+        content.innerHTML = '<div class="s5-auth-shell"><section class="s5-auth-visual"><div class="s5-auth-logo"><span class="s5-auth-logo-mark">✦</span><span>SOSKS5 <span style="color:#69dcff">/ ACCESS</span></span></div><div><div class="s5-auth-kicker">安全数字体验</div><div class="s5-auth-headline">' + (registering ? '开启你的<br>数字服务空间' : '欢迎回到<br>深空控制台') + '</div><p class="s5-auth-copy">' + (registering ? '创建账户，连接你的服务、订阅与订单。安全验证由服务器实时处理。' : '登录后继续管理套餐、订单与个人服务。账户状态和登录结果均以服务器响应为准。') + '</p></div><div class="s5-auth-orbit"></div><div class="s5-auth-side-note">加密会话 · 实时接口</div></section><section class="s5-auth-formpane"><div class="s5-auth-tabs ' + (registering ? 'is-register' : '') + '" role="tablist" aria-label="账户入口"><button type="button" class="s5-auth-tab" role="tab" aria-selected="' + (!registering) + '" onclick="App.openModal(\'login\')">登录</button><button type="button" class="s5-auth-tab" role="tab" aria-selected="' + registering + '" onclick="App.openModal(\'register\')">注册</button></div><div class="s5-auth-kicker">' + (registering ? '创建新账户' : '会员登录') + '</div><h2>' + (registering ? '创建账户' : '登录账户') + '</h2><p class="s5-auth-muted">' + (registering ? '使用邮箱验证码完成注册' : '请输入你的账户凭证以继续') + '</p><div id="s5-auth-error" class="s5-auth-error" hidden></div><form id="s5-auth-form" onsubmit="event.preventDefault();' + (registering ? 'App.doRegister()' : 'App.doLogin()') + '"><label class="s5-auth-field"><span>邮箱地址</span><input class="s5-auth-input" type="email" id="' + (registering ? 'reg-email' : 'login-email') + '" placeholder="请输入邮箱地址" autocomplete="email" required></label>' + (registering ? '<label class="s5-auth-field"><span>邮箱验证码</span><div class="s5-auth-code-row"><input class="s5-auth-input" type="text" id="reg-code" placeholder="输入邮箱验证码" autocomplete="one-time-code" required><button type="button" class="s5-auth-code-btn" id="btn-send-code" onclick="App.sendCode()">获取验证码</button></div></label><label class="s5-auth-field"><span>设置密码</span><div class="s5-auth-input-wrap"><input class="s5-auth-input" type="password" id="reg-pass" placeholder="至少 6 位密码" autocomplete="new-password" minlength="6" required><button type="button" class="s5-auth-eye" data-s5-toggle-password="reg-pass" aria-label="显示密码" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></button></div></label><label class="s5-auth-field"><span>确认密码</span><div class="s5-auth-input-wrap"><input class="s5-auth-input" type="password" id="reg-pass-confirm" placeholder="再次输入密码" autocomplete="new-password" minlength="6" required><button type="button" class="s5-auth-eye" data-s5-toggle-password="reg-pass-confirm" aria-label="显示密码" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></button></div></label><label class="s5-auth-field"><span>邀请码（选填）</span><input class="s5-auth-input" type="text" id="reg-invite" placeholder="邀请码或 5 位 short_id" value="' + esc(inviteFromUrl) + '" maxlength="64" autocomplete="off"></label>' : '<label class="s5-auth-field"><span>密码</span><div class="s5-auth-input-wrap"><input class="s5-auth-input" type="password" id="login-pass" placeholder="请输入密码" autocomplete="current-password" required><button type="button" class="s5-auth-eye" data-s5-toggle-password="login-pass" aria-label="显示密码" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></button></div></label>') + '<label class="s5-auth-consent"><input type="checkbox" id="s5-auth-consent"><span>我已阅读并同意 <button type="button" data-s5-legal>《用户协议》</button> 与 <button type="button" data-s5-legal>《隐私政策》</button></span></label><button type="submit" class="s5-auth-primary" id="s5-auth-submit"><span>' + (registering ? '创建账户' : '登录') + '</span></button></form><div class="s5-auth-switch">' + (registering ? '已有账号？' : '没有账号？') + '<button type="button" onclick="App.openModal(\'' + (registering ? 'login' : 'register') + '\')">' + (registering ? '返回登录' : '立即注册') + '</button></div><div class="s5-auth-security">安全身份验证 · 所有账户凭证均由真实服务器接口验证。</div></section></div>';
         content.querySelectorAll('[data-s5-toggle-password]').forEach((button) => {
           button.addEventListener('click', () => {
             const input = $(button.getAttribute('data-s5-toggle-password'));
@@ -513,6 +524,17 @@
           });
         });
       const form = $('s5-auth-form');
+        const consent = $('s5-auth-consent');
+        const submit = $('s5-auth-submit');
+        if (submit) { submit.disabled = !consent?.checked; submit.setAttribute('aria-disabled', String(!consent?.checked)); }
+        if (consent && submit) consent.addEventListener('change', () => {
+          submit.disabled = !consent.checked;
+          submit.setAttribute('aria-disabled', String(!consent.checked));
+        });
+        content.querySelectorAll('[data-s5-legal]').forEach((link, index) => link.addEventListener('click', () => {
+          const title = index === 0 ? '用户协议' : '隐私政策';
+          authError('请在网站底部查看《' + title + '》完整内容；请确认阅读后再勾选同意。');
+        }));
         if (form) form.querySelector('input')?.focus({ preventScroll: true });
       };
       App.closeModal = function() {
@@ -525,7 +547,8 @@
       }
       function busy(button, label, yes) {
         if (!button) return;
-        button.disabled = !!yes;
+        button.disabled = !!yes || (!yes && button.id === 's5-auth-submit' && !$('s5-auth-consent')?.checked);
+        button.setAttribute('aria-disabled', String(button.disabled));
         button.innerHTML = yes ? '<span class="s5-auth-spinner"></span><span>' + esc(label) + '</span>' : '<span>' + esc(label) + '</span>';
       }
       App.sendCode = async function() {
@@ -533,7 +556,7 @@
         const button = $('btn-send-code');
         if (!email || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) return authError('请输入有效邮箱地址');
         if (button && button.disabled) return;
-        if (button) { button.disabled = true; button.textContent = '发送中…'; }
+        if (button) { button.disabled = true; button.textContent = '正在发送…'; }
         try {
           await request('/passport/auth/send-code', { method: 'POST', body: JSON.stringify({ email }) });
           if (typeof App.showToast === 'function') App.showToast('验证码已发送，请查收邮箱');
@@ -541,12 +564,12 @@
           if (button) button.textContent = seconds + ' 秒后重试';
           const timer = setInterval(() => {
             seconds -= 1;
-            if (button) button.textContent = seconds > 0 ? seconds + ' 秒后重试' : '发送验证码';
+            if (button) button.textContent = seconds > 0 ? seconds + ' 秒后重试' : '获取验证码';
             if (seconds <= 0) { clearInterval(timer); if (button) button.disabled = false; }
           }, 1000);
         } catch (error) {
           authError(error.message || '验证码发送失败');
-          if (button) { button.disabled = false; button.textContent = '发送验证码'; }
+          if (button) { button.disabled = false; button.textContent = '获取验证码'; }
         }
       };
       App.doRegister = async function() {

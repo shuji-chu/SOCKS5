@@ -57,8 +57,10 @@
     try {
       response = await fetch(API_BASE + '/api/v1' + path, Object.assign({}, opts, { headers, signal: opts.signal || (typeof AbortSignal !== 'undefined' && AbortSignal.timeout ? AbortSignal.timeout(12000) : undefined) }));
     } catch (error) {
+      // Cross-origin failures are often surfaced as TypeError; log the URL and native error for debugging.
+      console.error('[SOSKS5 API/CORS]', { url: API_BASE + '/api/v1' + path, error });
       const timeout = error && (error.name === 'TimeoutError' || error.name === 'AbortError');
-      throw new Error(timeout ? '请求超时，请检查网络后重试' : '网络异常，请检查连接后重试');
+      throw new Error(timeout ? '请求超时，请检查网络后重试' : '网络异常或跨域请求被浏览器拦截；详情见控制台');
     }
     let body;
     try { body = await response.json(); } catch (_) { throw new Error('服务端返回的 JSON 格式不正确，请稍后重试'); }

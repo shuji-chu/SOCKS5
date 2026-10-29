@@ -1,0 +1,37 @@
+# OS files
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Editors and IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs and temporary files
+*.log
+logs/
+tmp/
+temp/
+.cache/
+.parcel-cache/
+.npm/
+.yarn/
+coverage/
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Dependencies / build output (if introduced later)
+node_modules/
+dist/
+build/

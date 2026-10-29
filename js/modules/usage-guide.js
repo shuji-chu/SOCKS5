@@ -10,4 +10,5 @@ function relevant(p){const s=[p?._title,p?.protocol,p?.node_protocol,p?.protocol
 async function copyRules(button){try{if(navigator.clipboard&&w.isSecureContext)await navigator.clipboard.writeText(RULES);else{const t=d.createElement('textarea');t.value=RULES;t.style.position='fixed';t.style.opacity='0';d.body.appendChild(t);t.select();if(!d.execCommand('copy'))throw Error('copy failed');t.remove()}const old=button.textContent;button.textContent='已复制 ✓';setTimeout(()=>button.textContent=old,1500)}catch(_){const old=button.textContent;button.textContent='复制失败，请手动选择';setTimeout(()=>button.textContent=old,1800)}}
 d.addEventListener('click',e=>{const b=e.target.closest('[data-usage-copy="rules"]');if(b)copyRules(b)});
 w.UsageGuide={render,relevant,copyRules,rules:RULES};
+d.addEventListener('DOMContentLoaded',()=>{const root=d.getElementById('connectionHelpGuide');if(root)root.innerHTML=render()});
 })(window,document);

@@ -277,6 +277,8 @@
     }
   }
 
+  window.S5Api = { request: request, unwrap: unwrap, readToken: readToken };
+
   function install() {
     if (!window.App) return;
     const originalFetchMe = App.fetchMe && App.fetchMe.bind(App);

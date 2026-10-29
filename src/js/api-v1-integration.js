@@ -30,9 +30,9 @@
     }
     let body;
     try { body = await response.json(); } catch (_) { body = {}; }
-    if (!response.ok) throw new Error((body && body.message) || ('HTTP ' + response.status + (body && body.msg ? '：' + body.msg : '')));
-    if (body && body.status === 'fail') throw new Error(body.message !== undefined ? String(body.message) : '接口返回 status: fail');
-    if (body && body.error) throw new Error(body.message !== undefined ? String(body.message) : String(body.error));
+    if (!response.ok) throw new Error((body && (body.message || body.msg || body.detail || body.error)) || ('HTTP ' + response.status));
+    if (body && (body.status === 'fail' || body.success === false || (typeof body.code === 'number' && body.code !== 200 && body.code !== 0 && body.data === undefined))) throw new Error(String(body.message || body.msg || body.detail || body.error || '请求未成功'));
+    if (body && body.error) throw new Error(String(body.message || body.msg || body.error));
     return body;
   }
 
@@ -278,7 +278,40 @@
     }
   }
 
-  window.S5Api = { request: request, unwrap: unwrap, readToken: readToken };
+  // Growth APIs: contracts agreed for future backend implementation.
+  // These functions call real endpoints and deliberately do not fabricate fallback data.
+  async function validateCoupon(payload) {
+    return request('/user/coupon/validate', { method: 'POST', body: JSON.stringify({
+      code: String(payload && payload.code || '').trim(),
+      plan_id: Number(payload && payload.plan_id),
+      period: String(payload && payload.period || ''),
+      ...(payload && payload.protocol ? { protocol: String(payload.protocol) } : {})
+    }) });
+  }
+  async function drawBlindbox() {
+    return request('/user/blindbox/draw', { method: 'POST', body: JSON.stringify({}) });
+  }
+  async function getReferralLeaderboard(options) {
+    const opts = options || {};
+    const qs = new URLSearchParams();
+    qs.set('period', String(opts.period || 'month'));
+    qs.set('limit', String(Math.min(10, Math.max(1, Number(opts.limit) || 10))));
+    return request('/user/referrals/leaderboard?' + qs.toString(), { method: 'GET' });
+  }
+  async function getAnnouncements(options) {
+    const placement = String(options && options.placement || 'marquee');
+    return request('/user/announcements?placement=' + encodeURIComponent(placement), { method: 'GET' });
+  }
+
+  window.S5Api = {
+    request: request,
+    unwrap: unwrap,
+    readToken: readToken,
+    validateCoupon: validateCoupon,
+    drawBlindbox: drawBlindbox,
+    getReferralLeaderboard: getReferralLeaderboard,
+    getAnnouncements: getAnnouncements
+  };
 
   function install() {
     if (!window.App) return;
@@ -361,6 +394,136 @@
         if (button) { button.disabled = false; button.textContent = 'Sign In'; }
       }
     };
+
+
+    // Premium glassmorphism auth experience. Auth requests remain wired to the real /api/v1 endpoints above.
+    (function installAuthExperience() {
+      if (!$('s5-auth-style')) {
+        const style = document.createElement('style');
+        style.id = 's5-auth-style';
+        style.textContent = `
+          #modal-overlay.s5-auth-overlay{background:radial-gradient(ellipse at 15% 15%,#164e8a66,transparent 42%),rgba(2,8,23,.82);backdrop-filter:blur(16px);padding:18px;overflow:auto}
+          #modal-overlay.s5-auth-overlay>div{max-width:960px!important;width:min(960px,100%)!important;padding:0!important;background:transparent!important;border:0!important;box-shadow:none!important;border-radius:28px!important}
+          #modal-overlay.s5-auth-overlay>div>button:first-child{z-index:5;top:18px;right:18px;color:#a9c7e8;font-size:28px}
+          .s5-auth-shell{display:grid;grid-template-columns:1.02fr .98fr;min-height:600px;overflow:hidden;border:1px solid #8ecaff38;border-radius:28px;background:linear-gradient(135deg,#0a1a31f5,#071326f7);box-shadow:0 35px 110px #0009,0 0 50px #1e8aff22;color:#eaf5ff}
+          .s5-auth-visual{position:relative;isolation:isolate;display:flex;flex-direction:column;justify-content:space-between;padding:42px 36px;overflow:hidden;background:radial-gradient(ellipse at 25% 25%,#165c9b77,transparent 42%),linear-gradient(150deg,#0d2b4b,#071426 70%)}
+          .s5-auth-visual:before,.s5-auth-visual:after{content:"";position:absolute;inset:-30%;z-index:-1;pointer-events:none;background-image:radial-gradient(2px 2px at 15% 20%,#d9f5ff 50%,transparent 100%),radial-gradient(1px 1px at 68% 25%,#fff 50%,transparent 100%),radial-gradient(2px 2px at 42% 65%,#a6e6ff 50%,transparent 100%),radial-gradient(1px 1px at 85% 78%,#fff 50%,transparent 100%),radial-gradient(1px 1px at 25% 88%,#8bd7ff 50%,transparent 100%);background-size:260px 220px;animation:s5StarDrift 36s linear infinite;opacity:.8}
+          .s5-auth-visual:after{filter:blur(1px);opacity:.35;transform:scale(1.35);animation-duration:58s}
+          @keyframes s5StarDrift{from{transform:translate3d(0,0,0)}to{transform:translate3d(-70px,45px,0)}}
+          .s5-auth-logo{display:flex;align-items:center;gap:12px;font-weight:850;letter-spacing:.5px}.s5-auth-logo-mark{display:grid;place-items:center;width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#60d8ff,#3975ff);box-shadow:0 0 32px #37baff55;color:#061326;font-size:21px}
+          .s5-auth-kicker{color:#6de2ff;font-size:10px;letter-spacing:3px;font-weight:800}.s5-auth-headline{font-size:clamp(28px,3vw,39px);line-height:1.12;letter-spacing:-1px;font-weight:850;margin:16px 0}.s5-auth-copy{max-width:350px;color:#9db9d8;line-height:1.8;font-size:13px}.s5-auth-orbit{position:absolute;width:270px;height:270px;border:1px solid #64caff35;border-radius:50%;right:-95px;bottom:72px;box-shadow:0 0 60px #268dff18,inset 0 0 60px #268dff12}.s5-auth-orbit:before,.s5-auth-orbit:after{content:"";position:absolute;border:1px solid #64caff28;border-radius:50%;inset:26px}.s5-auth-orbit:after{inset:55px}.s5-auth-side-note{font-size:10px;color:#6485a9;letter-spacing:1.4px}
+          .s5-auth-formpane{padding:52px 42px 38px;display:flex;flex-direction:column;justify-content:center;background:linear-gradient(145deg,#0a192bf2,#071222f8);backdrop-filter:blur(22px)}.s5-auth-formpane h2{font-size:27px;font-weight:850;letter-spacing:-.6px;color:#f4f9ff;margin:7px 0}.s5-auth-muted{font-size:12px;line-height:1.7;color:#8da9c8}.s5-auth-field{display:block;margin-top:17px}.s5-auth-field>span{display:block;font-size:11px;color:#b7cce3;font-weight:700;margin-bottom:8px}.s5-auth-input{display:block;width:100%;box-sizing:border-box;border:1px solid #244666;border-radius:12px;background:#071426b8;color:#eff8ff;padding:13px 14px;outline:none;transition:border-color .2s,box-shadow .2s,background .2s;font-size:13px}.s5-auth-input::placeholder{color:#54708f}.s5-auth-input:focus{border-color:#4acbff;background:#081a30;box-shadow:0 0 0 3px #29baff20,0 0 24px #24aaff20}.s5-auth-primary{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;margin-top:23px;border:1px solid #7ce7ff44;border-radius:12px;padding:14px;background:linear-gradient(105deg,#1678d5,#3d65ff 58%,#6b58ed);box-shadow:0 12px 28px #1b72ee30;color:#fff;font-weight:800;transition:filter .2s,transform .2s}.s5-auth-primary:hover{filter:brightness(1.12);transform:translateY(-1px)}.s5-auth-primary:disabled{opacity:.65;cursor:wait;transform:none}.s5-auth-spinner{width:15px;height:15px;border:2px solid #ffffff66;border-top-color:#fff;border-radius:50%;animation:s5AuthSpin .7s linear infinite}@keyframes s5AuthSpin{to{transform:rotate(360deg)}}.s5-auth-switch{text-align:center;margin-top:20px;color:#7e9bbd;font-size:12px}.s5-auth-switch button{color:#65d9ff;font-weight:800;margin-left:5px}.s5-auth-code-row{display:grid;grid-template-columns:1fr auto;gap:8px}.s5-auth-code-btn{align-self:end;min-height:44px;padding:0 12px;border:1px solid #2e6388;border-radius:11px;background:#0d2944;color:#8be7ff;font-size:11px;font-weight:800;white-space:nowrap}.s5-auth-code-btn:disabled{opacity:.5}.s5-auth-security{margin-top:22px;color:#567697;font-size:10px;line-height:1.7}.s5-auth-error{margin-top:12px;padding:10px 12px;border:1px solid #f8717140;border-radius:10px;background:#7f1d1d26;color:#fca5a5;font-size:12px}
+          @media(max-width:700px){#modal-overlay.s5-auth-overlay>div{max-width:480px!important}.s5-auth-shell{grid-template-columns:1fr;min-height:0}.s5-auth-visual{min-height:165px;padding:25px 24px}.s5-auth-headline{font-size:25px;margin:10px 0 6px}.s5-auth-copy{display:none}.s5-auth-orbit{width:160px;height:160px;right:-55px;bottom:-65px}.s5-auth-side-note{display:none}.s5-auth-formpane{padding:28px 24px 25px}.s5-auth-formpane h2{font-size:24px}}
+        `;
+        document.head.appendChild(style);
+      }
+      const overlay = $('modal-overlay');
+      const closeButton = overlay && overlay.querySelector(':scope > div > button');
+      if (closeButton) { closeButton.style.color = '#9dc4e9'; closeButton.style.fontSize = '28px'; }
+      App.openModal = function(type) {
+        const content = $('modal-content');
+        if (!overlay || !content) return;
+        overlay.classList.add('s5-auth-overlay');
+        overlay.classList.remove('hidden');
+        const registering = type === 'register';
+        const inviteFromUrl = (new URLSearchParams(location.search).get('short_id') || new URLSearchParams(location.search).get('invite_code') || new URLSearchParams(location.search).get('invite') || '').trim();
+        content.innerHTML = '<div class="s5-auth-shell"><section class="s5-auth-visual"><div class="s5-auth-logo"><span class="s5-auth-logo-mark">✦</span><span>SOSKS5 <span style="color:#69dcff">/ ACCESS</span></span></div><div><div class="s5-auth-kicker">SECURE DIGITAL EXPERIENCE</div><div class="s5-auth-headline">' + (registering ? '开启你的<br>数字服务空间' : '欢迎回到<br>深空控制台') + '</div><p class="s5-auth-copy">' + (registering ? '创建账户，连接你的服务、订阅与订单。安全验证由服务器实时处理。' : '登录后继续管理套餐、订单与个人服务。账户状态和登录结果均以服务器响应为准。') + '</p></div><div class="s5-auth-orbit"></div><div class="s5-auth-side-note">ENCRYPTED SESSION · LIVE API</div></section><section class="s5-auth-formpane"><div class="s5-auth-kicker">' + (registering ? 'CREATE ACCOUNT' : 'MEMBER SIGN IN') + '</div><h2>' + (registering ? '创建账户' : '登录账户') + '</h2><p class="s5-auth-muted">' + (registering ? '使用邮箱验证码完成注册' : '请输入你的账户凭证以继续') + '</p><div id="s5-auth-error" class="s5-auth-error" hidden></div><form id="s5-auth-form" onsubmit="event.preventDefault();' + (registering ? 'App.doRegister()' : 'App.doLogin()') + '"><label class="s5-auth-field"><span>邮箱地址</span><input class="s5-auth-input" type="email" id="' + (registering ? 'reg-email' : 'login-email') + '" placeholder="name@example.com" autocomplete="email" required></label>' + (registering ? '<label class="s5-auth-field"><span>邮箱验证码</span><div class="s5-auth-code-row"><input class="s5-auth-input" type="text" id="reg-code" placeholder="输入邮箱验证码" autocomplete="one-time-code" required><button type="button" class="s5-auth-code-btn" id="btn-send-code" onclick="App.sendCode()">发送验证码</button></div></label><label class="s5-auth-field"><span>设置密码</span><input class="s5-auth-input" type="password" id="reg-pass" placeholder="至少 6 位密码" autocomplete="new-password" minlength="6" required></label><label class="s5-auth-field"><span>确认密码</span><input class="s5-auth-input" type="password" id="reg-pass-confirm" placeholder="再次输入密码" autocomplete="new-password" minlength="6" required></label><label class="s5-auth-field"><span>邀请码（选填）</span><input class="s5-auth-input" type="text" id="reg-invite" placeholder="邀请码或 5 位 short_id" value="' + esc(inviteFromUrl) + '" maxlength="64" autocomplete="off"></label>' : '<label class="s5-auth-field"><span>密码</span><input class="s5-auth-input" type="password" id="login-pass" placeholder="输入账户密码" autocomplete="current-password" required></label>') + '<button type="submit" class="s5-auth-primary" id="s5-auth-submit"><span>' + (registering ? '创建账户' : '登录') + '</span></button></form><div class="s5-auth-switch">' + (registering ? '已有账户？' : '还没有账户？') + '<button type="button" onclick="App.openModal(\'' + (registering ? 'login' : 'register') + '\')">' + (registering ? '返回登录' : '立即注册') + '</button></div><div class="s5-auth-security">SECURE AUTHENTICATION · 不会在前端伪造登录状态；所有凭证由真实接口验证。</div></section></div>';
+        const form = $('s5-auth-form');
+        if (form) form.querySelector('input')?.focus({ preventScroll: true });
+      };
+      App.closeModal = function() {
+        if (overlay) { overlay.classList.add('hidden'); overlay.classList.remove('s5-auth-overlay'); }
+      };
+      function authError(message) {
+        const box = $('s5-auth-error');
+        if (box) { box.textContent = message || '请求失败'; box.hidden = false; }
+        if (typeof App.showToast === 'function') App.showToast(message || '请求失败', 'bg-red-600');
+      }
+      function busy(button, label, yes) {
+        if (!button) return;
+        button.disabled = !!yes;
+        button.innerHTML = yes ? '<span class="s5-auth-spinner"></span><span>' + esc(label) + '</span>' : '<span>' + esc(label) + '</span>';
+      }
+      App.sendCode = async function() {
+        const email = $('reg-email')?.value.trim() || '';
+        const button = $('btn-send-code');
+        if (!email || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) return authError('请输入有效邮箱地址');
+        if (button && button.disabled) return;
+        if (button) { button.disabled = true; button.textContent = '发送中…'; }
+        try {
+          await request('/passport/auth/send-code', { method: 'POST', body: JSON.stringify({ email }) });
+          if (typeof App.showToast === 'function') App.showToast('验证码已发送，请查收邮箱');
+          let seconds = 60;
+          if (button) button.textContent = seconds + ' 秒后重试';
+          const timer = setInterval(() => {
+            seconds -= 1;
+            if (button) button.textContent = seconds > 0 ? seconds + ' 秒后重试' : '发送验证码';
+            if (seconds <= 0) { clearInterval(timer); if (button) button.disabled = false; }
+          }, 1000);
+        } catch (error) {
+          authError(error.message || '验证码发送失败');
+          if (button) { button.disabled = false; button.textContent = '发送验证码'; }
+        }
+      };
+      App.doRegister = async function() {
+        const email = $('reg-email')?.value.trim() || '';
+        const code = $('reg-code')?.value.trim() || '';
+        const password = $('reg-pass')?.value || '';
+        const confirmPassword = $('reg-pass-confirm')?.value || '';
+        const invite = $('reg-invite')?.value.trim() || '';
+        if (!email || !code || !password || !confirmPassword) return authError('请完整填写邮箱、验证码和密码');
+        if (password.length < 6) return authError('密码至少需要 6 位');
+        if (password !== confirmPassword) return authError('两次输入的密码不一致');
+        if (invite && !/^[A-Za-z0-9_-]{5,64}$/.test(invite)) return authError('邀请码格式不正确');
+        const button = $('s5-auth-submit');
+        if (button?.disabled) return;
+        busy(button, '正在创建账户…', true);
+        try {
+          const body = { email, code, password };
+          if (invite) { body.invite_code = invite; if (/^[A-Za-z0-9]{5}$/.test(invite)) body.short_id = invite; }
+          const response = await request('/passport/auth/register', { method: 'POST', body: JSON.stringify(body) });
+          const data = unwrap(response) || {};
+          const token = data.token || data.auth_data || data.access_token;
+          if (token) {
+            saveToken(token);
+            if (data.user) saveUser(data.user);
+            try { await fetchUserInfo(); } catch (_) {}
+            App.closeModal(); setUserNav(); App.router();
+            if (typeof App.showToast === 'function') App.showToast('注册成功，欢迎加入');
+          } else {
+            App.openModal('login');
+            if ($('login-email')) $('login-email').value = email;
+            if (typeof App.showToast === 'function') App.showToast('注册成功，请使用新账户登录');
+          }
+        } catch (error) {
+          authError(error.message || '注册失败');
+        } finally { busy(button, '创建账户', false); }
+      };
+      App.doLogin = async function() {
+        const email = $('login-email')?.value.trim() || '';
+        const password = $('login-pass')?.value || '';
+        if (!email || !password) return authError('请输入邮箱和密码');
+        const button = $('s5-auth-submit');
+        if (button?.disabled) return;
+        busy(button, '正在验证账户…', true);
+        try {
+          const response = await request('/passport/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) });
+          const data = unwrap(response) || {};
+          const token = data.token || data.auth_data || data.access_token;
+          if (!token) throw new Error(data.message || data.msg || '登录接口未返回 token');
+          saveToken(token);
+          if (data.user) saveUser(data.user);
+          try { await fetchUserInfo(); } catch (_) { if (data.user) saveUser(data.user); }
+          App.closeModal(); setUserNav(); App.router();
+          if (typeof App.showToast === 'function') App.showToast('登录成功');
+          const redirect = new URLSearchParams(location.search).get('redirect');
+          if (redirect && redirect.startsWith('#/')) location.hash = redirect;
+          else if (location.hash === '#/login' || location.hash === '#/register') location.hash = '#/dashboard';
+        } catch (error) {
+          authError(error.message || '登录失败');
+        } finally { busy(button, '登录', false); }
+      };
+    })();
 
     const oldDashboard = App.views.dashboard;
     App.views.dashboard = function () {

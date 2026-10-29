@@ -157,14 +157,14 @@
       const stats = unwrap(statsResponse) || {};
       const customers = listFrom(unwrap(customersResponse));
       const monthCustomers = customers.filter((c) => thisMonth(c.created_at || c.createdAt));
-      const activeCustomers = customers.filter((c) => Number(c.charge || 0) > 0);
+      const activeCustomers = customers;
       const commissionCents = customers.reduce((sum,c) => sum + Number(c.commission || 0), 0);
       const metricCards = $$('#promo-metrics .metric-card');
       metricCards[0].querySelector('strong').textContent = fmtCount(monthCustomers.length);
       metricCards[1].querySelector('strong').textContent = fmtCount(activeCustomers.length);
       metricCards[2].querySelector('strong').textContent = money(commissionCents, false);
       metricCards[0].querySelector('span').textContent = '本月邀请注册';
-      metricCards[1].querySelector('span').textContent = '有消费的邀请用户';
+      metricCards[1].querySelector('span').textContent = '有效注册用户';
       metricCards[2].querySelector('span').textContent = '累计预估佣金';
       const bot = unwrap(botResponse) || {};
       const botUrl = bot.mivra_url || '';

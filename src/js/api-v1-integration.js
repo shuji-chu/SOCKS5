@@ -299,6 +299,47 @@
         this.router();
       }
     };
+    App.sendCode = async function () {
+      const email = $('reg-email') && $('reg-email').value.trim();
+      if (!email || !email.includes('@')) return showError('请输入有效邮箱');
+      const button = $('btn-send-code');
+      if (button) { button.disabled = true; button.textContent = '发送中…'; }
+      try {
+        await request('/passport/auth/send-code', { method: 'POST', body: JSON.stringify({ email }) });
+        if (typeof App.showToast === 'function') App.showToast('验证码已发送');
+        let seconds = 60;
+        if (button) button.textContent = seconds + 's';
+        const timer = setInterval(() => {
+          seconds--;
+          if (button) button.textContent = seconds > 0 ? seconds + 's' : '获取验证码';
+          if (seconds <= 0) { clearInterval(timer); if (button) button.disabled = false; }
+        }, 1000);
+      } catch (e) {
+        showError(e.message || '验证码发送失败');
+        if (button) { button.disabled = false; button.textContent = '获取验证码'; }
+      }
+    };
+
+    App.doRegister = async function () {
+      const email = $('reg-email') && $('reg-email').value.trim();
+      const code = $('reg-code') && $('reg-code').value.trim();
+      const password = $('reg-pass') && $('reg-pass').value;
+      const params = new URLSearchParams(location.search);
+      const inviteCode = (params.get('invite_code') || params.get('invite') || '').trim().toUpperCase();
+      if (!email || !code || !password) return showError('请填写邮箱、验证码和密码');
+      try {
+        const response = await request('/passport/auth/register', { method: 'POST', body: JSON.stringify({ email, code, password, invite_code: inviteCode }) });
+        const data = unwrap(response) || {};
+        const token = data.token || data.auth_data || data.access_token;
+        if (!token) throw new Error('注册接口未返回登录凭证');
+        saveToken(token);
+        if (data.user) saveUser(data.user);
+        try { await fetchUserInfo(); } catch (_) {}
+        App.closeModal(); setUserNav(); App.router();
+        if (typeof App.showToast === 'function') App.showToast(inviteCode ? '注册成功，已提交邀请码' : '注册成功');
+      } catch (e) { showError(e.message || '注册失败'); }
+    };
+
     App.doLogin = async function () {
       const email = $('login-email') && $('login-email').value.trim();
       const password = $('login-pass') && $('login-pass').value;

@@ -89,7 +89,7 @@
       normalizeChannels(config);
     } catch (error) {
       paymentChannels = [];
-      console.error('[SOSKS5] /config failed:', error);
+      // Production UI intentionally avoids logging raw backend/network errors.
       // Do not invent payment IDs; disable checkout choices until backend config is available.
     }
     return paymentChannels;
@@ -216,7 +216,7 @@
       const data = unwrap(await request('/user/getSubscribe', { method: 'GET' }));
       renderSubscription(data || {});
     } catch (e) {
-      box.innerHTML = '<div class="mt-8 rounded-xl border border-rose-200 bg-rose-50 p-5 text-sm text-rose-700">' + esc(e.message) + '</div>';
+      box.innerHTML = '<div class="mt-8 rounded-xl border border-rose-200 bg-rose-50 p-5 text-sm text-rose-700">' + esc(safeUiMessage(e.message)) + '</div>';
     }
   }
 
@@ -342,7 +342,7 @@
       box.dataset.loaded = "0";
       box.innerHTML = '<div class="s5-clone-heading"><div><h2>海外精选数字商品</h2><p class="s5-clone-intro">商品目录暂时无法读取，请稍后重试。</p></div></div><button type="button" class="s5-clone-retry">重新加载</button>';
       box.querySelector(".s5-clone-retry")?.addEventListener("click", loadClonedProducts);
-      console.warn("[SOSKS5] cloned_products 请求失败：", error);
+      // Optional catalog unavailable; the UI will show a neutral empty state.
     }
   }
 
@@ -396,7 +396,7 @@
         this.state.products = plans.map(normalizePlan);
         this.router();
       } catch (e) {
-        console.error('[SOSKS5] plan/fetch failed:', e);
+        // Keep internal network details out of production console output.
         this.state.products = [];
         this.router();
       }
@@ -574,8 +574,8 @@
       };
       function authError(message) {
         const box = $('s5-auth-error');
-        if (box) { box.textContent = message || '请求失败'; box.hidden = false; }
-        if (typeof App.showToast === 'function') App.showToast(message || '请求失败', 'bg-red-600');
+        if (box) { box.textContent = safeUiMessage(message || '请求失败'); box.hidden = false; }
+        if (typeof App.showToast === 'function') App.showToast(safeUiMessage(message || '请求失败'), 'bg-red-600');
       }
       function busy(button, label, yes) {
         if (!button) return;

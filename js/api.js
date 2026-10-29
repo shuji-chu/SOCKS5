@@ -30,9 +30,13 @@
     }
     let body;
     try { body = await response.json(); } catch (_) { body = {}; }
-    if (!response.ok) throw new Error((body && (body.message || body.msg || body.detail || body.error)) || ('HTTP ' + response.status));
-    if (body && (body.status === 'fail' || body.success === false || (typeof body.code === 'number' && body.code !== 200 && body.code !== 0 && body.data === undefined))) throw new Error(String(body.message || body.msg || body.detail || body.error || '请求未成功'));
-    if (body && body.error) throw new Error(String(body.message || body.msg || body.error));
+    const logicalStatus = body && body.http_status !== undefined ? Number(body.http_status) : null;
+    const message = body && (body.message || body.msg || body.detail || body.error || body.error_message);
+    if (!response.ok) throw new Error(String(message || ('HTTP ' + response.status)));
+    // This API may wrap errors in HTTP 200; http_status is the authoritative business status.
+    if (logicalStatus !== null && logicalStatus !== 200) throw new Error(String(message || ('接口错误 HTTP ' + logicalStatus)));
+    if (body && (body.status === 'fail' || body.success === false || (typeof body.code === 'number' && body.code !== 200 && body.code !== 0 && body.data === undefined))) throw new Error(String(message || '请求未成功'));
+    if (body && body.error) throw new Error(String(message || body.error));
     return body;
   }
 
@@ -368,7 +372,9 @@
     validateCoupon: validateCoupon,
     drawBlindbox: drawBlindbox,
     getReferralLeaderboard: getReferralLeaderboard,
-    getAnnouncements: getAnnouncements
+    getAnnouncements: getAnnouncements,
+    createOrder: function (payload) { return request('/user/order/save', { method: 'POST', body: JSON.stringify(payload || {}) }); },
+    checkoutOrder: function (tradeNo) { return request('/user/order/checkout', { method: 'POST', body: JSON.stringify({ trade_no: tradeNo }); }
   };
 
   function install() {

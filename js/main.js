@@ -256,7 +256,7 @@
     const tab = document.createElement('nav');
     tab.className = 'mobile-tabbar';
     tab.setAttribute('aria-label','底部导航');
-    tab.innerHTML = '<a class="' + (active === 'home' ? 'active' : '') + '" href="./index.html"><span>⌂</span><small>首页</small></a><a class="' + (active === 'shop' ? 'active' : '') + '" href="./shop.html"><span>▦</span><small>商城</small></a><a class="' + (active === 'user' ? 'active' : '') + '" href="./user.html"><span>◉</span><small>我的</small></a>';
+    tab.innerHTML = '<a class="' + (active === 'home' ? 'active' : '') + '" href="./index.html"><span>⌂</span><small>首页</small></a><a class="' + (active === 'shop' ? 'active' : '') + '" href="./shop.html"><span>▦</span><small>商城</small></a><a class="' + (active === 'promo' ? 'active' : '') + '" href="./promo.html"><span>✧</span><small>引流</small></a><a class="' + (active === 'user' ? 'active' : '') + '" href="./user.html"><span>◉</span><small>我的</small></a>';
     document.body.appendChild(tab);
     const support = document.createElement('a');
     support.className = 'floating-support';
@@ -267,11 +267,43 @@
     document.body.appendChild(support);
   }
   function installStyles() {
+    installCinematicBackground();
     if ($('#s5-live-styles')) return;
     const style = document.createElement('style');
     style.id = 's5-live-styles';
     style.textContent = '.live-state{grid-column:1/-1;padding:24px 16px;text-align:center;color:var(--muted,#8ca4bf);border:1px solid var(--line,rgba(132,190,230,.17));border-radius:14px;background:rgba(11,23,41,.65)}.live-product-card .product-photo{object-fit:cover}.break-all{overflow-wrap:anywhere;word-break:break-word}.bot-entry{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}.bot-status{color:var(--muted,#8ca4bf)}.mobile-tabbar{display:none}.floating-support{position:fixed;right:16px;bottom:24px;z-index:80;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;width:54px;height:54px;border:1px solid rgba(115,234,255,.4);border-radius:50%;background:#0b2038;color:#73eaff;box-shadow:0 8px 28px #0005;font-size:20px}.floating-support small{font-size:10px}.announcement[hidden]{display:none!important}@media(max-width:650px){body{padding-bottom:76px}.mobile-tabbar{position:fixed;left:0;right:0;bottom:0;z-index:70;display:flex;justify-content:space-around;align-items:center;padding:7px 8px calc(7px + env(safe-area-inset-bottom));min-height:62px;background:rgba(5,13,28,.96);border-top:1px solid var(--line,rgba(132,190,230,.17));backdrop-filter:blur(18px)}.mobile-tabbar a{display:flex;min-width:64px;flex-direction:column;align-items:center;gap:2px;color:var(--muted,#8ca4bf);font-size:19px}.mobile-tabbar a small{font-size:10px}.mobile-tabbar a.active{color:var(--cyan,#73eaff)}.floating-support{bottom:calc(82px + env(safe-area-inset-bottom));right:12px;width:48px;height:48px}.bot-entry{align-items:flex-start;flex-direction:column}.site-footer{padding-bottom:88px!important}}';
     document.head.appendChild(style);
+  }
+
+  function installCinematicBackground() {
+    if (!document.body || document.getElementById('s5-cinematic-bg')) return;
+    const video = document.createElement('video');
+    video.id = 's5-cinematic-bg';
+    video.setAttribute('autoplay', '');
+    video.setAttribute('muted', '');
+    video.setAttribute('loop', '');
+    video.setAttribute('playsinline', '');
+    video.setAttribute('webkit-playsinline', '');
+    video.setAttribute('aria-hidden', 'true');
+    video.preload = 'metadata';
+    video.muted = true;
+    video.defaultMuted = true;
+    video.src = 'https://assets.mixkit.co/videos/preview/mixkit-stars-in-space-1610-large.mp4';
+    video.addEventListener('error', () => video.classList.add('video-fallback'), { once: true });
+    document.body.prepend(video);
+    const style = document.createElement('style');
+    style.id = 's5-cinematic-background-style';
+    style.textContent = '#s5-cinematic-bg{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:-2;pointer-events:none;opacity:.34;background:#061326}body:before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(180deg,rgba(3,12,29,.76),rgba(4,15,34,.88)),radial-gradient(ellipse at 70% 0%,rgba(24,93,160,.2),transparent 55%)}#s5-cinematic-bg.video-fallback{display:none}body{isolation:isolate}.site-header,.site-footer{background-color:rgba(5,13,28,.72)!important;backdrop-filter:blur(16px)}.panel,.product-card,.business-card,.announcement{backdrop-filter:blur(14px)}@media(max-width:650px){#s5-cinematic-bg{opacity:.22}body:before{background:linear-gradient(180deg,rgba(3,12,29,.82),rgba(4,15,34,.92))}}@media(prefers-reduced-motion:reduce){#s5-cinematic-bg{display:none}}';
+    document.head.appendChild(style);
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const saveData = navigator.connection && navigator.connection.saveData;
+    if (reduce || saveData) { video.removeAttribute('autoplay'); video.pause(); video.style.display = 'none'; return; }
+    const play = () => video.play().catch(() => video.classList.add('video-fallback'));
+    if (document.visibilityState === 'visible') play();
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && !reduce && !saveData) play();
+      else video.pause();
+    });
   }
 
   function loadLogin() {

@@ -1,6 +1,6 @@
 
 const API_ROOT='https://web.lynli.me';
-const assetBase=()=>String(window.SOSKS5_OSS_BASE_URL||'').replace(/\\/+$/,'');
+const assetBase=()=>String(window.SOSKS5_OSS_BASE_URL||'').replace(/\/+$/,'');
 const API_V1='https://web.lynli.me/api/v1';
 const requestedCategory=new URLSearchParams(location.search).get('category')||'全部';
 let liveProducts=[],activeKind=['全部','节点','账号','流量包'].includes(requestedCategory)?requestedCategory:'全部',searchTerm='',paymentMethods=[];

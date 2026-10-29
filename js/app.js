@@ -100,7 +100,7 @@ async function loadCatalogs(){
   liveProducts=[];
   const breakdown=document.getElementById('catalogBreakdown');if(breakdown)breakdown.textContent='真实商品目录暂不可用';
   const hint=document.getElementById('resultCount');if(hint)hint.textContent='加载失败';
-  root.innerHTML='<div class="error-state"><div class="symbol">⌁</div><b>真实商品目录暂时无法加载</b><p>'+escHtml(safeUiMessage(e.message))+'</p><button class="btn" type="button" onclick="loadCatalogs()">重新加载</button></div>';
+  root.innerHTML='<div class="error-state"><div class="symbol"><img src="./assets/icons/network.svg" alt="" aria-hidden="true"></div><b>真实商品目录暂时无法加载</b><p>'+escHtml(safeUiMessage(e.message))+'</p><button class="btn" type="button" onclick="loadCatalogs()">重新加载</button></div>';
  }finally{root.removeAttribute('aria-busy')}
 }
 document.querySelectorAll('[data-kind]').forEach(b=>{b.className=b.dataset.kind===activeKind?'btn primary':'btn ghost';b.addEventListener('click',()=>{activeKind=b.dataset.kind;document.querySelectorAll('[data-kind]').forEach(x=>x.className='btn ghost');b.className='btn primary';renderProducts()})});

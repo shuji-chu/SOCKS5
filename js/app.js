@@ -32,7 +32,7 @@ function groupedNodeRows(response){
   ['sku_id','skuId','product_id','productId','sku_name','skuName','product_name','productName','price','price_cents','price_yuan','sale_price','month_price','monthly_price','protocol','node_protocol','product_type'].some(k=>row[k]!==undefined&&row[k]!==null)||
   ((row.name||row.title)&&(['id','uuid','stock','available_stock','description','content'].some(k=>row[k]!==undefined&&row[k]!==null)))
  );
- const regionOf=(obj,fallback)=>String(obj.region_name||obj.region||obj.area||obj.country||obj.location||obj.group_name||obj.zone||obj.name||fallback||'');
+ const regionOf=(obj,fallback)=>String(obj.region_name||obj.region||obj.area||obj.country||obj.location||obj.group_name||obj.zone||(!isSku(obj)?obj.name:'')||fallback||'');
  const visit=(value,region='',depth=0)=>{
   if(value==null||depth>12)return;
   if(Array.isArray(value)){value.forEach(item=>visit(item,region,depth+1));return;}

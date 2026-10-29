@@ -241,45 +241,21 @@
 
         // ================= 支付核心逻辑 =================
         function openPayModal() {
-            const totalStr = document.getElementById('total-amount').innerText;
-            const total = parseFloat(totalStr.replace(/[¥$]/g, ''));
-            
-            document.getElementById('pay-modal').classList.add('active');
+            clearInterval(timer);
+            const modal = document.getElementById('pay-modal');
+            modal.classList.add('active');
             document.getElementById('pay-step-1').classList.add('active');
             document.getElementById('pay-step-2').classList.remove('active');
-            
             const tip = document.getElementById('pay-tip');
-            const amount = document.getElementById('pay-amount');
-            const qr = document.getElementById('pay-qr');
-            const usdtAddr = document.getElementById('pay-usdt-addr');
-
-            if (currentPayType === 'alipay') {
-                tip.innerText = '请使用支付宝扫码付款';
-                amount.innerText = currentProduct.currency === 'USDT' ? `¥ ${(total * 8).toFixed(2)}` : `¥ ${total.toFixed(2)}`;
-                usdtAddr.classList.add('hidden');
-                qr.src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=alipay_order_' + total;
-            } else {
-                tip.innerText = '请转账至以下 TRC20 地址';
-                amount.innerText = currentProduct.currency === 'USDT' ? `${total.toFixed(2)} USDT` : `${(total / 8).toFixed(2)} USDT`;
-                usdtAddr.classList.remove('hidden');
-                qr.src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=TYu8x9ZqP3vK2mN4wL5jR6tB7cV8bA9sD0';
-            }
-            qr.classList.remove('hidden');
-
-            timeLeft = 600;
-            document.getElementById('countdown').innerText = timeLeft;
-            clearInterval(timer);
-            timer = setInterval(() => {
-                timeLeft--;
-                document.getElementById('countdown').innerText = timeLeft;
-                if (timeLeft <= 0) {
-                    clearInterval(timer);
-                    closeModal('pay-modal');
-                }
-            }, 1000);
+            tip.textContent = '支付服务尚未接通，暂不能生成真实订单或收款二维码。请勿向任何地址转账。';
+            document.getElementById('pay-qrcode').classList.add('hidden');
+            document.getElementById('pay-usdt-addr').classList.add('hidden');
+            document.getElementById('pay-amount').textContent = '暂不可支付';
+            document.getElementById('countdown').parentElement.hidden = true;
+            const confirmButton = modal.querySelector('button[onclick="mockPaySuccess()"]');
+            if (confirmButton) { confirmButton.disabled = true; confirmButton.textContent = '等待支付接口接入'; confirmButton.classList.add('opacity-50'); }
         }
 
-        
         // ================= 真实后端支付对接区 =================
         async function mockPaySuccess() {
             clearInterval(timer);

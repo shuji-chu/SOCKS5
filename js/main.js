@@ -234,7 +234,7 @@
       $('#traffic-total').textContent = '总流量：' + traffic(total);
       const expiry = dateValue(sub.expired_at || info.expiredAt || info.expired_at);
       $('#account-expiry').textContent = expiry ? expiry.toLocaleDateString('zh-CN') : '未设置';
-      const subscribeUrl = sub.subscribe_url || sub.subscribeUrl || sub.url || '';
+      const subscribeUrl = String(sub && (sub.subscribe_url || sub.subscribeUrl || sub.url) || '订阅地址暂不可用（等待服务端返回）');
       const subscriptionContent = $('#subscription-content');
       subscriptionContent.innerHTML = subscribeUrl ? '<div class="subscription-card"><div class="sub-copy"><b>个人订阅链接</b><span class="break-all">' + esc(subscribeUrl) + '</span></div><button class="button button-small" id="copy-subscription" type="button">复制订阅链接</button></div>' : emptyState('服务端未返回订阅链接');
       const copySub = $('#copy-subscription');
@@ -285,21 +285,24 @@
     video.setAttribute('playsinline', '');
     video.setAttribute('webkit-playsinline', '');
     video.setAttribute('aria-hidden', 'true');
-    video.preload = 'metadata';
+    video.preload = 'none';
     video.muted = true;
     video.defaultMuted = true;
     video.src = 'https://assets.mixkit.co/videos/preview/mixkit-stars-in-space-1610-large.mp4';
-    video.addEventListener('error', () => video.classList.add('video-fallback'), { once: true });
+    video.addEventListener('error', () => { video.classList.add('video-fallback'); video.removeAttribute('src'); video.load(); }, { once: true });
     document.body.prepend(video);
     const style = document.createElement('style');
     style.id = 's5-cinematic-background-style';
-    style.textContent = '#s5-cinematic-bg{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:-2;pointer-events:none;opacity:.34;background:#061326}body:before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(180deg,rgba(3,12,29,.76),rgba(4,15,34,.88)),radial-gradient(ellipse at 70% 0%,rgba(24,93,160,.2),transparent 55%)}#s5-cinematic-bg.video-fallback{display:none}body{isolation:isolate}.site-header,.site-footer{background-color:rgba(5,13,28,.72)!important;backdrop-filter:blur(16px)}.panel,.product-card,.business-card,.announcement{backdrop-filter:blur(14px)}@media(max-width:650px){#s5-cinematic-bg{opacity:.22}body:before{background:linear-gradient(180deg,rgba(3,12,29,.82),rgba(4,15,34,.92))}}@media(prefers-reduced-motion:reduce){#s5-cinematic-bg{display:none}}';
+    style.textContent = 'html,body{background-color:#061326!important;background-image:radial-gradient(ellipse at 75% 0%,rgba(28,89,160,.24),transparent 50%),linear-gradient(180deg,#061326,#030b1a)!important}#s5-cinematic-bg{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:-2;pointer-events:none;opacity:.34;background:#061326}body:before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(180deg,rgba(3,12,29,.76),rgba(4,15,34,.88)),radial-gradient(ellipse at 70% 0%,rgba(24,93,160,.2),transparent 55%)}#s5-cinematic-bg.video-fallback{display:none}body{isolation:isolate}.site-header,.site-footer{background-color:rgba(5,13,28,.72)!important;backdrop-filter:blur(16px)}.panel,.product-card,.business-card,.announcement{backdrop-filter:blur(14px)}@media(max-width:650px){#s5-cinematic-bg{opacity:.22}body:before{background:linear-gradient(180deg,rgba(3,12,29,.82),rgba(4,15,34,.92))}}@media(prefers-reduced-motion:reduce){#s5-cinematic-bg{display:none}}';
     document.head.appendChild(style);
     const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const saveData = navigator.connection && navigator.connection.saveData;
-    if (reduce || saveData) { video.removeAttribute('autoplay'); video.pause(); video.style.display = 'none'; return; }
-    const play = () => video.play().catch(() => video.classList.add('video-fallback'));
-    if (document.visibilityState === 'visible') play();
+    const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    const saveData = !!(connection && connection.saveData);
+    const slowNetwork = !!(connection && (connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g' || (Number(connection.downlink) > 0 && Number(connection.downlink) < 1.2)));
+    const mobile = window.matchMedia('(max-width: 768px)').matches || /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+    if (reduce || saveData || slowNetwork || mobile) { video.removeAttribute('autoplay'); video.pause(); video.removeAttribute('src'); video.load(); video.style.display = 'none'; return; }
+    const play = () => video.play().catch(() => { video.classList.add('video-fallback'); video.removeAttribute('src'); video.load(); });
+    if (document.visibilityState === 'visible') { video.load(); play(); }
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible' && !reduce && !saveData) play();
       else video.pause();

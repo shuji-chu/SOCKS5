@@ -266,9 +266,10 @@
   }
 
   function cloneMoney(p) {
-    const raw = p.price_yuan != null ? Number(p.price_yuan) : Number(p.price_cents ?? p.price_amount ?? p.price ?? p.amount ?? p.sale_price ?? 0);
+    const hasYuanPrice = p.price_yuan != null;
+    const raw = Number(hasYuanPrice ? p.price_yuan : (p.price_cents ?? p.price_amount ?? p.price ?? p.amount ?? p.sale_price ?? 0));
     if (!Number.isFinite(raw)) return "价格以客服确认为准";
-    const yuan = p.price_yuan != null ? raw : (raw >= 1000 ? raw / 100 : raw);
+    const yuan = hasYuanPrice ? raw : raw / 100;
     return "¥" + yuan.toFixed(2);
   }
 

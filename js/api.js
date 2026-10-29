@@ -339,10 +339,35 @@
     return request('/user/announcements?placement=' + encodeURIComponent(placement), { method: 'GET' });
   }
 
+  function saveToken(token) {
+    TOKEN_KEYS.forEach((key) => localStorage.setItem(key, String(token || '')));
+  }
+  function clearSession() {
+    TOKEN_KEYS.concat(USER_KEYS).forEach((key) => localStorage.removeItem(key));
+  }
+  function getPlans() { return request('/user/plan/fetch', { method: 'GET' }); }
+  function getClonedProducts() { return request('/user/cloned_products', { method: 'GET' }); }
+  function getUserInfo() { return request('/user/info', { method: 'GET' }); }
+  function getSubscription() { return request('/user/getSubscribe', { method: 'GET' }); }
+  function getInviteStats() { return request('/user/invite/fetch', { method: 'GET' }); }
+  function getInviteCustomers() { return request('/user/invite/customers', { method: 'GET' }); }
+  function getBotStatus() { return request('/user/bot/status', { method: 'GET' }); }
+  function getNotices() { return request('/user/notices', { method: 'GET' }); }
+
   window.S5Api = {
     request: request,
     unwrap: unwrap,
     readToken: readToken,
+    saveToken: saveToken,
+    clearSession: clearSession,
+    getPlans: getPlans,
+    getClonedProducts: getClonedProducts,
+    getUserInfo: getUserInfo,
+    getSubscription: getSubscription,
+    getInviteStats: getInviteStats,
+    getInviteCustomers: getInviteCustomers,
+    getBotStatus: getBotStatus,
+    getNotices: getNotices,
     validateCoupon: validateCoupon,
     drawBlindbox: drawBlindbox,
     getReferralLeaderboard: getReferralLeaderboard,

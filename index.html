@@ -29,5 +29,5 @@ async function load(){let remoteSlides=null;try{let base=String(window.SOSKS5_AP
 if(remoteSlides&&remoteSlides.length)slides=remoteSlides;else slides=defaults;render()}
 document.getElementById('homeCarouselPrev').onclick=()=>show(index-1);document.getElementById('homeCarouselNext').onclick=()=>show(index+1);
 root.addEventListener('mouseenter',()=>clearInterval(timer));root.addEventListener('mouseleave',start);
-window.addEventListener('storage',e=>{if(e.key===KEY)load()});load();
+window.addEventListener('storage',e=>{if(e.key===KEY)load()});slides=defaults;render();load();
 })();</script></body></html>

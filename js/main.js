@@ -119,7 +119,9 @@
     const isSocialAccount = (p) => /facebook|脸书|instagram|tiktok|twitter|推特|telegram|电报|whatsapp|google|gmail|youtube|油管|discord|reddit|snapchat|linkedin|outlook|apple id|meta account/.test([p.name,p.title,p.content,p.description,p.type,p.product_type,p.product_category].join(' ').toLowerCase());
     const isAccountPlan = (p) => {
       const kind = String(p.product_type || p.product_category || p.service_type || p.type || '').toLowerCase();
-      return isSocialAccount(p) || kind === 'account' || kind === 'accounts' || /账号|account/.test(kind);
+      const words = [p.name,p.title,p.content,p.description,p.protocol,p.node_protocol].join(' ').toLowerCase();
+      if (/node|nodes|proxy|节点|代理|订阅|vless|vmess|hysteria|trojan|shadowsocks|socks5|wireguard|tuic/.test(kind + ' ' + words)) return false;
+      return kind === 'account' || kind === 'accounts' || /账号|account/.test(kind) || isSocialAccount(p);
     };
     const nodes = plans.filter((p) => {
       if (isAccountPlan(p)) return false;

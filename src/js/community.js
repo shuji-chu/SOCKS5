@@ -143,9 +143,6 @@
 
   const addLinks = () => {
     const nav = document.querySelector('#navbar .hidden.md\\:flex.items-center');
-    if (nav && !nav.querySelector('[data-s5-traffic]')) {
-      const a = document.createElement('a'); a.href = '#/traffic'; a.dataset.s5Traffic = '1'; a.className = 'px-3 py-2 rounded-lg hover:bg-gray-100 transition'; a.textContent = '引流'; nav.appendChild(a);
-    }
     const drawer = document.querySelector('#user-drawer .p-2.space-y-1');
     if (drawer && !drawer.querySelector('[data-s5-profile]')) {
       const a = document.createElement('a'); a.href = '#/profile'; a.dataset.s5Profile = '1'; a.className = 'block px-3 py-2 rounded-lg hover:bg-gray-100 hover:text-slate-900 transition'; a.textContent = '个人资料 / 昵称头像'; drawer.prepend(a);

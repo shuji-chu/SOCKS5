@@ -70,8 +70,11 @@
     p.title = p.name || p.title || ('套餐 #' + p.id);
     p.name = p.name || p.title;
     p.description = p.content || p.description || p.description_text || '查看套餐规格、有效期和服务说明。';
-    const kind = [p.name, p.content, p.tags, p.category, p.type].flat().join(' ').toLowerCase();
-    p.category = p.category || (/node|proxy|节点|代理|订阅|vpn|网络/.test(kind) ? '节点服务' : /traffic|引流|增长|推广|群发|机器人|growth/.test(kind) ? '引流服务' : '账号服务');
+    const kind = [p.name, p.content, p.tags, p.category, p.product_type, p.type].flat().join(' ').toLowerCase();
+    p.protocol = p.protocol || p.node_protocol || '';
+    p.protocols = Array.isArray(p.protocols) ? p.protocols : (p.protocol ? [p.protocol] : []);
+    const productKind = String(p.product_type || p.product_category || p.service_type || '').toLowerCase();
+    p.category = p.category || (/traffic|引流|增长|推广|群发|机器人|growth/.test(productKind + ' ' + kind) ? '引流服务' : /node|proxy|节点|代理|订阅|vpn|网络/.test(productKind + ' ' + kind) ? '节点服务' : '账号服务');
     const periods = periodOptions(p);
     const prices = periods.map(x => x.price).filter(x => Number.isFinite(x) && x >= 0);
     p.price = prices.length ? Math.min.apply(null, prices) / 100 : Number(p.price || p.sale_price || 0);
@@ -196,6 +199,14 @@
     loadSubscription();
   }
 
+  function protocolOptions(plan) {
+    const supported = ['VLESS', 'VMess', 'Hysteria2', 'TROJAN'];
+    const provided = (plan.protocols || []).map(x => String(x).toUpperCase());
+    const options = provided.length ? supported.filter(x => provided.includes(x.toUpperCase())) : supported;
+    const current = String(plan.protocol || '').toUpperCase();
+    return options.map(x => '<option value="' + esc(x.toLowerCase()) + '"' + (current === x.toUpperCase() ? ' selected' : '') + '>' + esc(x) + '</option>').join('');
+  }
+
   function openPurchase(plan) {
     if (!readToken()) {
       showModal('登录后购买', '<p class="text-sm text-slate-500 mb-4">请先登录后再继续购买。</p><button type="button" id="s5-purchase-login" class="w-full rounded-xl bg-blue-600 py-3 font-bold text-white">前往登录</button>');
@@ -214,7 +225,7 @@
     }
     const periodHtml = periods.map((p, i) => '<option value="' + esc(p.value) + '"' + (i === 0 ? ' selected' : '') + '>' + esc(p.label) + ' · ' + esc((p.price / 100).toFixed(2)) + '</option>').join('');
     const paymentHtml = paymentChannels.map((p, i) => '<label class="flex items-center gap-2 rounded-xl border border-slate-200 p-3 cursor-pointer"><input type="radio" name="s5-payment" value="' + esc(i) + '"' + (i === 0 ? ' checked' : '') + '><span>' + esc(p.label) + '</span></label>').join('');
-    showModal('确认购买 · ' + (plan.name || plan.title || '套餐'), '<form id="s5-purchase-form"><label class="block text-sm font-semibold mb-2">套餐周期</label><select id="s5-period" class="w-full rounded-xl border border-slate-200 p-3 mb-4">' + periodHtml + '</select><label class="block text-sm font-semibold mb-2">支付方式</label><div class="grid grid-cols-2 gap-3 mb-5">' + paymentHtml + '</div><button id="s5-create-order" class="w-full rounded-xl bg-blue-600 py-3 font-bold text-white" type="submit">确认支付</button><p class="mt-3 text-xs text-slate-400">支付方式来自服务器配置。</p></form>');
+    showModal('确认购买 · ' + (plan.name || plan.title || '套餐'), '<form id="s5-purchase-form"><label class="block text-sm font-semibold mb-2">套餐周期</label><select id="s5-period" class="w-full rounded-xl border border-slate-200 p-3 mb-4">' + periodHtml + '</select><label class="block text-sm font-semibold mb-2">开通协议</label><select id="s5-protocol" name="protocol" class="w-full rounded-xl border border-slate-200 p-3 mb-4">' + protocolOptions(plan) + '</select><label class="block text-sm font-semibold mb-2">支付方式</label><div class="grid grid-cols-2 gap-3 mb-5">' + paymentHtml + '</div><button id="s5-create-order" class="w-full rounded-xl bg-blue-600 py-3 font-bold text-white" type="submit">确认支付</button><p class="mt-3 text-xs text-slate-400">支付方式来自服务器配置。</p></form>');
     $('s5-purchase-form').addEventListener('submit', async (event) => {
       event.preventDefault();
       const button = $('s5-create-order');
@@ -227,7 +238,7 @@
         const period = $('s5-period').value;
         const orderResponse = await request('/user/order/save', {
           method: 'POST',
-          body: JSON.stringify({ plan_id: plan.id, period, payment: paymentChoice.value })
+          body: JSON.stringify({ plan_id: plan.id, period, payment: paymentChoice.value, protocol: $('s5-protocol').value })
         });
         const order = unwrap(orderResponse) || {};
         const tradeNo = order.trade_no || order.tradeNo || order.order_no || order.orderNo;
@@ -317,10 +328,11 @@
   function renderPlanPage(kind) {
     const all = (App.state.products || []).map(normalizePlan);
     const matches = all.filter((p) => {
-      const text = [p.category, p.title, p.name, p.description].join(' ').toLowerCase();
-      if (kind === 'nodes') return /node|proxy|节点|代理|订阅|vpn|网络/.test(text);
-      if (kind === 'traffic') return /traffic|引流|增长|推广|群发|机器人|growth/.test(text);
-      return !/node|proxy|节点|代理|订阅|vpn|网络|traffic|引流|增长|推广|群发|机器人|growth/.test(text);
+      const text = [p.category, p.title, p.name, p.description, p.product_type].join(' ').toLowerCase();
+      const productKind = String(p.product_type || p.product_category || '').toLowerCase();
+      if (kind === 'nodes') return productKind === 'node' || /node|proxy|节点|代理|订阅|vpn|网络/.test(text);
+      if (kind === 'traffic') return productKind === 'traffic' || /traffic|引流|增长|推广|群发|机器人|growth/.test(text);
+      return productKind !== 'node' && productKind !== 'traffic' && !/node|proxy|节点|代理|订阅|vpn|网络|traffic|引流|增长|推广|群发|机器人|growth/.test(text);
     });
     const title = kind === 'nodes' ? '节点中心' : kind === 'traffic' ? '引流系统' : '账号商城';
     const subtitle = kind === 'nodes' ? '节点套餐与网络服务' : kind === 'traffic' ? '引流与增长服务套餐' : '账号与数字服务套餐';

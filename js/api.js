@@ -428,11 +428,11 @@
       const inviteCode = ($('reg-invite')?.value.trim() || params.get('invite_code') || params.get('invite') || '').trim().toUpperCase();
       const emailEl=$('reg-email'),codeEl=$('reg-code'),passEl=$('reg-pass'),confirmEl=$('reg-pass-confirm'),inviteEl=$('reg-invite');
       [emailEl,codeEl,passEl,confirmEl,inviteEl].forEach(el=>el?.classList.remove('invalid'));
-      if (!email || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {emailEl?.classList.add('invalid');return authError(email?'邮箱格式不正确':'请输入邮箱地址')}
-      if (!code) {codeEl?.classList.add('invalid');return authError('请输入邮箱验证码')}
-      if (!password || password.length < 6) {passEl?.classList.add('invalid');return authError('密码至少需要 6 位')}
-      if (password !== confirmPassword) {confirmEl?.classList.add('invalid');return authError('两次输入的密码不一致')}
-      if (inviteCode && !/^[A-Za-z0-9_-]{5,64}$/.test(inviteCode)) {inviteEl?.classList.add('invalid');return authError('邀请码格式不正确')}
+      if (!email || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {emailEl?.classList.add('invalid');return showError(email?'邮箱格式不正确':'请输入邮箱地址')}
+      if (!code) {codeEl?.classList.add('invalid');return showError('请输入邮箱验证码')}
+      if (!password || password.length < 6) {passEl?.classList.add('invalid');return showError('密码至少需要 6 位')}
+      if (password !== confirmPassword) {confirmEl?.classList.add('invalid');return showError('两次输入的密码不一致')}
+      if (inviteCode && !/^[A-Za-z0-9_-]{5,64}$/.test(inviteCode)) {inviteEl?.classList.add('invalid');return showError('邀请码格式不正确')}
       try {
         const response = await request('/passport/auth/register', { method: 'POST', body: JSON.stringify({ email, code, password, invite_code: inviteCode }) });
         const data = unwrap(response) || {};
@@ -451,8 +451,8 @@
       const password = $('login-pass') && $('login-pass').value;
       const emailEl=$('login-email'),passEl=$('login-pass');
       [emailEl,passEl].forEach(el=>el?.classList.remove('invalid'));
-      if (!email || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {emailEl?.classList.add('invalid');return authError(email?'邮箱格式不正确':'请输入邮箱地址')}
-      if (!password) {passEl?.classList.add('invalid');return authError('请输入密码')}
+      if (!email || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {emailEl?.classList.add('invalid');return showError(email?'邮箱格式不正确':'请输入邮箱地址')}
+      if (!password) {passEl?.classList.add('invalid');return showError('请输入密码')}
       const button = document.querySelector('#modal-content button[onclick="App.doLogin()"]');
       if (button) { button.disabled = true; button.textContent = '登录中…'; }
       try {

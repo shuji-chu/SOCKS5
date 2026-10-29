@@ -20,7 +20,34 @@ function listify(d){d=unpack(d);if(Array.isArray(d))return d;for(const k of ['it
 async function api(path,method='GET',body){const headers={Accept:'application/json','Content-Type':'application/json'};if(token())headers.Authorization='Bearer '+token();let r;try{r=await fetch(API_V1+path,{method,headers,signal:AbortSignal.timeout?AbortSignal.timeout(12000):undefined,...(body!==undefined?{body:JSON.stringify(body)}:{})})}catch(e){throw Error(e.name==='TimeoutError'||e.name==='AbortError'?'请求超时，请检查网络后重试':'网络连接失败，请检查网络后重试')}let d;try{d=await r.json()}catch{throw Error('服务端返回的 JSON 格式不正确，请稍后重试')}const hs=d&&d.http_status!==undefined?Number(d.http_status):null;if(!r.ok||hs!==null&&hs!==200||d?.success===false||d?.status==='fail'||d?.error)throw Error(safeUiMessage(d?.message||d?.msg||d?.detail||d?.error||('请求未成功（HTTP '+(hs!==null&&hs!==200?hs:r.status)+'）')));return d}
 function categoryOf(p,source){const raw=String(p.category||p.product_type||p.product_category||p.type||p.kind||p.tag||'').toLowerCase();if(/traffic|flow|引流|流量包|traffic_pack|接码|短信|验证码|查询|查号|sms|lookup|query/.test(raw))return '其他';if(/node|proxy|vpn|节点|线路|订阅|vless|vmess|trojan|hysteria/.test(raw)||source==='node')return '节点';if(/account|账号|帐号|chatgpt|telegram|google/.test(raw)||source==='account')return '账号';return '其他'}
 function moneyOf(p){let v=p.price_yuan??p.sale_price_yuan??p.price??p.sale_price??p.amount??p.month_price??p.monthly_price??0;v=Number(v);if(!Number.isFinite(v))return 0;const unit=String(p.price_unit||p.currency_unit||p.unit||'').toLowerCase();if(['yuan','cny','元','rmb'].includes(unit)||p.price_yuan!=null||p.sale_price_yuan!=null)return v;return v/100}
-function groupedNodeRows(response){const root=unpack(response);const grouped=root&&typeof root==='object'?(root.grouped??root.data?.grouped):null;if(!grouped||typeof grouped!=='object')return [];const out=[];const groups=Array.isArray(grouped)?grouped.map((g,i)=>[String(g.region||g.name||g.area||g.country||('地区 '+(i+1))),g]):Object.entries(grouped);for(const [region,group] of groups){const rows=Array.isArray(group)?group:(Array.isArray(group?.items)?group.items:Array.isArray(group?.plans)?group.plans:Array.isArray(group?.nodes)?group.nodes:[]);for(const row of rows)if(row&&typeof row==='object')out.push({...row,_region:row.region_name||row.region||row.country||region});}return out;}
+function groupedNodeRows(response){
+ const root=unpack(response);
+ const findGrouped=(value,depth=0)=>{if(!value||typeof value!=='object'||depth>5)return null;if(Object.prototype.hasOwnProperty.call(value,'grouped'))return value.grouped;for(const key of ['data','result','payload','response']){const found=findGrouped(value[key],depth+1);if(found!==null&&found!==undefined)return found;}return null};
+ const grouped=findGrouped(root)??root;
+ const out=[],seenObjects=new Set();
+ const containers=['items','plans','nodes','skus','sku_list','skuList','sku_items','skuItems','products','list','rows','records','children','variants','goods','regions','groups','data','result'];
+ const metaKeys=new Set(['total','count','page','page_size','pageSize','current_page','last_page','success','status','message','msg','code','http_status']);
+ const isSku=row=>!!row&&typeof row==='object'&&!Array.isArray(row)&&(
+  ['sku_id','skuId','product_id','productId','sku_name','skuName','product_name','productName','price','price_cents','price_yuan','sale_price','month_price','monthly_price','protocol','node_protocol','product_type'].some(k=>row[k]!==undefined&&row[k]!==null)||
+  ((row.name||row.title)&&(['id','uuid','stock','available_stock','description','content'].some(k=>row[k]!==undefined&&row[k]!==null)))
+ );
+ const regionOf=(obj,fallback)=>String(obj.region_name||obj.region||obj.area||obj.country||obj.location||obj.group_name||obj.zone||fallback||'');
+ const visit=(value,region='',depth=0)=>{
+  if(value==null||depth>12)return;
+  if(Array.isArray(value)){value.forEach(item=>visit(item,region,depth+1));return;}
+  if(typeof value!=='object'||seenObjects.has(value))return;
+  seenObjects.add(value);
+  const regionName=regionOf(value,region);
+  if(isSku(value)){out.push({...value,_region:String(value._region||regionName||region||'')});return;}
+  let traversed=false;
+  for(const key of containers){const child=value[key];if(child&&typeof child==='object'){visit(child,regionName||region,depth+1);traversed=true;}}
+  if(!traversed)for(const [key,child] of Object.entries(value)){if(metaKeys.has(key)||!child||typeof child!=='object')continue;visit(child,regionName||region||key,depth+1);}
+ };
+ visit(grouped,'',0);
+ const unique=new Map();
+ out.forEach((row,index)=>{const id=row.sku_id??row.skuId??row.product_id??row.productId??row.id??row.uuid;const key=id!=null?'id:'+String(id):'row:'+String(row._region)+'|'+String(row.sku_name||row.name||row.title||row.product_name||index)+'|'+String(row.price??row.price_yuan??row.month_price??'');if(!unique.has(key))unique.set(key,row);});
+ return Array.from(unique.values());
+}
 function normalize(p,i,source){
  const icon=p.icon_url||p.brand_icon_url||p.protocol_icon_url||'';
  let image=p.image_url||p.cover_url||p.image||p.cover||p.thumbnail||p.thumb||p.logo||'';
@@ -31,7 +58,7 @@ function normalize(p,i,source){
  const priceRaw=p.price_cents??p.price??p.sale_price??p.amount??p.month_price??p.monthly_price??p.price_yuan??0;
  const priceYuan=p.price_yuan!=null?Number(p.price_yuan):Number(priceRaw)/100;
  const priceProvided=[p.price_yuan,p.sale_price_yuan,p.price_cents,p.price,p.sale_price,p.amount,p.month_price,p.monthly_price].some(v=>v!==undefined&&v!==null&&v!=='');
- return {...p,_key:source+'-'+i+'-'+String(p.sku_id??p.id??p.product_id??p.uuid??'sku'),_source:source,_kind:categoryOf(p,source),_title:String(p.sku_name||p.name||p.title||p.product_name||p.label||'未命名 SKU'),_desc:String(p.description_zh||p.chinese_description||p.description_cn||p.description||p.summary||p.content||''),_image:resolveAsset(image),_icon:resolveAsset(icon),_price:Number.isFinite(priceYuan)?priceYuan:0,_priceProvided:priceProvided,_priceCents:Number(priceRaw)||0,_stock:rawStock,_sales:p.sales??p.sold_count??p.total_sales??p.buy_count,_tutorial:p.tutorial_markdown||p.tutorial_md||p.tutorial||p.guide_markdown||p.guide||p.markdown||p.content_md||'',_delivery:p.delivery_content||p.delivery_description||p.delivery||p.deliverables||p.delivery_type||p.delivery_method||'',_warranty:p.warranty||p.warranty_period||p.after_sales||p.after_sale||p.support_policy||p.guarantee||'',_notice:p.notice||p.notes||p.warning||p.terms||'',_merchantAttrs:merchant,_region:String(p._region||p.region_name||p.region||p.country||p.area||p.location||''),_premium:premium,_period:p.period_name||p.period_label||p.period||p.billing_cycle||''};
+ return {...p,_key:source+'-'+i+'-'+String(p.sku_id??p.id??p.product_id??p.uuid??'sku'),_source:source,_kind:categoryOf(p,source),_title:String(p.sku_name||p.name||p.title||p.product_name||p.label||'未命名 SKU'),_desc:String(p.description_zh||p.chinese_description||p.description_cn||p.description||p.summary||p.content||''),_image:resolveAsset(image),_icon:localIcon(icon),_price:Number.isFinite(priceYuan)?priceYuan:0,_priceProvided:priceProvided,_priceCents:Number(priceRaw)||0,_stock:rawStock,_sales:p.sales??p.sold_count??p.total_sales??p.buy_count,_tutorial:p.tutorial_markdown||p.tutorial_md||p.tutorial||p.guide_markdown||p.guide||p.markdown||p.content_md||'',_delivery:p.delivery_content||p.delivery_description||p.delivery||p.deliverables||p.delivery_type||p.delivery_method||'',_warranty:p.warranty||p.warranty_period||p.after_sales||p.after_sale||p.support_policy||p.guarantee||'',_notice:p.notice||p.notes||p.warning||p.terms||'',_merchantAttrs:merchant,_region:String(p._region||p.region_name||p.region||p.country||p.area||p.location||''),_premium:premium,_period:p.period_name||p.period_label||p.period||p.billing_cycle||''};
 }
 function markdown(md){const lines=String(md||'暂无教程内容').split(String.fromCharCode(10));let out='',listOpen=false;for(const raw of lines){const line=raw.trim();if(!line){if(listOpen){out+='</ul>';listOpen=false}out+='<p></p>';continue}let level=0;while(level<6&&line[level]==='#')level++;if(level>0&&line[level]===' '){if(listOpen){out+='</ul>';listOpen=false}out+='<h'+level+'>'+inlineMd(line.slice(level+1))+'</h'+level+'>';continue}if(line.startsWith('- ')||line.startsWith('* ')){if(!listOpen){out+='<ul>';listOpen=true}out+='<li>'+inlineMd(line.slice(2))+'</li>';continue}if(listOpen){out+='</ul>';listOpen=false}out+='<p>'+inlineMd(line)+'</p>'}if(listOpen)out+='</ul>';return '<div class="markdown">'+out+'</div>'}
 function inlineMd(v){let s=escHtml(safeModalText(v));s=s.split('**').map((x,i)=>i%2?'<strong>'+x+'</strong>':x).join('');s=s.split('`').map((x,i)=>i%2?'<code>'+x+'</code>':x).join('');return s}
@@ -62,7 +89,7 @@ async function loadCatalogs(){
  try{
   const [nodeResponse,accountResponse]=await Promise.all([api('/user/plan/fetch'),api('/account/products')]);
   const nodeRows=groupedNodeRows(nodeResponse),accountRows=listify(accountResponse).filter(p=>{const kind=[p.category,p.product_type,p.product_category,p.type,p.kind,p.tag,p.name,p.title,p.sku_name,p.product_name].filter(Boolean).join(' ').toLowerCase();return categoryOf(p,'account')==='账号'&&!/接码|短信|验证码|查询|查号|流量包|流量|引流|traffic|sms|verification|lookup|query/.test(kind)});
-  liveProducts=[...nodeRows.map((p,i)=>normalize(p,i,'node')),...accountRows.map((p,i)=>normalize(p,i,'account'))];const breakdown=document.getElementById('catalogBreakdown');if(breakdown){const premium=nodeRows.filter(p=>/singapore|新加坡|sgp|\\bsg\\b/i.test([p.region,p.country,p.area,p.name,p.title,p.location].filter(Boolean).join(' '))||p.premium===true||p.is_premium===true).length;breakdown.textContent='节点 '+nodeRows.length+' SKU · 新加坡高端 '+premium+' 款 · 账号 '+accountRows.length+' 件';}
+  liveProducts=[...nodeRows.map((p,i)=>normalize(p,i,'node')),...accountRows.map((p,i)=>normalize(p,i,'account'))];const breakdown=document.getElementById('catalogBreakdown');if(breakdown){const premium=nodeRows.filter(p=>/singapore|新加坡|sgp|\\bsg\\b/i.test([p._region,p.region,p.country,p.area,p.name,p.title,p.location].filter(Boolean).join(' '))||p.premium===true||p.is_premium===true).length;breakdown.textContent='节点 '+nodeRows.length+' SKU · 新加坡高端 '+premium+' 款 · 账号 '+accountRows.length+' 件';}
   renderProducts();
  }catch(e){
   liveProducts=[];

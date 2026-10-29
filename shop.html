@@ -29,6 +29,12 @@ const STATIC_CATALOGS=[
 let liveProducts=[],activeKind='全部',searchTerm='',paymentMethods=[];
 const escHtml=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const safeUiMessage=value=>String(value??'操作未完成').replace(/Bearer\s+\S+/gi,'[凭据已隐藏]').replace(/https?:\/\/[^\s"'<>]+/gi,'[链接已隐藏]').replace(/\b(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}(?::\d+)?\b/gi,'[地址已隐藏]').replace(/\b(?:\d{1,3}\.){3}\d{1,3}(?::\d+)?\b/g,'[地址已隐藏]').replace(/(?:^|\n)\s*at\s+[^\n]+/g,'').replace(/\s{2,}/g,' ').trim().slice(0,240)||'操作未完成，请稍后重试。';window.safeUiMessage=safeUiMessage;
+function toast(message){
+ const el=document.getElementById('toast');if(!el)return;
+ el.textContent=safeUiMessage(message);el.hidden=false;
+ clearTimeout(window.__shopToastTimer);
+ window.__shopToastTimer=setTimeout(()=>{el.hidden=true},3200);
+}
 const token=()=>localStorage.getItem('sosks5_token')||localStorage.getItem('tgx_token')||'';
 function unpack(r){return r&&r.data!==undefined?r.data:r}
 function listify(d){d=unpack(d);if(Array.isArray(d))return d;for(const k of ['items','list','products','plans','nodes','accounts','rows','data'])if(Array.isArray(d?.[k]))return d[k];throw Error('商品目录 JSON 结构不正确：未找到商品数组')}

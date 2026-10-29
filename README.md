@@ -47,6 +47,7 @@ SOCKS5/
 ├── shop.html                # 账号与节点商城
 ├── promo.html               # 引流机器人 / 分销中心
 ├── user.html                # 个人中心
+├── login.html               # 独立登录页
 ├── .gitignore
 ├── LICENSE
 └── README.md
@@ -100,3 +101,19 @@ python -m http.server 8080
 ## 开源协议
 
 本项目采用 MIT License，详见根目录的 `LICENSE` 文件。
+
+
+## 真实数据接口
+
+页面请求统一由 `js/api.js` 发出，`js/main.js` 负责页面渲染：
+
+- `GET /api/v1/user/info`：登录用户资料、短 ID、余额字段。
+- `GET /api/v1/user/plan/fetch`：节点套餐。
+- `GET /api/v1/user/cloned_products`：海外账号商品（需要后端实现并返回商品数组）。
+- `GET /api/v1/user/getSubscribe`：订阅链接与流量字段。
+- `GET /api/v1/user/invite/fetch`、`GET /api/v1/user/invite/customers`：邀请统计与当前用户邀请客户。
+- `GET /api/v1/user/referrals/leaderboard`：若后端部署该路由，则展示真实排行榜；路由不可用时页面显示真实邀请客户明细。
+- `GET /api/v1/user/bot/status`：TG 机器人绑定状态与入口。
+- `GET /api/v1/user/notices`：公告。
+
+当前后端源码中 `/user/cloned_products` 与 `/user/referrals/leaderboard` 尚未找到对应路由；用户信息接口的 `balance` 字段也返回固定的 `0`。这些数据必须由后端补齐后，前端才能显示真实账号商品、全站排行榜和真实余额。前端不会用静态假数据填补这些缺口。

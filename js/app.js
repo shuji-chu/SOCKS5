@@ -39,9 +39,12 @@ function groupedNodeRows(response){
   if(typeof value!=='object'||seenObjects.has(value))return;
   seenObjects.add(value);
   const regionName=regionOf(value,region);
+  const rowContainers=['items','plans','nodes','skus','sku_list','skuList','sku_items','skuItems','products','list','rows','records','children','regions','groups'];
+  const hasRows=rowContainers.some(key=>value[key]&&typeof value[key]==='object');
+  if(hasRows){for(const key of rowContainers){const child=value[key];if(child&&typeof child==='object')visit(child,regionName||region,depth+1);}return;}
   if(isSku(value)){out.push({...value,_region:String(value._region||regionName||region||'')});return;}
   let traversed=false;
-  for(const key of containers){const child=value[key];if(child&&typeof child==='object'){visit(child,regionName||region,depth+1);traversed=true;}}
+  for(const key of ['variants','goods','data','result']){const child=value[key];if(child&&typeof child==='object'){visit(child,regionName||region,depth+1);traversed=true;}}
   if(!traversed)for(const [key,child] of Object.entries(value)){if(metaKeys.has(key)||!child||typeof child!=='object')continue;visit(child,regionName||region||key,depth+1);}
  };
  visit(grouped,'',0);

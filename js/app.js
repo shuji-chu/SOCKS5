@@ -1,6 +1,7 @@
 
 const API_ROOT='https://web.lynli.me';
 const assetBase=()=>String(window.SOSKS5_OSS_BASE_URL||'').replace(/\/+$/,'');
+const localIcon=u=>{if(!u)return '';const s=String(u).trim();if(s.startsWith('./assets/icons/'))return s;if(s.startsWith('/assets/icons/'))return '.'+s;const m=s.match(/assets\/icons\/([a-z0-9_.-]+\.svg)/i);return m?'./assets/icons/'+m[1]:'./assets/icons/network.svg'};
 const API_V1='https://web.lynli.me/api/v1';
 const requestedCategory=new URLSearchParams(location.search).get('category')||'节点';
 let liveProducts=[],activeKind=['节点','账号'].includes(requestedCategory)?requestedCategory:'节点',searchTerm='',paymentMethods=[];
@@ -54,7 +55,7 @@ function normalize(p,i,source){
  const resolveAsset=u=>{if(!u)return '';u=String(u);if(u.startsWith('data:'))return u;const cdn=assetBase();if(/^https?:\/\//i.test(u)){if(cdn){try{const parsed=new URL(u),apiHost=new URL(API_ROOT).hostname;if(parsed.hostname===apiHost)return cdn+parsed.pathname+parsed.search+parsed.hash}catch(_){}}return u}const path=u.startsWith('/')?u:'/'+(u.startsWith('./')?u.slice(2):u);return cdn?cdn+path:API_ROOT+path};
  const merchant=p.merchant_attrs||p.merchantAttrs||p.attributes||{};
  const rawStock=p.available_stock??p.stock_available??p.stock??p.inventory??p.quantity??p.count??null;
- const premium=source==='node'&&(/singapore|新加坡|sgp|\bsg\b/i.test([p.region,p.country,p.area,p.name,p.title,p.location].filter(Boolean).join(' '))||p.premium===true||p.is_premium===true);
+ const premium=source==='node'&&(/singapore|新加坡|sgp|\bsg\b/i.test([p._region,p.region,p.country,p.area,p.name,p.title,p.location].filter(Boolean).join(' '))||p.premium===true||p.is_premium===true);
  const priceRaw=p.price_cents??p.price??p.sale_price??p.amount??p.month_price??p.monthly_price??p.price_yuan??0;
  const priceYuan=p.price_yuan!=null?Number(p.price_yuan):Number(priceRaw)/100;
  const priceProvided=[p.price_yuan,p.sale_price_yuan,p.price_cents,p.price,p.sale_price,p.amount,p.month_price,p.monthly_price].some(v=>v!==undefined&&v!==null&&v!=='');

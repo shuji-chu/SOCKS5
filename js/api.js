@@ -374,7 +374,7 @@
     getReferralLeaderboard: getReferralLeaderboard,
     getAnnouncements: getAnnouncements,
     createOrder: function (payload) { return request('/user/order/save', { method: 'POST', body: JSON.stringify(payload || {}) }); },
-    checkoutOrder: function (tradeNo) { return request('/user/order/checkout', { method: 'POST', body: JSON.stringify({ trade_no: tradeNo }); }
+    checkoutOrder: function (tradeNo) { return request('/user/order/checkout', { method: 'POST', body: JSON.stringify({ trade_no: tradeNo }) }); }
   };
 
   function install() {

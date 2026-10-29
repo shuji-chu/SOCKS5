@@ -152,7 +152,7 @@ import { UnrealBloomPass } from 'https://cdn.jsdelivr.net/npm/three@0.164.1/exam
       tick();
       window.addEventListener('pagehide',()=>{cancelAnimationFrame(raf);resizeObserver?.disconnect();composer?.dispose();renderer?.dispose();},{once:true});
     } catch(error) {
-      console.warn('WebGL 不可用，保留 CSS 深空背景。',error);
+      // Rendering fallback is silent in production; raw WebGL errors stay out of the console.
       cancelAnimationFrame(raf); resizeObserver?.disconnect(); canvas.remove(); hero.classList.remove('s5-webgl-hero');
     }
   }

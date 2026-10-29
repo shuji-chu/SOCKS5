@@ -57,7 +57,7 @@ async function loadCatalogs(){
  try{
   const [nodeResponse,accountResponse]=await Promise.all([api('/user/plan/fetch'),api('/account/products')]);
   const nodeRows=listify(nodeResponse),accountRows=listify(accountResponse);
-  liveProducts=[...nodeRows.map((p,i)=>normalize(p,i,'node')),...accountRows.map((p,i)=>normalize(p,i,'account'))];
+  liveProducts=[...nodeRows.map((p,i)=>normalize(p,i,'node')),...accountRows.map((p,i)=>normalize(p,i,'account'))];const breakdown=document.getElementById('catalogBreakdown');if(breakdown){const premium=nodeRows.filter(p=>/singapore|新加坡|sgp|\\bsg\\b/i.test([p.region,p.country,p.area,p.name,p.title,p.location].filter(Boolean).join(' '))||p.premium===true||p.is_premium===true).length;breakdown.textContent='节点 '+nodeRows.length+' SKU · 新加坡高端 '+premium+' 款 · 账号 '+accountRows.length+' 件';}
   renderProducts();
  }catch(e){
   liveProducts=[];toast('商品目录加载失败，请检查网络后重试');root.innerHTML='<div class="error-state"><b>真实商品目录暂不可用</b><p>'+escHtml(safeUiMessage(e.message))+'</p><button class="btn" type="button" onclick="loadCatalogs()">重新加载</button></div>';

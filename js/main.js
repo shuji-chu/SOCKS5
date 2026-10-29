@@ -115,7 +115,8 @@
     const accountResponse = results[1].status === 'fulfilled' ? unwrap(results[1].value) : [];
     if (results[0].status === 'rejected') toast('节点商品加载失败：' + results[0].reason.message);
     if (results[1].status === 'rejected') toast('账号商品加载失败：' + results[1].reason.message);
-    const plans = listFrom(nodesResponse);
+    const grouped = nodesResponse && typeof nodesResponse === 'object' ? (nodesResponse.grouped || (nodesResponse.data && nodesResponse.data.grouped)) : null;
+    const plans = grouped && typeof grouped === 'object' ? (Array.isArray(grouped) ? grouped.flatMap((g) => { const region = g.region || g.name || g.area || g.country || ''; const rows = Array.isArray(g) ? g : (g.items || g.plans || g.nodes || []); return rows.map((p) => Object.assign({}, p, {_region: p.region || p.region_name || region})); }) : Object.entries(grouped).flatMap(([region, group]) => (Array.isArray(group) ? group : (group.items || group.plans || group.nodes || [])).map((p) => Object.assign({}, p, {_region: p.region || p.region_name || region})))) : [];
     const isSocialAccount = (p) => /facebook|脸书|instagram|tiktok|twitter|推特|telegram|电报|whatsapp|google|gmail|youtube|油管|discord|reddit|snapchat|linkedin|outlook|apple id|meta account/.test([p.name,p.title,p.content,p.description,p.type,p.product_type,p.product_category].join(' ').toLowerCase());
     const isAccountPlan = (p) => {
       const kind = String(p.product_type || p.product_category || p.service_type || p.type || '').toLowerCase();
@@ -132,7 +133,8 @@
     const overridePayload = results[2].status === 'fulfilled' ? results[2].value : [];
     const overrideRows = listFrom(unwrap(overridePayload));
     const overrideMap = new Map(overrideRows.filter((item) => item && item.id != null).map((item) => [String(item.id), item]));
-    const combined = listFrom(accountResponse).concat(plans.filter(isAccountPlan)).map((item) => Object.assign({}, item, overrideMap.get(String(item.id)) || {}));
+    const allowedAccount = (item) => !/接码|短信|验证码|查询|查号|流量包|流量|引流|traffic|sms|verification|lookup|query/i.test([item.category,item.product_type,item.product_category,item.type,item.name,item.title,item.product_name].filter(Boolean).join(' '));
+    const combined = listFrom(accountResponse).filter(allowedAccount).concat(plans.filter(isAccountPlan).filter(allowedAccount)).map((item) => Object.assign({}, item, overrideMap.get(String(item.id)) || {}));
     const seen = new Set();
     const accounts = combined.filter((item) => {
       const key = item.id != null ? 'id:' + String(item.id) : 'name:' + String(item.name || item.title || item.product_name || '');

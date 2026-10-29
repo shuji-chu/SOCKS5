@@ -105,7 +105,9 @@
     p.protocol = p.protocol || p.node_protocol || (/^(vless|vmess|hysteria2|trojan)$/i.test(String(p.type || '')) ? p.type : '');
     p.protocols = Array.isArray(p.protocols) ? p.protocols : (p.protocol ? [p.protocol] : []);
     const productKind = String(p.product_type || p.product_category || p.service_type || '').toLowerCase();
-    p.category = p.category || (/traffic|引流|增长|推广|群发|机器人|growth/.test(productKind + ' ' + kind) ? '引流服务' : /node|proxy|节点|代理|订阅|vpn|网络|vless|vmess|hysteria2|trojan/.test(productKind + ' ' + kind) ? '节点服务' : '账号服务');
+    const nodeProduct = /node|proxy|节点|代理|订阅|vpn|网络|vless|vmess|hysteria2|trojan|shadowsocks|socks5|wireguard|tuic/.test(productKind + ' ' + kind);
+    const socialAccount = /facebook|脸书|instagram|tiktok|twitter|推特|telegram|电报|whatsapp|google|gmail|youtube|油管|discord|reddit|snapchat|linkedin|outlook|apple id|meta account/.test(kind);
+    p.category = nodeProduct ? '节点服务' : (socialAccount ? '账号服务' : (p.category || (/traffic|引流|增长|推广|群发|机器人|growth/.test(productKind + ' ' + kind) ? '引流服务' : '账号服务')));
     const periods = periodOptions(p);
     const prices = periods.map(x => x.price).filter(x => Number.isFinite(x) && x >= 0);
     p.price = prices.length ? Math.min.apply(null, prices) / 100 : Number(p.price || p.sale_price || 0);

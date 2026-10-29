@@ -1,0 +1,2 @@
+// Root-level multi-page static entry. No API requests are started here.
+(function(){'use strict';document.querySelectorAll('.announcement-track').forEach(el=>el.setAttribute('aria-label','平台公告'));})();

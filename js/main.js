@@ -116,15 +116,26 @@
     if (results[0].status === 'rejected') toast('节点商品加载失败：' + results[0].reason.message);
     if (results[1].status === 'rejected') toast('账号商品加载失败：' + results[1].reason.message);
     const plans = listFrom(nodesResponse);
+    const isSocialAccount = (p) => /facebook|脸书|instagram|tiktok|twitter|推特|telegram|电报|whatsapp|google|gmail|youtube|油管|discord|reddit|snapchat|linkedin|outlook|apple id|meta account/.test([p.name,p.title,p.content,p.description,p.type,p.product_type,p.product_category].join(' ').toLowerCase());
+    const isAccountPlan = (p) => {
+      const kind = String(p.product_type || p.product_category || p.service_type || p.type || '').toLowerCase();
+      return isSocialAccount(p) || kind === 'account' || kind === 'accounts' || /账号|account/.test(kind);
+    };
     const nodes = plans.filter((p) => {
+      if (isAccountPlan(p)) return false;
       const kind = String(p.product_type || p.product_category || p.service_type || '').toLowerCase();
-      const words = [p.name,p.title,p.content,p.description,p.type].join(' ').toLowerCase();
+      const words = [p.name,p.title,p.content,p.description,p.type,p.protocol,p.node_protocol].join(' ').toLowerCase();
       return kind === 'node' || kind === 'nodes' || kind === 'proxy' || /节点|proxy|vpn|订阅|vless|vmess|hysteria|trojan|shadowsocks|socks5|wireguard|tuic|network/.test(words);
     });
-    const accounts = listFrom(accountResponse).map((item) => Object.assign({}, item, {category: '账号服务', product_type: 'account', account_category: item.account_category || item.platform || accountCategoryName(item)}));
+    const combined = listFrom(accountResponse).concat(plans.filter(isAccountPlan));
+    const seen = new Set();
+    const accounts = combined.filter((item) => {
+      const key = item.id != null ? 'id:' + String(item.id) : 'name:' + String(item.name || item.title || item.product_name || '');
+      if (seen.has(key)) return false;
+      seen.add(key); return true;
+    }).map((item) => Object.assign({}, item, {category: '账号服务', product_type: 'account', account_category: item.account_category || item.platform || accountCategoryName(item)}));
     return {nodes, accounts};
   }
-
   async function loadHome() {
     const productSection = $$('.content-section').find((section) => /精选数字商品/.test(section.textContent));
     if (productSection) {

@@ -47,7 +47,7 @@ import { UnrealBloomPass } from 'https://cdn.jsdelivr.net/npm/three@0.164.1/exam
       fragmentShader:`uniform float uTime; varying vec2 vUv; varying float vDepth;
         float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453123);}
         float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(hash(i),hash(i+vec2(1.,0.)),f.x),mix(hash(i+vec2(0.,1.)),hash(i+vec2(1.,1.)),f.x),f.y);}
-        void main(){vec2 p=(vUv-.5)*2.0;float r=length(p);float n=noise(p*3.2+uTime*.025)*.55+noise(p*7.0-uTime*.018)*.25+noise(p*13.0)*.2;float cloud=smoothstep(.95,.12,r)*smoothstep(.28,.92,n);float wisps=smoothstep(.35,.8,noise(p*5.0+vec2(uTime*.015,-uTime*.02)));float a=(cloud*.13+wisps*cloud*.09)*smoothstep(42.,4.,vDepth);vec3 c=mix(vec3(.0,.16,.27),vec3(.0,.94,1.0),n);c=mix(c,vec3(.39,1.0,.85),smoothstep(.65,.94,n)*.55);gl_FragColor=vec4(c,a);}`,
+        void main(){vec2 p=(vUv-.5)*2.0;float r=length(p);float n=noise(p*3.2+uTime*.025)*.55+noise(p*7.0-uTime*.018)*.25+noise(p*13.0)*.2;float cloud=(1.0-smoothstep(.12,.95,r))*smoothstep(.28,.92,n);float wisps=smoothstep(.35,.8,noise(p*5.0+vec2(uTime*.015,-uTime*.02)));float a=(cloud*.13+wisps*cloud*.09)*(1.0-smoothstep(4.,42.,vDepth));vec3 c=mix(vec3(.0,.16,.27),vec3(.0,.94,1.0),n);c=mix(c,vec3(.39,1.0,.85),smoothstep(.65,.94,n)*.55);gl_FragColor=vec4(c,a);}`,
       transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide
     });
     const plane = new THREE.Mesh(new THREE.PlaneGeometry(42,25,1,1),cloudMaterial);

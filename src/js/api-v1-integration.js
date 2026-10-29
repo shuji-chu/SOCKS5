@@ -299,6 +299,13 @@
     });
   }
 
+  function platformIcon(p) {
+    const text = [p && p.account_category,p && p.platform,p && p.name,p && p.title,p && p.product_name,p && p.product_type].filter(Boolean).join(' ').toLowerCase();
+    const entries = [[/facebook|脸书|fb账号/,'platform-facebook.svg'],[/instagram|ins账号/,'platform-instagram.svg'],[/tiktok|tik tok|抖音海外/,'platform-tiktok.svg'],[/twitter|推特|x账号/,'platform-x.svg'],[/telegram|电报|tg账号/,'platform-telegram.svg'],[/google|gmail|谷歌/,'platform-google.svg'],[/whatsapp|wa账号/,'platform-whatsapp.svg'],[/discord/,'platform-discord.svg'],[/youtube|油管/,'platform-youtube.svg'],[/reddit/,'platform-reddit.svg']];
+    const found = entries.find(([re]) => re.test(text));
+    return found ? '../../assets/images/' + found[1] : '../../assets/images/accounts.svg';
+  }
+
   function cloneMoney(p) {
     const hasYuanPrice = p.price_yuan != null;
     const raw = Number(hasYuanPrice ? p.price_yuan : (p.price_cents ?? p.price_amount ?? p.price ?? p.amount ?? p.sale_price ?? 0));
@@ -309,10 +316,10 @@
 
   function renderCloneModal(p) {
     const title = p.name || p.title || p.product_name || "数字商品";
-    const image = p.image_url || p.image || p.cover_url || p.thumbnail || p.oss_url || "";
+    const image = p.image_url || p.image || p.cover_url || p.thumbnail || p.oss_url || platformIcon(p);
     const description = p.detail_description || p.details || p.content_zh || p.description_zh || p.chinese_description || p.description_cn || p.content || p.description || p.introduction || "暂未提供详细说明，请联系客服了解商品规格、交付方式与适用范围。";
     showModal("商品详情", '<div class="s5-clone-detail">' +
-      (image ? '<img class="s5-clone-detail-image" src="' + esc(image) + '" alt="' + esc(title) + '">' : "") +
+      '<img class="s5-clone-detail-image" src="' + esc(image) + '" alt="' + esc(title) + '" onerror="this.onerror=null;this.src=\'../../assets/images/accounts.svg\'">' +
       '<h3>' + esc(title) + '</h3><p>' + esc(description) + '</p><div class="s5-clone-detail-price">' + esc(cloneMoney(p)) + '</div>' +
       '<a class="s5-clone-buy" href="https://t.me/qingtian_Boss" target="_blank" rel="noopener noreferrer">立即购买 / 联系客服</a></div>');
   }
@@ -333,7 +340,7 @@
           const image = p.image_url || p.image || p.cover_url || p.thumbnail || p.oss_url || "";
           const desc = p.description_zh || p.chinese_description || p.description_cn || p.summary_zh || p.description || p.summary || "查看商品详情，了解规格、交付方式与适用范围。";
           return '<button type="button" class="s5-clone-card" data-clone-index="' + index + '">' +
-            (image ? '<img loading="lazy" src="' + esc(image) + '" alt="' + esc(title) + '" class="s5-clone-image">' : '<span class="s5-clone-image s5-clone-image-empty">全球精选</span>') +
+            '<img loading="lazy" src="' + esc(image) + '" alt="' + esc(title) + '" class="s5-clone-image" onerror="this.onerror=null;this.src=\'../../assets/images/accounts.svg\'">' +
             '<span class="s5-clone-card-body"><span class="s5-clone-name">' + esc(title) + '</span><span class="s5-clone-desc">' + esc(desc) + '</span><span class="s5-clone-card-foot"><strong>' + esc(cloneMoney(p)) + '</strong><span>查看详情 ↗</span></span></span></button>';
         }).join("") + '</div>' : '<div class="s5-clone-empty">当前暂无已发布商品，请稍后再来查看。</div>');
       box.querySelectorAll("[data-clone-index]").forEach((card) => card.addEventListener("click", () => {

@@ -26,7 +26,27 @@
 <div class="modal-backdrop" id="logoutModal"><div class="modal"><h3>确认退出登录？</h3><p class="muted">退出后需要重新登录才能查看个人信息。</p><div class="actions"><button class="btn ghost" onclick="hideModal('logoutModal')">取消</button><button class="btn primary" onclick="hideModal('logoutModal');localStorage.removeItem('sosks5_token');localStorage.removeItem('tgx_token');localStorage.removeItem('sosks5_user');localStorage.removeItem('tgx_user');sessionStorage.removeItem('sosks5_token');sessionStorage.removeItem('tgx_token');location.href='./login.html'">确认退出</button></div></div></div>
 <nav class="bottom-nav"><a href="./index.html"><img src="./assets/icons/home.svg" alt="" aria-hidden="true">首页</a><a class="" href="./shop.html"><img src="./assets/icons/shop.svg" alt="" aria-hidden="true">商城</a><a class="" href="#inviteRewards"><img src="./assets/icons/network.svg" alt="" aria-hidden="true">邀请/分销</a><a class="active" href="./user.html"><img src="./assets/icons/user.svg" alt="" aria-hidden="true">我的</a></nav><div id="toast" class="toast" hidden></div>
 <script>
-function botNotConfigured(name,action){toast(name+'：真实 Telegram 入口尚未配置，暂不跳转虚构账号');}
+const telegramBotMap={};
+async function loadTelegramBots(){
+ try{
+  const base=String(window.SOSKS5_PUBLIC_API_BASE||'https://api.lynli.me').replace(/\/+$/,'');
+  const response=await fetch(base+'/api/v1/public/telegram-bots',{headers:{Accept:'application/json'},signal:AbortSignal.timeout?AbortSignal.timeout(5000):undefined});
+  if(!response.ok)return;
+  const payload=await response.json();const rows=Array.isArray(payload)?payload:Array.isArray(payload.data)?payload.data:[];
+  rows.forEach(bot=>{if(bot&&bot.id&&bot.username&&bot.enabled===true)telegramBotMap[String(bot.id).toLowerCase()]=bot});
+  const map=[['safew','.bot-safew'],['mivra','.bot-mivra'],['qingtian','.bot-qingtian']];
+  map.forEach(([id,selector])=>{const card=document.querySelector(selector),bot=telegramBotMap[id];if(!card)return;const foot=card.querySelector('.bot-foot'),state=card.querySelector('.bot-state'),title=card.querySelector('h2'),subtitle=card.querySelector('.bot-subtitle'),desc=card.querySelector('.bot-description'),button=card.querySelector('.bot-actions .btn.primary');if(bot){if(title&&bot.name)title.textContent=bot.name;if(subtitle&&bot.subtitle)subtitle.textContent=bot.subtitle;if(desc&&bot.description)desc.textContent=bot.description;if(state)state.textContent='入口已配置';if(foot)foot.textContent='Telegram 入口已配置';if(button&&bot.button)button.childNodes[0].textContent=bot.button+' ';}else{if(state)state.textContent='待配置';if(foot)foot.textContent='真实入口尚未配置，当前不会跳转虚构账号';}});
+ }catch{/* Keep the matrix available; do not show raw network details. */}
+}
+function botNotConfigured(name,action){
+ const key=/safew/i.test(name)?'safew':/mivra/i.test(name)?'mivra':/晴天|qingtian/i.test(name)?'qingtian':'';
+ const bot=telegramBotMap[key];
+ if(!bot||!bot.username){toast(name+'：官方 Telegram 入口尚未配置，暂不跳转。');return}
+ const username=String(bot.username).replace(/^@/,'');
+ if(!/^[A-Za-z][A-Za-z0-9_]{4,31}$/.test(username)){toast('该机器人入口配置无效，请联系管理员。');return}
+ window.open('https://t.me/'+username,'_blank','noopener,noreferrer');
+}
+
 function safeUiMessage(value){return String(value??'操作未完成').replace(/Bearer\s+\S+/gi,'[凭据已隐藏]').replace(/\b(access[_-]?token|refresh[_-]?token|api[_-]?key|secret|password|authorization)\s*[:=]\s*["']?[^,\s"';&]+/gi,'$1=[凭据已隐藏]').replace(/(?:\b[0-9a-f]{1,4}:){2,}[0-9a-f:.]{1,}/gi,'[IP地址已隐藏]').replace(/https?:\/\/[^\s"'<>]+/gi,'[链接已隐藏]').replace(/\b(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}(?::\d+)?\b/gi,'[地址已隐藏]').replace(/\b(?:\d{1,3}\.){3}\d{1,3}(?::\d+)?\b/g,'[地址已隐藏]').replace(/(?:^|\n)\s*at\s+[^\n]+/g,'').replace(/\s{2,}/g,' ').trim().slice(0,240)||'操作未完成，请稍后重试。'};window.safeUiMessage=safeUiMessage;
 function toast(s){let t=document.getElementById('toast');t.textContent=safeUiMessage(s);t.hidden=false;clearTimeout(window.__toastTimer);window.__toastTimer=setTimeout(()=>t.hidden=true,2200)}
 function copyText(s,button){if(!s||/^(暂无|尚未|服务器未返回|暂不可用|正在读取|演示)/.test(String(s))){toast('当前没有可复制的真实内容');return}const done=()=>{toast('已复制到剪贴板');if(button){const old=button.dataset.originalText||button.textContent;button.dataset.originalText=old;button.textContent='已复制';button.classList.add('copied');setTimeout(()=>{button.textContent=old;button.classList.remove('copied')},1800)}};if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(s).then(done).catch(()=>fallbackCopy(s,done))}else fallbackCopy(s,done)}
@@ -57,5 +77,6 @@ document.getElementById('confirmApiReset')?.addEventListener('click',async()=>{c
 document.getElementById('downloadPoster')?.addEventListener('click',()=>{const c=document.getElementById('invitePoster');c.toBlob(blob=>{if(!blob){toast('海报生成失败');return}const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='SOSKS5-invitation.png';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)},'image/png')});
 document.getElementById('copyInvite')?.addEventListener('click',e=>copyText(document.getElementById('inviteUrlValue').value,e.currentTarget));
 document.getElementById('apiResetModal')?.addEventListener('click',e=>{if(e.target.id==='apiResetModal')hideModal('apiResetModal')});
+loadTelegramBots();
 initDeveloperTools();
 </script></body></html>

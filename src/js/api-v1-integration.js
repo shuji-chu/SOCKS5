@@ -57,13 +57,13 @@
     try {
       response = await fetch(API_BASE + '/api/v1' + path, Object.assign({}, opts, { headers }));
     } catch (error) {
-      throw new Error('接口请求失败，可能是跨域或后端未启动：' + (error && error.message ? error.message : '网络连接失败'));
+      throw new Error('网络请求失败，请检查连接后重试');
     }
     let body;
     try { body = await response.json(); } catch (_) { body = {}; }
-    if (!response.ok) throw new Error((body && (body.message || body.msg || body.detail || body.error)) || ('HTTP ' + response.status));
-    if (body && (body.status === 'fail' || body.success === false || (typeof body.code === 'number' && body.code !== 200 && body.code !== 0 && body.data === undefined))) throw new Error(String(body.message || body.msg || body.detail || body.error || '请求未成功'));
-    if (body && body.error) throw new Error(String(body.message || body.msg || body.error));
+    if (!response.ok) throw new Error(safeUiMessage((body && (body.message || body.msg || body.detail || body.error)) || ('请求未成功（HTTP ' + response.status + '）')));
+    if (body && (body.status === 'fail' || body.success === false || (typeof body.code === 'number' && body.code !== 200 && body.code !== 0 && body.data === undefined))) throw new Error(safeUiMessage(String(body.message || body.msg || body.detail || body.error || '请求未成功')));
+    if (body && body.error) throw new Error(safeUiMessage(String(body.message || body.msg || body.error)));
     return body;
   }
 

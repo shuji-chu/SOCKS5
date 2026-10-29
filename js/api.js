@@ -339,9 +339,6 @@
     return request('/user/announcements?placement=' + encodeURIComponent(placement), { method: 'GET' });
   }
 
-  function saveToken(token) {
-    TOKEN_KEYS.forEach((key) => localStorage.setItem(key, String(token || '')));
-  }
   function clearSession() {
     TOKEN_KEYS.concat(USER_KEYS).forEach((key) => localStorage.removeItem(key));
   }

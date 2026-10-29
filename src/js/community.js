@@ -13,6 +13,7 @@
   document.head.appendChild(style);
 
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const safeUiMessage = (v) => String(v ?? '操作未完成').replace(/Bearer\s+\S+/gi,'[凭据已隐藏]').replace(/https?:\/\/[^\s"'<>]+/gi,'[链接已隐藏]').replace(/\b(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}(?::\d+)?\b/gi,'[地址已隐藏]').replace(/\b(?:\d{1,3}\.){3}\d{1,3}(?::\d+)?\b/g,'[地址已隐藏]').replace(/(?:^|\n)\s*at\s+[^\n]+/g,'').slice(0,240) || '操作未完成，请稍后重试。';
   const token = () => localStorage.getItem('sosks5_token') || '';
   const api = async (path, opts = {}) => {
     const headers = { ...(opts.headers || {}) };
@@ -20,7 +21,7 @@
     if (opts.body && !(opts.body instanceof FormData)) headers['Content-Type'] = 'application/json';
     const r = await fetch('/api' + path, {...opts, headers});
     const data = await r.json().catch(() => ({}));
-    if (!r.ok) throw new Error(data.message || ('HTTP ' + r.status));
+    if (!r.ok) throw new Error(safeUiMessage(data.message || ('请求未成功（HTTP ' + r.status + '）')));
     return data;
   };
   const shell = (inner) => '<section class="s5-shell">' + inner + '</section>';
@@ -124,7 +125,7 @@
             if (ar.user) { App.state.user = {...App.state.user,...ar.user}; localStorage.setItem('sosks5_user', JSON.stringify(App.state.user)); }
           }
           status.textContent = '保存成功。'; App.renderNav();
-        } catch (e) { status.textContent = '暂时未能保存：' + e.message + '。请接通 PATCH /api/users/profile 和 POST /api/users/avatar。'; }
+        } catch (e) { status.textContent = '资料暂时未能保存，请稍后重试。'; }
         finally { btn.disabled = false; }
       });
     } else if (hash === '#/traffic/new') {
@@ -135,7 +136,7 @@
         const fd = new FormData(form);
         const body = {title:fd.get('title'),url:fd.get('url'),category:fd.get('category'),description:fd.get('description'),tags:String(fd.get('tags')||'').split(',').map(x=>x.trim()).filter(Boolean)};
         try { const r = await api('/traffic/posts',{method:'POST',body:JSON.stringify(body)}); status.textContent = r.message || '发布成功'; setTimeout(()=>location.hash='#/traffic',700); }
-        catch(err) { status.textContent = '尚未发布：' + err.message + '。请接通 POST /api/traffic/posts。'; }
+        catch(err) { status.textContent = '内容暂未发布，请稍后重试。'; }
       });
     }
   }

@@ -6,7 +6,7 @@ var api=function(path,opts){if(!window.S5Api) return Promise.reject(new Error('A
 var token=function(){return window.S5Api&&window.S5Api.readToken?window.S5Api.readToken():'';};
 function linksFrom(text){
  text=String(text||'').trim();
- if(/^[A-Za-z0-9+/=\r\n]+$/.test(text)&&!/(vless|vmess|trojan|ss|hysteria):\/\//i.test(text)){try{text=decodeURIComponent(escape(atob(text.replace(/\s/g,'')));}catch(e){}}
+ if(/^[A-Za-z0-9+/=\r\n]+$/.test(text)&&!/(vless|vmess|trojan|ss|hysteria):\/\//i.test(text)){try{text=decodeURIComponent(escape(atob(text.replace(/\s/g,''))));}catch(e){}}
  return Array.from(new Set(text.match(/(?:vless|vmess|trojan|ss|ssr|hysteria2?|tuic|wireguard):\/\/[^\s"'<>]+/g)||[]));
 }
 function singbox(text){

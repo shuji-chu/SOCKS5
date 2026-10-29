@@ -1,34 +1,36 @@
-# SOSKS5｜探索无界网络，极速全球节点
+# SOSKS5 | 全球数字资产与私域流量聚合平台
 
-![中文界面](https://img.shields.io/badge/界面-中文-1677ff?style=for-the-badge) ![JavaScript](https://img.shields.io/badge/JavaScript-原生-F7DF1E?style=for-the-badge&logo=javascript) ![WebGL](https://img.shields.io/badge/WebGL-Three.js-000000?style=for-the-badge&logo=threedotjs) ![部署](https://img.shields.io/badge/部署-GitHub%20Pages-222222?style=for-the-badge&logo=github)
+SOSKS5 是面向全球数字业务场景的综合数字商业平台前端，聚焦三大核心业务：**海量账号资源商城、一键引流机器人矩阵、全球高速节点服务**。项目使用原生 HTML、CSS 与 JavaScript 多页面结构，首页、商城、引流中心和个人中心分别维护，便于独立扩展。
 
-> 深空视觉、响应式商城与真实 API 驱动的数字服务前端。
+## 三大核心业务
+- **海量账号资源商城**：海外账号资源展示、分类浏览和商品入口。
+- **一键引流机器人矩阵**：机器人推广工具、自动化流程和分销入口。
+- **全球高速节点服务**：全球网络节点与服务套餐展示。
 
-## 预览截图
-
-请将真实运行截图添加至 `docs/screenshots/home.png` 与 `docs/screenshots/login.png`，再取消下方注释；仓库暂不包含经过验证的截图。
-
-<!-- ![首页](docs/screenshots/home.png) ![登录](docs/screenshots/login.png) -->
-
-## 一分钟部署
-
-要求：Python 3。
-
-```bash
-git clone https://github.com/shuji-chu/SOCKS5.git
-cd SOCKS5
-python -m http.server 8080
+## 项目目录
+```text
+SOCKS5/
+├── index.html
+├── shop.html
+├── promo.html
+├── user.html
+├── README.md
+├── css/
+│   ├── global.css
+│   ├── components.css
+│   └── pages.css
+└── js/
+    ├── api.js
+    ├── ui.js
+    └── main.js
 ```
 
-浏览器打开 http://localhost:8080/src/ 。静态预览不包含后端能力；登录、注册、订单和支付需要部署真实 API。
+## 本地预览
+在项目根目录执行 `python -m http.server 8080`，然后打开 `http://localhost:8080/`。
 
-## 技术与合规
-
-- 前端：HTML、CSS、JavaScript；WebGL 视觉使用 Three.js。
-- 未接入的业务不展示虚构成功状态或虚构数据。
-- 请勿提交 API 密钥、Token 或真实用户数据。
-- 用户协议与隐私说明必须根据真实数据处理流程及适用法律由维护者审核；示例文案不构成法律意见。
-
-## 支持项目
-
-如果项目对你有帮助，欢迎点亮 **Star** ⭐，提交 Issue 或贡献改进。
+## 当前状态
+- 商品标题、价格、库存和排行榜为静态展示，不是实时后端数据。
+- 商城图片使用公开图片 CDN 作为视觉占位。
+- `js/api.js` 保留原有 API 集成文件内容，不会被静态页面入口自动加载。
+- 购买、订单、订阅导出和机器人任务需要接入真实业务后才能使用。
+- 不要提交 API 密钥、Token 或真实用户数据。

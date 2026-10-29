@@ -7,10 +7,12 @@
  const idOf=n=>n?.node_id??n?.server_id??n?.id??n?.uuid??n?.product_id;
  const ipOf=n=>String(n?.ip??n?.host??n?.server_ip??n?.address??'').trim();
  const coords=n=>{
-  const lat=Number(n?.lat??n?.latitude??n?.geo_lat??n?.location?.lat);
-  const lng=Number(n?.lng??n?.lon??n?.longitude??n?.geo_lng??n?.location?.lng??n?.location?.lon);
+  const latRaw=n?.lat??n?.latitude??n?.geo_lat??n?.location?.lat,lngRaw=n?.lng??n?.lon??n?.longitude??n?.geo_lng??n?.location?.lng??n?.location?.lon;
+  if(latRaw==null||lngRaw==null||String(latRaw).trim()===''||String(lngRaw).trim()==='')return null;
+  const lat=Number(latRaw),lng=Number(lngRaw);
   return Number.isFinite(lat)&&Number.isFinite(lng)&&lat>=-90&&lat<=90&&lng>=-180&&lng<=180?{lat,lng}:null;
  };
+ const hostOf=n=>{const raw=ipOf(n);if(!raw)return '';try{return new URL(raw.includes('://')?raw:'https://'+raw).hostname.replace(/^\[|\]$/g,'')}catch{return raw.replace(/^\[|\]$/g,'').replace(/:\d+$/,'')}};
  function headers(json=true){const h={Accept:'application/json'};if(json)h['Content-Type']='application/json';if(token())h.Authorization='Bearer '+token();return h}
  async function request(path,method='GET',body){const r=await fetch(API+path,{method,headers:headers(method!=='GET'),...(body!==undefined?{body:JSON.stringify(body)}:{}),signal:AbortSignal.timeout?AbortSignal.timeout(12000):undefined});let d={};try{d=await r.json()}catch{}if(!r.ok||d.success===false||d.error||d.status==='fail')throw Error(d.message||d.msg||('本站接口响应 HTTP '+r.status));return d.data??d}
  function rowsOf(d){if(Array.isArray(d))return d;for(const k of ['nodes','servers','items','list','rows','data'])if(Array.isArray(d?.[k]))return d[k];if(d?.data&&typeof d.data==='object')return rowsOf(d.data);return []}
@@ -44,9 +46,9 @@
      const start=performance.now(),d=await request(w.SOSKS5_NODE_SPEED_PATH,'POST',{node_id:idOf(n),product_id:n?.product_id??n?.id,ip:ipOf(n)}),elapsed=performance.now()-start;
      const ms=Number(d.latency_ms??d.latency??d.ping_ms??d.rtt_ms);success=true;message=(Number.isFinite(ms)&&ms>=0?ms:elapsed).toFixed(1)+' ms（本站测速接口）';
     }else{
-     const record=await findNodeRecord(n),target=String(record?.health_url??record?.api_url??record?.status_url??record?.ping_url??'').trim(),host=ipOf(record||n);
+     const record=await findNodeRecord(n),target=String(record?.health_url??record?.api_url??record?.status_url??record?.ping_url??'').trim(),host=hostOf(record||n);
      let url;try{url=new URL(target,location.origin)}catch{}
-     const allowedHost=url&&(url.hostname===host||url.hostname===String(record?.domain||n?.domain||''));
+     const allowedHost=url&&(url.hostname.replace(/^\[|\]$/g,'')===host||url.hostname===String(record?.domain||n?.domain||''));
      if(!target||!url||!/^https?:$/.test(url.protocol)||!allowedHost)throw Error('节点目录未提供与当前节点 IP 匹配的健康检查 API 地址，无法安全直测');
      const start=performance.now(),r=await fetch(url.href,{method:'GET',cache:'no-store',mode:'cors',signal:AbortSignal.timeout?AbortSignal.timeout(10000):undefined}),elapsed=performance.now()-start;
      if(!r.ok)throw Error('当前节点 API 返回 HTTP '+r.status);

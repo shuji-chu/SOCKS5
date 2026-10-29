@@ -164,7 +164,7 @@
         const encoded=encodeURIComponent(key);
         const paths=['/user/order/detail?trade_no='+encoded,'/user/order/fetch?trade_no='+encoded,'/user/order/detail?id='+encoded];
         for(const path of paths){try{const data=await get(path,tok);order=findOrder(data,key);if(order)break}catch(e){if(/登录状态已失效/.test(e.message)){showError(e.message);return}last=e.message}}
-        if(!order){for(const path of ['/user/order/fetch','/user/order/list','/user/orders']){try{const data=await get(path,tok);order=findOrder(data,key);if(order)break}catch(e){if(/登录状态已失效/.test(e.message)){showError(e.message);return}last=e.message}}}
+        if(!order){for(const path of ['/user/orders?page=1&page_size=100','/user/order/fetch','/user/order/list']){try{const data=await get(path,tok);order=findOrder(data,key);if(order)break}catch(e){if(/登录状态已失效/.test(e.message)){showError(e.message);return}last=e.message}}}
         if(!order){showError('无法读取该订单的真实详情：'+last+'。为保护账户数据，本页不会使用示例商品、示例卡密或虚构支付状态。');return}
         const title=first(order,['product_name','plan_name','goods_name','name','title','subject'])||'商品名称未返回';
         const no=first(order,['trade_no','order_no','orderNo','id'])||key;

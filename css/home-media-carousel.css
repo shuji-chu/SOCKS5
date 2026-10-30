@@ -20,3 +20,8 @@ img[src*="/assets/icons/"],img[src*="./assets/icons/"],.protocol-badge img,.sku-
 .bottom-nav a img,.home-bottom-nav a img,.mobile-tabbar a img{filter:brightness(0) saturate(100%) invert(19%) sepia(99%) saturate(5247%) hue-rotate(222deg) brightness(101%) contrast(106%)!important}
 .bottom-nav a.active img,.home-bottom-nav a.active img,.mobile-tabbar a.active img{filter:brightness(0) saturate(100%) invert(19%) sepia(99%) saturate(5247%) hue-rotate(222deg) brightness(101%) contrast(106%)!important}
 button svg,.button svg,.btn svg,.card svg,.protocol-badge svg{color:#0055FF}
+
+/* Integrate the carousel into the existing hero grid without overflowing */
+.space-hero .home-media-carousel{flex:0 1 43%;width:43%;min-width:0;margin:0 0 0 auto;padding:0}
+.space-hero>.space-orbit{display:none!important}
+@media(max-width:760px){.space-hero .home-media-carousel{flex:0 0 auto;width:100%;margin:28px auto 12px;padding:0}.space-hero{min-height:unset!important}.media-carousel-stage{min-height:190px}}

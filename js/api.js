@@ -248,61 +248,109 @@
     return options.map(x => '<option value="' + esc(x.toLowerCase()) + '"' + (current === x.toUpperCase() ? ' selected' : '') + '>' + esc(x) + '</option>').join('');
   }
 
+  const S5_REGION_POOL = {
+    us:{name:'美国',domains:['us1.de5.net','us2.de5.net'],ips:['192.0.2.11','192.0.2.12','192.0.2.13','192.0.2.14','192.0.2.15','192.0.2.16','192.0.2.17']},
+    sg:{name:'新加坡',domains:['sg1.de5.net','sg2.de5.net'],ips:['198.51.100.21','198.51.100.22','198.51.100.23','198.51.100.24','198.51.100.25','198.51.100.26','198.51.100.27']},
+    jp:{name:'日本',domains:['jp1.de5.net','jp2.de5.net'],ips:['203.0.113.31','203.0.113.32','203.0.113.33','203.0.113.34','203.0.113.35','203.0.113.36','203.0.113.37']},
+    hk:{name:'香港',domains:['hk1.de5.net','hk2.de5.net'],ips:['192.0.2.41','192.0.2.42','192.0.2.43','192.0.2.44','192.0.2.45','192.0.2.46','192.0.2.47']},
+    de:{name:'德国',domains:['de1.de5.net','de2.de5.net'],ips:['198.51.100.51','198.51.100.52','198.51.100.53','198.51.100.54','198.51.100.55','198.51.100.56','198.51.100.57']},
+    uk:{name:'英国',domains:['uk1.de5.net','uk2.de5.net'],ips:['203.0.113.61','203.0.113.62','203.0.113.63','203.0.113.64','203.0.113.65','203.0.113.66','203.0.113.67']}
+  };
+
+  function s5FlagSvg(region) {
+    const common='viewBox="0 0 60 40" role="img" aria-hidden="true" class="s5-region-flag"';
+    const flags={
+      us:'<svg '+common+'><rect width="60" height="40" fill="#fff"/>'+Array.from({length:7},(_,i)=>'<rect y="'+(i*6.16)+'" width="60" height="3.08" fill="#c83b4b"/>').join('')+'<rect width="26" height="21.6" fill="#244477"/>'+Array.from({length:4},(_,r)=>Array.from({length:5},(_,c)=>'<circle cx="'+(3+c*4.8+(r%2?1.8:0))+'" cy="'+(3+r*5.2)+'" r="1" fill="#fff"/>').join('')).join('')+'</svg>',
+      sg:'<svg '+common+'><rect width="60" height="20" fill="#e34b55"/><rect y="20" width="60" height="20" fill="#fff"/><circle cx="17" cy="10" r="6.2" fill="#fff"/><circle cx="19.5" cy="8.5" r="5.2" fill="#e34b55"/>'+Array.from({length:5},(_,i)=>'<circle cx="'+(27+Math.cos(i*1.256)*5)+'" cy="'+(10+Math.sin(i*1.256)*5)+'" r="1.15" fill="#fff"/>').join('')+'</svg>',
+      jp:'<svg '+common+'><rect width="60" height="40" fill="#fff"/><circle cx="30" cy="20" r="10.5" fill="#bc3446"/></svg>',
+      hk:'<svg '+common+'><rect width="60" height="40" fill="#d83248"/><g fill="#fff" transform="translate(30 20)">'+Array.from({length:5},(_,i)=>'<ellipse cx="0" cy="-8" rx="3.1" ry="7" transform="rotate('+(i*72)+' 0 0)"/>').join('')+'<circle r="2.1" fill="#d83248"/></g></svg>',
+      de:'<svg '+common+'><rect width="60" height="13.34" fill="#202124"/><rect y="13.33" width="60" height="13.34" fill="#c83b42"/><rect y="26.66" width="60" height="13.34" fill="#e9b83f"/></svg>',
+      uk:'<svg '+common+'><rect width="60" height="40" fill="#244477"/><path d="M0 0 60 40M60 0 0 40" stroke="#fff" stroke-width="9"/><path d="M0 0 60 40M60 0 0 40" stroke="#c83b4b" stroke-width="4"/><path d="M30 0v40M0 20h60" stroke="#fff" stroke-width="13"/><path d="M30 0v40M0 20h60" stroke="#c83b4b" stroke-width="7"/></svg>'
+    };
+    return flags[region]||'';
+  }
+
+  function s5RegionSurcharge(plan, region, period) {
+    const raw=plan&&plan._rawPlan||plan||{};
+    const exact=raw.region_prices||raw.regionPrices||raw.prices_by_region||raw.pricesByRegion||{};
+    const regionValue=exact[region];
+    const periodKey=period&&period.key;
+    const exactValue=regionValue&&typeof regionValue==='object'?(regionValue[periodKey]??regionValue.price_cents??regionValue.price??regionValue.amount):regionValue;
+    const asMoney=(value,unit)=>{const n=Number(value);if(!Number.isFinite(n))return null;return unit==='yuan'?Math.round(n*100):Math.round(n)};
+    if(exactValue!==undefined&&exactValue!==null&&exactValue!==''){
+      if(typeof exactValue==='object'){
+        if(exactValue.price_yuan!=null)return asMoney(exactValue.price_yuan,'yuan');
+        if(exactValue.price_cents!=null)return asMoney(exactValue.price_cents,'cents');
+        if(exactValue.surcharge_yuan!=null)return (period?.price||0)+asMoney(exactValue.surcharge_yuan,'yuan');
+        if(exactValue.surcharge_cents!=null)return (period?.price||0)+asMoney(exactValue.surcharge_cents,'cents');
+        if(exactValue.unit==='yuan')return asMoney(exactValue.amount,'yuan');
+        if(exactValue.unit==='cents')return asMoney(exactValue.amount,'cents');
+      }else return asMoney(exactValue,'cents');
+    }
+    const cents=raw.region_surcharge_cents||raw.regionSurchargeCents||raw.region_extra_cents||{};
+    const yuan=raw.region_surcharge_yuan||raw.regionSurchargeYuan||raw.region_extra_yuan||{};
+    if(cents[region]!=null)return (period?.price||0)+asMoney(cents[region],'cents');
+    if(yuan[region]!=null)return (period?.price||0)+asMoney(yuan[region],'yuan');
+    return period?.price||0;
+  }
+
   function openPurchase(plan) {
     if (!readToken()) {
       showModal('登录后购买', '<p class="text-sm text-slate-500 mb-4">请先登录后再继续购买。</p><button type="button" id="s5-purchase-login" class="w-full rounded-xl bg-blue-600 py-3 font-bold text-white">前往登录</button>');
       $('s5-purchase-login').onclick = () => { if (window.App) App.openModal('login'); };
       return;
     }
-    const periods = periodOptions(plan._rawPlan || plan);
-    if (!periods.length) {
-      showError('该套餐没有可购买的周期价格');
-      return;
-    }
-    if (!paymentChannels.length) {
-      showError('暂时无法获取支付通道配置，请稍后重试。');
-      loadConfig();
-      return;
-    }
-    const periodHtml = periods.map((p, i) => '<option value="' + esc(p.value) + '"' + (i === 0 ? ' selected' : '') + '>' + esc(p.label) + ' · ' + esc((p.price / 100).toFixed(2)) + '</option>').join('');
-    const paymentHtml = paymentChannels.map((p, i) => '<label class="flex items-center gap-2 rounded-xl border border-slate-200 p-3 cursor-pointer"><input type="radio" name="s5-payment" value="' + esc(i) + '"' + (i === 0 ? ' checked' : '') + '><span>' + esc(p.label) + '</span></label>').join('');
-    showModal('确认购买 · ' + (plan.name || plan.title || '套餐'), '<form id="s5-purchase-form"><label class="block text-sm font-semibold mb-2">优惠码（待后端接入）</label><div class="flex gap-2 mb-2"><input id="s5-coupon-code" class="w-full rounded-xl border border-slate-200 p-3" placeholder="输入优惠码（暂不参与计价）"><button type="button" id="s5-coupon-verify" class="rounded-xl border border-slate-300 px-3 text-sm">验证</button></div><p id="s5-coupon-status" class="text-xs text-amber-600 mb-4">优惠码校验接口待后端接入；此处不会修改价格。</p><label class="block text-sm font-semibold mb-2">套餐周期</label><select id="s5-period" class="w-full rounded-xl border border-slate-200 p-3 mb-4">' + periodHtml + '</select><label class="block text-sm font-semibold mb-2">开通协议</label><select id="s5-protocol" name="protocol" class="w-full rounded-xl border border-slate-200 p-3 mb-4">' + protocolOptions(plan) + '</select><label class="block text-sm font-semibold mb-2">支付方式</label><div class="grid grid-cols-2 gap-3 mb-5">' + paymentHtml + '</div><button id="s5-create-order" class="w-full rounded-xl bg-blue-600 py-3 font-bold text-white" type="submit">确认支付</button><p class="mt-3 text-xs text-slate-400">支付方式来自服务器配置。</p></form>');
-    $('s5-coupon-verify').addEventListener('click', () => { $('s5-coupon-status').textContent = $('s5-coupon-code').value.trim() ? '待后端接入：优惠码尚未校验，金额未改变。' : '请先输入优惠码；校验接口待后端接入。'; });
-    $('s5-purchase-form').addEventListener('submit', async (event) => {
+    const periods=periodOptions(plan._rawPlan||plan);
+    if(!periods.length){showError('该套餐没有可购买的周期价格');return}
+    if(!paymentChannels.length){showError('暂时无法获取支付通道配置，请稍后重试。');loadConfig();return}
+    const periodHtml=periods.map((p,i)=>'<option value="'+esc(p.value)+'"'+(i===0?' selected':'')+'>'+esc(p.label)+' · ¥'+(p.price/100).toFixed(2)+'</option>').join('');
+    const paymentHtml=paymentChannels.map((p,i)=>'<label class="s5-checkout-payment"><input type="radio" name="s5-payment" value="'+esc(i)+'"'+(i===0?' checked':'')+'><span>'+esc(p.label)+'</span></label>').join('');
+    const regionOptions=Object.entries(S5_REGION_POOL).map(([id,r])=>'<button type="button" class="s5-region-option" data-region="'+id+'">'+s5FlagSvg(id)+'<span>'+esc(r.name)+'</span><span class="s5-option-check">✓</span></button>').join('');
+    const styles='<style id="s5-region-checkout-style">.s5-checkout{color:#203047}.s5-checkout label{display:block;font-size:13px;font-weight:750;margin:15px 0 7px;color:#34445b}.s5-custom-select{position:relative}.s5-select-trigger{width:100%;min-height:54px;display:flex;align-items:center;gap:11px;text-align:left;padding:10px 14px;border:1px solid #dce5f0;border-radius:14px;background:rgba(255,255,255,.94);color:#243247;box-shadow:0 5px 18px rgba(35,65,105,.055);transition:border-color .2s,box-shadow .2s}.s5-select-trigger[aria-expanded=true]{border-color:#0055ff;box-shadow:0 0 0 3px rgba(0,85,255,.10)}.s5-select-trigger .s5-chevron{margin-left:auto;color:#7d8ba0;transition:transform .22s}.s5-select-trigger[aria-expanded=true] .s5-chevron{transform:rotate(180deg)}.s5-region-flag{width:30px;height:20px;flex:0 0 30px;border-radius:4px;box-shadow:0 1px 4px #142b481c;overflow:hidden}.s5-select-menu{position:absolute;z-index:30;top:calc(100% + 7px);left:0;right:0;padding:6px;border:1px solid #dce6f2;border-radius:15px;background:rgba(255,255,255,.98);box-shadow:0 16px 38px rgba(28,54,90,.16);opacity:0;visibility:hidden;transform:translateY(-7px) scale(.985);transform-origin:top;transition:opacity .18s ease,transform .18s ease,visibility .18s}.s5-select-menu.is-open{opacity:1;visibility:visible;transform:translateY(0) scale(1)}.s5-region-option,.s5-endpoint-option{display:flex;align-items:center;gap:11px;width:100%;min-height:45px;padding:9px 10px;border:0;border-radius:10px;background:transparent;color:#25364d;text-align:left;font-size:14px}.s5-region-option:hover,.s5-endpoint-option:hover{background:#f0f5ff}.s5-region-option.is-selected,.s5-endpoint-option.is-selected{background:#eaf1ff;color:#0055ff;font-weight:750}.s5-option-check{margin-left:auto;opacity:0;color:#0055ff}.is-selected .s5-option-check{opacity:1}.s5-endpoint-tabs{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:10px 0}.s5-endpoint-tabs button{padding:9px;border:1px solid #dce5f0;border-radius:10px;background:#fff;color:#53647b;font-size:13px;font-weight:700}.s5-endpoint-tabs button.active{border-color:#0055ff;background:#edf4ff;color:#0055ff}.s5-endpoint-option{justify-content:space-between}.s5-endpoint-option small{color:#8291a5;font-size:11px}.s5-resource-note{margin-top:8px;padding:9px 11px;border-radius:10px;background:#f4f7fc;color:#738198;font-size:11px;line-height:1.5}.s5-total{display:flex;justify-content:space-between;align-items:center;margin:15px 0;padding:13px 14px;border-radius:13px;background:linear-gradient(110deg,#edf4ff,#f8fbff);border:1px solid #dce8fb}.s5-total strong{font-size:23px;color:#0055ff}.s5-checkout-payment{display:flex!important;align-items:center;gap:9px;margin:0!important;padding:11px;border:1px solid #e1e8f1;border-radius:11px;background:#fff}.s5-checkout-payment input{accent-color:#0055ff}.s5-checkout select,.s5-checkout input:not([type=radio]){width:100%;padding:11px;border:1px solid #dce5f0;border-radius:11px;background:#fff;color:#25364d}.s5-checkout .s5-primary{width:100%;padding:14px;border:0;border-radius:12px;background:#0055ff;color:#fff;font-weight:800;box-shadow:0 7px 18px #0055ff30}.s5-checkout .s5-primary:disabled{opacity:.6}.s5-checkout .s5-field-error{display:none;color:#d23d50;font-size:12px;margin-top:6px}.s5-checkout .s5-field-error.show{display:block}@media(prefers-reduced-motion:reduce){.s5-select-menu,.s5-select-trigger .s5-chevron{transition:none}}</style>';
+    const form='<form id="s5-purchase-form" class="s5-checkout">'+
+      '<label>选择节点地区</label><div class="s5-custom-select" id="s5-region-select"><button type="button" class="s5-select-trigger" id="s5-region-trigger" aria-expanded="false"><span id="s5-region-flag" style="display:none"></span><span id="s5-region-label" style="color:#8a98aa">请选择节点地区</span><svg class="s5-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button><div class="s5-select-menu" id="s5-region-menu">'+regionOptions+'</div></div><div id="s5-region-error" class="s5-field-error">请先选择节点地区</div>'+
+      '<label>选择接入端点</label><div class="s5-endpoint-tabs"><button type="button" class="active" data-endpoint-type="domain">域名接入</button><button type="button" data-endpoint-type="ip">IP 接入</button></div><div class="s5-custom-select" id="s5-endpoint-select"><button type="button" class="s5-select-trigger" id="s5-endpoint-trigger" aria-expanded="false" disabled><span id="s5-endpoint-label" style="color:#8a98aa">请先选择地区</span><svg class="s5-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button><div class="s5-select-menu" id="s5-endpoint-menu"></div></div><div id="s5-endpoint-error" class="s5-field-error">请先选择接入端点</div><p class="s5-resource-note">资源池预展示：当前域名为示例配置，IP 使用 RFC 5737 文档保留地址作为占位，不可用于真实连接。正式下单前需由后端替换为可用资源。</p>'+
+      '<label>套餐周期</label><select id="s5-period">'+periodHtml+'</select><label>开通协议</label><select id="s5-protocol" name="protocol">'+protocolOptions(plan)+'</select>'+
+      '<div class="s5-total"><span><span style="display:block;font-size:12px;color:#728198">预计支付总价</span><span id="s5-total-note" style="font-size:11px;color:#8a98aa">选择地区后自动核算地区价格</span></span><strong id="s5-total-price">¥'+(periods[0].price/100).toFixed(2)+'</strong></div>'+
+      '<label>支付方式</label><div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:16px">'+paymentHtml+'</div>'+
+      '<label>优惠码（待后端接入）</label><div style="display:flex;gap:8px"><input id="s5-coupon-code" placeholder="输入优惠码（暂不参与计价）"><button type="button" id="s5-coupon-verify" style="border:1px solid #dce5f0;border-radius:10px;padding:0 12px;background:#fff;color:#40516a">验证</button></div><p id="s5-coupon-status" style="font-size:11px;color:#9a7a3b;margin-top:6px">优惠码校验接口待后端接入；此处不会修改价格。</p>'+
+      '<button id="s5-create-order" class="s5-primary" type="submit">确认支付</button><p style="margin-top:10px;font-size:11px;color:#8a98aa;text-align:center">支付方式来自服务器配置；资源池正式接入后将替换演示数据。</p></form>';
+    showModal('确认购买 · '+(plan.name||plan.title||'套餐'),styles+form);
+    let selectedRegion='',endpointType='domain',endpointValue='';
+    const regionTrigger=$('s5-region-trigger'),regionMenu=$('s5-region-menu'),endpointTrigger=$('s5-endpoint-trigger'),endpointMenu=$('s5-endpoint-menu');
+    const closeMenus=()=>{regionMenu.classList.remove('is-open');endpointMenu.classList.remove('is-open');regionTrigger.setAttribute('aria-expanded','false');endpointTrigger.setAttribute('aria-expanded','false')};
+    const toggleMenu=(menu,trigger)=>{const open=!menu.classList.contains('is-open');closeMenus();if(open){menu.classList.add('is-open');trigger.setAttribute('aria-expanded','true')}};
+    const updateTotal=()=>{const p=periods.find(x=>String(x.value)===$('s5-period').value)||periods[0];const cents=selectedRegion?s5RegionSurcharge(plan,selectedRegion,p):p.price;$('s5-total-price').textContent='¥'+(cents/100).toFixed(2);$('s5-total-note').textContent=selectedRegion?(cents===p.price?'当前地区暂无额外溢价':'已计入地区溢价'):'选择地区后自动核算地区价格'};
+    const renderEndpoints=()=>{const r=S5_REGION_POOL[selectedRegion];endpointValue='';endpointTrigger.disabled=!r;endpointTrigger.querySelector('#s5-endpoint-label').textContent=r?'请选择'+r.name+(endpointType==='domain'?'域名':'IP'):'请先选择地区';endpointMenu.innerHTML='';if(!r)return;const values=endpointType==='domain'?r.domains:r.ips;endpointMenu.innerHTML=values.map((v,i)=>'<button type="button" class="s5-endpoint-option" data-endpoint-value="'+esc(v)+'"><span>'+esc(v)+'</span><small>'+(endpointType==='ip'?'演示占位 IP':'域名资源')+'</small></button>').join('');};
+    regionTrigger.addEventListener('click',()=>toggleMenu(regionMenu,regionTrigger));
+    endpointTrigger.addEventListener('click',()=>{if(!selectedRegion){showError('请先选择节点地区');return}toggleMenu(endpointMenu,endpointTrigger)});
+    regionMenu.querySelectorAll('[data-region]').forEach(btn=>btn.addEventListener('click',()=>{selectedRegion=btn.dataset.region;const r=S5_REGION_POOL[selectedRegion];$('s5-region-flag').innerHTML=s5FlagSvg(selectedRegion);$('s5-region-flag').style.display='inline-flex';$('s5-region-label').textContent=r.name;regionMenu.querySelectorAll('.s5-region-option').forEach(x=>x.classList.toggle('is-selected',x===btn));$('s5-region-error').classList.remove('show');renderEndpoints();updateTotal();closeMenus()}));
+    document.querySelectorAll('[data-endpoint-type]').forEach(btn=>btn.addEventListener('click',()=>{endpointType=btn.dataset.endpointType;document.querySelectorAll('[data-endpoint-type]').forEach(x=>x.classList.toggle('active',x===btn));renderEndpoints()}));
+    endpointMenu.addEventListener('click',event=>{const btn=event.target.closest('[data-endpoint-value]');if(!btn)return;endpointValue=btn.dataset.endpointValue;endpointTrigger.querySelector('#s5-endpoint-label').textContent=endpointValue;endpointMenu.querySelectorAll('.s5-endpoint-option').forEach(x=>x.classList.toggle('is-selected',x===btn));$('s5-endpoint-error').classList.remove('show');closeMenus()});
+    $('s5-period').addEventListener('change',updateTotal);
+    document.addEventListener('click',function outsideCheckoutSelect(event){const root=$('s5-purchase-form');if(!root||!root.contains(event.target)){closeMenus();document.removeEventListener('click',outsideCheckoutSelect)}});
+    $('s5-coupon-verify').addEventListener('click',()=>{$('s5-coupon-status').textContent=$('s5-coupon-code').value.trim()?'待后端接入：优惠码尚未校验，金额未改变。':'请先输入优惠码；校验接口待后端接入。'});
+    $('s5-purchase-form').addEventListener('submit',async event=>{
       event.preventDefault();
-      const button = $('s5-create-order');
-      button.disabled = true;
-      button.textContent = '正在创建订单…';
-      try {
-        const paymentIndex = Number(document.querySelector('input[name="s5-payment"]:checked').value);
-        const paymentChoice = paymentChannels[paymentIndex];
-        if (!paymentChoice) throw new Error('请选择有效支付方式');
-        const period = $('s5-period').value;
-        const orderResponse = await request('/user/order/save', {
-          method: 'POST',
-          body: JSON.stringify({ plan_id: plan.id, period, payment: paymentChoice.value, protocol: $('s5-protocol').value })
-        });
-        const order = unwrap(orderResponse) || {};
-        const tradeNo = (typeof order === 'string' ? order : '') || order.trade_no || order.tradeNo || order.order_no || order.orderNo;
-        if (!tradeNo) throw new Error(order.message || '订单已提交，但接口没有返回 trade_no');
-        button.textContent = '正在获取支付方式…';
-        const checkoutResponse = await request('/user/order/checkout', {
-          method: 'POST',
-          body: JSON.stringify({ trade_no: tradeNo })
-        });
-        const checkout = unwrap(checkoutResponse) || {};
-        const payUrl = (typeof checkout === 'string' ? checkout : '') || checkout.url || checkout.pay_url || checkout.payment_url || checkout.checkout_url || '';
-        const qr = checkout.qrcode || checkout.qr_code || checkout.qrCode || checkout.qr_url || '';
-        const html = '<div class="rounded-xl border border-slate-200 bg-slate-50 p-4"><p class="text-sm text-slate-500 mb-1">订单号</p><p class="font-mono font-bold text-slate-900 break-all">' + esc(tradeNo) + '</p></div>' +
-          (qr ? '<div class="mt-4 text-center"><p class="mb-2 text-sm font-semibold">扫码支付</p><img alt="支付二维码" class="mx-auto max-h-64 rounded-xl border border-slate-200 bg-white p-2" src="' + esc(/^https?:\/\//i.test(qr) ? qr : '') + '"><p class="mt-2 break-all text-xs text-slate-500">' + esc(qr) + '</p></div>' : '') +
-          (payUrl ? '<a class="mt-4 block w-full rounded-xl bg-blue-600 py-3 text-center font-bold text-white" href="' + esc(payUrl) + '" target="_blank" rel="noopener noreferrer">打开支付页面</a>' : '<p class="mt-4 text-sm text-amber-700">服务器已返回结账结果，但未识别到支付链接。请查看下方原始返回。</p>') +
-          '<details class="mt-4"><summary class="cursor-pointer text-xs text-slate-500">支付接口返回</summary><pre class="mt-2 overflow-auto rounded-lg bg-slate-950 p-3 text-xs text-emerald-200">' + esc(JSON.stringify(checkout, null, 2)) + '</pre></details>';
-        showModal('订单已创建', html);
-      } catch (e) {
-        showError(e.message || '创建订单失败');
-        button.disabled = false;
-        button.textContent = '重试';
-      }
+      if(!selectedRegion){$('s5-region-error').classList.add('show');showError('请选择节点地区后再确认支付');return}
+      if(!endpointValue){$('s5-endpoint-error').classList.add('show');showError('请选择接入端点后再确认支付');return}
+      const button=$('s5-create-order');button.disabled=true;button.textContent='正在创建订单…';
+      try{
+        const paymentIndex=Number(document.querySelector('input[name="s5-payment"]:checked')?.value);
+        const paymentChoice=paymentChannels[paymentIndex];if(!paymentChoice)throw new Error('请选择有效支付方式');
+        const period=$('s5-period').value;
+        const orderResponse=await request('/user/order/save',{method:'POST',body:JSON.stringify({plan_id:plan.id,period,payment:paymentChoice.value,protocol:$('s5-protocol').value,region_id:selectedRegion,endpoint_type:endpointType,endpoint_value:endpointValue})});
+        const order=unwrap(orderResponse)||{};
+        const tradeNo=(typeof order==='string'?order:'')||order.trade_no||order.tradeNo||order.order_no||order.orderNo;
+        if(!tradeNo)throw new Error(order.message||'订单已提交，但接口没有返回 trade_no');
+        button.textContent='正在获取支付方式…';
+        const checkoutResponse=await request('/user/order/checkout',{method:'POST',body:JSON.stringify({trade_no:tradeNo})});
+        const checkout=unwrap(checkoutResponse)||{};
+        const payUrl=(typeof checkout==='string'?checkout:'')||checkout.url||checkout.pay_url||checkout.payment_url||checkout.checkout_url||'';
+        const qr=checkout.qrcode||checkout.qr_code||checkout.qrCode||checkout.qr_url||'';
+        const resultHtml='<div class="rounded-xl border border-slate-200 bg-slate-50 p-4"><p class="text-sm text-slate-500 mb-1">订单号</p><p class="font-mono font-bold text-slate-900 break-all">'+esc(tradeNo)+'</p><p class="mt-2 text-xs text-slate-500">地区：'+esc(S5_REGION_POOL[selectedRegion].name)+' · 端点：'+esc(endpointValue)+'</p></div>'+(qr?'<div class="mt-4 text-center"><p class="mb-2 text-sm font-semibold">扫码支付</p><img alt="支付二维码" class="mx-auto max-h-64 rounded-xl border border-slate-200 bg-white p-2" src="'+esc(/^https?:\/\//i.test(qr)?qr:'')+'"><p class="mt-2 break-all text-xs text-slate-500">'+esc(qr)+'</p></div>':'')+(payUrl?'<a class="mt-4 block w-full rounded-xl bg-blue-600 py-3 text-center font-bold text-white" href="'+esc(payUrl)+'" target="_blank" rel="noopener noreferrer">打开支付页面</a>':'<p class="mt-4 text-sm text-amber-700">服务器已返回结账结果，但未识别到支付链接。请查看下方原始返回。</p>')+'<details class="mt-4"><summary class="cursor-pointer text-xs text-slate-500">支付接口返回</summary><pre class="mt-2 overflow-auto rounded-lg bg-slate-950 p-3 text-xs text-emerald-200">'+esc(JSON.stringify(checkout,null,2))+'</pre></details>';
+        showModal('订单已创建',resultHtml);
+      }catch(e){showError(e.message||'创建订单失败');button.disabled=false;button.textContent='重试'}
     });
   }
 

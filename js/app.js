@@ -18,7 +18,7 @@ const catalogFacetIcon=(p,kind,label)=>{
  return './assets/images/platform-'+slug+'.svg';
 };
 function catalogFacet(p,kind){
- let attrs=p._merchantAttrs||p.extra_attrs||p.extraAttrs||p.extra_attributes||p.extraAttributes||p.attributes||{};
+ let attrs=p.extra_attrs||p.extraAttrs||p.extra_attributes||p.extraAttributes||p.attributes||{};
  if(typeof attrs==='string'){try{attrs=JSON.parse(attrs)}catch(_){attrs={}}}
  const read=(keys)=>{for(const key of keys){const v=p[key]??attrs[key];if(v!==undefined&&v!==null&&v!=='')return v}return ''};
  if(kind==='节点'){
@@ -28,10 +28,10 @@ function catalogFacet(p,kind){
   const many=read(['protocols','supported_protocols','protocol_list']);
   return Array.isArray(many)?many.map(String):[];
  }
- const v=read(kind==='账号'?['platform','account_platform','provider','brand','account_category','category_name','product_category','type']:['platform','traffic_platform','target_platform','source_platform','social_platform','channel_platform','website_platform','provider','brand','service_category','category_name','product_category','type','source','site']);
- const values=Array.isArray(v)?v:[v];
- const extra=read(['platforms','supported_platforms','channels','services','platform_list','site_list']);
- if(Array.isArray(extra))values.push(...extra);else if(typeof extra==='string')values.push(...extra.split(/[,，|\/、;；]+/));
+ const keys=kind==='账号'?['platform','account_platform','provider','brand','account_category','category_name','product_category','type']:['platform','platform_name','traffic_platform','target_platform','source_platform','social_platform','product_platform','site','app','channel','channel_name','media','service','provider','brand','service_category','category_name','product_category','type'];
+ const values=keys.map(k=>read([k])).filter(v=>v!==''&&v!=null);
+ const extra=read(['platforms','supported_platforms','channels','services','platform_list','platform_names']);
+ if(Array.isArray(extra))values.push(...extra);else if(extra)values.push(extra);
  return [...new Set(values.flatMap(x=>String(x||'').split(/[,，|\/、;；]+/).map(y=>y.trim()).filter(Boolean)))];
 }
 function renderCatalogFilters(){
@@ -140,7 +140,8 @@ function normalize(p,i,source){
  const firstEntry=(obj,keys)=>{for(const key of keys){const value=obj&&obj[key];if(value===undefined||value===null||value==='')continue;if(value===0||typeof value==='string'&&Number(value.trim())===0)continue;if(value&&typeof value==='object'&&!Array.isArray(value)){const nested=value.price_yuan??value.yuan??value.price_cents??value.cents??value.amount??value.value??value.price;if(nested===0||typeof nested==='string'&&Number(nested.trim())===0)continue}return {value,key}}return null};
  const priceKeys=['price_yuan','sale_price_yuan','current_price_yuan','unit_price_yuan','monthly_price_yuan','cost_yuan','amount_yuan','price_cents','sale_price_cents','current_price_cents','unit_price_cents','amount_cents','price_amount_cents','amount_in_cents','cost_cents','price_amount','sale_price','current_price','unit_price','price','amount','cost','price_value','price_num','month_price','monthly_price','retail_price','selling_price','cost_price','final_price'];
  const extraPricing=parseJsonObject(extraPrice.pricing||extraPrice.price_info||extraPrice.priceInfo||extraPrice.price_detail||extraPrice.priceDetail||extraPrice);
- const foundPrice=firstEntry(p,priceKeys)||firstEntry(pricing,priceKeys)||firstEntry(extraPricing,priceKeys)||firstEntry(extraPricing.pricing,priceKeys)||firstEntry(parseJsonObject(p.price),['price_yuan','price_cents','amount_cents','amount','value','price'])||firstEntry(parseJsonObject(extraPricing.price),['price_yuan','yuan','price_cents','cents','amount','value','price']);
+ const trafficPriceKeys=['price_yuan','price_cents','cost','amount','price','sale_price','selling_price','unit_price','final_price'];
+ const foundPrice=(source==='traffic'?(firstEntry(p,trafficPriceKeys)||firstEntry(pricing,trafficPriceKeys)||firstEntry(extraPricing,trafficPriceKeys)||firstEntry(extraPricing.pricing,trafficPriceKeys)||firstEntry(attrs,trafficPriceKeys)):null)||firstEntry(p,priceKeys)||firstEntry(pricing,priceKeys)||firstEntry(extraPricing,priceKeys)||firstEntry(extraPricing.pricing,priceKeys)||firstEntry(parseJsonObject(p.price),['price_yuan','price_cents','amount_cents','amount','value','price'])||firstEntry(parseJsonObject(extraPricing.price),['price_yuan','yuan','price_cents','cents','amount','value','price']);
  const priceSource=foundPrice?foundPrice.value:null;
  const parseMoney=(value,key)=>{
   if(value==null||value==='')return null;

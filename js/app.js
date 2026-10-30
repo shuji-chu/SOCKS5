@@ -72,9 +72,10 @@ function groupedNodeRows(response){
 function normalize(p,i,source){
  const nested=[p.product,p.goods,p.item,p.sku,p.detail].filter(v=>v&&typeof v==='object'&&!Array.isArray(v));
  p=Object.assign({},...nested,p);
- const icon=p.icon_url||p.brand_icon_url||p.brand_logo||p.platform_icon||p.platform_logo||p.logo_url||p.protocol_icon_url||'';
- let image=p.image_url||p.cover_url||p.image||p.cover||p.thumbnail||p.thumb||p.logo||'';
+ let icon=p.icon_url||p.brand_icon_url||p.brand_logo||p.platform_icon||p.platform_logo||p.logo_url||p.protocol_icon_url||p.icon?.url||'';
+ let image=p.original_image_url||p.product_image_url||p.image_url||p.cover_url||p.image||p.cover||p.thumbnail||p.thumb||p.picture_url||p.logo||'';
  const resolveAsset=u=>{if(!u)return '';u=String(u);if(u.startsWith('data:'))return u;const cdn=assetBase();if(/^https?:\/\//i.test(u)){if(cdn){try{const parsed=new URL(u),apiHost=new URL(API_ROOT).hostname;if(parsed.hostname===apiHost)return cdn+parsed.pathname+parsed.search+parsed.hash}catch(_){}}return u}const path=u.startsWith('/')?u:'/'+(u.startsWith('./')?u.slice(2):u);return cdn?cdn+path:API_ROOT+path};
+ if(!icon&&source==='account'){const brand=String(p.platform||p.brand||p.provider||p.email_domain||p.domain||p.name||p.title||p.product_name||'').toLowerCase();if(/gmail|google mail|@gmail|google workspace/.test(brand))icon='https://cdn.simpleicons.org/gmail/EA4335';else if(/outlook|hotmail|live\.com|microsoft/.test(brand))icon='https://cdn.simpleicons.org/microsoftoutlook/0078D4';else if(/yahoo/.test(brand))icon='https://cdn.simpleicons.org/yahoo/6001D2';else if(/icloud|apple/.test(brand))icon='https://cdn.simpleicons.org/icloud/3693F3';else if(/proton/.test(brand))icon='https://cdn.simpleicons.org/protonmail/6D4AFF';}
  const merchant=p.merchant_attrs||p.merchantAttrs||p.attributes||{};
  const rawStock=p.available_stock??p.stock_available??p.stock??p.inventory??p.quantity??p.count??null;
  const premium=source==='node'&&(/singapore|新加坡|sgp|\bsg\b/i.test([p._region,p.region,p.country,p.area,p.name,p.title,p.location].filter(Boolean).join(' '))||p.premium===true||p.is_premium===true);

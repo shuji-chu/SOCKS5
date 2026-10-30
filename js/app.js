@@ -44,7 +44,7 @@ function renderCatalogFilters(){
   return '<button type="button" class="catalog-filter-pill'+(label===activeFilter?' active':'')+'" data-catalog-filter="'+escHtml(label)+'" aria-pressed="'+String(label===activeFilter)+'"><img src="'+escHtml(icon)+'" alt="" aria-hidden="true" loading="lazy"><span>'+escHtml(label)+'</span></button>';
  }).join('');
 }
-function catalogEndpoint(kind){return kind==='节点'?'/user/plan/fetch':'/user/cloned_products';}
+function catalogEndpoint(kind){return kind==='节点'?'/user/plan/fetch':kind==='账号'?'/account/products':'/user/cloned_products';}
 function catalogRows(response,kind){return kind==='节点'?groupedNodeRows(response):listify(response)};
 function catalogMeta(response,rows,page){
  let root=response;

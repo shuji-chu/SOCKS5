@@ -10,6 +10,39 @@ const catalogAllRowsLoaded={节点:false,账号:false,引流:false};
 const catalogCache={节点:null,账号:null,引流:null};
 const catalogPrefetching=new Set();
 const CATALOG_PAGE_SIZE=15;
+
+const STATIC_CATALOG_URLS={
+ '节点':'https://raw.githubusercontent.com/shuji-chu/qian/main/nodes.json',
+ '账号':'https://raw.githubusercontent.com/shuji-chu/qian/main/accounts.json',
+ '引流':'https://raw.githubusercontent.com/shuji-chu/qian/main/traffic.json'
+};
+const STATIC_CATALOG_FALLBACKS={
+ '节点':'https://api.lynli.me/static/qian/nodes.json',
+ '账号':'https://api.lynli.me/static/qian/accounts.json',
+ '引流':'https://api.lynli.me/static/qian/traffic.json'
+};
+async function fetchStaticCatalog(kind){
+ const urls=[STATIC_CATALOG_URLS[kind],STATIC_CATALOG_FALLBACKS[kind]].filter(Boolean);
+ let lastError=null;
+ for(const url of urls){
+  console.info('[S5 static catalog] fetching JSON:',url);
+  const controller=new AbortController();
+  const timeout=setTimeout(()=>controller.abort(),15000);
+  try{
+   const response=await fetch(url,{method:'GET',mode:'cors',credentials:'omit',cache:'no-store',headers:{Accept:'application/json'},signal:controller.signal});
+   if(!response.ok)throw new Error('HTTP '+response.status);
+   const rows=await response.json();
+   if(!Array.isArray(rows))throw new Error('静态商品 JSON 必须是纯数组');
+   console.info('[S5 static catalog] loaded:',kind,'count:',rows.length,'url:',url);
+   return rows;
+  }catch(error){
+   lastError=error;
+   console.error('[S5 static catalog] request failed:',{kind,url,error});
+  }finally{clearTimeout(timeout)}
+ }
+ throw new Error(lastError&&lastError.name==='AbortError'?'网络请求超时，请重新加载':'网络异常，请重新加载');
+}
+
 const catalogFacetIcon=(p,kind,label)=>{
  if(kind==='节点')return '';
  const backend=p.platform_icon_url||p.icon_url||p.brand_icon_url||p.brand_logo||p.platform_icon||p.platform_logo||p.logo_url||p.icon?.url||'';
@@ -61,7 +94,7 @@ function renderCatalogFilters(){
   return '<button type="button" class="catalog-filter-pill'+(label===activeFilter?' active':'')+'" data-catalog-filter="'+escHtml(label)+'" aria-pressed="'+String(label===activeFilter)+'">'+image+glyph+'<span class="catalog-filter-label">'+escHtml(label)+'</span></button>';
  }).join('');
 }
-function catalogEndpoint(kind){return kind==='节点'?'/user/plan/fetch':kind==='账号'?'/account/products':'/user/cloned_products';}
+function catalogEndpoint(kind){return STATIC_CATALOG_URLS[kind]||'';}
 function catalogRows(response,kind){return kind==='节点'?groupedNodeRows(response):listify(response)};
 function catalogMeta(response,rows,page){
  const queue=[response],seen=new Set();
@@ -154,7 +187,7 @@ function normalize(p,i,source){
  p=Object.assign({},...nested,p);
  const picture=p.picture;const pictureUrl=typeof picture==='string'?picture:(picture&&typeof picture==='object'?(picture.url||picture.src||picture.image_url||picture.original_url||''):'');
  let icon=p.icon_url||p.brand_icon_url||p.brand_logo||p.platform_icon||p.platform_logo||p.logo_url||p.protocol_icon_url||p.icon?.url||'';
- let image=p.image_url||p.original_image_url||p.product_image_url||p.cover_url||p.image||p.cover||p.thumbnail||p.thumb||p.picture_url||pictureUrl||p.logo||'';
+ let image=(p.image_url!==undefined&&p.image_url!==null&&p.image_url!==''?p.image_url:p.cover_url)||p.original_image_url||p.product_image_url||p.image||p.cover||p.thumbnail||p.thumb||p.picture_url||pictureUrl||p.logo||'';
  if(source==='account'){icon=p.icon_url||p.brand_icon_url||p.brand_logo||p.platform_icon||p.platform_logo||p.logo_url||p.icon?.url||icon;image=p.image_url||pictureUrl||p.picture_url||p.original_image_url||p.product_image_url||p.cover_url||p.image||p.cover||p.thumbnail||p.thumb||image;}
  const resolveAsset=u=>{if(!u)return '';u=String(u);if(u.startsWith('data:'))return u;const cdn=assetBase();if(/^https?:\/\//i.test(u)){if(cdn){try{const parsed=new URL(u),apiHost=new URL(API_ROOT).hostname;if(parsed.hostname===apiHost)return cdn+parsed.pathname+parsed.search+parsed.hash}catch(_){}}return u}const path=u.startsWith('/')?u:'/'+(u.startsWith('./')?u.slice(2):u);return cdn?cdn+path:API_ROOT+path};
  if(!icon&&source==='account'){const brand=String(p.platform||p.brand||p.provider||p.email_domain||p.domain||p.name||p.title||p.product_name||'').toLowerCase();if(/gmail|google mail|@gmail|google workspace/.test(brand))icon='https://cdn.simpleicons.org/gmail/EA4335';else if(/outlook|hotmail|live\.com|microsoft/.test(brand))icon='https://cdn.simpleicons.org/microsoftoutlook/0078D4';else if(/yahoo/.test(brand))icon='https://cdn.simpleicons.org/yahoo/6001D2';else if(/icloud|apple/.test(brand))icon='https://cdn.simpleicons.org/icloud/3693F3';else if(/proton/.test(brand))icon='https://cdn.simpleicons.org/protonmail/6D4AFF';}
@@ -162,37 +195,15 @@ function normalize(p,i,source){
  if(typeof attrs==='string'){try{attrs=JSON.parse(attrs)}catch(_){attrs={}}}
  const merchant=attrs&&typeof attrs==='object'?attrs:{};
 
- const rawStock=source==='traffic'?(p.available_stock??p.stock_available??p.stock??p.inventory??p.inventory_count??p.stock_count??p.stock_num??p.stock_quantity??p.quantity??p.count??p.num??attrs.available_stock??attrs.stock_available??attrs.stock??attrs.inventory??attrs.inventory_count??attrs.stock_count??attrs.stock_num??attrs.stock_quantity??attrs.quantity??attrs.count??null):(p.available_stock??p.stock_available??p.stock??p.inventory??p.quantity??p.count??attrs.stock??attrs.inventory??null);
+ const rawStock=p.sold_out===true||p.in_stock===false?0:(p.in_stock===true?(p.stock??p.available_stock??1):(p.stock??p.available_stock??p.stock_available??p.inventory??p.quantity??p.count??null));
  const premium=source==='node'&&(/singapore|新加坡|sgp|\bsg\b/i.test([p._region,p.region,p.country,p.area,p.name,p.title,p.location].filter(Boolean).join(' '))||p.premium===true||p.is_premium===true);
- const firstValue=(obj,keys)=>{for(const key of keys){const value=obj&&obj[key];if(value!==undefined&&value!==null&&value!=='')return value}return null};
- const parseJsonObject=value=>{if(typeof value!=='string')return value&&typeof value==='object'?value:{};try{const parsed=JSON.parse(value);return parsed&&typeof parsed==='object'?parsed:{}}catch(_){return {}}};
- const extraPrice=parseJsonObject(p.extra_attrs??p.extraAttrs??p.extra_attributes??p.extraAttributes??attrs);
- const pricing=parseJsonObject(p.pricing||p.price_info||p.priceInfo||attrs.pricing||attrs.price_info||attrs.priceInfo||extraPrice.pricing||extraPrice.price_info);
- const firstEntry=(obj,keys)=>{for(const key of keys){const value=obj&&obj[key];if(value===undefined||value===null||value==='')continue;if(value===0||typeof value==='string'&&Number(value.trim())===0)continue;if(value&&typeof value==='object'&&!Array.isArray(value)){const nested=value.price_yuan??value.yuan??value.price_cents??value.cents??value.amount??value.value??value.price;if(nested===0||typeof nested==='string'&&Number(nested.trim())===0)continue}return {value,key}}return null};
- const priceKeys=['price_yuan','sale_price_yuan','current_price_yuan','unit_price_yuan','monthly_price_yuan','cost_yuan','amount_yuan','price_cents','sale_price_cents','current_price_cents','unit_price_cents','amount_cents','price_amount_cents','amount_in_cents','cost_cents','price_amount','sale_price','current_price','unit_price','price','amount','cost','price_value','price_num','month_price','monthly_price','retail_price','selling_price','cost_price','final_price'];
- const extraPricing=parseJsonObject(extraPrice.pricing||extraPrice.price_info||extraPrice.priceInfo||extraPrice.price_detail||extraPrice.priceDetail||extraPrice);
- const trafficPriceKeys=['price_yuan','price_cents','cost','amount','price','sale_price','selling_price','unit_price','final_price'];
- const accountPriceKeys=['price_yuan','price','price_cents','sale_price_yuan','sale_price','sale_price_cents','amount_yuan','amount_cents'];
- const foundPrice=(source==='traffic'?(firstEntry(p,trafficPriceKeys)||firstEntry(pricing,trafficPriceKeys)||firstEntry(extraPricing,trafficPriceKeys)||firstEntry(extraPricing.pricing,trafficPriceKeys)||firstEntry(attrs,trafficPriceKeys)):source==='account'?(firstEntry(p,accountPriceKeys)||firstEntry(pricing,accountPriceKeys)||firstEntry(extraPricing,accountPriceKeys)||firstEntry(attrs,accountPriceKeys)):null)||firstEntry(p,priceKeys)||firstEntry(pricing,priceKeys)||firstEntry(extraPricing,priceKeys)||firstEntry(extraPricing.pricing,priceKeys)||firstEntry(parseJsonObject(p.price),['price_yuan','price_cents','amount_cents','amount','value','price'])||firstEntry(parseJsonObject(extraPricing.price),['price_yuan','yuan','price_cents','cents','amount','value','price']);
- const priceSource=foundPrice?foundPrice.value:null;
- const parseMoney=(value,key)=>{
-  if(value==null||value==='')return null;
-  let unit='';
-  if(typeof value==='object'){unit=String(value.unit||value.currency_unit||value.currency||'').toLowerCase();const nested=firstEntry(value,['price_yuan','yuan','price_cents','cents','amount','value','price']);if(!nested)return null;key=nested.key;value=nested.value}
-  const raw=String(value).trim(),clean=raw.replace(/,/g,'').replace(/[^0-9.+-]/g,'');
-  if(!clean||!/[0-9]/.test(clean))return null;
-  const n=Number(clean);if(!Number.isFinite(n)||n<0)return null;
-  const declaredUnit=(unit+' '+String(p.price_unit||p.currency_unit||p.unit||p.pricing?.unit||p.pricing?.currency||attrs.price_unit||attrs.currency_unit||'')).toLowerCase();
-  if(/yuan|cny|rmb|元/.test(declaredUnit)||/[¥￥]/.test(raw)||/_yuan$/.test(key))return n;
-  if(/cent|分|fen/.test(declaredUnit)||/_cents?$/.test(key)||/cents/.test(key))return n/100;
-  if(/[.]/.test(clean))return n;
-  return n/100;
- };
- const parsedPrice=parseMoney(priceSource,foundPrice?.key||'');
- const priceYuan=parsedPrice==null?0:parsedPrice;
- const priceProvided=parsedPrice!=null&&parsedPrice>0;
- if(!priceProvided)console.warn('[S5 catalog price audit: missing/zero price]',{id:p.sku_id??p.id??p.product_id,title:p.title||p.name||p.product_name,priceField:foundPrice?.key||null,priceValue:priceSource,extra_attrs:extraPrice,rawProduct:p});
- if(i===0)console.info('[S5 catalog first product full JSON]',{source,product:p,parsedExtraAttrs:extraPrice,parsedPricing:pricing,priceField:foundPrice?.key||null,priceRaw:priceSource,priceYuan,priceProvided});
+
+ const yuanValue=source==='traffic'?(p.price_yuan??p.unit_price_yuan):(p.price_yuan);
+ const centsValue=p.price_cents;
+ const parsedPrice=yuanValue!==undefined&&yuanValue!==null&&yuanValue!==''?Number(yuanValue):(centsValue!==undefined&&centsValue!==null&&centsValue!==''?Number(centsValue)/100:null);
+ const priceYuan=parsedPrice!==null&&Number.isFinite(parsedPrice)&&parsedPrice>=0?parsedPrice:0;
+ const priceProvided=parsedPrice!==null&&Number.isFinite(parsedPrice)&&parsedPrice>=0;
+ if(!priceProvided)console.warn('[S5 static catalog: price missing]',{source,id:p.id,title:p.name||p.title,price_yuan:p.price_yuan,unit_price_yuan:p.unit_price_yuan,price_cents:p.price_cents});
  const rawTitle=String((source==='traffic'?(p.name||p.title||p.product_title||p.productTitle||p.sku_name||p.skuName||p.product_name||p.productName||p.goods_name||p.goodsName||p.item_name||p.itemName||p.display_name||p.displayName||p.label||merchant.name||merchant.title||merchant.product_title||merchant.sku_name||merchant.product_name||''):(p.title||p.name||p.product_title||p.productTitle||p.display_name||p.displayName||p.sku_title||p.skuTitle||p.sku_name||p.product_name||p.productName||p.goods_name||p.goodsName||p.item_name||p.itemName||p.label||p.en_name||p.name_en||p.english_name||p.description_zh||p.description||''))||'商品 '+String(p.sku_id??p.id??p.product_id??i+1));
  const finalTitle=(source==='traffic'||source==='account')?localizeTrafficTitle(rawTitle).replace(/\bShared\b/gi,'共享').replace(/高级版\s+共享/gi,'高级共享账号').replace(/\s*\(\s*1m\s*\)/gi,' (1个月)').replace(/\bSteamGuard\b/gi,'令牌').replace(/\bSteam\s*Guard\b/gi,'令牌'):rawTitle;
  const brandText=(rawTitle+' '+String(p.platform||p.brand||p.provider||'')).toLowerCase();
@@ -221,82 +232,73 @@ function renderProducts(){
  root.innerHTML='<div class="error-state">商品渲染模块未加载，请刷新页面。</div>';
 }
 
-async function prefetchCatalogKind(kind){
- if(catalogCache[kind]||catalogPrefetching.has(kind))return;
- catalogPrefetching.add(kind);
- try{
-  const endpoint=catalogEndpoint(kind),requestedSize=kind==='节点'?CATALOG_PAGE_SIZE:100;
-  const pagedEndpoint=kind==='节点'?endpoint:endpoint+'?page=1&size='+requestedSize;
-  const response=await api(pagedEndpoint),firstRows=catalogRows(response,kind);
-  let rawRows=firstRows.slice(),meta=catalogMeta(response,firstRows,1),complete=kind==='节点';
-  if(kind!=='节点'&&meta.hasServerTotal){
-   const pageSize=Math.max(1,Number(meta.pageSize)||requestedSize),totalPages=Math.max(1,Number(meta.pages)||Math.ceil(meta.total/pageSize));
-   const pageNumbers=Array.from({length:Math.max(0,totalPages-1)},(_,i)=>i+2);
-   for(let offset=0;offset<pageNumbers.length;offset+=4){
-    const batch=pageNumbers.slice(offset,offset+4);
-    const responses=await Promise.all(batch.map(n=>api(endpoint+'?page='+n+'&size='+pageSize)));
-    responses.forEach((result,index)=>{try{rawRows.push(...catalogRows(result,kind))}catch(e){console.warn('[S5 catalog prefetch] skipped page',batch[index],e.message)}});
-   }
-   complete=rawRows.length>=meta.total;
-  }
-  const rows=kind==='节点'?rawRows.filter(p=>categoryOf(p,'node')==='节点'):rawRows;
-  const products=rows.map((p,i)=>{const item=normalize(p,i,kind==='节点'?'node':kind==='账号'?'account':'traffic');item._platformFacets=catalogFacet(item,kind);return item});
-  const total=meta.hasServerTotal?meta.total:rows.length;
-  const pages=complete?Math.max(1,Math.ceil(products.length/CATALOG_PAGE_SIZE)):meta.pages;
-  catalogCache[kind]={products,total,pages,complete};
-  catalogAllRowsLoaded[kind]=complete;
- }catch(e){console.warn('[S5 catalog prefetch] '+kind+' unavailable',safeUiMessage(e.message))}
- finally{catalogPrefetching.delete(kind)}
-}
 
 async function loadCatalogPage(page=1,kind=activeKind){
  const root=document.getElementById('products');if(!root)return;
+ const requestId=++catalogRequestId;
+ activeKind=kind;
+ catalogPage=Math.max(1,Number(page)||1);
  const cached=catalogCache[kind];
- if(cached){catalogRequestId++;activeKind=kind;catalogPage=Math.max(1,Number(page)||1);liveProducts=cached.products;catalogTotal=cached.total;catalogTotalPages=cached.pages;catalogAllRowsLoaded[kind]=cached.complete;catalogLoading=false;root.removeAttribute('aria-busy');renderCatalogFilters();renderProducts();return}
- if(kind===activeKind&&catalogAllRowsLoaded[kind]&&page!==1){catalogPage=Math.max(1,Number(page)||1);renderProducts();return}
- const requestId=++catalogRequestId;catalogLoading=true;catalogPage=Math.max(1,Number(page)||1);activeKind=kind;
- root.setAttribute('aria-busy','true');root.innerHTML=Array.from({length:6},()=>'<div class="skeleton-card"><div class="skeleton-cover"></div><div class="skeleton-line" style="width:62%"></div><div class="skeleton-line" style="width:40%"></div></div>').join('');
- const hint=document.getElementById('resultCount');if(hint)hint.textContent='正在同步商品与平台分类…';
+ if(cached){
+  liveProducts=cached.products;
+  catalogTotal=cached.total;
+  catalogTotalPages=Math.max(1,Math.ceil(cached.products.length/CATALOG_PAGE_SIZE));
+  catalogAllRowsLoaded[kind]=true;
+  catalogLoading=false;
+  root.removeAttribute('aria-busy');
+  renderCatalogFilters();
+  renderProducts();
+  return;
+ }
+ catalogLoading=true;
+ root.setAttribute('aria-busy','true');
+ root.innerHTML=Array.from({length:6},()=>'<div class="skeleton-card"><div class="skeleton-cover"></div><div class="skeleton-line" style="width:62%"></div><div class="skeleton-line" style="width:40%"></div></div>').join('');
+ const hint=document.getElementById('resultCount');if(hint)hint.textContent='正在加载静态商品数据…';
  try{
-  const endpoint=catalogEndpoint(kind),requestedSize=kind==='节点'?CATALOG_PAGE_SIZE:100;
-  const pagedEndpoint=kind==='节点'?endpoint:endpoint+'?page=1&size='+requestedSize;
-  const response=await api(pagedEndpoint);if(requestId!==catalogRequestId)return;
-  const firstRows=catalogRows(response,kind);let rawRows=firstRows.slice(),meta=catalogMeta(response,firstRows,1),complete=kind==='节点';
-  // Render the first response immediately; never wait for every pagination request before showing products.
-  const firstVisibleRows=kind==='节点'?rawRows.filter(p=>categoryOf(p,'node')==='节点'):rawRows;
-  liveProducts=firstVisibleRows.map((p,i)=>{const item=normalize(p,i,kind==='节点'?'node':kind==='账号'?'account':'traffic');item._platformFacets=catalogFacet(item,kind);return item});
-  catalogAllRowsLoaded[kind]=complete;catalogTotal=meta.hasServerTotal?meta.total:firstVisibleRows.length;
-  catalogTotalPages=meta.pages;catalogPage=1;
-  catalogCache[kind]={products:liveProducts,total:catalogTotal,pages:catalogTotalPages,complete};
-  renderCatalogFilters();renderProducts();
-  if(kind!=='节点'&&meta.hasServerTotal){
-   const pageSize=Math.max(1,Number(meta.pageSize)||requestedSize),totalPages=Math.max(1,Number(meta.pages)||Math.ceil(meta.total/pageSize));
-   const pageNumbers=Array.from({length:Math.max(0,totalPages-1)},(_,i)=>i+2);
-   for(let offset=0;offset<pageNumbers.length;offset+=4){
-    const batch=pageNumbers.slice(offset,offset+4),responses=await Promise.all(batch.map(n=>api(endpoint+'?page='+n+'&size='+pageSize)));
-    if(requestId!==catalogRequestId)return;
-    responses.forEach((result,index)=>{try{rawRows.push(...catalogRows(result,kind))}catch(e){console.warn('[S5 platform scan] page parse skipped',batch[index],e.message)}});
-   }
-   complete=rawRows.length>=meta.total;
-  }
-  const rows=kind==='节点'?rawRows.filter(p=>categoryOf(p,'node')==='节点'):rawRows;
-  const sample=firstRows[0]||null,nested=sample&&(sample.product||sample.goods||sample.item||sample.sku)||{};
-  console.info('[S5 catalog JSON audit]',{category:kind,request:API_V1+pagedEndpoint,total:meta.total,length:rawRows.length,acceptedLength:rows.length,page:1,size:meta.pageSize,hasServerTotal:meta.hasServerTotal,allPagesLoaded:complete,platformCount:new Set(rows.flatMap(p=>catalogFacet(p,kind).map(x=>x.toLowerCase()))).size,responseKeys:response&&typeof response==='object'?Object.keys(response):[]});
-  if(sample)console.info('[S5 catalog first product full JSON]',{category:kind,product:sample,nestedProduct:nested,extra_attrs:sample.extra_attrs??sample.extraAttrs??null,price:sample.price??null,price_cents:sample.price_cents??null});
-  liveProducts=rows.map((p,i)=>{const item=normalize(p,i,kind==='节点'?'node':kind==='账号'?'account':'traffic');item._platformFacets=catalogFacet(item,kind);return item});
-  catalogAllRowsLoaded[kind]=complete;catalogTotal=meta.hasServerTotal?meta.total:rows.length;
-  catalogTotalPages=complete?Math.max(1,Math.ceil(liveProducts.length/CATALOG_PAGE_SIZE)):meta.pages;catalogPage=1;
-  catalogCache[kind]={products:liveProducts,total:catalogTotal,pages:catalogTotalPages,complete};
-  const breakdown=document.getElementById('catalogBreakdown');if(breakdown)breakdown.textContent=(complete?'已扫描全部 '+rows.length.toLocaleString()+' 件':'后端总数 '+catalogTotal.toLocaleString()+' 件')+' · 已识别 '+new Set(liveProducts.flatMap(p=>p._platformFacets||[]).map(x=>x.toLowerCase())).size+' 个平台';
-  renderCatalogFilters();renderProducts();
-  ['节点','引流','账号'].filter(other=>other!==kind).forEach(other=>prefetchCatalogKind(other));
- }catch(e){
+  const source=kind==='节点'?'node':kind==='账号'?'account':'traffic';
+  const rawRows=await fetchStaticCatalog(kind);
   if(requestId!==catalogRequestId)return;
-  if(liveProducts.length){catalogAllRowsLoaded[kind]=false;catalogCache[kind]={products:liveProducts,total:catalogTotal,pages:catalogTotalPages,complete:false};renderCatalogFilters();renderProducts();if(hint)hint.textContent='已显示当前商品，更多商品暂时无法同步';}
-  else{liveProducts=[];catalogAllRowsLoaded[kind]=false;renderCatalogFilters();const breakdown=document.getElementById('catalogBreakdown');if(breakdown)breakdown.textContent='真实商品目录暂不可用';if(hint)hint.textContent='加载失败';root.innerHTML='<div class="error-state"><div class="symbol"><img src="./assets/icons/network.svg" alt="" aria-hidden="true"></div><b>真实商品目录暂时无法加载</b><p>'+escHtml(safeUiMessage(e.message))+'</p><button class="btn" type="button" onclick="loadCatalogs()">重新加载</button></div>';}
- }finally{if(requestId===catalogRequestId){catalogLoading=false;root.removeAttribute('aria-busy')}}
-}function loadCatalogs(){catalogPage=1;return loadCatalogPage(1,activeKind)}
+  const products=rawRows
+   .filter(row=>row&&typeof row==='object'&&row.visible!==false&&row.is_visible!==false)
+   .map((row,index)=>{
+    const item=normalize(row,index,source);
+    item._platformFacets=catalogFacet(item,kind);
+    return item;
+   });
+  catalogCache[kind]={products,total:products.length,pages:Math.max(1,Math.ceil(products.length/CATALOG_PAGE_SIZE)),complete:true};
+  catalogAllRowsLoaded[kind]=true;
+  liveProducts=products;
+  catalogTotal=products.length;
+  catalogTotalPages=Math.max(1,Math.ceil(products.length/CATALOG_PAGE_SIZE));
+  catalogPage=Math.min(catalogPage,catalogTotalPages);
+  catalogLoading=false;
+  renderCatalogFilters();
+  renderProducts();
+  if(hint)hint.textContent='已加载 '+products.length.toLocaleString()+' 件商品';
+ }catch(error){
+  if(requestId!==catalogRequestId)return;
+  catalogCache[kind]=null;
+  catalogAllRowsLoaded[kind]=false;
+  liveProducts=[];
+  catalogTotal=0;
+  catalogTotalPages=1;
+  catalogLoading=false;
+  renderCatalogFilters();
+  const breakdown=document.getElementById('catalogBreakdown');if(breakdown)breakdown.textContent='静态商品目录暂不可用';
+  if(hint)hint.textContent='加载失败';
+  root.innerHTML='<div class="error-state"><div class="symbol"><img src="./assets/icons/network.svg" alt="" aria-hidden="true"></div><b>网络异常，请重新加载</b><p>'+escHtml(safeUiMessage(error.message))+'</p><button class="btn" type="button" data-static-catalog-retry>重新加载</button></div>';
+  root.querySelector('[data-static-catalog-retry]')?.addEventListener('click',()=>loadCatalogs(true));
+ }finally{
+  if(requestId===catalogRequestId){catalogLoading=false;root.removeAttribute('aria-busy')}
+ }
+}
+function loadCatalogs(force=false){
+ catalogPage=1;
+ if(force)catalogCache[activeKind]=null;
+ return loadCatalogPage(1,activeKind);
+}
 window.loadCatalogPage=loadCatalogPage;
+window.loadCatalogs=loadCatalogs;
 document.querySelectorAll('[data-kind]').forEach(b=>{b.className=b.dataset.kind===activeKind?'btn primary':'btn ghost';b.setAttribute('aria-pressed',String(b.dataset.kind===activeKind));b.addEventListener('click',()=>{if(activeKind===b.dataset.kind)return;activeKind=b.dataset.kind;activeFilter='全部';catalogPage=1;document.querySelectorAll('[data-kind]').forEach(x=>{x.className=x.dataset.kind===activeKind?'btn primary':'btn ghost';x.setAttribute('aria-pressed',String(x.dataset.kind===activeKind))});renderCatalogFilters();loadCatalogPage(1,activeKind)})});
 const catalogFilterRoot=document.getElementById('catalogFilters');
 catalogFilterRoot?.addEventListener('click',e=>{const b=e.target.closest('[data-catalog-filter]');if(!b||!catalogFilterRoot.contains(b))return;activeFilter=b.dataset.catalogFilter||'全部';catalogPage=1;catalogFilterRoot.querySelectorAll('[data-catalog-filter]').forEach(x=>{const selected=x===b;x.classList.toggle('active',selected);x.setAttribute('aria-pressed',String(selected))});renderProducts()});

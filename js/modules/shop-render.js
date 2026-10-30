@@ -96,14 +96,16 @@ function render({root,products,activeKind='节点',searchTerm='',activeFilter='�
  const rows=products.filter(p=>p._kind===activeKind&&matchesFilter(p,activeFilter)&&(!query||[p._title,p._desc,p._kind,p._region,p.tags,p.protocol,p.node_protocol,p.platform,p.brand,p.provider,p.account_category,p.traffic_platform,JSON.stringify(p._merchantAttrs||{})].filter(Boolean).join(' ').toLowerCase().includes(query))).sort((a,b)=>Number(b._premium)-Number(a._premium));
  const page=Math.max(1,Number(pageInfo.page)||1),total=Math.max(0,Number(pageInfo.total)||0),totalPages=pageInfo.serverPaginated?Math.max(1,Number(pageInfo.totalPages)||1):Math.max(1,Math.ceil(rows.length/15));
  const count=document.getElementById('resultCount');if(count)count.textContent='共 '+total.toLocaleString()+' 件商品 · 当前筛选 '+rows.length+' 件';
- const pagination=()=>'<nav class="sku-pagination" aria-label="商品分页"><button type="button" data-page="prev" '+(page<=1?'disabled':'')+'>上一页</button><span class="sku-page-number">第 '+page+' / '+totalPages+' 页</span><button type="button" data-page="next" '+(page>=totalPages?'disabled':'')+'>下一页</button></nav>';
+ const pageNumbers=[...new Set([1,page-1,page,page+1,totalPages])].filter(n=>n>=1&&n<=totalPages).sort((a,b)=>a-b);
+ const pageButtons=pageNumbers.map((n,index)=>((index>0&&n-pageNumbers[index-1]>1)?'<span class="sku-page-number" aria-hidden="true">…</span>':'')+'<button type="button" data-page="'+n+'" '+(n===page?'aria-current="page" class="active"':'')+'>'+n+'</button>').join('');
+ const pagination=()=>'<nav class="sku-pagination" aria-label="商品分页"><button type="button" data-page="prev" '+(page<=1?'disabled':'')+'>上一页</button>'+pageButtons+'<span class="sku-page-number">第 '+page+' / '+totalPages+' 页</span><button type="button" data-page="next" '+(page>=totalPages?'disabled':'')+'>下一页</button></nav>';
  if(!rows.length){root.innerHTML='<div class="empty-space"><div><div class="planet"></div><b>当前筛选暂无商品</b><p>接口已返回 '+total.toLocaleString()+' 件商品总量；可切换“全部”查看当前页商品。</p></div></div>'+pagination();bind();return}
  const visibleRows=pageInfo.serverPaginated?rows.slice(0,15):rows.slice((page-1)*15,page*15);
  root.innerHTML='<div class="sku-list">'+visibleRows.map(p=>renderUnifiedItem(p,activeFilter)).join('')+'</div>'+pagination();
  bind();
  function bind(){
   root.querySelectorAll('[data-open-sku]').forEach(btn=>btn.addEventListener('click',()=>{if(typeof w.openDetail==='function')w.openDetail(btn.dataset.openSku)}));
-  root.querySelectorAll('[data-page]').forEach(btn=>btn.addEventListener('click',()=>{if(btn.disabled)return;const next=page+(btn.dataset.page==='next'?1:-1);if(typeof w.loadCatalogPage==='function'){w.loadCatalogPage(next,activeKind);const target=document.getElementById('products');if(target)target.scrollIntoView({behavior:'smooth',block:'start'});}}));
+  root.querySelectorAll('[data-page]').forEach(btn=>btn.addEventListener('click',()=>{if(btn.disabled)return;const next=btn.dataset.page==='next'?page+1:btn.dataset.page==='prev'?page-1:Number(btn.dataset.page);if(typeof w.loadCatalogPage==='function'){w.loadCatalogPage(next,activeKind);const target=document.getElementById('products');if(target)target.scrollIntoView({behavior:'smooth',block:'start'});}}));
  }
 }
 w.ShopRender={render,merchantDashboard,productImage:image,stockLabel:stock,protocolBadges:protocols,nodeCapabilities,deliveryPanel,tutorialPanel,tagList};})(window);

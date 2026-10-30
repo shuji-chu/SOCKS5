@@ -10,7 +10,11 @@ const CATALOG_PAGE_SIZE=15;
 const catalogFacetIcon=(p,kind,label)=>{
  const backend=p.icon_url||p.brand_icon_url||p.platform_icon||p.platform_logo||p.protocol_icon_url||p.logo_url||p.icon?.url||'';
  if(backend)return String(backend);
- const slug=String(label).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,36);
+ const name=String(label).toLowerCase();
+ const local=[[/facebook|脸书/,'platform-facebook.svg'],[/instagram|ins/,'platform-instagram.svg'],[/tiktok|抖音/,'platform-tiktok.svg'],[/twitter|推特|^x$/,'platform-x.svg'],[/telegram|电报|^tg$/,'platform-telegram.svg'],[/google|gmail|谷歌/,'platform-google.svg'],[/whatsapp/,'platform-whatsapp.svg'],[/discord/,'platform-discord.svg'],[/youtube|油管/,'platform-youtube.svg'],[/reddit/,'platform-reddit.svg'],[/vless|vmess|trojan|hysteria|shadowsocks|tuic|anytls|ssr|mtproto/,'nodes.svg']];
+ const match=local.find(([pattern])=>pattern.test(name));
+ if(match)return './assets/images/'+match[1];
+ const slug=name.replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,36);
  return './assets/images/platform-'+slug+'.svg';
 };
 function catalogFacet(p,kind){

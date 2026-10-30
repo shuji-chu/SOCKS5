@@ -9,7 +9,7 @@ let catalogPage=1,catalogTotal=0,catalogTotalPages=1,catalogLoading=false,catalo
 const catalogAllRowsLoaded={节点:false,账号:false,引流:false};
 const CATALOG_PAGE_SIZE=15;
 const catalogFacetIcon=(p,kind,label)=>{
- const backend=p.platform_icon_url||p.brand_icon_url||p.brand_logo||p.platform_icon||p.platform_logo||p.logo_url||p.icon?.url||'';
+ const backend=p.platform_icon_url||p.icon_url||p.brand_icon_url||p.brand_logo||p.platform_icon||p.platform_logo||p.logo_url||p.icon?.url||'';
  if(backend)return String(backend);
  const slug=String(label||'').normalize('NFKD').toLowerCase().replace(/[^a-z0-9]+/g,'');
  return slug?'https://cdn.simpleicons.org/'+encodeURIComponent(slug):'';
@@ -39,8 +39,8 @@ function renderCatalogFilters(){
  if(!options.includes(activeFilter))activeFilter='全部';
  root.innerHTML=options.map(label=>{
   const icon=label==='全部'?'./assets/icons/shop.svg':facets.get(label);
-  const glyph='<span class="catalog-filter-glyph" aria-hidden="true">'+(label==='全部'?'⌂':escHtml(label.charAt(0).toUpperCase()))+'</span>';
-  const image=icon?'<img src="'+escHtml(icon)+'" alt="" aria-hidden="true" loading="lazy" onerror="this.hidden=true">':'';
+  const glyph='<span class="catalog-filter-glyph" aria-hidden="true"'+(icon?' hidden':'')+'>'+(label==='全部'?'⌂':escHtml(label.charAt(0).toUpperCase()))+'</span>';
+  const image=icon?'<img src="'+escHtml(icon)+'" alt="" aria-hidden="true" loading="lazy" onerror="this.hidden=true;this.nextElementSibling.hidden=false">':'';
   return '<button type="button" class="catalog-filter-pill'+(label===activeFilter?' active':'')+'" data-catalog-filter="'+escHtml(label)+'" aria-pressed="'+String(label===activeFilter)+'">'+image+glyph+'<span class="catalog-filter-label">'+escHtml(label)+'</span></button>';
  }).join('');
 }
@@ -244,7 +244,7 @@ async function loadCatalogPage(page=1,kind=activeKind){
 window.loadCatalogPage=loadCatalogPage;
 document.querySelectorAll('[data-kind]').forEach(b=>{b.className=b.dataset.kind===activeKind?'btn primary':'btn ghost';b.setAttribute('aria-pressed',String(b.dataset.kind===activeKind));b.addEventListener('click',()=>{if(activeKind===b.dataset.kind)return;activeKind=b.dataset.kind;activeFilter='全部';catalogPage=1;document.querySelectorAll('[data-kind]').forEach(x=>{x.className=x.dataset.kind===activeKind?'btn primary':'btn ghost';x.setAttribute('aria-pressed',String(x.dataset.kind===activeKind))});renderCatalogFilters();loadCatalogPage(1,activeKind)})});
 const catalogFilterRoot=document.getElementById('catalogFilters');
-catalogFilterRoot?.addEventListener('click',e=>{const b=e.target.closest('[data-catalog-filter]');if(!b||!catalogFilterRoot.contains(b))return;activeFilter=b.dataset.catalogFilter||'全部';catalogFilterRoot.querySelectorAll('[data-catalog-filter]').forEach(x=>{const selected=x===b;x.classList.toggle('active',selected);x.setAttribute('aria-pressed',String(selected))});renderProducts()});
+catalogFilterRoot?.addEventListener('click',e=>{const b=e.target.closest('[data-catalog-filter]');if(!b||!catalogFilterRoot.contains(b))return;activeFilter=b.dataset.catalogFilter||'全部';catalogPage=1;catalogFilterRoot.querySelectorAll('[data-catalog-filter]').forEach(x=>{const selected=x===b;x.classList.toggle('active',selected);x.setAttribute('aria-pressed',String(selected))});renderProducts()});
 const productListRoot=document.getElementById('products');
 productListRoot?.addEventListener('click',event=>{const card=event.target.closest('[data-buy-sku]');if(!card||!productListRoot.contains(card))return;const product=liveProducts.find(item=>String(item._key)===String(card.dataset.buySku));if(!product)return;if(typeof window.S5_OPEN_PURCHASE!=='function'){console.error('[S5 checkout] purchase modal is unavailable');return}window.S5_OPEN_PURCHASE(product)});
 productListRoot?.addEventListener('keydown',event=>{if(event.key!=='Enter'&&event.key!==' ')return;const card=event.target.closest('[data-buy-sku]');if(!card||!productListRoot.contains(card))return;event.preventDefault();const product=liveProducts.find(item=>String(item._key)===String(card.dataset.buySku));if(product&&typeof window.S5_OPEN_PURCHASE==='function')window.S5_OPEN_PURCHASE(product)});

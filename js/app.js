@@ -7,19 +7,40 @@ const requestedCategory=new URLSearchParams(location.search).get('category')||'�
 let liveProducts=[],activeKind=['节点','账号','引流'].includes(requestedCategory)?requestedCategory:'节点',searchTerm='',activeFilter='全部',paymentMethods=[];
 let catalogPage=1,catalogTotal=0,catalogTotalPages=1,catalogLoading=false,catalogRequestId=0;
 const CATALOG_PAGE_SIZE=15;
-const CATALOG_FILTERS={
- '节点':['全部','VLESS','Hysteria2','Trojan','VMess','Shadowsocks','TUIC','AnyTLS','SSR','MTProto'],
- '账号':['全部','Gmail','Outlook','TikTok','Instagram','Discord','Microsoft','Yahoo','iCloud','Proton'],
- '引流':['全部','Telegram','Instagram','TikTok','YouTube','WhatsApp','Discord','Facebook','Gmail','Outlook']
+const catalogFacetIcon=(p,kind,label)=>{
+ const backend=p.icon_url||p.brand_icon_url||p.platform_icon||p.platform_logo||p.protocol_icon_url||p.logo_url||p.icon?.url||'';
+ if(backend)return String(backend);
+ const slug=String(label).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,36);
+ return './assets/images/platform-'+slug+'.svg';
 };
+function catalogFacet(p,kind){
+ const attrs=p.extra_attrs||p.extraAttrs||p.extra_attributes||p.extraAttributes||p.attributes||{};
+ const read=(keys)=>{for(const key of keys){const v=p[key]??attrs[key];if(v!==undefined&&v!==null&&v!=='')return v}return ''};
+ if(kind==='节点'){
+  const v=read(['protocol','node_protocol','protocol_name','network_protocol','type']);
+  if(Array.isArray(v))return v.map(String);
+  if(typeof v==='string'&&v.trim())return v.split(/[,，|/、]/).map(x=>x.trim()).filter(Boolean);
+  const many=read(['protocols','supported_protocols','protocol_list']);
+  return Array.isArray(many)?many.map(String):[];
+ }
+ const v=read(kind==='账号'?['platform','account_platform','provider','brand','account_category','category_name','product_category','type']:['platform','traffic_platform','target_platform','provider','brand','service_category','category_name','product_category','type']);
+ const values=Array.isArray(v)?v:[v];
+ const extra=read(['platforms','supported_platforms','channels','services']);
+ if(Array.isArray(extra))values.push(...extra);
+ return [...new Set(values.flatMap(x=>String(x||'').split(/[,，|/、]/).map(y=>y.trim()).filter(Boolean)))];
+}
 function renderCatalogFilters(){
  const root=document.getElementById('catalogFilters');if(!root)return;
- const options=CATALOG_FILTERS[activeKind]||['全部'];
+ const facets=new Map();
+ liveProducts.forEach(p=>catalogFacet(p,activeKind).forEach(label=>{if(!facets.has(label))facets.set(label,catalogFacetIcon(p,activeKind,label))}));
+ const options=['全部',...Array.from(facets.keys()).sort((a,b)=>a.localeCompare(b))];
  if(!options.includes(activeFilter))activeFilter='全部';
- root.innerHTML=options.map(label=>'<button type="button" class="catalog-filter-pill'+(label===activeFilter?' active':'')+'" data-catalog-filter="'+escHtml(label)+'" aria-pressed="'+String(label===activeFilter)+'">'+escHtml(label)+'</button>').join('');
+ root.innerHTML=options.map(label=>{
+  const icon=label==='全部'?'./assets/icons/shop.svg':facets.get(label);
+  return '<button type="button" class="catalog-filter-pill'+(label===activeFilter?' active':'')+'" data-catalog-filter="'+escHtml(label)+'" aria-pressed="'+String(label===activeFilter)+'"><img src="'+escHtml(icon)+'" alt="" aria-hidden="true" loading="lazy" onerror="this.onerror=null;this.src=\\'./assets/icons/network.svg\\'"><span>'+escHtml(label)+'</span></button>';
+ }).join('');
 }
-
-function catalogEndpoint(kind){return kind==='节点'?'/user/plan/fetch':kind==='账号'?'/account/products':'/user/cloned_products'};
+function catalogEndpoint(kind){return kind==='节点'?'/user/plan/fetch':'/user/cloned_products';}
 function catalogRows(response,kind){return kind==='节点'?groupedNodeRows(response):listify(response)};
 function catalogMeta(response,rows,page){
  let root=response;
@@ -149,19 +170,37 @@ function renderProducts(){
 }
 
 async function loadCatalogPage(page=1,kind=activeKind){
- const root=document.getElementById('products');if(!root)return;const requestId=++catalogRequestId;catalogLoading=true;catalogPage=Math.max(1,Number(page)||1);activeKind=kind;
+ const root=document.getElementById('products');if(!root)return;
+ const requestId=++catalogRequestId;catalogLoading=true;catalogPage=Math.max(1,Number(page)||1);activeKind=kind;
  root.setAttribute('aria-busy','true');root.innerHTML=Array.from({length:6},()=>'<div class="skeleton-card"><div class="skeleton-cover"></div><div class="skeleton-line" style="width:62%"></div><div class="skeleton-line" style="width:40%"></div></div>').join('');
- document.getElementById('networkError').hidden=true;const hint=document.getElementById('resultCount');if(hint)hint.textContent='正在加载第 '+catalogPage+' 页…';
+ const error=document.getElementById('networkError');if(error)error.hidden=true;
+ const hint=document.getElementById('resultCount');if(hint)hint.textContent='正在同步完整商品目录…';
  try{
-  const endpoint=catalogEndpoint(kind),response=await api(endpoint+'?page='+catalogPage+'&size='+CATALOG_PAGE_SIZE),rawRows=catalogRows(response,kind);
+  const endpoint=catalogEndpoint(kind);
+  // Existing cloned-products API is a full-list endpoint in this project; do not send invented pagination parameters.
+  const response=await api(endpoint);
   if(requestId!==catalogRequestId)return;
-  const rows=rawRows.filter(p=>{const k=categoryOf(p,kind==='节点'?'node':kind==='账号'?'account':'traffic');return k===kind});
-  const sample=rawRows[0]||null,nested=sample&&(sample.product||sample.goods||sample.item||sample.sku)||{};console.info('[S5 catalog JSON audit]',{category:kind,endpoint,rawArrayLength:rawRows.length,acceptedRows:rows.length,page:catalogPage,firstProductJSON:sample,topLevelKeys:sample?Object.keys(sample):[],nestedKeys:nested&&typeof nested==='object'?Object.keys(nested):[],extraAttrsKeys:sample&&typeof(sample.extra_attrs||sample.extraAttrs)==='object'?Object.keys(sample.extra_attrs||sample.extraAttrs):[],responseKeys:response&&typeof response==='object'?Object.keys(response):[]});
+  const rawRows=catalogRows(response,kind);
+  const rows=rawRows.filter(p=>{
+   if(kind==='节点')return categoryOf(p,'node')==='节点';
+   const raw=String([p.category,p.product_type,p.product_category,p.service_type,p.type,p.kind,p.tag,p.platform,p.account_category,p.traffic_platform].filter(Boolean).join(' ')).toLowerCase();
+   const isTraffic=/traffic|flow|引流|流量包|growth|推广|群发|机器人|接码|短信|验证码|查询|查号|sms|lookup|query/.test(raw);
+   const isAccount=/account|账号|帐号|email|gmail|outlook|tiktok|instagram|discord|yahoo|icloud|proton|telegram|whatsapp|facebook|google|reddit|snapchat|linkedin/.test(raw);
+   return kind==='引流'?isTraffic:!isTraffic&&(isAccount||!!(p.platform||p.account_category||p.email_domain||p.provider));
+  });
+  const sample=rawRows[0]||null,nested=sample&&(sample.product||sample.goods||sample.item||sample.sku)||{};
+  console.info('[S5 catalog JSON audit]',{category:kind,endpoint,returnedRows:rawRows.length,filteredRows:rows.length,firstProductJSON:sample,topLevelKeys:sample?Object.keys(sample):[],nestedKeys:nested&&typeof nested==='object'?Object.keys(nested):[],extraAttrs:sample?.extra_attrs??sample?.extraAttrs??null,responseKeys:response&&typeof response==='object'?Object.keys(response):[]});
   liveProducts=rows.map((p,i)=>normalize(p,i,kind==='节点'?'node':kind==='账号'?'account':'traffic'));
-  const meta=catalogMeta(response,rawRows,catalogPage);catalogTotal=meta.total;catalogTotalPages=meta.hasServerTotal?Math.max(meta.pages,catalogPage):Math.max(meta.pages,catalogPage);
-  const breakdown=document.getElementById('catalogBreakdown');if(breakdown)breakdown.textContent='每页 '+CATALOG_PAGE_SIZE+' 件 · '+(kind==='节点'?'节点套餐':kind==='账号'?'账号商品':'引流服务');
+  catalogTotal=liveProducts.length;catalogTotalPages=Math.max(1,Math.ceil(catalogTotal/CATALOG_PAGE_SIZE));
+  const breakdown=document.getElementById('catalogBreakdown');
+  if(breakdown)breakdown.textContent='真实商品 '+catalogTotal.toLocaleString()+' 件 · 每页 '+CATALOG_PAGE_SIZE+' 件';
+  renderCatalogFilters();
   renderProducts();
- }catch(e){if(requestId!==catalogRequestId)return;liveProducts=[];const breakdown=document.getElementById('catalogBreakdown');if(breakdown)breakdown.textContent='真实商品目录暂不可用';if(hint)hint.textContent='加载失败';root.innerHTML='<div class="error-state"><div class="symbol"><img src="./assets/icons/network.svg" alt="" aria-hidden="true"></div><b>真实商品目录暂时无法加载</b><p>'+escHtml(safeUiMessage(e.message))+'</p><button class="btn" type="button" onclick="loadCatalogs()">重新加载</button></div>';
+ }catch(e){
+  if(requestId!==catalogRequestId)return;liveProducts=[];renderCatalogFilters();
+  const breakdown=document.getElementById('catalogBreakdown');if(breakdown)breakdown.textContent='真实商品目录暂不可用';
+  if(hint)hint.textContent='加载失败';
+  root.innerHTML='<div class="error-state"><div class="symbol"><img src="./assets/icons/network.svg" alt="" aria-hidden="true"></div><b>真实商品目录暂时无法加载</b><p>'+escHtml(safeUiMessage(e.message))+'</p><button class="btn" type="button" onclick="loadCatalogs()">重新加载</button></div>';
  }finally{if(requestId===catalogRequestId){catalogLoading=false;root.removeAttribute('aria-busy')}}
 }
 function loadCatalogs(){catalogPage=1;return loadCatalogPage(1,activeKind)}

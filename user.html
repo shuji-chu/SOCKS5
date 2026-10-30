@@ -155,7 +155,7 @@ document.getElementById('confirmApiReset')?.addEventListener('click',async()=>{c
 
 document.getElementById('apiResetModal')?.addEventListener('click',e=>{if(e.target.id==='apiResetModal')hideModal('apiResetModal')});
 const helpGuideRoot=document.getElementById('connectionHelpGuide');if(helpGuideRoot&&window.UsageGuide)helpGuideRoot.innerHTML=window.UsageGuide.render();
-if(b)copyText(b.dataset.copySecret,b)});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-copy-secret]');if(b)copyText(b.dataset.copySecret,b)});
 
 initDeveloperTools();
 </script><script src="./js/ui-fallbacks.js" defer></script><script id="profile-avatar-upload">

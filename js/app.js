@@ -179,7 +179,7 @@ function productImage(p){
 function stockLabel(p){const single=p._stock??'—';const bulk=p.bulk_available_count??p.wholesale_available_count??p.batch_stock??p.bulk_stock??p.wholesale_stock??p.available_batches??null;return bulk!=null?'可成批数 '+String(bulk):String(single)}
 function renderProducts(){
  const root=document.getElementById('products');
- if(window.ShopRender){window.ShopRender.render({root,products:liveProducts,activeKind,searchTerm,activeFilter,pageInfo:{page:catalogPage,size:CATALOG_PAGE_SIZE,total:catalogTotal,totalPages:catalogTotalPages}});return}
+ if(window.ShopRender){window.ShopRender.render({root,products:liveProducts,activeKind,searchTerm,activeFilter,pageInfo:{page:catalogPage,size:CATALOG_PAGE_SIZE,total:catalogTotal,totalPages:catalogTotalPages,serverPaginated:activeKind!=='节点'}});return}
  root.innerHTML='<div class="error-state">商品渲染模块未加载，请刷新页面。</div>';
 }
 

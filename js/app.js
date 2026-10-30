@@ -327,13 +327,26 @@ async function loadCatalogPage(page=1,kind=activeKind){
   const source=kind==='节点'?'node':kind==='账号'?'account':'traffic';
   const rawRows=await fetchStaticCatalog(kind);
   if(requestId!==catalogRequestId)return;
+  let blockedInternal=0,blockedPrice=0;
   const products=rawRows
-   .filter(row=>row&&typeof row==='object'&&row.visible!==false&&row.is_visible!==false)
+   .filter(row=>{
+    if(!row||typeof row!=='object'||row.visible===false||row.is_visible===false)return false;
+    if(kind!=='账号')return true;
+    const fields=['title','name','product_title','product_name','display_name','sku_title','sku_name','goods_name','item_name','category','category_zh','category_en','category_slug','product_category','product_type','account_category','tags','tag','labels','platform','brand','provider'];
+    const values=fields.map(key=>row[key]).filter(value=>value!=null).map(value=>typeof value==='string'?value:JSON.stringify(value)).join(' ');
+    if(/lynli\\.me|lynli\\.com|admin/i.test(values)){blockedInternal++;return false;}
+    return true;
+   })
    .map((row,index)=>{
     const item=normalize(row,index,source);
     item._platformFacets=catalogFacet(item,kind);
     return item;
+   })
+   .filter(item=>{
+    if(kind==='账号'&&Number.isFinite(Number(item._price))&&Number(item._price)>1000){blockedPrice++;return false;}
+    return true;
    });
+  if(kind==='账号'&&(blockedInternal||blockedPrice))console.warn('[S5 account catalog guard] 已拦截异常商品：',{internalDomainOrAdmin:blockedInternal,priceOver1000:blockedPrice,total:blockedInternal+blockedPrice});
   catalogCache[kind]={products,total:products.length,pages:Math.max(1,Math.ceil(products.length/CATALOG_PAGE_SIZE)),complete:true};
   catalogAllRowsLoaded[kind]=true;
   liveProducts=products;

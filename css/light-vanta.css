@@ -2,9 +2,9 @@
 :root{color-scheme:light!important;--bg:#e0f7fa;--panel:rgba(255,255,255,.75);--panel2:rgba(255,255,255,.88);--line:rgba(10,25,47,.09);--text:#0A192F;--muted:#334155;--cyan:#087fbd;--blue:#2563eb}
 html,body{min-height:100%;background:#e0f7fa!important;color:#334155!important}
 body{position:relative;isolation:isolate;background-color:#e0f7fa!important;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif!important}
-#s5-vanta-bg{position:fixed!important;inset:0!important;width:100%!important;height:100%!important;z-index:0!important;pointer-events:none!important;overflow:hidden!important;background:#e0f7fa!important}
+#s5-vanta-bg{position:fixed!important;inset:0!important;width:100%!important;height:100%!important;z-index:-1!important;pointer-events:none!important;overflow:hidden!important;background:#e0f7fa!important}
 #s5-vanta-bg canvas{display:block!important;width:100%!important;height:100%!important}
-body>*:not(#s5-vanta-bg){position:relative;z-index:1}
+body>*:not(#s5-vanta-bg){z-index:1}
 h1,h2,h3,h4,h5,h6,strong,b,.page-title,.section-heading{color:#0A192F}
 p,small,label,li,dt,dd,figcaption,.muted,.eyebrow,.description{color:#334155}
 a{color:#155eaa}

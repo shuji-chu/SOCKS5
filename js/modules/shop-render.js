@@ -66,12 +66,12 @@ function renderUnifiedItem(p,activeFilter='全部'){
  const protocolTags=protocolNames(p);
  const selectedTag=activeFilter&&activeFilter!=='全部'&&matchesFilter(p,activeFilter)?[activeFilter]:[];
  const tags=[...new Set([...selectedTag,...protocolTags,...planMetaTags(p),cleanAccountText(p._region||p.region_name||p.region||p.country||p.area||''),...tagList(p).map(cleanAccountText)].filter(Boolean))].slice(0,8);
- const src=p._kind==='账号'?(p._icon||p._image):(p._image||p._icon);
+ const src=p._image||p._icon;
  const fallback='./assets/icons/server.svg';
  const brand=p._brandIcon||(/\\bsteam\\b/i.test(title)?'steam':/netflix/i.test(title)?'netflix':/midjourney/i.test(title)?'midjourney':/\\bmail\\b|gmail|outlook/i.test(title)?'mail':'');
  const brandClass=brand?' brand-'+brand:'';
  const brandLabel=brand==='steam'?'S':brand==='netflix'?'N':brand==='midjourney'?'M':brand==='mail'?'✉':esc(title.trim().charAt(0).toUpperCase()||'?');
- const icon=brand?'<span class="sku-brand-mark'+brandClass+'" aria-label="'+esc(brand)+'">'+brandLabel+'</span>':'<img src="'+esc(src||fallback)+'" alt="" loading="lazy" decoding="async" onerror="this.remove()">';
+ const icon=src?'<img src="'+esc(src)+'" alt="'+esc(title)+'" loading="lazy" decoding="async" onerror="this.hidden=true;this.parentElement.classList.add(\'image-missing\')">':brand?'<span class="sku-brand-mark'+brandClass+'" aria-label="'+esc(brand)+'">'+brandLabel+'</span>':'<img src="'+esc(fallback)+'" alt="" loading="lazy" decoding="async" onerror="this.remove()">';
  const price=p._priceProvided?'¥'+Number(p._price).toFixed(2):'询价';
  const stockValue=p._stock;
  const stockNumber=stockValue===null||stockValue===''?null:Number(stockValue);

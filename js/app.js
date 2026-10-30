@@ -6,32 +6,30 @@ const API_V1='https://web.lynli.me/api/v1';
 const requestedCategory=new URLSearchParams(location.search).get('category')||'节点';
 let liveProducts=[],activeKind=['节点','账号','引流'].includes(requestedCategory)?requestedCategory:'节点',searchTerm='',activeFilter='全部',paymentMethods=[];
 let catalogPage=1,catalogTotal=0,catalogTotalPages=1,catalogLoading=false,catalogRequestId=0;
+const catalogAllRowsLoaded={节点:false,账号:false,引流:false};
 const CATALOG_PAGE_SIZE=15;
 const catalogFacetIcon=(p,kind,label)=>{
- const backend=p.icon_url||p.brand_icon_url||p.platform_icon||p.platform_logo||p.logo_url||p.icon?.url||'';
+ const backend=p.platform_icon_url||p.brand_icon_url||p.brand_logo||p.platform_icon||p.platform_logo||p.logo_url||p.icon?.url||'';
  if(backend)return String(backend);
- const name=String(label).toLowerCase();
- const local=[[/facebook|脸书/,'platform-facebook.svg'],[/instagram|ins/,'platform-instagram.svg'],[/tiktok|抖音/,'platform-tiktok.svg'],[/twitter|推特|^x$/,'platform-x.svg'],[/telegram|电报|^tg$/,'platform-telegram.svg'],[/steam/,'platform-steam.svg'],[/netflix/,'platform-netflix.svg'],[/gmail|google|谷歌/,'platform-google.svg'],[/mail\\.ru|mailru/,'platform-mailru.svg'],[/whatsapp/,'platform-whatsapp.svg'],[/discord/,'platform-discord.svg'],[/youtube|油管/,'platform-youtube.svg'],[/reddit/,'platform-reddit.svg']];
- const match=local.find(([pattern])=>pattern.test(name));
- return match?'./assets/images/'+match[1]:'';
+ const slug=String(label||'').normalize('NFKD').toLowerCase().replace(/[^a-z0-9]+/g,'');
+ return slug?'https://cdn.simpleicons.org/'+encodeURIComponent(slug):'';
 };
 function catalogFacet(p,kind){
- let attrs=p._merchantAttrs||p.extra_attrs||p.extraAttrs||p.extra_attributes||p.extraAttributes||p.attributes||{};
- if(typeof attrs==='string'){try{attrs=JSON.parse(attrs)}catch(_){attrs={}}}
- const keys=kind==='账号'
-  ?['platform','account_platform','provider','brand','service','email_provider','account_category','platform_name','product_platform']
-  :['platform','platform_name','traffic_platform','target_platform','source_platform','social_platform','product_platform','site','app','channel','channel_name','media','service','provider','brand'];
- const values=[];
- keys.forEach(k=>{const v=p[k]??attrs[k];if(v!==undefined&&v!==null&&v!=='')values.push(v)});
- const extra=p.platforms??p.supported_platforms??p.channels??p.services??attrs.platforms??attrs.supported_platforms??attrs.channels??attrs.services;
- if(Array.isArray(extra))values.push(...extra);else if(extra)values.push(extra);
- const labels=values.flatMap(v=>String(typeof v==='object'?(v.name||v.platform||v.title||''):v).split(/[,，|、;；]+/).map(x=>x.trim()).filter(Boolean));
+ const values=[],seen=new Set(),keyPattern=/(platform|provider|brand|service|site|app|channel|media|social|email.?provider|account.?category)/i,ignored=/(icon|logo|url|image|id|count|price|stock|quantity|description)/i;
+ const add=value=>{
+  if(value==null||value==='')return;
+  if(Array.isArray(value)){value.forEach(add);return}
+  if(typeof value==='object'){const named=value.name??value.platform??value.title??value.label??value.value;if(named!=null)add(named);return}
+  String(value).split(/[,，|、;；]+/).map(x=>x.trim()).filter(x=>x&&x.length<=40).forEach(x=>{const k=x.toLocaleLowerCase();if(!seen.has(k)){seen.add(k);values.push(x)}});
+ };
+ const walk=(obj,depth=0)=>{if(!obj||typeof obj!=='object'||depth>4)return;if(Array.isArray(obj)){obj.forEach(x=>walk(x,depth+1));return}Object.entries(obj).forEach(([key,value])=>{if(ignored.test(key))return;if(keyPattern.test(key))add(value);if(value&&typeof value==='object')walk(value,depth+1)})};
+ walk(p);walk(p._merchantAttrs||p.extra_attrs||p.extraAttrs||p.extra_attributes||p.extraAttributes||p.attributes);
  const title=String(p._title||p.title||p.name||p.product_name||p.sku_name||'');
- const known=[
-  [/\btelegram\b|电报/i,'Telegram'],[/\bsteam\b/i,'Steam'],[/\bnetflix\b/i,'Netflix'],[/\bgmail\b|\bgoogle\s*mail\b/i,'Gmail'],[/mail\.ru|\bmailru\b/i,'Mail.ru'],[/\btiktok\b|抖音/i,'TikTok'],[/\binstagram\b|\big\b/i,'Instagram'],[/\bfacebook\b/i,'Facebook'],[/\bwhatsapp\b/i,'WhatsApp'],[/\bdiscord\b/i,'Discord'],[/\byoutube\b/i,'YouTube'],[/\breddit\b/i,'Reddit'],[/\btwitter\b|\bx\s*账号/i,'X']
- ];
- known.forEach(([re,name])=>{if(re.test(title+' '+labels.join(' ')))labels.push(name)});
- return [...new Set(labels.map(x=>x.trim()).filter(x=>x&&x.length<=40))];
+ const candidates=[...title.matchAll(/[【［[(]([^】］)\]]{2,32})[】］)\]]/g)].map(m=>m[1]);
+ const prefix=title.match(/^([A-Za-z][A-Za-z0-9._ -]{1,30}?)(?=\s*(?:账号|帐号|账户|粉丝|关注|引流|群|频道|注册|$))/i);
+ if(prefix)candidates.push(prefix[1]);
+ candidates.forEach(candidate=>{const cleaned=candidate.replace(/\b(?:account|accounts|premium|aged|verified|shared|full|access|followers|likes|views|traffic|service|product)\b/gi,' ').replace(/账号|帐号|账户|粉丝|关注|引流|群|频道|注册/g,' ').replace(/[|·:_-]+/g,' ').trim();if(cleaned&&cleaned.length<=30&&/[A-Za-z\u4e00-\u9fff]/.test(cleaned))add(cleaned)});
+ return values;
 }
 function renderCatalogFilters(){
  const root=document.getElementById('catalogFilters');if(!root)return;
@@ -41,8 +39,9 @@ function renderCatalogFilters(){
  if(!options.includes(activeFilter))activeFilter='全部';
  root.innerHTML=options.map(label=>{
   const icon=label==='全部'?'./assets/icons/shop.svg':facets.get(label);
-  const image=icon?'<img src="'+escHtml(icon)+'" alt="" aria-hidden="true" loading="lazy" onerror="this.remove()">':'<span class="catalog-filter-glyph" aria-hidden="true">'+(label==='全部'?'⌂':escHtml(label.charAt(0).toUpperCase()))+'</span>';
-  return '<button type="button" class="catalog-filter-pill'+(label===activeFilter?' active':'')+'" data-catalog-filter="'+escHtml(label)+'" aria-pressed="'+String(label===activeFilter)+'">'+image+'<span>'+escHtml(label)+'</span></button>';
+  const glyph='<span class="catalog-filter-glyph" aria-hidden="true">'+(label==='全部'?'⌂':escHtml(label.charAt(0).toUpperCase()))+'</span>';
+  const image=icon?'<img src="'+escHtml(icon)+'" alt="" aria-hidden="true" loading="lazy" onerror="this.hidden=true">':'';
+  return '<button type="button" class="catalog-filter-pill'+(label===activeFilter?' active':'')+'" data-catalog-filter="'+escHtml(label)+'" aria-pressed="'+String(label===activeFilter)+'">'+image+glyph+'<span class="catalog-filter-label">'+escHtml(label)+'</span></button>';
  }).join('');
 }
 function catalogEndpoint(kind){return kind==='节点'?'/user/plan/fetch':kind==='账号'?'/account/products':'/user/cloned_products';}
@@ -201,38 +200,47 @@ function productImage(p){
 function stockLabel(p){const single=p._stock??'—';const bulk=p.bulk_available_count??p.wholesale_available_count??p.batch_stock??p.bulk_stock??p.wholesale_stock??p.available_batches??null;return bulk!=null?'可成批数 '+String(bulk):String(single)}
 function renderProducts(){
  const root=document.getElementById('products');
- if(window.ShopRender){window.ShopRender.render({root,products:liveProducts,activeKind,searchTerm,activeFilter,pageInfo:{page:catalogPage,size:CATALOG_PAGE_SIZE,total:catalogTotal,totalPages:catalogTotalPages,serverPaginated:activeKind!=='节点'}});return}
+ if(window.ShopRender){window.ShopRender.render({root,products:liveProducts,activeKind,searchTerm,activeFilter,pageInfo:{page:catalogPage,size:CATALOG_PAGE_SIZE,total:catalogTotal,totalPages:catalogTotalPages,serverPaginated:activeKind!=='节点'&&!catalogAllRowsLoaded[activeKind]}});return}
  root.innerHTML='<div class="error-state">商品渲染模块未加载，请刷新页面。</div>';
 }
 
 async function loadCatalogPage(page=1,kind=activeKind){
  const root=document.getElementById('products');if(!root)return;
+ if(kind===activeKind&&catalogAllRowsLoaded[kind]&&page!==1){catalogPage=Math.max(1,Number(page)||1);renderProducts();return}
  const requestId=++catalogRequestId;catalogLoading=true;catalogPage=Math.max(1,Number(page)||1);activeKind=kind;
  root.setAttribute('aria-busy','true');root.innerHTML=Array.from({length:6},()=>'<div class="skeleton-card"><div class="skeleton-cover"></div><div class="skeleton-line" style="width:62%"></div><div class="skeleton-line" style="width:40%"></div></div>').join('');
- const error=document.getElementById('networkError');if(error)error.hidden=true;
- const hint=document.getElementById('resultCount');if(hint)hint.textContent='正在同步第 '+catalogPage+' 页商品…';
+ const hint=document.getElementById('resultCount');if(hint)hint.textContent='正在同步商品与平台分类…';
  try{
-  const endpoint=catalogEndpoint(kind);
-  const pagedEndpoint=kind==='节点'?endpoint:endpoint+'?page='+catalogPage+'&size='+CATALOG_PAGE_SIZE;
+  const endpoint=catalogEndpoint(kind),requestedSize=kind==='节点'?CATALOG_PAGE_SIZE:100;
+  const pagedEndpoint=kind==='节点'?endpoint:endpoint+'?page=1&size='+requestedSize;
   const response=await api(pagedEndpoint);if(requestId!==catalogRequestId)return;
-  const rawRows=catalogRows(response,kind);
+  const firstRows=catalogRows(response,kind);let rawRows=firstRows.slice(),meta=catalogMeta(response,firstRows,1),complete=kind==='节点';
+  if(kind!=='节点'&&meta.hasServerTotal){
+   const pageSize=Math.max(1,Number(meta.pageSize)||requestedSize),totalPages=Math.max(1,Number(meta.pages)||Math.ceil(meta.total/pageSize));
+   const pageNumbers=Array.from({length:Math.max(0,totalPages-1)},(_,i)=>i+2);
+   for(let offset=0;offset<pageNumbers.length;offset+=4){
+    const batch=pageNumbers.slice(offset,offset+4),responses=await Promise.all(batch.map(n=>api(endpoint+'?page='+n+'&size='+pageSize)));
+    if(requestId!==catalogRequestId)return;
+    responses.forEach((result,index)=>{try{rawRows.push(...catalogRows(result,kind))}catch(e){console.warn('[S5 platform scan] page parse skipped',batch[index],e.message)}});
+   }
+   complete=rawRows.length>=meta.total;
+  }
   const rows=kind==='节点'?rawRows.filter(p=>categoryOf(p,'node')==='节点'):rawRows;
-  const meta=catalogMeta(response,rows,catalogPage);
-  const sample=rawRows[0]||null,nested=sample&&(sample.product||sample.goods||sample.item||sample.sku)||{};
-  console.info('[S5 catalog JSON audit]',{category:kind,request:API_V1+pagedEndpoint,total:meta.total,length:rawRows.length,acceptedLength:rows.length,page:catalogPage,size:CATALOG_PAGE_SIZE,hasServerTotal:meta.hasServerTotal,responseKeys:response&&typeof response==='object'?Object.keys(response):[]});
+  const sample=firstRows[0]||null,nested=sample&&(sample.product||sample.goods||sample.item||sample.sku)||{};
+  console.info('[S5 catalog JSON audit]',{category:kind,request:API_V1+pagedEndpoint,total:meta.total,length:rawRows.length,acceptedLength:rows.length,page:1,size:meta.pageSize,hasServerTotal:meta.hasServerTotal,allPagesLoaded:complete,platformCount:new Set(rows.flatMap(p=>catalogFacet(p,kind).map(x=>x.toLowerCase()))).size,responseKeys:response&&typeof response==='object'?Object.keys(response):[]});
   if(sample)console.info('[S5 catalog first product full JSON]',{category:kind,product:sample,nestedProduct:nested,extra_attrs:sample.extra_attrs??sample.extraAttrs??null,price:sample.price??null,price_cents:sample.price_cents??null});
-  liveProducts=rows.map((p,i)=>normalize(p,i,kind==='节点'?'node':kind==='账号'?'account':'traffic'));
-  catalogTotal=meta.total;catalogTotalPages=meta.pages;
-  const breakdown=document.getElementById('catalogBreakdown');if(breakdown)breakdown.textContent='后端总数 '+catalogTotal.toLocaleString()+' 件 · 本页 '+rawRows.length+' 件 · 每页 '+CATALOG_PAGE_SIZE+' 件';
+  liveProducts=rows.map((p,i)=>{const item=normalize(p,i,kind==='节点'?'node':kind==='账号'?'account':'traffic');item._platformFacets=catalogFacet(item,kind);return item});
+  catalogAllRowsLoaded[kind]=complete;catalogTotal=meta.hasServerTotal?meta.total:rows.length;
+  catalogTotalPages=complete?Math.max(1,Math.ceil(liveProducts.length/CATALOG_PAGE_SIZE)):meta.pages;catalogPage=1;
+  const breakdown=document.getElementById('catalogBreakdown');if(breakdown)breakdown.textContent=(complete?'已扫描全部 '+rows.length.toLocaleString()+' 件':'后端总数 '+catalogTotal.toLocaleString()+' 件')+' · 已识别 '+new Set(liveProducts.flatMap(p=>p._platformFacets||[]).map(x=>x.toLowerCase())).size+' 个平台';
   renderCatalogFilters();renderProducts();
  }catch(e){
-  if(requestId!==catalogRequestId)return;liveProducts=[];renderCatalogFilters();
+  if(requestId!==catalogRequestId)return;liveProducts=[];catalogAllRowsLoaded[kind]=false;renderCatalogFilters();
   const breakdown=document.getElementById('catalogBreakdown');if(breakdown)breakdown.textContent='真实商品目录暂不可用';
   if(hint)hint.textContent='加载失败';
   root.innerHTML='<div class="error-state"><div class="symbol"><img src="./assets/icons/network.svg" alt="" aria-hidden="true"></div><b>真实商品目录暂时无法加载</b><p>'+escHtml(safeUiMessage(e.message))+'</p><button class="btn" type="button" onclick="loadCatalogs()">重新加载</button></div>';
  }finally{if(requestId===catalogRequestId){catalogLoading=false;root.removeAttribute('aria-busy')}}
-}
-function loadCatalogs(){catalogPage=1;return loadCatalogPage(1,activeKind)}
+}function loadCatalogs(){catalogPage=1;return loadCatalogPage(1,activeKind)}
 window.loadCatalogPage=loadCatalogPage;
 document.querySelectorAll('[data-kind]').forEach(b=>{b.className=b.dataset.kind===activeKind?'btn primary':'btn ghost';b.setAttribute('aria-pressed',String(b.dataset.kind===activeKind));b.addEventListener('click',()=>{if(activeKind===b.dataset.kind)return;activeKind=b.dataset.kind;activeFilter='全部';catalogPage=1;document.querySelectorAll('[data-kind]').forEach(x=>{x.className=x.dataset.kind===activeKind?'btn primary':'btn ghost';x.setAttribute('aria-pressed',String(x.dataset.kind===activeKind))});renderCatalogFilters();loadCatalogPage(1,activeKind)})});
 const catalogFilterRoot=document.getElementById('catalogFilters');

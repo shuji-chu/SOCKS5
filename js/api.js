@@ -108,7 +108,7 @@
   }
 
   function catalogPriceYuan(plan, type) {
-    const yuan = plan && (plan.price_yuan ?? (type === 'traffic' ? plan.unit_price_yuan : undefined));
+    const yuan = plan && (plan._staticPriceYuan ?? plan.price_yuan ?? (type === 'traffic' ? plan.unit_price_yuan : undefined));
     if (yuan !== undefined && yuan !== null && yuan !== '') {
       const value = Number(yuan);
       return Number.isFinite(value) && value >= 0 ? value : null;

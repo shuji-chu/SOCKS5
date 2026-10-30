@@ -249,7 +249,7 @@
     const socialAccount = /facebook|脸书|instagram|tiktok|twitter|推特|telegram|电报|whatsapp|google|gmail|youtube|油管|discord|reddit|snapchat|linkedin|outlook|apple id|meta account/.test(kind);
     p.category = nodeProduct ? '节点服务' : (socialAccount ? '账号服务' : (p.category || (/traffic|引流|增长|推广|群发|机器人|growth/.test(productKind + ' ' + kind) ? '引流服务' : '账号服务')));
     const periods = periodOptions(p);
-    const directYuan = p._staticPriceYuan ?? p.price_yuan ?? p.unit_price_yuan;
+    const directYuan = p._staticPriceYuan ?? p.price_yuan ?? (p.product_type === 'traffic' ? p.unit_price_yuan : undefined);
     const cents = p.price_cents;
     const prices = periods.map(x => x.price).filter(x => Number.isFinite(x) && x >= 0);
     if (directYuan !== undefined && directYuan !== null && directYuan !== '') p.price = Number(directYuan);

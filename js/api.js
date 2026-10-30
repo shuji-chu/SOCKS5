@@ -5,15 +5,61 @@
   // window.SOSKS5_API_BASE = 'https://your-api-host.example';
   const API_BASE = String(window.SOSKS5_API_BASE || 'https://web.lynli.me').replace(/\/+$/, '');
 
+  function debounce(fn, delay) {
+    let timer;
+    return function () {
+      const context = this, args = arguments;
+      clearTimeout(timer);
+      timer = setTimeout(function () { fn.apply(context, args); }, Math.max(0, Number(delay) || 0));
+    };
+  }
+  window.debounce = window.debounce || debounce;
+  if (!window.__S5_GLOBAL_ACTION_GUARD__) {
+    window.__S5_GLOBAL_ACTION_GUARD__ = true;
+    const selector = '[data-buy-sku],[data-product-id],#s5-auth-submit,button[onclick*="App.doLogin"],button[onclick*="App.doRegister"]';
+    const lock = function (el) {
+      if (!el || !el.matches || !el.matches(selector)) return true;
+      if (el.dataset.s5Cooldown === '1') return false;
+      const wasDisabled = !!el.disabled;
+      el.dataset.s5Cooldown = '1';
+      if ('disabled' in el) el.disabled = true;
+      el.setAttribute('aria-disabled', 'true');
+      setTimeout(function () {
+        el.dataset.s5Cooldown = '0';
+        if ('disabled' in el) el.disabled = wasDisabled || el.dataset.busy === '1';
+        if (!wasDisabled && el.dataset.busy !== '1') el.removeAttribute('aria-disabled');
+      }, 3000);
+      return true;
+    };
+    document.addEventListener('click', function (event) {
+      const el = event.target && event.target.closest ? event.target.closest(selector) : null;
+      if (!el) return;
+      if (!lock(el)) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        return;
+      }
+      if (el.id === 's5-auth-submit') el.dataset.s5SubmitArmed = '1';
+    }, true);
+    document.addEventListener('submit', function (event) {
+      const form = event.target;
+      if (!form || !form.matches || !form.matches('#s5-auth-form')) return;
+      const submit = form.querySelector('#s5-auth-submit');
+      if (!submit) return;
+      if (submit.dataset.s5SubmitArmed === '1') { submit.dataset.s5SubmitArmed = '0'; return; }
+      lock(submit);
+    }, true);
+  }
+
   const STATIC_DATA_URLS = {
-    nodes: 'https://raw.githubusercontent.com/shuji-chu/qian/main/nodes.json',
-    accounts: 'https://raw.githubusercontent.com/shuji-chu/qian/main/accounts.json',
-    traffic: 'https://raw.githubusercontent.com/shuji-chu/qian/main/traffic.json'
-  };
-  const STATIC_DATA_FALLBACKS = {
     nodes: 'https://api.lynli.me/static/qian/nodes.json',
     accounts: 'https://api.lynli.me/static/qian/accounts.json',
     traffic: 'https://api.lynli.me/static/qian/traffic.json'
+  };
+  const STATIC_DATA_FALLBACKS = {
+    nodes: 'https://raw.githubusercontent.com/shuji-chu/qian/main/nodes.json',
+    accounts: 'https://raw.githubusercontent.com/shuji-chu/qian/main/accounts.json',
+    traffic: 'https://raw.githubusercontent.com/shuji-chu/qian/main/traffic.json'
   };
 
   async function fetchStaticData(type) {
@@ -23,7 +69,7 @@
     let lastError = null;
     for (const url of [STATIC_DATA_URLS[type], STATIC_DATA_FALLBACKS[type]]) {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 15000);
+      const timeout = setTimeout(() => controller.abort(), 5000);
       console.info('[SOSKS5 Static JSON] 请求地址：', url);
       try {
         const response = await fetch(url, {
@@ -48,7 +94,7 @@
     }
     throw new Error(lastError && lastError.name === 'AbortError'
       ? '网络请求超时，请重新加载'
-      : '网络异常，请重新加载');
+      : '网络异常，请点击重试');
   }
 
   function normalizeStaticPlan(raw, type) {
@@ -251,6 +297,13 @@
 
   function setUserNav() {
     if (!window.App) return;
+    if (!document.getElementById('s5-catalog-skeleton-style')) {
+      const style = document.createElement('style');
+      style.id = 's5-catalog-skeleton-style';
+      style.textContent = '.s5-skeleton-card{display:grid;gap:10px;padding:14px;border:1px solid #dbeafe!important;border-radius:18px;background:rgba(241,247,255,.96)!important;box-shadow:0 8px 24px rgba(61,112,173,.08)}.s5-skeleton{display:block;min-height:18px;border-radius:10px;background:linear-gradient(90deg,#e8f1fb 20%,#f8fbff 50%,#e8f1fb 80%);background-size:200% 100%;animation:s5CatalogSkeletonPulse 1.8s ease-in-out infinite}.s5-skeleton-cover{min-height:132px}.s5-skeleton-line{min-height:13px;width:82%}.s5-skeleton-line.short{width:48%}@keyframes s5CatalogSkeletonPulse{0%,100%{opacity:.62}50%{opacity:1}}@media(prefers-reduced-motion:reduce){.s5-skeleton{animation:none}}';
+      document.head.appendChild(style);
+    }
+
     App.renderNav();
     const area = $('nav-user-area');
     if (area && App.state.user) {
@@ -775,7 +828,8 @@
       document.addEventListener('input',function(e){if(e.target&&e.target.classList&&e.target.classList.contains('s5-auth-input'))e.target.classList.remove('invalid')});
       function busy(button, label, yes) {
         if (!button) return;
-        button.disabled = !!yes || (!yes && button.id === 's5-auth-submit' && !$('s5-auth-consent')?.checked);
+        button.dataset.busy = yes ? '1' : '0';
+        button.disabled = !!yes || button.dataset.s5Cooldown === '1' || (!yes && button.id === 's5-auth-submit' && !$('s5-auth-consent')?.checked);
         button.setAttribute('aria-disabled', String(button.disabled));
         button.innerHTML = yes ? '<span class="s5-auth-spinner"></span><span>' + esc(label) + '</span>' : '<span>' + esc(label) + '</span>';
       }
@@ -883,7 +937,7 @@
     const staticType = kind === 'nodes' ? 'nodes' : kind === 'traffic' ? 'traffic' : 'accounts';
     const hero = '<section class="s5-subpage-hero"><div class="s5-subpage-copy"><span class="s5-section-label">LIVE SERVICE CATALOG</span><h1>' + title + '</h1><p>' + subtitle + '</p></div></section>';
     if (App.state._staticCatalogLoading) {
-      const skeleton = Array.from({ length: 6 }, () => '<article class="s5-glass-card s5-product-card"><div class="s5-skeleton"></div><div class="s5-skeleton"></div></article>').join('');
+      const skeleton = Array.from({ length: 6 }, () => '<article class="s5-glass-card s5-product-card s5-skeleton-card" aria-hidden="true"><div class="s5-skeleton s5-skeleton-cover"></div><div class="s5-skeleton s5-skeleton-line"></div><div class="s5-skeleton s5-skeleton-line short"></div></article>').join('');
       return hero + '<section class="s5-subpage-content"><div class="s5-product-grid">' + skeleton + '</div></section>';
     }
     if (App.state._staticCatalogError) {

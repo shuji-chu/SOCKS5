@@ -234,7 +234,7 @@
     console.info('[S5 home catalog] ready', {nodes:nodes.length, accounts:accounts.length, source:{nodes:staticNodes&&staticNodes.length?'static':'api',accounts:staticAccounts&&staticAccounts.length?'static':'api'}});
     return {nodes, accounts};
   }
-  async async function loadHome() {
+  async function loadHome() {
     const productSection = $$('.content-section').find((section) => /精选数字商品/.test(section.textContent));
     if (productSection) {
       const grid = $('.product-grid', productSection);

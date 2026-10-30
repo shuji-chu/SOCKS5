@@ -53,6 +53,11 @@
   function emptyState(message) {
     return '<div class="live-state">' + esc(message) + '</div>';
   }
+  function productErrorState() {
+    return '<div class="s5-product-error" role="alert"><div class="s5-product-error-icon"><img src="./assets/icons/network.svg" alt="" aria-hidden="true"></div><strong>商品暂时无法加载</strong><p>商品服务暂时没有响应，请检查网络后重新加载。</p><button type="button" onclick="location.reload()">重新加载</button></div>';
+  }
+  (function injectProductErrorStyles(){if(document.getElementById('s5-product-error-styles'))return;const st=document.createElement('style');st.id='s5-product-error-styles';st.textContent='.s5-product-error{grid-column:1/-1;max-width:620px;width:100%;margin:22px auto;padding:30px 22px;text-align:center;border:1px solid rgba(71,145,220,.2);border-radius:22px;background:linear-gradient(145deg,rgba(255,255,255,.96),rgba(238,247,255,.94));color:#334b66;box-shadow:0 18px 48px rgba(44,117,190,.12),0 0 28px rgba(86,169,255,.1);backdrop-filter:blur(22px)}.s5-product-error-icon{display:grid;place-items:center;width:68px;height:68px;margin:0 auto 15px;border:1px solid rgba(0,85,255,.13);border-radius:20px;background:linear-gradient(145deg,#f5faff,#e6f2ff)}.s5-product-error-icon img{width:36px;height:36px}.s5-product-error strong{display:block;color:#0A192F;font-size:19px;font-weight:900}.s5-product-error p{margin:8px auto 18px;color:#4a6078;font-size:13px}.s5-product-error button{min-width:190px;min-height:48px;border:0;border-radius:13px;background:linear-gradient(110deg,#087bff,#0055d9 58%,#1746c8);color:#fff;font-weight:900;box-shadow:0 10px 24px rgba(0,85,255,.22)}';document.head.appendChild(st);})();
+
   function productIconPath(item, type) {
     const name = [item && item.account_category, item && item.platform, item && item.name, item && item.title, item && item.product_name, item && item.product_type].filter(Boolean).join(' ').toLowerCase();
     const icons = [
@@ -188,7 +193,7 @@ async function fetchCatalog() {
           .concat(catalog.nodes.slice(1).map((p) => ({item:p,type:'node'}))).slice(0, 3);
         grid.innerHTML = featured.length ? featured.map((entry) => card(entry.item, entry.type)).join('') : emptyState('当前暂无可展示商品');
       } catch (error) {
-        grid.innerHTML = emptyState('商品暂时无法加载，请稍后重试');
+        grid.innerHTML = productErrorState();
         toast(error.message || '商品加载失败');
       }
     }
@@ -235,7 +240,7 @@ async function fetchCatalog() {
       const user = info.user || info;
       const shortId = String(user.short_id || info.short_id || info.shortId || '');
       if (!shortId) throw new Error('用户接口未返回 short_id');
-      const inviteUrl = 'https://sosks5.com/invite/' + encodeURIComponent(shortId);
+      const inviteUrl = location.origin + '/invite/' + encodeURIComponent(shortId);
       inviteUrlNode.textContent = inviteUrl;
       $('#invite-note').textContent = '当前账户邀请码：' + shortId;
       $('#copy-invite').addEventListener('click', () => UI.copy(inviteUrl));

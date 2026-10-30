@@ -197,9 +197,9 @@
     const needLiveNodes = !staticNodes || !staticNodes.length;
     const needLiveAccounts = !staticAccounts || !staticAccounts.length;
     const results = await Promise.allSettled([
-      needLiveNodes ? API.getPlans() : Promise.resolve([]),
-      needLiveAccounts ? API.getClonedProducts() : Promise.resolve([]),
-      (async()=>{const base=String(window.SOSKS5_PUBLIC_API_BASE||'https://api.lynli.me').replace(/\\/+$/,'');const response=await fetch(base+'/api/v1/public/catalog/account-overrides',{headers:{Accept:'application/json'},signal:AbortSignal.timeout?AbortSignal.timeout(5000):undefined});if(!response.ok)throw Error('catalog overrides unavailable');return response.json()})()
+      needLiveNodes ? (API && typeof API.getPlans === 'function' ? API.getPlans() : Promise.reject(new Error('API module unavailable'))) : Promise.resolve([]),
+      needLiveAccounts ? (API && typeof API.getClonedProducts === 'function' ? API.getClonedProducts() : Promise.reject(new Error('API module unavailable'))) : Promise.resolve([]),
+      (async()=>{const base=String(window.SOSKS5_PUBLIC_API_BASE||'https://api.lynli.me').replace(/\/+$/,'');const response=await fetch(base+'/api/v1/public/catalog/account-overrides',{headers:{Accept:'application/json'},signal:AbortSignal.timeout?AbortSignal.timeout(5000):undefined});if(!response.ok)throw Error('catalog overrides unavailable');return response.json()})()
     ]);
     const nodesResponse = staticNodes && staticNodes.length ? staticNodes : (results[0].status === 'fulfilled' ? unwrap(results[0].value) : []);
     const accountResponse = staticAccounts && staticAccounts.length ? staticAccounts : (results[1].status === 'fulfilled' ? unwrap(results[1].value) : []);

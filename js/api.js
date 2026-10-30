@@ -880,6 +880,15 @@
     });
     const title = kind === 'nodes' ? '节点中心' : kind === 'traffic' ? '引流系统' : '账号商城';
     const subtitle = kind === 'nodes' ? '节点套餐与网络服务' : kind === 'traffic' ? '引流与增长服务套餐' : '账号与数字服务套餐';
+    const staticType = kind === 'nodes' ? 'nodes' : kind === 'traffic' ? 'traffic' : 'accounts';
+    const hero = '<section class="s5-subpage-hero"><div class="s5-subpage-copy"><span class="s5-section-label">LIVE SERVICE CATALOG</span><h1>' + title + '</h1><p>' + subtitle + '</p></div></section>';
+    if (App.state._staticCatalogLoading) {
+      const skeleton = Array.from({ length: 6 }, () => '<article class="s5-glass-card s5-product-card"><div class="s5-skeleton"></div><div class="s5-skeleton"></div></article>').join('');
+      return hero + '<section class="s5-subpage-content"><div class="s5-product-grid">' + skeleton + '</div></section>';
+    }
+    if (App.state._staticCatalogError) {
+      return hero + '<section class="s5-subpage-content"><div class="s5-glass-card p-8 text-center"><h2>网络异常，请重新加载</h2><p>暂时无法获取商品数据，请检查网络连接后重试。</p><button type="button" class="s5-small-cta" onclick="App.loadProducts(\'' + staticType + '\', true)">重新加载</button></div></section>';
+    }
     const cards = matches.length ? matches.map((p) => {
       const periods = periodOptions(p._rawPlan || p);
       const price = periods.length ? Math.min.apply(null, periods.map((x) => x.price)) / 100 : Number(p.price || 0);
@@ -888,7 +897,7 @@
     }).join('') : '<div class="s5-empty-state">该分类暂无可购买套餐。套餐目录由服务端实时提供，请稍后刷新。</div>';
     const docs = '<footer class="s5-developer-docs"><a href="#" aria-label="开发者文档">开发者文档（即将上线）</a></footer>';
     const clonePanel = kind === 'traffic' ? '<section id="s5-cloned-products" class="s5-clone-products"></section>' : '';
-    return '<section class="s5-subpage-hero"><div class="s5-subpage-copy"><span class="s5-section-label">LIVE SERVICE CATALOG</span><h1>' + title + '</h1><p>' + subtitle + ' · 套餐、价格与可购买状态来自实时接口。</p></div></section><section class="s5-subpage-content"><div class="s5-section-heading"><div><span class="s5-section-label">AVAILABLE PLANS</span><h2>' + title + '套餐</h2><p>下单前请确认套餐周期、价格与支付方式。</p></div></div><div class="s5-product-grid">' + cards + '</div></section>' + clonePanel + docs;
+    return hero + '<section class="s5-subpage-content"><div class="s5-section-heading"><div><span class="s5-section-label">AVAILABLE PLANS</span><h2>' + title + '套餐</h2><p>下单前请确认套餐周期、价格与支付方式。</p></div></div><div class="s5-product-grid">' + cards + '</div></section>' + clonePanel + docs;
   }
 
     const originalRouter = App.router.bind(App);

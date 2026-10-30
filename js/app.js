@@ -262,6 +262,13 @@ async function loadCatalogPage(page=1,kind=activeKind){
   const pagedEndpoint=kind==='节点'?endpoint:endpoint+'?page=1&size='+requestedSize;
   const response=await api(pagedEndpoint);if(requestId!==catalogRequestId)return;
   const firstRows=catalogRows(response,kind);let rawRows=firstRows.slice(),meta=catalogMeta(response,firstRows,1),complete=kind==='节点';
+  // Render the first response immediately; never wait for every pagination request before showing products.
+  const firstVisibleRows=kind==='节点'?rawRows.filter(p=>categoryOf(p,'node')==='节点'):rawRows;
+  liveProducts=firstVisibleRows.map((p,i)=>{const item=normalize(p,i,kind==='节点'?'node':kind==='账号'?'account':'traffic');item._platformFacets=catalogFacet(item,kind);return item});
+  catalogAllRowsLoaded[kind]=complete;catalogTotal=meta.hasServerTotal?meta.total:firstVisibleRows.length;
+  catalogTotalPages=meta.pages;catalogPage=1;
+  catalogCache[kind]={products:liveProducts,total:catalogTotal,pages:catalogTotalPages,complete};
+  renderCatalogFilters();renderProducts();
   if(kind!=='节点'&&meta.hasServerTotal){
    const pageSize=Math.max(1,Number(meta.pageSize)||requestedSize),totalPages=Math.max(1,Number(meta.pages)||Math.ceil(meta.total/pageSize));
    const pageNumbers=Array.from({length:Math.max(0,totalPages-1)},(_,i)=>i+2);
@@ -284,10 +291,9 @@ async function loadCatalogPage(page=1,kind=activeKind){
   renderCatalogFilters();renderProducts();
   ['节点','引流','账号'].filter(other=>other!==kind).forEach(other=>prefetchCatalogKind(other));
  }catch(e){
-  if(requestId!==catalogRequestId)return;liveProducts=[];catalogAllRowsLoaded[kind]=false;renderCatalogFilters();
-  const breakdown=document.getElementById('catalogBreakdown');if(breakdown)breakdown.textContent='真实商品目录暂不可用';
-  if(hint)hint.textContent='加载失败';
-  root.innerHTML='<div class="error-state"><div class="symbol"><img src="./assets/icons/network.svg" alt="" aria-hidden="true"></div><b>真实商品目录暂时无法加载</b><p>'+escHtml(safeUiMessage(e.message))+'</p><button class="btn" type="button" onclick="loadCatalogs()">重新加载</button></div>';
+  if(requestId!==catalogRequestId)return;
+  if(liveProducts.length){catalogAllRowsLoaded[kind]=false;catalogCache[kind]={products:liveProducts,total:catalogTotal,pages:catalogTotalPages,complete:false};renderCatalogFilters();renderProducts();if(hint)hint.textContent='已显示当前商品，更多商品暂时无法同步';}
+  else{liveProducts=[];catalogAllRowsLoaded[kind]=false;renderCatalogFilters();const breakdown=document.getElementById('catalogBreakdown');if(breakdown)breakdown.textContent='真实商品目录暂不可用';if(hint)hint.textContent='加载失败';root.innerHTML='<div class="error-state"><div class="symbol"><img src="./assets/icons/network.svg" alt="" aria-hidden="true"></div><b>真实商品目录暂时无法加载</b><p>'+escHtml(safeUiMessage(e.message))+'</p><button class="btn" type="button" onclick="loadCatalogs()">重新加载</button></div>';}
  }finally{if(requestId===catalogRequestId){catalogLoading=false;root.removeAttribute('aria-busy')}}
 }function loadCatalogs(){catalogPage=1;return loadCatalogPage(1,activeKind)}
 window.loadCatalogPage=loadCatalogPage;

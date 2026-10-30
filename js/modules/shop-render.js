@@ -92,7 +92,8 @@ function render({root,products,activeKind='节点',searchTerm='',activeFilter='�
  const count=document.getElementById('resultCount');if(count)count.textContent='共 '+total.toLocaleString()+' 件商品 · 当前筛选 '+rows.length+' 件';
  const pagination=()=>'<nav class="sku-pagination" aria-label="商品分页"><button type="button" data-page="prev" '+(page<=1?'disabled':'')+'>上一页</button><span class="sku-page-number">第 '+page+' / '+totalPages+' 页</span><button type="button" data-page="next" '+(page>=totalPages?'disabled':'')+'>下一页</button></nav>';
  if(!rows.length){root.innerHTML='<div class="empty-space"><div><div class="planet"></div><b>当前筛选暂无商品</b><p>接口已返回 '+total.toLocaleString()+' 件商品总量；可切换“全部”查看当前页商品。</p></div></div>'+pagination();bind();return}
- root.innerHTML='<div class="sku-list">'+rows.slice(0,15).map(p=>renderUnifiedItem(p,activeFilter)).join('')+'</div>'+pagination();
+ const visibleRows=pageInfo.serverPaginated?rows.slice(0,15):rows.slice((page-1)*15,page*15);
+ root.innerHTML='<div class="sku-list">'+visibleRows.map(p=>renderUnifiedItem(p,activeFilter)).join('')+'</div>'+pagination();
  bind();
  function bind(){
   root.querySelectorAll('[data-open-sku]').forEach(btn=>btn.addEventListener('click',()=>{if(typeof w.openDetail==='function')w.openDetail(btn.dataset.openSku)}));

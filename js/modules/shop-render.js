@@ -33,24 +33,21 @@ function planMetaTags(p){
 function tagList(p){
  let raw=val(p.tags,p.labels,p.badges,p.features,p.tagline,p.selling_points,attrs(p).tags,attrs(p).labels,attrs(p).features,attrs(p).tagline);
  if(raw==null)return [];
- const parseString=s=>{
-  const text=String(s).trim();if(!text)return [];
-  if(text[0]==='['||text[0]==='{'){
-   try{return JSON.parse(text)}catch(_){return text.replace(/[\\[\\]"]/g,' ').split(/[,，|、;；\\n]+/)}
+ const flatten=value=>{
+  if(value==null||value==='')return [];
+  if(Array.isArray(value))return value.flatMap(flatten);
+  if(typeof value==='object'){
+   for(const key of ['name','text','label','title','value','tag','display_name'])if(value[key]!==undefined&&value[key]!==null&&value[key]!=='')return flatten(value[key]);
+   return Object.entries(value).filter(([,v])=>v===true).map(([k])=>k);
   }
-  return text.split(/[,，|、;；\\n]+/);
+  if(typeof value==='string'){
+   const text=value.trim();if(!text)return [];
+   if(text[0]==='['||text[0]==='{'){try{return flatten(JSON.parse(text))}catch(_){}}
+   return text.split(/[,，|、;；\\n]+/).map(x=>x.trim()).filter(Boolean);
+  }
+  return [String(value)];
  };
- if(typeof raw==='string')raw=parseString(raw);
- if(!Array.isArray(raw)&&raw&&typeof raw==='object')raw=Object.entries(raw).filter(([,v])=>v===true).map(([k])=>k);
- if(!Array.isArray(raw))raw=[raw];
- const out=[];
- for(const item of raw){
-  let value=item&&typeof item==='object'?(item.label||item.name||item.title||item.value||''):item;
-  if(typeof value==='string'&&(value.trim().startsWith('[')||value.trim().startsWith('{'))){
-   const parsed=parseString(value);for(const v of (Array.isArray(parsed)?parsed:[parsed]))if(v!=null&&String(v).trim())out.push(String(v).trim());
-  }else if(value!=null&&String(value).trim())out.push(String(value).trim());
- }
- return [...new Set(out.map(x=>x.replace(/[\\[\\]"]/g,' ').trim()).filter(Boolean))].slice(0,8);
+ return [...new Set(flatten(raw).map(cleanAccountText).filter(Boolean))].slice(0,8);
 }
 function skuTitle(p){const a=attrs(p),parts=[val(p.registration_year,p.register_year,a.registration_year,a.register_year,a.created_year),val(p.registration_region,p.register_region,a.registration_region,a.registration_country,a.region,a.country),val(p.two_fa_status,p.two_fa,a.two_fa_status,a.two_fa,a.has_2fa),val(p.device_lock_status,p.device_lock,a.device_lock_status,a.device_lock)];const present=parts.filter(x=>x!==null).length;return present?parts.map((v,i)=>v===null?null:(i===0?'注册 '+v+'年':i===1?'地区 '+v:i===2?'2FA '+nice(v):'设备锁 '+nice(v))).filter(Boolean).join(' · '):''}
 function merchantDashboard(p){if(p._kind!=='账号')return '';const a=attrs(p),groups=[['注册年份',['registration_year','register_year','created_year','year']],['注册地区',['registration_region','register_region','registration_country','region','country']],['2FA 状态',['two_fa','two_fa_status','twoFA','two_factor','has_2fa']],['设备锁状态',['device_lock','device_lock_status','deviceLock','device_bound']],['绑卡情况',['card_bound','has_card','payment_card','billing_card','card_status']]];const used=new Set(),rows=groups.map(([label,keys])=>{const k=keys.find(x=>a[x]!==undefined&&a[x]!==null)||keys.find(x=>p[x]!==undefined&&p[x]!==null);if(k)used.add(k);return [label,k?nice(a[k]??p[k]):'商家未提供']});for(const [k,v] of Object.entries(a))if(!used.has(k)&&v!=null&&typeof v!=='object')rows.push([k.replace(/_/g,' '),nice(v)]);return '<section class="archive-panel merchant-dashboard"><div class="archive-head"><div><div class="eyebrow">SKU ATTRIBUTE MATRIX</div><h4>商品属性档案</h4></div><span class="archive-stamp">逐 SKU 展示</span></div><div class="archive-grid">'+rows.map(([k,v])=>'<div class="archive-item"><span>'+esc(k)+'</span><b>'+esc(v)+'</b></div>').join('')+'</div></section>'}
@@ -59,8 +56,16 @@ function deliveryPanel(p){const d=val(p.delivery_content,p.delivery_description,
 function tutorialPanel(p){const t=val(p._tutorial,p.tutorial_markdown,p.tutorial_md,p.tutorial,p.guide_markdown,p.guide,p.content_md);if(t)return '<section class="archive-panel"><div class="archive-head"><div><div class="eyebrow">PRODUCT PLAYBOOK</div><h4>本商品专属使用教程</h4></div><span class="archive-stamp">商家提供</span></div><div class="markdown">'+String(w.SOSKS5_RENDER_MARKDOWN?w.SOSKS5_RENDER_MARKDOWN(t):esc(t).replace(/\n/g,'<br>'))+'</div></section>';let steps=p._kind==='节点'?[['导入配置','在订单交付区复制订阅或配置，导入对应客户端。'],['首次连接','选择本商品支持的协议节点，连接后访问服务商允许的网站。'],['排查连接','连接失败时先更新订阅、切换协议节点并检查客户端时间与网络。']]:p._kind==='账号'?[['核对交付信息','收到账号后先核对登录方式、绑定信息和商家列出的 SKU 属性。'],['安全初始化','首次登录后按平台支持的流程更新密码、绑定恢复方式并启用双重验证。'],['妥善保管','不要共享验证码或恢复凭据；遇到登录异常先联系商家售后。']]:[['核对交付','按订单页面说明领取对应文件、兑换码或服务内容。'],['按说明启用','依照商品交付说明完成导入或激活。'],['保留凭证','保存订单号与交付记录，遇到问题通过官方售后渠道反馈。']];return '<section class="archive-panel"><div class="archive-head"><div><div class="eyebrow">PRODUCT PLAYBOOK</div><h4>上手与安全使用指南</h4></div><span class="archive-stamp">通用指引</span></div><p class="archive-note">商家尚未配置此 SKU 的专属教程，以下为通用操作建议，不代表商家承诺或特定平台规则。</p><div class="guide-steps">'+steps.map((x,i)=>'<div class="guide-step"><b>0'+(i+1)+' · '+esc(x[0])+'</b><p>'+esc(x[1])+'</p></div>').join('')+'</div></section>'}
 
 function cleanAccountText(value){
- const raw=typeof value==='string'?value:(value&&typeof value==='object'?JSON.stringify(value):String(value??''));
- return raw.replace(/[\\[\\]"']/g,'').replace(/\\s*[,，|、;；]+\\s*/g,' · ').replace(/\\s+/g,' ').trim();
+ const pick=value=>{
+  if(value==null)return '';
+  if(Array.isArray(value))return value.map(pick).filter(Boolean).join(' · ');
+  if(typeof value==='object'){
+   for(const key of ['name','text','label','title','value','display_name','tag'])if(value[key]!==undefined&&value[key]!==null&&value[key]!=='')return pick(value[key]);
+   return Object.entries(value).filter(([,v])=>v===true).map(([k])=>k).join(' · ');
+  }
+  return String(value);
+ };
+ return pick(value).replace(/[\\[\\]"']/g,'').replace(/\\s*[,，|、;；]+\\s*/g,' · ').replace(/\\s+/g,' ').trim();
 }
 function renderUnifiedItem(p,activeFilter='全部'){
  const title=cleanAccountText(p._title||p.title||p.name||p.product_title||p.display_name||p.sku_title||p.sku_name||p.product_name||p.goods_name||p.item_name||'商品 '+String(p._key||''));
@@ -69,9 +74,9 @@ function renderUnifiedItem(p,activeFilter='全部'){
  const tags=[...new Set([...selectedTag,...protocolTags,...planMetaTags(p),cleanAccountText(p._region||p.region_name||p.region||p.country||p.area||''),...tagList(p).map(cleanAccountText)].filter(Boolean))].slice(0,8);
  const src=p._image||p._icon;
  const fallback='./assets/icons/server.svg';
- const brand=p._brandIcon||(/\\bsteam\\b/i.test(title)?'steam':/netflix/i.test(title)?'netflix':/midjourney/i.test(title)?'midjourney':/\\bmail\\b|gmail|outlook/i.test(title)?'mail':'');
- const brandClass=brand?' brand-'+brand:'';
- const brandLabel=brand==='steam'?'S':brand==='netflix'?'N':brand==='midjourney'?'M':brand==='mail'?'✉':esc(title.trim().charAt(0).toUpperCase()||'?');
+ const brand=p._brandIcon||(/\\bsteam\\b/i.test(title)?'steam':/netflix/i.test(title)?'netflix':/midjourney/i.test(title)?'midjourney':/mail\\.ru|mailru/i.test(title)?'mailru':/telegram|电报/i.test(title)?'telegram':/threads/i.test(title)?'threads':/\\bmail\\b|gmail|outlook/i.test(title)?'mail':'generic');
+ const brandClass=' brand-'+brand;
+ const brandLabel=brand==='steam'?'S':brand==='netflix'?'N':brand==='midjourney'?'MJ':brand==='mailru'?'AT':brand==='telegram'?'TE':brand==='threads'?'TH':brand==='mail'?'✉':brand==='whatsapp'?'WA':brand==='instagram'?'IG':brand==='facebook'?'FB':brand==='discord'?'DC':brand==='tiktok'?'TT':brand==='youtube'?'YT':esc(title.trim().slice(0,2).toUpperCase()||'?');
  const icon=src?'<img src="'+esc(src)+'" alt="'+esc(title)+'" loading="lazy" decoding="async" onerror="this.hidden=true;this.parentElement.classList.add(\'image-missing\')">':brand?'<span class="sku-brand-mark'+brandClass+'" aria-label="'+esc(brand)+'">'+brandLabel+'</span>':'<img src="'+esc(fallback)+'" alt="" loading="lazy" decoding="async" onerror="this.remove()">';
  const price=p._priceProvided?'¥'+Number(p._price).toFixed(2):'询价';
  const stockValue=p._stock;
@@ -99,7 +104,7 @@ function render({root,products,activeKind='节点',searchTerm='',activeFilter='�
  const count=document.getElementById('resultCount');if(count)count.textContent='共 '+total.toLocaleString()+' 件商品 · 当前筛选 '+rows.length+' 件';
  const pageNumbers=[...new Set([1,page-1,page,page+1,totalPages])].filter(n=>n>=1&&n<=totalPages).sort((a,b)=>a-b);
  const pageButtons=pageNumbers.map((n,index)=>((index>0&&n-pageNumbers[index-1]>1)?'<span class="sku-page-number" aria-hidden="true">…</span>':'')+'<button type="button" data-page="'+n+'" '+(n===page?'aria-current="page" class="active"':'')+'>'+n+'</button>').join('');
- const pagination=()=>'<nav class="sku-pagination" aria-label="商品分页"><button type="button" data-page="prev" '+(page<=1?'disabled':'')+'>上一页</button>'+pageButtons+'<span class="sku-page-number">第 '+page+' / '+totalPages+' 页</span><button type="button" data-page="next" '+(page>=totalPages?'disabled':'')+'>下一页</button></nav>';
+ const pagination=()=>'<nav class="sku-pagination" aria-label="商品分页"><button type="button" class="sku-page-prev" data-page="prev" '+(page<=1?'disabled':'')+'>上一页</button>'+pageButtons+'<button type="button" class="sku-page-next" data-page="next" '+(page>=totalPages?'disabled':'')+'>下一页</button></nav>';
  if(!rows.length){root.innerHTML='<div class="empty-space"><div><div class="planet"></div><b>当前筛选暂无商品</b><p>接口已返回 '+total.toLocaleString()+' 件商品总量；可切换“全部”查看当前页商品。</p></div></div>'+pagination();bind();return}
  const visibleRows=pageInfo.serverPaginated?rows.slice(0,15):rows.slice((page-1)*15,page*15);
  root.innerHTML='<div class="sku-list">'+visibleRows.map(p=>renderUnifiedItem(p,activeFilter)).join('')+'</div>'+pagination();

@@ -71,7 +71,7 @@ function renderUnifiedItem(p,activeFilter='全部'){
  const brand=p._brandIcon||(/\\bsteam\\b/i.test(title)?'steam':/netflix/i.test(title)?'netflix':/midjourney/i.test(title)?'midjourney':/\\bmail\\b|gmail|outlook/i.test(title)?'mail':'');
  const brandClass=brand?' brand-'+brand:'';
  const brandLabel=brand==='steam'?'S':brand==='netflix'?'N':brand==='midjourney'?'M':brand==='mail'?'✉':esc(title.trim().charAt(0).toUpperCase()||'?');
- const icon=brand?'<span class="sku-brand-mark'+brandClass+'" aria-label="'+esc(brand)+'">'+brandLabel+'</span>':'<img src="'+esc(src||fallback)+'" alt="" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=\\''+fallback+'\\';this.classList.add(\\'sku-icon-fallback\\')">';
+ const icon=brand?'<span class="sku-brand-mark'+brandClass+'" aria-label="'+esc(brand)+'">'+brandLabel+'</span>':'<img src="'+esc(src||fallback)+'" alt="" loading="lazy" decoding="async" onerror="this.remove()">';
  const price=p._priceProvided?'¥'+Number(p._price).toFixed(2):'询价';
  const stockValue=p._stock;
  const stockNumber=stockValue===null||stockValue===''?null:Number(stockValue);

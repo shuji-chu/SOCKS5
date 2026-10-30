@@ -62,6 +62,8 @@ input::placeholder,textarea::placeholder{color:#64748b!important}
 .bottom-nav a.active,.home-bottom-nav a.active,.mobile-tabbar a.active{
  color:#0055FF!important;
  font-weight:900!important;
+ background:rgba(0,85,255,.08)!important;
+ border-radius:12px!important;
  text-shadow:0 0 12px rgba(0,85,255,.22)!important;
 }
 .bottom-nav a img,.home-bottom-nav a img,.mobile-tabbar a img{

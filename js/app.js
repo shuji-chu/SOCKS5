@@ -8,31 +8,30 @@ let liveProducts=[],activeKind=['节点','账号','引流'].includes(requestedCa
 let catalogPage=1,catalogTotal=0,catalogTotalPages=1,catalogLoading=false,catalogRequestId=0;
 const CATALOG_PAGE_SIZE=15;
 const catalogFacetIcon=(p,kind,label)=>{
- const backend=p.icon_url||p.brand_icon_url||p.platform_icon||p.platform_logo||p.protocol_icon_url||p.logo_url||p.icon?.url||'';
+ const backend=p.icon_url||p.brand_icon_url||p.platform_icon||p.platform_logo||p.logo_url||p.icon?.url||'';
  if(backend)return String(backend);
  const name=String(label).toLowerCase();
- const local=[[/facebook|脸书/,'platform-facebook.svg'],[/instagram|ins/,'platform-instagram.svg'],[/tiktok|抖音/,'platform-tiktok.svg'],[/twitter|推特|^x$/,'platform-x.svg'],[/telegram|电报|^tg$/,'platform-telegram.svg'],[/google|gmail|谷歌/,'platform-google.svg'],[/whatsapp/,'platform-whatsapp.svg'],[/discord/,'platform-discord.svg'],[/youtube|油管/,'platform-youtube.svg'],[/reddit/,'platform-reddit.svg'],[/vless|vmess|trojan|hysteria|shadowsocks|tuic|anytls|ssr|mtproto/,'nodes.svg']];
+ const local=[[/facebook|脸书/,'platform-facebook.svg'],[/instagram|ins/,'platform-instagram.svg'],[/tiktok|抖音/,'platform-tiktok.svg'],[/twitter|推特|^x$/,'platform-x.svg'],[/telegram|电报|^tg$/,'platform-telegram.svg'],[/steam/,'platform-steam.svg'],[/netflix/,'platform-netflix.svg'],[/gmail|google|谷歌/,'platform-google.svg'],[/mail\\.ru|mailru/,'platform-mailru.svg'],[/whatsapp/,'platform-whatsapp.svg'],[/discord/,'platform-discord.svg'],[/youtube|油管/,'platform-youtube.svg'],[/reddit/,'platform-reddit.svg']];
  const match=local.find(([pattern])=>pattern.test(name));
- if(match)return './assets/images/'+match[1];
- const slug=name.replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,36);
- return './assets/images/platform-'+slug+'.svg';
+ return match?'./assets/images/'+match[1]:'';
 };
 function catalogFacet(p,kind){
- let attrs=p.extra_attrs||p.extraAttrs||p.extra_attributes||p.extraAttributes||p.attributes||{};
+ let attrs=p._merchantAttrs||p.extra_attrs||p.extraAttrs||p.extra_attributes||p.extraAttributes||p.attributes||{};
  if(typeof attrs==='string'){try{attrs=JSON.parse(attrs)}catch(_){attrs={}}}
- const read=(keys)=>{for(const key of keys){const v=p[key]??attrs[key];if(v!==undefined&&v!==null&&v!=='')return v}return ''};
- if(kind==='节点'){
-  const v=read(['protocol','node_protocol','protocol_name','network_protocol','type']);
-  if(Array.isArray(v))return v.map(String);
-  if(typeof v==='string'&&v.trim())return v.split(/[,，|\/、]/).map(x=>x.trim()).filter(Boolean);
-  const many=read(['protocols','supported_protocols','protocol_list']);
-  return Array.isArray(many)?many.map(String):[];
- }
- const keys=kind==='账号'?['platform','account_platform','provider','brand','account_category','category_name','product_category','type']:['platform','platform_name','traffic_platform','target_platform','source_platform','social_platform','product_platform','site','app','channel','channel_name','media','service','provider','brand','service_category','category_name','product_category','type'];
- const values=keys.map(k=>read([k])).filter(v=>v!==''&&v!=null);
- const extra=read(['platforms','supported_platforms','channels','services','platform_list','platform_names']);
+ const keys=kind==='账号'
+  ?['platform','account_platform','provider','brand','service','email_provider','account_category','platform_name','product_platform']
+  :['platform','platform_name','traffic_platform','target_platform','source_platform','social_platform','product_platform','site','app','channel','channel_name','media','service','provider','brand'];
+ const values=[];
+ keys.forEach(k=>{const v=p[k]??attrs[k];if(v!==undefined&&v!==null&&v!=='')values.push(v)});
+ const extra=p.platforms??p.supported_platforms??p.channels??p.services??attrs.platforms??attrs.supported_platforms??attrs.channels??attrs.services;
  if(Array.isArray(extra))values.push(...extra);else if(extra)values.push(extra);
- return [...new Set(values.flatMap(x=>String(x||'').split(/[,，|\/、;；]+/).map(y=>y.trim()).filter(Boolean)))];
+ const labels=values.flatMap(v=>String(typeof v==='object'?(v.name||v.platform||v.title||''):v).split(/[,，|\\/、;；]+/).map(x=>x.trim()).filter(Boolean));
+ const title=String(p._title||p.title||p.name||p.product_name||p.sku_name||'');
+ const known=[
+  [/\\btelegram\\b|电报/i,'Telegram'],[/\\bsteam\\b/i,'Steam'],[/\\bnetflix\\b/i,'Netflix'],[/\\bgmail\\b|\\bgoogle\\s*mail\\b/i,'Gmail'],[/mail\\.ru|\\bmailru\\b/i,'Mail.ru'],[/\\btiktok\\b|抖音/i,'TikTok'],[/\\binstagram\\b|\\big\\b/i,'Instagram'],[/\\bfacebook\\b/i,'Facebook'],[/\\bwhatsapp\\b/i,'WhatsApp'],[/\\bdiscord\\b/i,'Discord'],[/\\byoutube\\b/i,'YouTube'],[/\\breddit\\b/i,'Reddit'],[/\\btwitter\\b|\\bx\\s*账号/i,'X']
+ ];
+ known.forEach(([re,name])=>{if(re.test(title+' '+labels.join(' ')))labels.push(name)});
+ return [...new Set(labels.map(x=>x.trim()).filter(x=>x&&x.length<=40))];
 }
 function renderCatalogFilters(){
  const root=document.getElementById('catalogFilters');if(!root)return;
@@ -42,7 +41,8 @@ function renderCatalogFilters(){
  if(!options.includes(activeFilter))activeFilter='全部';
  root.innerHTML=options.map(label=>{
   const icon=label==='全部'?'./assets/icons/shop.svg':facets.get(label);
-  return '<button type="button" class="catalog-filter-pill'+(label===activeFilter?' active':'')+'" data-catalog-filter="'+escHtml(label)+'" aria-pressed="'+String(label===activeFilter)+'"><img src="'+escHtml(icon)+'" alt="" aria-hidden="true" loading="lazy"><span>'+escHtml(label)+'</span></button>';
+  const image=icon?'<img src="'+escHtml(icon)+'" alt="" aria-hidden="true" loading="lazy" onerror="this.remove()">':'<span class="catalog-filter-glyph" aria-hidden="true">'+(label==='全部'?'⌂':escHtml(label.charAt(0).toUpperCase()))+'</span>';
+  return '<button type="button" class="catalog-filter-pill'+(label===activeFilter?' active':'')+'" data-catalog-filter="'+escHtml(label)+'" aria-pressed="'+String(label===activeFilter)+'">'+image+'<span>'+escHtml(label)+'</span></button>';
  }).join('');
 }
 function catalogEndpoint(kind){return kind==='节点'?'/user/plan/fetch':kind==='账号'?'/account/products':'/user/cloned_products';}

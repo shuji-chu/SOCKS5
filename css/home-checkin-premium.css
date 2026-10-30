@@ -46,3 +46,15 @@
 @media(max-width:760px){.s5-checkin-card{padding:22px 18px;border-radius:23px!important}.s5-checkin-card .checkin-layout{grid-template-columns:minmax(0,1fr);gap:20px}.checkin-topline{margin-bottom:19px}.s5-checkin-card h2{font-size:clamp(26px,7vw,34px)}.checkin-benefits{gap:7px}.benefit-item{flex-direction:column;align-items:flex-start;gap:7px;padding:10px 9px}.benefit-item>img{width:24px;height:24px;flex-basis:24px}.benefit-item b{font-size:12px}.benefit-item small{font-size:10px}.checkin-pool{min-height:unset;padding:20px}.pool-total{font-size:58px}.s5-checkin-card .checkin-button{width:100%}}
 @media(max-width:390px){.checkin-topline{align-items:flex-start;flex-direction:column}.checkin-benefits{grid-template-columns:1fr}.benefit-item{flex-direction:row;align-items:center}.s5-checkin-card{padding:19px 15px}}
 @media(prefers-reduced-motion:reduce){.s5-checkin-card .checkin-button{transition:none}}
+
+/* Keep the existing secure reward dialog styled after moving the inline module CSS */
+.mtp-modal{position:fixed;inset:0;z-index:999;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(2,7,20,.8);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.mtp-modal.show{display:flex}
+.mtp-dialog{position:relative;width:min(560px,100%);padding:25px;border:1px solid rgba(0,112,230,.24);border-radius:24px;background:linear-gradient(145deg,#fff,#edf6ff);box-shadow:0 0 70px rgba(38,124,229,.2),0 30px 100px rgba(0,24,68,.22)}
+.mtp-dialog h3{margin:0;color:#0a2344!important;font-size:25px}
+.mtp-dialog>p{color:#405773!important}
+.mtp-link{display:block;overflow-wrap:anywhere;padding:14px;margin:18px 0;border:1px solid rgba(0,112,230,.2);border-radius:13px;background:#f3f8ff;color:#0755b8;font-size:12px;line-height:1.7;user-select:all}
+.mtp-actions{display:flex;gap:10px;flex-wrap:wrap}
+.mtp-actions a,.mtp-actions button{flex:1;min-width:140px;text-align:center;justify-content:center}
+.mtp-close{float:right;border:1px solid rgba(10,50,100,.14);border-radius:10px;background:#edf5ff;padding:6px 10px;color:#254765;cursor:pointer}
+@media(max-width:620px){.mtp-dialog{padding:20px}}

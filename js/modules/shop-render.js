@@ -1,5 +1,6 @@
 /* SOSKS5 atomic-SKU storefront renderer. One API row = one independent SKU; never merges variants. */
 (function(w){'use strict';
+let pageNavigationLocked=false;
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const val=(...xs)=>{for(const x of xs)if(x!==undefined&&x!==null&&String(x).trim()!=='')return x;return null};
 const attrs=p=>p._merchantAttrs&&typeof p._merchantAttrs==='object'?p._merchantAttrs:{};
@@ -105,7 +106,19 @@ function render({root,products,activeKind='节点',searchTerm='',activeFilter='�
  bind();
  function bind(){
   root.querySelectorAll('[data-open-sku]').forEach(btn=>btn.addEventListener('click',()=>{if(typeof w.openDetail==='function')w.openDetail(btn.dataset.openSku)}));
-  root.querySelectorAll('[data-page]').forEach(btn=>btn.addEventListener('click',()=>{if(btn.disabled)return;const next=btn.dataset.page==='next'?page+1:btn.dataset.page==='prev'?page-1:Number(btn.dataset.page);if(typeof w.loadCatalogPage==='function'){w.loadCatalogPage(next,activeKind);const target=document.getElementById('products');if(target)target.scrollIntoView({behavior:'smooth',block:'start'});}}));
+  root.querySelectorAll('[data-page]').forEach(btn=>btn.addEventListener('click',()=>{
+   if(btn.disabled||pageNavigationLocked)return;
+   pageNavigationLocked=true;
+   root.querySelectorAll('[data-page]').forEach(control=>{control.disabled=true;control.setAttribute('aria-busy','true')});
+   const next=btn.dataset.page==='next'?page+1:btn.dataset.page==='prev'?page-1:Number(btn.dataset.page);
+   if(typeof w.loadCatalogPage==='function'){
+    try{
+     const pending=w.loadCatalogPage(next,activeKind);
+     Promise.resolve(pending).finally(()=>{pageNavigationLocked=false});
+     const target=document.getElementById('products');if(target)target.scrollIntoView({behavior:'smooth',block:'start'});
+    }catch(error){pageNavigationLocked=false;throw error}
+   }else pageNavigationLocked=false;
+  }));
  }
 }
 w.ShopRender={render,merchantDashboard,productImage:image,stockLabel:stock,protocolBadges:protocols,nodeCapabilities,deliveryPanel,tutorialPanel,tagList};})(window);

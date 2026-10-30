@@ -68,9 +68,15 @@ function renderUnifiedItem(p,activeFilter='全部'){
  const tags=[...new Set([...selectedTag,...protocolTags,...planMetaTags(p),cleanAccountText(p._region||p.region_name||p.region||p.country||p.area||''),...tagList(p).map(cleanAccountText)].filter(Boolean))].slice(0,8);
  const src=p._kind==='账号'?(p._icon||p._image):(p._image||p._icon);
  const fallback='./assets/icons/server.svg';
- const icon='<img src="'+esc(src||fallback)+'" alt="" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=\''+fallback+'\';this.classList.add(\'sku-icon-fallback\')">';
- const price=p._priceProvided?'¥'+Number(p._price).toFixed(2):'价格待商家提供';
- return '<article class="sku-row sku-clickable" data-sku="'+esc(p._key)+'" data-buy-sku="'+esc(p._key)+'" role="button" tabindex="0" aria-label="购买 '+esc(title)+'">'+
+ const brand=p._brandIcon||(/\\bsteam\\b/i.test(title)?'steam':/netflix/i.test(title)?'netflix':/midjourney/i.test(title)?'midjourney':/\\bmail\\b|gmail|outlook/i.test(title)?'mail':'');
+ const brandClass=brand?' brand-'+brand:'';
+ const brandLabel=brand==='steam'?'S':brand==='netflix'?'N':brand==='midjourney'?'M':brand==='mail'?'✉':esc(title.trim().charAt(0).toUpperCase()||'?');
+ const icon=brand?'<span class="sku-brand-mark'+brandClass+'" aria-label="'+esc(brand)+'">'+brandLabel+'</span>':'<img src="'+esc(src||fallback)+'" alt="" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=\\''+fallback+'\\';this.classList.add(\\'sku-icon-fallback\\')">';
+ const price=p._priceProvided?'¥'+Number(p._price).toFixed(2):'询价';
+ const stockValue=p._stock;
+ const stockNumber=stockValue===null||stockValue===''?null:Number(stockValue);
+ const outOfStock=stockNumber!==null&&Number.isFinite(stockNumber)&&stockNumber<=0;
+ return '<article class="sku-row sku-clickable'+(outOfStock?' sku-out-of-stock':'')+'" data-sku="'+esc(p._key)+'" '+(outOfStock?'aria-disabled="true" tabindex="-1"':'data-buy-sku="'+esc(p._key)+'" role="button" tabindex="0" aria-label="购买 '+esc(title)+'"')+'>'+
   '<div class="sku-icon">'+icon+'</div>'+
   '<div class="sku-content">'+
    '<div class="sku-title">'+esc(title)+'</div>'+

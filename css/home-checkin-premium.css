@@ -58,3 +58,24 @@
 .mtp-actions a,.mtp-actions button{flex:1;min-width:140px;text-align:center;justify-content:center}
 .mtp-close{float:right;border:1px solid rgba(10,50,100,.14);border-radius:10px;background:#edf5ff;padding:6px 10px;color:#254765;cursor:pointer}
 @media(max-width:620px){.mtp-dialog{padding:20px}}
+
+/* Conversion update: four clear SVG benefits + honest shared-pool status */
+.s5-checkin-card .checkin-benefits{grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.s5-checkin-card .benefit-item{min-height:92px;align-items:flex-start;padding:13px 11px;background:rgba(255,255,255,.9);border-color:rgba(37,112,205,.17);box-shadow:0 7px 20px rgba(31,93,164,.07)}
+.s5-checkin-card .benefit-item>img{flex-basis:29px;width:29px;height:29px;padding:3px;border-radius:9px;background:linear-gradient(145deg,#f0f7ff,#e1efff);filter:none}
+.s5-checkin-card .benefit-item b{color:#0b2a50!important;font-size:13px}
+.s5-checkin-card .benefit-item small{color:#405873!important;font-size:11px;line-height:1.55}
+.s5-checkin-card .checkin-upgrade{border-color:rgba(104,82,214,.24);background:linear-gradient(100deg,#f1edff,#f1f8ff)}
+.s5-checkin-card .upgrade-seal{border-color:rgba(89,73,197,.3);background:linear-gradient(145deg,#fff,#e6e2ff);box-shadow:0 0 18px rgba(104,82,214,.13)}
+.s5-checkin-card .upgrade-seal img{width:23px;height:23px;filter:none}
+.s5-checkin-card .checkin-upgrade b{color:#30216c!important}
+.s5-checkin-card .checkin-upgrade small{color:#465572!important}
+.s5-checkin-card .pool-total{font-size:clamp(58px,6vw,76px)}
+.s5-checkin-card .pool-remaining b{color:#0755c9!important;font-size:12px;text-align:right}
+.s5-checkin-card .pool-meter-pending{position:relative;background:#dceafb}
+.s5-checkin-card .pool-meter-pending span{width:34%;background:linear-gradient(90deg,#5bd4ff,#086aff,#5bd4ff);background-size:200% 100%;animation:poolPending 2.2s ease-in-out infinite}
+.s5-checkin-card .pool-note{max-width:220px;color:#536b86!important}
+@keyframes poolPending{0%{transform:translateX(-110%);background-position:0 0}100%{transform:translateX(310%);background-position:100% 0}}
+@media(max-width:760px){.s5-checkin-card .checkin-benefits{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.s5-checkin-card .benefit-item{min-height:82px;flex-direction:row;align-items:center;gap:9px;padding:11px 9px}.s5-checkin-card .benefit-item>img{width:26px;height:26px;flex-basis:26px}.s5-checkin-card .benefit-item b{font-size:12px}.s5-checkin-card .benefit-item small{font-size:10px}}
+@media(max-width:390px){.s5-checkin-card .checkin-benefits{grid-template-columns:1fr}.s5-checkin-card .benefit-item{min-height:unset}}
+@media(prefers-reduced-motion:reduce){.s5-checkin-card .pool-meter-pending span{animation:none;width:100%;opacity:.45}}

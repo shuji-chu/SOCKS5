@@ -99,7 +99,10 @@ function matchesFilter(p,filter){
 function render({root,products,activeKind='节点',searchTerm='',activeFilter='全部',pageInfo={}}){
  if(!root)return;
  const query=String(searchTerm||'').trim().toLowerCase();
- const rows=products.filter(p=>p._kind===activeKind&&matchesFilter(p,activeFilter)&&(!query||[p._title,p._desc,p._kind,p._region,p.tags,p.protocol,p.node_protocol,p.platform,p.brand,p.provider,p.account_category,p.traffic_platform,JSON.stringify(p._merchantAttrs||{})].filter(Boolean).join(' ').toLowerCase().includes(query))).sort((a,b)=>Number(b._premium)-Number(a._premium));
+ const rows=products.filter(p=>p._kind===activeKind&&matchesFilter(p,activeFilter)&&(!query||[p._title,p._desc,p._kind,p._region,p.tags,p.protocol,p.node_protocol,p.platform,p.brand,p.provider,p.account_category,p.traffic_platform,JSON.stringify(p._merchantAttrs||{})].filter(Boolean).join(' ').toLowerCase().includes(query))).sort((a,b)=>{
+  const weight=p=>{const raw=p.sort_weight??p._sortWeight??p.weight;const n=Number(raw);if(raw!==undefined&&raw!==null&&raw!==''&&Number.isFinite(n))return n;const stock=Number(p._stock??p.stock??p.available_stock??p.inventory??p.quantity??0);return Number.isFinite(stock)?stock:0};
+  return weight(b)-weight(a)||Number(b._premium)-Number(a._premium);
+ });
  const page=Math.max(1,Number(pageInfo.page)||1),total=Math.max(0,Number(pageInfo.total)||0),totalPages=pageInfo.serverPaginated?Math.max(1,Number(pageInfo.totalPages)||1):Math.max(1,Math.ceil(rows.length/15));
  const count=document.getElementById('resultCount');if(count)count.textContent='共 '+total.toLocaleString()+' 件商品 · 当前筛选 '+rows.length+' 件';
  const pageNumbers=[...new Set([1,page-1,page,page+1,totalPages])].filter(n=>n>=1&&n<=totalPages).sort((a,b)=>a-b);

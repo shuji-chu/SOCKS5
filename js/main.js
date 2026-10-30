@@ -191,7 +191,6 @@
   }
 
   async function fetchCatalog() {
-    if (!requireApi()) return {nodes: [], accounts: []};
     const staticResults = await Promise.allSettled([fetchHomeStatic('nodes'), fetchHomeStatic('accounts')]);
     const staticNodes = staticResults[0].status === 'fulfilled' ? staticResults[0].value : null;
     const staticAccounts = staticResults[1].status === 'fulfilled' ? staticResults[1].value : null;
@@ -231,7 +230,7 @@
       if (seen.has(key)) return false;
       seen.add(key); return true;
     }).map((item) => Object.assign({}, item, {category: '账号服务', product_type: 'account', account_category: item.account_category || item.platform || accountCategoryName(item)}));
-    console.info('[S5 home catalog] ready', {nodes:nodes.length, accounts:accounts.length, source:{nodes:staticNodes?'static':'api',accounts:staticAccounts?'static':'api'}});
+    console.info('[S5 home catalog] ready', {nodes:nodes.length, accounts:accounts.length, source:{nodes:staticNodes&&staticNodes.length?'static':'api',accounts:staticAccounts&&staticAccounts.length?'static':'api'}});
     return {nodes, accounts};
   }
   async function loadHome() {

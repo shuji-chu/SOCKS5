@@ -70,13 +70,13 @@ function renderUnifiedItem(p,activeFilter='全部'){
  const fallback='./assets/icons/server.svg';
  const icon='<img src="'+esc(src||fallback)+'" alt="" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=\''+fallback+'\';this.classList.add(\'sku-icon-fallback\')">';
  const price=p._priceProvided?'¥'+Number(p._price).toFixed(2):'价格待商家提供';
- return '<article class="sku-row" data-sku="'+esc(p._key)+'">'+
+ return '<article class="sku-row sku-clickable" data-sku="'+esc(p._key)+'" data-buy-sku="'+esc(p._key)+'" role="button" tabindex="0" aria-label="购买 '+esc(title)+'">'+
   '<div class="sku-icon">'+icon+'</div>'+
   '<div class="sku-content">'+
    '<div class="sku-title">'+esc(title)+'</div>'+
    (tags.length?'<div class="sku-tags">'+tags.map(x=>'<span>'+esc(x)+'</span>').join('')+'</div>':'')+
    '<div class="sku-bottom"><span class="sku-price">'+price+'</span><span class="sku-stock">库存：'+esc(stock(p))+'</span></div>'+
-   '<button class="sku-detail" type="button" data-open-sku="'+esc(p._key)+'" aria-label="查看 '+esc(title)+' 的 SKU 详情">查看 SKU 详情</button>'+
+ 
   '</div></article>';
 }
 function matchesFilter(p,filter){

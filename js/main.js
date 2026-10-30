@@ -199,13 +199,13 @@
     const needLiveAccounts = !staticAccounts || !staticAccounts.length;
     const results = await Promise.allSettled([
       needLiveNodes ? (API && typeof API.getPlans === 'function' ? API.getPlans() : Promise.reject(new Error('API module unavailable'))) : Promise.resolve([]),
-      needLiveAccounts ? (API && typeof API.getClonedProducts === 'function' ? API.getClonedProducts() : Promise.reject(new Error('API module unavailable'))) : Promise.resolve([]),
+      needLiveAccounts ? (API && typeof API.getAccounts === 'function' ? API.getAccounts() : Promise.reject(new Error('账号目录 API unavailable'))) : Promise.resolve([]),
       (async()=>{const base=String(window.SOSKS5_PUBLIC_API_BASE||'https://api.lynli.me').replace(/\/+$/,'');const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),1200);let response;try{response=await fetch(base+'/api/v1/public/catalog/account-overrides',{headers:{Accept:'application/json'},signal:controller.signal})}finally{clearTimeout(timer)}if(!response.ok)throw Error('catalog overrides unavailable');return response.json()})()
     ]);
     const nodesResponse = staticNodes && staticNodes.length ? staticNodes : (results[0].status === 'fulfilled' ? unwrap(results[0].value) : []);
     const accountResponse = staticAccounts && staticAccounts.length ? staticAccounts : (results[1].status === 'fulfilled' ? unwrap(results[1].value) : []);
     if (needLiveNodes && results[0].status === 'rejected') toast('节点商品加载失败：' + results[0].reason.message);
-    if (needLiveAccounts && results[1].status === 'rejected') toast('账号商品加载失败：' + results[1].reason.message);
+    if (needLiveAccounts && results[1].status === 'rejected') { console.error('[S5 home catalog] 账号目录回退失败', results[1].reason); toast('账号商品加载失败：' + results[1].reason.message); }
     const plans = groupedNodeRows(nodesResponse);
     const isSocialAccount = (p) => /facebook|脸书|instagram|tiktok|twitter|推特|telegram|电报|whatsapp|google|gmail|youtube|油管|discord|reddit|snapchat|linkedin|outlook|apple id|meta account|threads|steam|netflix/.test([p.name,p.title,p.content,p.description,p.type,p.product_type,p.product_category,p.platform,p.brand].join(' ').toLowerCase());
     const isAccountPlan = (p) => {

@@ -241,6 +241,52 @@ function groupedNodeRows(response){
 function localizeTrafficTitle(value){
  let title=String(value??'');
  const dictionary=[
+  [/\b2FA\s*On\b/gi,'已开2FA'],[/\b2FA\s*Off\b/gi,'无2FA'],[/\bRandom\s+Country\b/gi,'随机国家'],[/\bDevice\s+Lock\b/gi,'设备锁'],
+  [/\bFull\s+Account\b/gi,'全功能号'],[/\bBlind\s+Box\b/gi,'盲盒'],
+  [/\[\s*US\s*\]/gi,'[美国]'],
+  [/\[\s*UK\s*\]/gi,'[英国]'],
+  [/\[\s*GB\s*\]/gi,'[英国]'],
+  [/\[\s*IN\s*\]/gi,'[印度]'],
+  [/\[\s*SG\s*\]/gi,'[新加坡]'],
+  [/\[\s*CA\s*\]/gi,'[加拿大]'],
+  [/\[\s*BR\s*\]/gi,'[巴西]'],
+  [/\[\s*RU\s*\]/gi,'[俄罗斯]'],
+  [/\[\s*CN\s*\]/gi,'[中国]'],
+  [/\[\s*JP\s*\]/gi,'[日本]'],
+  [/\[\s*KR\s*\]/gi,'[韩国]'],
+  [/\[\s*HK\s*\]/gi,'[中国香港]'],
+  [/\[\s*TW\s*\]/gi,'[中国台湾]'],
+  [/\[\s*TH\s*\]/gi,'[泰国]'],
+  [/\[\s*VN\s*\]/gi,'[越南]'],
+  [/\[\s*ID\s*\]/gi,'[印度尼西亚]'],
+  [/\[\s*MY\s*\]/gi,'[马来西亚]'],
+  [/\[\s*PH\s*\]/gi,'[菲律宾]'],
+  [/\[\s*AU\s*\]/gi,'[澳大利亚]'],
+  [/\[\s*NZ\s*\]/gi,'[新西兰]'],
+  [/\[\s*DE\s*\]/gi,'[德国]'],
+  [/\[\s*FR\s*\]/gi,'[法国]'],
+  [/\[\s*IT\s*\]/gi,'[意大利]'],
+  [/\[\s*ES\s*\]/gi,'[西班牙]'],
+  [/\[\s*NL\s*\]/gi,'[荷兰]'],
+  [/\[\s*SE\s*\]/gi,'[瑞典]'],
+  [/\[\s*NO\s*\]/gi,'[挪威]'],
+  [/\[\s*FI\s*\]/gi,'[芬兰]'],
+  [/\[\s*PL\s*\]/gi,'[波兰]'],
+  [/\[\s*TR\s*\]/gi,'[土耳其]'],
+  [/\[\s*MX\s*\]/gi,'[墨西哥]'],
+  [/\[\s*AR\s*\]/gi,'[阿根廷]'],
+  [/\[\s*CL\s*\]/gi,'[智利]'],
+  [/\[\s*CO\s*\]/gi,'[哥伦比亚]'],
+  [/\[\s*ZA\s*\]/gi,'[南非]'],
+  [/\[\s*NG\s*\]/gi,'[尼日利亚]'],
+  [/\[\s*EG\s*\]/gi,'[埃及]'],
+  [/\[\s*AE\s*\]/gi,'[阿联酋]'],
+  [/\[\s*SA\s*\]/gi,'[沙特阿拉伯]'],
+  [/\[\s*IL\s*\]/gi,'[以色列]'],
+  [/\[\s*PK\s*\]/gi,'[巴基斯坦]'],
+  [/\[\s*BD\s*\]/gi,'[孟加拉国]'],
+  [/\[\s*LK\s*\]/gi,'[斯里兰卡]'],
+  [/\[\s*NP\s*\]/gi,'[尼泊尔]'],
   [/\bAPI\s+Login\b/gi,'API登录'],[/\biOS\s+Real\s+Device\b/gi,'iOS真机'],[/\bBlind\s+Box\b/gi,'盲盒'],
   [/\bFull\s+Account\b/gi,'全功能账号'],[/\bShared\s+Account\b/gi,'共享账号'],[/\bShared\b/gi,'共享号'],
   [/\bAged\b/gi,'老号'],[/\bBulk\s+Available\b/gi,'大量有货'],[/\bPhone\s+Verified\b/gi,'手机已验证'],
@@ -274,7 +320,9 @@ function normalize(p,i,source){
  const priceProvided=parsedPrice!==null&&Number.isFinite(parsedPrice)&&parsedPrice>=0;
  if(!priceProvided)console.warn('[S5 static catalog: price missing]',{source,id:p.id,title:p.name||p.title,price_yuan:p.price_yuan,unit_price_yuan:p.unit_price_yuan,price_cents:p.price_cents});
  const rawTitle=String((source==='traffic'?(p.name||p.title||p.product_title||p.productTitle||p.sku_name||p.skuName||p.product_name||p.productName||p.goods_name||p.goodsName||p.item_name||p.itemName||p.display_name||p.displayName||p.label||merchant.name||merchant.title||merchant.product_title||merchant.sku_name||merchant.product_name||''):(p.title||p.name||p.product_title||p.productTitle||p.display_name||p.displayName||p.sku_title||p.skuTitle||p.sku_name||p.product_name||p.productName||p.goods_name||p.goodsName||p.item_name||p.itemName||p.label||p.en_name||p.name_en||p.english_name||p.description_zh||p.description||''))||'商品 '+String(p.sku_id??p.id??p.product_id??i+1));
- const finalTitle=(source==='traffic'||source==='account')?localizeTrafficTitle(rawTitle).replace(/\bShared\b/gi,'共享').replace(/高级版\s+共享/gi,'高级共享账号').replace(/\s*\(\s*1m\s*\)/gi,' (1个月)').replace(/\bSteamGuard\b/gi,'令牌').replace(/\bSteam\s*Guard\b/gi,'令牌'):rawTitle;
+ let finalTitle=localizeTrafficTitle(rawTitle).replace(/\bShared\b/gi,'共享').replace(/高级版\s+共享/gi,'高级共享账号').replace(/\s*\(\s*1m\s*\)/gi,' (1个月)').replace(/\bSteamGuard\b/gi,'令牌').replace(/\bSteam\s*Guard\b/gi,'令牌');
+ const platformNotes=[[/^\s*Threads\b/i,'Threads（社交平台）'],[/^\s*Steam\b/i,'Steam（游戏平台）'],[/^\s*Telegram\b/i,'Telegram（即时通讯）'],[/^\s*TikTok\b/i,'TikTok（短视频平台）'],[/^\s*Discord\b/i,'Discord（社群平台）'],[/^\s*Reddit\b/i,'Reddit（社区论坛）']];
+ for(const [pattern,label] of platformNotes){if(pattern.test(finalTitle)){finalTitle=finalTitle.replace(pattern,label);break}}
  const brandText=(rawTitle+' '+String(p.platform||p.brand||p.provider||p.account_category||'')).toLowerCase();
  const brandIcon=/telegram|电报/.test(brandText)?'telegram':/threads/.test(brandText)?'threads':/tiktok|抖音/.test(brandText)?'tiktok':/instagram|\bins\b/.test(brandText)?'instagram':/facebook|脸书/.test(brandText)?'facebook':/whatsapp/.test(brandText)?'whatsapp':/discord/.test(brandText)?'discord':/steam/.test(brandText)?'steam':/netflix/.test(brandText)?'netflix':/midjourney/.test(brandText)?'midjourney':/mail\.ru|mailru/.test(brandText)?'mailru':/gmail|google mail/.test(brandText)?'gmail':/outlook|hotmail/.test(brandText)?'outlook':/yahoo/.test(brandText)?'yahoo':/icloud|apple/.test(brandText)?'icloud':/youtube|油管/.test(brandText)?'youtube':/reddit/.test(brandText)?'reddit':/\bmail\b/.test(brandText)?'mail':'';
  return {...p,_brandIcon:brandIcon,_key:source+'-'+i+'-'+String(p.sku_id??p.id??p.product_id??p.uuid??'sku'),_source:source,_kind:categoryOf(p,source),_title:finalTitle,_desc:String(p.description_zh||p.chinese_description||p.description_cn||p.description||p.summary||p.content||''),_image:resolveAsset(image),_icon:resolveAsset(icon),_price:Number.isFinite(priceYuan)?priceYuan:0,_priceProvided:priceProvided,_priceCents:Math.round(priceYuan*100),_stock:rawStock,_sales:p.sales??p.sold_count??p.total_sales??p.buy_count,_tutorial:p.tutorial_markdown||p.tutorial_md||p.tutorial||p.guide_markdown||p.guide||p.markdown||p.content_md||'',_delivery:p.delivery_content||p.delivery_description||p.delivery||p.deliverables||p.delivery_type||p.delivery_method||'',_warranty:p.warranty||p.warranty_period||p.after_sales||p.after_sale||p.support_policy||p.guarantee||'',_notice:p.notice||p.notes||p.warning||p.terms||'',_merchantAttrs:merchant,_region:catalogDisplayText(p._region||p.region_name||p.region||p.country||p.area||p.location||''),_premium:premium,_period:p.period_name||p.period_label||p.period||p.billing_cycle||''};

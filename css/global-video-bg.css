@@ -184,3 +184,72 @@ img[src*="/assets/icons/"],img[src^="./assets/icons/"],img[src^="assets/icons/"]
 }
 .site-footer img[src*="logo"],.footer-brand img[src*="logo"]{width:36px!important;height:36px!important;object-fit:cover!important;border-radius:10px!important}
 body:before,body:after{pointer-events:none!important;opacity:.08!important}
+
+
+/* FINAL ICE-WHITE CLEANUP: neutralize legacy dark surfaces site-wide */
+:root{
+ color-scheme:light!important;
+ --bg:#FFFFFF!important;--panel:rgba(255,255,255,.82)!important;
+ --panel2:#F0F4F8!important;--text:#0A192F!important;--muted:#334155!important;
+ --line:rgba(10,25,47,.12)!important;--cyan:#087fbd!important;--blue:#2563eb!important;
+}
+html,body{background-color:#FFFFFF!important;color:#334155!important}
+body{background-image:none!important}
+.s5-global-header,.site-header,.header,.top,.bar,.dp-header{
+ background:rgba(255,255,255,.92)!important;background-color:#FFFFFF!important;
+ color:#0A192F!important;border-color:rgba(10,25,47,.12)!important;
+ -webkit-backdrop-filter:blur(20px)!important;backdrop-filter:blur(20px)!important;
+}
+.bottom-nav,.home-bottom-nav,.mobile-tabbar,.mobile{
+ background:rgba(255,255,255,.97)!important;background-color:#FFFFFF!important;
+ border-color:rgba(37,99,235,.16)!important;
+}
+.bottom-nav a,.home-bottom-nav a,.mobile-tabbar a{color:#155eaa!important}
+.bottom-nav a.active,.home-bottom-nav a.active,.mobile-tabbar a.active{color:#0055FF!important}
+.brand img,.brand-logo-local,.dp-brand img,.top .brand img,.bar .brand img,
+.header .brand img,.s5-header-brand img,.s5-header-brand>img{
+ display:block!important;width:45px!important;height:45px!important;
+ min-width:45px!important;max-width:45px!important;max-height:45px!important;
+ object-fit:contain!important;image-rendering:-webkit-optimize-contrast!important;
+ background:transparent!important;border:0!important;border-radius:10px!important;
+ box-shadow:0 3px 12px rgba(15,50,90,.14)!important;flex:none!important;
+}
+.site-footer img[src*="logo"],.footer-brand img[src*="logo"],.footer-brandline img[src*="logo"]{
+ width:45px!important;height:45px!important;object-fit:contain!important;
+ image-rendering:-webkit-optimize-contrast!important;background:transparent!important;
+ box-shadow:0 3px 12px rgba(15,50,90,.12)!important;
+}
+/* Developer center and legacy dark components */
+.dp-glass,.dp-proof,.dp-docs a,.dp-terminal,.dp-terminal-head,.dp-modal-card,
+.dp-keybox,.dp-code,.dp-quota,.dp-skeleton,.dp-callout,.dp-docs,
+.dp-guide-card,.dp-input,.dp-chip,.dp-apply,.dp-card{
+ background:rgba(255,255,255,.84)!important;background-color:rgba(255,255,255,.84)!important;
+ color:#334155!important;border-color:rgba(10,25,47,.12)!important;
+ -webkit-backdrop-filter:blur(20px)!important;backdrop-filter:blur(20px)!important;
+ box-shadow:0 8px 30px rgba(15,45,80,.07)!important;
+}
+.dp-glass p,.dp-proof p,.dp-apply p,.dp-apply li,.dp-docs a span,
+.dp-terminal-head,.dp-code-head,.dp-field-hint,.dp-modal-card p,
+.dp-input,.dp-callout,.dp-footer{color:#334155!important}
+.dp-glass h2,.dp-glass h3,.dp-apply h2,.dp-modal-card h2,.dp-section-head h2,
+.dp-hero h1,.dp-brand{color:#0A192F!important}
+.dp-terminal pre,.dp-code pre{background:#F0F4F8!important;color:#0A192F!important}
+.dp-modal{background:rgba(224,247,250,.72)!important;backdrop-filter:blur(8px)!important}
+.dp-btn:not(.primary){background:rgba(255,255,255,.9)!important;color:#155eaa!important}
+.dp-btn.primary{background:linear-gradient(110deg,#258cf0,#1765d8)!important;color:#fff!important}
+/* Remove dark backplates on common legacy overlays, alerts and cards */
+.toast,#toast,.safe-ui-notice,.modal-card,.modal-content,.modal-panel,
+.detail-modal,.mtp-dialog,.login-card,.auth-card,.form-card,.code-card,
+.node-config-panel,.node-speed-panel,.node-map-panel,.metric-card,
+.subscription-card,.invite-field,.poster,.announcement,.blindbox{
+ background:rgba(255,255,255,.86)!important;background-color:rgba(255,255,255,.86)!important;
+ color:#334155!important;border-color:rgba(10,25,47,.12)!important;
+ -webkit-backdrop-filter:blur(20px)!important;backdrop-filter:blur(20px)!important;
+}
+h1,h2,h3,h4,h5,h6,strong,b,.title,.page-title,.section-heading{color:#0A192F!important}
+p,small,label,li,dt,dd,figcaption,.muted,.description,.lead{color:#334155!important}
+input,select,textarea,.input{background:#FFFFFF!important;color:#0A192F!important}
+input::placeholder,textarea::placeholder{color:#64748b!important}
+/* Keep the panda/video background recognizable instead of washing it out */
+#global-bg-overlay{background:rgba(255,255,255,.56)!important;-webkit-backdrop-filter:blur(1px)!important;backdrop-filter:blur(1px)!important}
+#global-bg-video{filter:brightness(1.12) contrast(1.18) saturate(1.08)!important}

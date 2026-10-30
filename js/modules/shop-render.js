@@ -7,7 +7,24 @@ const attrs=p=>p._merchantAttrs&&typeof p._merchantAttrs==='object'?p._merchantA
 const first=(o,keys)=>{for(const k of keys)if(o[k]!==undefined&&o[k]!==null&&String(o[k]).trim()!=='')return o[k];return null};
 const nice=v=>typeof v==='boolean'?(v?'已开启':'未开启'):typeof v==='object'?JSON.stringify(v):String(v);
 const asset=u=>{if(!u)return '';u=String(u);const cdn=String(w.SOSKS5_OSS_BASE_URL||'').replace(/\/+$/,'');if(/^https?:\/\//i.test(u)){if(cdn){try{const p=new URL(u),api=new URL('https://web.lynli.me');if(p.hostname===api.hostname)return cdn+p.pathname+p.search+p.hash}catch(_){}}return u}const path=u.startsWith('/')?u:'/'+(u.startsWith('./')?u.slice(2):u);return cdn?cdn+path:u};
-function stock(p){const b=val(p.bulk_available_count,p.wholesale_available_count,p.batch_stock,p.bulk_stock,p.wholesale_stock,p.available_batches);return b!==null?'可成批数 '+b:(p._stock==null?'商家未提供':String(p._stock))}
+function stock(p){
+ const read=value=>value&&typeof value==='object'?val(value.available,value.available_count,value.stock,value.quantity,value.count,value.total,value.remaining):value;
+ const bulk=read(val(p.bulk_available_count,p.wholesale_available_count,p.batch_stock,p.bulk_stock,p.wholesale_stock,p.available_batches));
+ if(bulk!==null&&bulk!==undefined&&bulk!==''){
+  const n=Number(bulk);return '可成批数 '+(Number.isFinite(n)&&n>=0?n.toLocaleString('zh-CN'):'信息待核实');
+ }
+ const raw=read(val(p._stock,p.stock,p.available_stock,p.stock_available,p.inventory,p.quantity,p.count));
+ if(raw===null||raw===undefined||raw===''){
+  if(p.sold_out===true||p.in_stock===false)return '缺货';
+  if(p.in_stock===true)return '有货（数量未提供）';
+  return '商家未提供';
+ }
+ const n=Number(raw);
+ if(Number.isFinite(n))return n>=0?n.toLocaleString('zh-CN'):'信息待核实';
+ const text=String(raw).trim();
+ if(/unlimited|infinite|不限量/i.test(text))return '不限量';
+ return '信息待核实';
+}
 function image(p){const src=p._kind==='账号'?(p._icon||p._image):(p._image||p._icon)||'',initial=esc((p._title||'?').trim().charAt(0).toUpperCase());return '<div class="product-art">'+(src?'<img src="'+esc(src)+'" alt="'+esc(p._title)+'" loading="lazy" decoding="async" onerror="this.hidden=true;this.parentElement.classList.add(\'image-missing\')">':'')+'<span class="product-initial">'+initial+'</span></div>'}
 function localIcon(u){if(!u)return './assets/icons/server.svg';const s=String(u).trim();if(s.startsWith('./assets/icons/'))return s.split(/[?#]/)[0];const marker='/assets/icons/';const i=s.indexOf(marker);if(i>=0){const file=s.slice(i+marker.length).split(/[?#]/)[0];if(/^[a-z0-9_.-]+\.svg$/i.test(file))return './assets/icons/'+file}if(s.startsWith('assets/icons/'))return './'+s.split(/[?#]/)[0];return './assets/icons/server.svg'}
 function protocols(p){if(p._kind!=='节点')return '';const raw=p.protocols||p.supported_protocols||[p.protocol||p.node_protocol||p.type].filter(Boolean),items=Array.isArray(raw)?raw:String(raw).split(/[,，|]/).filter(Boolean),icons=p.protocol_icons||p.protocol_icon_urls||{};if(!items.length)return '<div class="sku-muted">协议信息：商家未提供</div>';return '<div class="protocol-badges">'+items.map(it=>{const n=typeof it==='object'?(it.name||it.protocol||it.type||'协议'):it,k=String(n).toLowerCase().replace(/[^a-z0-9]/g,''),u=(typeof it==='object'&&(it.icon_url||it.icon))||(icons[n]||icons[k])||p.icon_url||p.protocol_icon_url||p._icon||'';return '<span class="protocol-badge"><img loading="lazy" decoding="async" src="'+esc(localIcon(u))+'" onerror="this.onerror=null;this.src=\'./assets/icons/server.svg\'" alt="" aria-hidden="true">'+esc(n)+'</span>'}).join('')+'</div>'}

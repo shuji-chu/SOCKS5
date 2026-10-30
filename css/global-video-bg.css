@@ -1,0 +1,9 @@
+/* S5 global responsive video background */
+html{min-height:100%;background:#E0F7FA!important}
+body{position:relative;min-height:100vh;background:#E0F7FA!important}
+#global-bg-video{position:fixed;top:0;left:0;width:100vw;height:100vh;object-fit:cover;z-index:-2;pointer-events:none;background:#E0F7FA}
+#global-bg-overlay{position:fixed;inset:0;z-index:-1;pointer-events:none;background:rgba(255,255,255,.75);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px)}
+/* Keep page surfaces readable above the video */
+.brand img,.brand-logo-local,.dp-brand img,.top .brand img,.bar .brand img,.header .brand img{width:auto!important;height:40px!important;max-width:160px;object-fit:contain!important;flex:none}
+.site-footer img[src*="logo"],.footer-brand img[src*="logo"]{width:auto;height:36px;object-fit:contain}
+@media(prefers-reduced-motion:reduce){#global-bg-video{display:none}}

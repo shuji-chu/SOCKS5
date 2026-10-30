@@ -107,19 +107,25 @@
       : '网络异常，请点击重试');
   }
 
+  function catalogPriceYuan(plan, type) {
+    const yuan = plan && (plan.price_yuan ?? (type === 'traffic' ? plan.unit_price_yuan : undefined));
+    if (yuan !== undefined && yuan !== null && yuan !== '') {
+      const value = Number(yuan);
+      return Number.isFinite(value) && value >= 0 ? value : null;
+    }
+    const cents = plan && plan.price_cents;
+    if (cents !== undefined && cents !== null && cents !== '') {
+      const value = Number(cents);
+      return Number.isFinite(value) && value >= 0 ? value / 100 : null;
+    }
+    return null;
+  }
+
   function normalizeStaticPlan(raw, type) {
     const p = Object.assign({}, raw || {});
-    const yuan = type === 'traffic'
-      ? (p.price_yuan ?? p.unit_price_yuan)
-      : p.price_yuan;
-    const cents = p.price_cents;
-    if (yuan !== undefined && yuan !== null && yuan !== '') {
-      p.price = Math.round(Number(yuan) * 100);
-    } else if (cents !== undefined && cents !== null && cents !== '') {
-      p.price = Number(cents);
-    } else {
-      p.price = 0;
-    }
+    const yuan = catalogPriceYuan(p, type);
+    p._staticPriceYuan = yuan;
+    p.price = yuan === null ? 0 : yuan;
     p.product_type = type === 'nodes' ? 'node' : type === 'accounts' ? 'account' : 'traffic';
     p.category = type === 'nodes' ? '节点服务' : type === 'accounts' ? '账号服务' : '引流服务';
     p.image_url = p.image_url || p.cover_url || '';
@@ -243,8 +249,12 @@
     const socialAccount = /facebook|脸书|instagram|tiktok|twitter|推特|telegram|电报|whatsapp|google|gmail|youtube|油管|discord|reddit|snapchat|linkedin|outlook|apple id|meta account/.test(kind);
     p.category = nodeProduct ? '节点服务' : (socialAccount ? '账号服务' : (p.category || (/traffic|引流|增长|推广|群发|机器人|growth/.test(productKind + ' ' + kind) ? '引流服务' : '账号服务')));
     const periods = periodOptions(p);
+    const directYuan = p._staticPriceYuan ?? p.price_yuan ?? p.unit_price_yuan;
+    const cents = p.price_cents;
     const prices = periods.map(x => x.price).filter(x => Number.isFinite(x) && x >= 0);
-    p.price = prices.length ? Math.min.apply(null, prices) / 100 : Number(p.price || p.sale_price || 0);
+    if (directYuan !== undefined && directYuan !== null && directYuan !== '') p.price = Number(directYuan);
+    else if (cents !== undefined && cents !== null && cents !== '') p.price = Number(cents) / 100;
+    else p.price = prices.length ? Math.min.apply(null, prices) / 100 : Number(p.price || p.sale_price || 0);
     p.stock = p.stock === undefined ? (p.available === false ? 0 : 1) : Number(p.stock);
     p._rawPlan = raw;
     return p;
@@ -263,7 +273,15 @@
     ];
     const out = keys.filter(([key]) => plan && plan[key] !== null && plan[key] !== undefined && plan[key] !== '' && Number(plan[key]) >= 0)
       .map(([key, label, value]) => ({ key, label, value, price: Number(plan[key]) }));
-    if (!out.length && plan && plan.price !== undefined) out.push({ key: 'month_price', label: '默认套餐', value: 'month_price', price: Number(plan.price) });
+    if (!out.length && plan) {
+      const yuan = plan._staticPriceYuan ?? plan.price_yuan ?? plan.unit_price_yuan ?? plan.price;
+      const cents = plan.price_cents;
+      if (yuan !== undefined && yuan !== null && yuan !== '' && Number.isFinite(Number(yuan)) && Number(yuan) >= 0) {
+        out.push({ key: 'month_price', label: '默认套餐', value: 'month_price', price: Math.round(Number(yuan) * 100) });
+      } else if (cents !== undefined && cents !== null && cents !== '' && Number.isFinite(Number(cents)) && Number(cents) >= 0) {
+        out.push({ key: 'month_price', label: '默认套餐', value: 'month_price', price: Number(cents) });
+      }
+    }
     return out;
   }
 
@@ -955,7 +973,7 @@
     }
     const cards = matches.length ? matches.map((p) => {
       const periods = periodOptions(p._rawPlan || p);
-      const price = periods.length ? Math.min.apply(null, periods.map((x) => x.price)) / 100 : Number(p.price || 0);
+      const price = Number.isFinite(Number(p.price)) ? Number(p.price) : 0;
       const sold = Number(p.stock) <= 0;
       return '<article class="s5-glass-card s5-product-card"><div class="s5-product-top"><div class="s5-product-symbol">◈</div><span class="s5-product-category">' + esc(p.category || title) + '</span></div><h3>' + esc(p.name || p.title) + '</h3><p class="s5-product-desc">' + esc(p.content || p.description || '套餐规格与有效期以服务端信息为准。') + '</p><div class="s5-product-bottom"><div><small>起售价</small><strong>¥' + price.toFixed(2) + '</strong></div><button type="button" class="s5-small-cta" data-product-id="' + esc(p.id) + '"' + (sold ? ' disabled' : '') + '>' + (sold ? '暂不可购' : '立即购买') + '</button></div></article>';
     }).join('') : '<div class="s5-empty-state">该分类暂无可购买套餐。套餐目录由服务端实时提供，请稍后刷新。</div>';

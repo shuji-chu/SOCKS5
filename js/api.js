@@ -523,11 +523,8 @@
   }
 
   function cloneMoney(p) {
-    const raw = p.price_yuan != null ? Number(p.price_yuan)
-      : p.unit_price_yuan != null ? Number(p.unit_price_yuan)
-      : p.price_cents != null ? Number(p.price_cents) / 100
-      : NaN;
-    if (!Number.isFinite(raw) || raw < 0) return "价格以客服确认为准";
+    const raw = catalogPriceYuan(p, 'traffic');
+    if (raw === null) return "价格以客服确认为准";
     return "¥" + raw.toFixed(2);
   }
 

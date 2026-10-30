@@ -191,7 +191,127 @@ button:disabled{opacity:.48;cursor:not-allowed;transform:none!important}
 .account-row .account-stock{color:#15965a!important;font-size:12px!important;font-weight:700!important;text-align:right;overflow-wrap:anywhere}
 .account-row .account-detail{margin-top:8px!important;min-height:30px!important;padding:4px 9px!important;font-size:11px!important;border-radius:6px!important}
 @media(max-width:480px){.account-long-list>.account-row{gap:10px!important;padding:11px 7px!important}.account-row .account-platform-logo{flex-basis:42px;width:42px;height:42px}.account-row .account-full-title{font-size:14px!important;line-height:1.6!important}}
-</style></head><body>
+</style>
+<style id="node-card-layout-emergency-fix">
+/* Node category only: full-width vertical card; account and traffic layouts remain untouched. */
+#products .node-product-grid{
+ display:grid!important;
+ grid-template-columns:minmax(0,1fr)!important;
+ align-items:stretch!important;
+ justify-items:stretch!important;
+ gap:14px!important;
+ width:100%!important;
+ min-width:0!important;
+ overflow:visible!important;
+}
+#products .node-product-grid>.node-product-card{
+ display:flex!important;
+ flex:1 1 100%!important;
+ flex-direction:column!important;
+ width:100%!important;
+ min-width:100%!important;
+ max-width:100%!important;
+ min-height:0!important;
+ box-sizing:border-box!important;
+}
+#products .node-product-card,
+#products .node-product-card *{
+ writing-mode:horizontal-tb!important;
+ white-space:normal!important;
+ word-break:break-word!important;
+}
+#products .node-product-card .product-body{
+ display:flex!important;
+ flex:1 1 auto!important;
+ flex-direction:column!important;
+ align-items:stretch!important;
+ width:100%!important;
+ min-width:0!important;
+ gap:10px!important;
+}
+#products .node-product-card .sku-card-heading,
+#products .node-product-card .sku-overline,
+#products .node-product-card h3,
+#products .node-product-card .sku-subtitle{
+ display:block;
+ width:100%!important;
+ min-width:0!important;
+ text-align:left!important;
+}
+#products .node-product-card .sku-card-tags{
+ display:block!important;
+ width:100%!important;
+ min-width:0!important;
+ overflow:visible!important;
+}
+#products .node-product-card .sku-card-tags>.sku-tag{
+ display:inline-block!important;
+ vertical-align:middle!important;
+ margin:0 8px 8px 0!important;
+ max-width:100%!important;
+ white-space:normal!important;
+ word-break:normal!important;
+ overflow-wrap:break-word!important;
+}
+#products .node-product-card .protocol-badges{
+ display:flex!important;
+ flex-direction:row!important;
+ flex-wrap:wrap!important;
+ align-items:center!important;
+ gap:6px!important;
+ width:100%!important;
+}
+#products .node-product-card .protocol-badge{
+ display:inline-flex!important;
+ flex:0 0 auto!important;
+ flex-direction:row!important;
+ align-items:center!important;
+ white-space:nowrap!important;
+ word-break:normal!important;
+}
+#products .node-product-card .sku-price-row{
+ display:flex!important;
+ flex-direction:row!important;
+ flex-wrap:nowrap!important;
+ align-items:center!important;
+ justify-content:space-between!important;
+ gap:12px!important;
+ width:100%!important;
+ min-width:0!important;
+ margin-top:4px!important;
+}
+#products .node-product-card .sku-price-row>.price{
+ flex:0 0 auto!important;
+ white-space:nowrap!important;
+ word-break:normal!important;
+ font-size:clamp(22px,4vw,30px)!important;
+}
+#products .node-product-card .sku-price-row>.sku-stock{
+ flex:0 1 auto!important;
+ min-width:0!important;
+ white-space:nowrap!important;
+ word-break:normal!important;
+ text-align:right!important;
+}
+#products .node-product-card .product-meta{
+ width:100%!important;
+ min-width:0!important;
+}
+#products .node-product-card .sku-detail-btn{
+ display:flex!important;
+ flex:0 0 auto!important;
+ align-items:center!important;
+ justify-content:center!important;
+ width:100%!important;
+ min-width:100%!important;
+ min-height:46px!important;
+ margin:4px 0 0!important;
+ text-align:center!important;
+ white-space:normal!important;
+}
+#products .node-product-card .sku-detail-btn img{flex:0 0 auto!important}
+</style>
+</head><body>
 <header class="s5-global-header"><a class="s5-header-brand" href="./index.html" aria-label="S5 首页"><img src="assets/logo.png" alt="晴天社区 Logo" width="40" height="40"></a><nav class="s5-header-nav" aria-label="主导航"><a href="./index.html">首页</a><a class="active" href="./shop.html">商城</a><a href="./user.html">我的</a></nav><a class="s5-account-button" href="./user.html">我的账户</a></header>
 <main class="wrap"><section class="page-head"><div class="eyebrow">DIGITAL ASSET MARKET</div><h1 class="title">发现你的下一项数字资产</h1><p class="lead">节点、账号与引流三大品类，商品信息清晰呈现，购买路径简单直接。</p><div class="actions" style="margin-top:20px"><span class="pill live"><i class="status-dot" aria-hidden="true"></i>服务状态正常</span><span class="pill">安全交付 · 全天候服务</span></div></section>
 <section class="section" id="nodes"><div class="section-head"><h2>数字商品目录</h2><div style="text-align:right"><span class="muted" id="resultCount">正在整理商品…</span><div class="muted" id="catalogBreakdown" style="font-size:11px"></div></div></div><div class="actions" id="tabs" style="margin-bottom:18px"><button class="btn ghost" data-kind="节点" aria-pressed="true">节点</button><button class="btn ghost" data-kind="账号" aria-pressed="false">账号</button><button class="btn ghost" data-kind="引流" aria-pressed="false">引流</button></div><div style="margin:0 0 16px"><input id="globalSearch" class="input" type="search" placeholder="搜索地区 / 协议" autocomplete="off" aria-label="全局搜索商品"></div><div id="products" class="grid products"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div><div id="networkError" class="error-state" hidden><div class="symbol"><img src="./assets/icons/network.svg" alt="" aria-hidden="true"></div><b>商品暂时无法加载</b><p>真实商品接口暂不可用，请检查网络后重新加载。</p><button class="btn" onclick="loadCatalogs()">重新加载</button></div></section></main>

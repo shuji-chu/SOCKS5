@@ -72,3 +72,115 @@ input::placeholder,textarea::placeholder{color:#64748b!important}
 .bottom-nav a.active img,.home-bottom-nav a.active img,.mobile-tabbar a.active img{
  filter:brightness(0) saturate(100%) invert(20%) sepia(100%) saturate(7480%) hue-rotate(239deg) brightness(100%) contrast(145%)!important;
 }
+
+
+/* S5 GLOBAL LIGHT VIDEO THEME — authoritative final layer */
+:root{
+ color-scheme:light!important;
+ --bg:#f8fbff!important;
+ --panel:rgba(255,255,255,.7)!important;
+ --panel2:rgba(255,255,255,.82)!important;
+ --line:rgba(10,25,47,.09)!important;
+ --text:#0A192F!important;
+ --muted:#334155!important;
+ --cyan:#087fbd!important;
+ --blue:#2563eb!important;
+}
+html,body{min-height:100%;background:transparent!important;color:#334155!important}
+html{background-color:#f8fbff!important}
+body{
+ position:relative!important;
+ isolation:isolate!important;
+ background:transparent!important;
+ background-color:transparent!important;
+ color:#334155!important;
+}
+#global-bg-video{
+ position:fixed!important;top:0!important;left:0!important;
+ width:100vw!important;height:100vh!important;
+ object-fit:cover!important;z-index:-2!important;
+ pointer-events:none!important;background:#eaf4ff;
+}
+#global-bg-overlay{
+ position:fixed!important;inset:0!important;z-index:-1!important;
+ pointer-events:none!important;background:rgba(255,255,255,.75)!important;
+ -webkit-backdrop-filter:blur(5px)!important;
+ backdrop-filter:blur(5px)!important;
+}
+h1,h2,h3,h4,h5,h6,strong,b,.page-title,.section-heading,.title{color:#0A192F!important}
+p,small,label,li,dt,dd,figcaption,.muted,.eyebrow,.description,.lead{color:#334155!important}
+a{color:#155eaa}
+button,.button,.btn,.checkin-button,.home-carousel-cta,.s5-account-button{color:#fff!important}
+.button,.btn.primary,.button:not(.button-ghost),.checkin-button,.home-carousel-cta{
+ background:linear-gradient(110deg,#258cf0,#1765d8)!important;
+ border-color:transparent!important;color:#fff!important;
+ box-shadow:0 8px 24px rgba(37,99,235,.16)!important;
+}
+.button-ghost,.btn.ghost{background:rgba(255,255,255,.86)!important;color:#155eaa!important;border:1px solid rgba(21,94,170,.18)!important}
+.s5-global-header,.site-header,.header,.top,.bar,.dp-header{
+ background:rgba(255,255,255,.88)!important;
+ border-color:rgba(10,25,47,.08)!important;color:#0A192F!important;
+ -webkit-backdrop-filter:blur(20px)!important;backdrop-filter:blur(20px)!important;
+ box-shadow:0 4px 20px rgba(15,23,42,.035)!important;
+}
+.s5-header-nav a,.main-nav a,.nav a,.dp-nav a{color:#334155!important}
+.s5-header-nav a.active,.main-nav a.active,.nav a.active,.nav a:hover,.dp-nav a.active{color:#155eaa!important}
+.bottom-nav,.home-bottom-nav,.mobile-tabbar,.mobile{
+ background:rgba(255,255,255,.96)!important;border-color:rgba(10,25,47,.09)!important;
+ box-shadow:0 -8px 28px rgba(15,23,42,.08)!important;
+ -webkit-backdrop-filter:blur(20px)!important;backdrop-filter:blur(20px)!important;
+}
+.bottom-nav a,.home-bottom-nav a,.mobile-tabbar a{color:#334155!important}
+.bottom-nav a.active,.home-bottom-nav a.active,.mobile-tabbar a.active{color:#155eaa!important}
+.business-card,.product-card,.panel,.card,.content,.article-card,.ad,
+.archive-panel,.archive-head,.node-config-panel,.checkin-card,.mtp-dialog,
+.modal,.modal-content,.modal-panel,.detail-modal,.shop-card,.product-item,
+.api-card,.feature-card,.stat-card,.dashboard-card,.invite-card,.traffic-card,
+.faq-item,.faq-card,.skeleton-card,.node-speed-panel,.node-map-panel,.blindbox,
+.announcement,.home-carousel-shell,.login-card,.auth-card,.form-card,.dp-card,
+.code-card,.docs-card,.content-box,.side-card,.profile-card,.order-card,
+.wallet-card,.table-wrap,.table-container,.bot-card,.matrix-note,
+.invite-reward-card,.metric-card,.subscription-card,.archive-item{
+ background:rgba(255,255,255,.7)!important;
+ color:#334155!important;
+ border:1px solid rgba(0,0,0,.05)!important;
+ -webkit-backdrop-filter:blur(20px)!important;backdrop-filter:blur(20px)!important;
+ box-shadow:0 8px 32px rgba(0,0,0,.05)!important;
+}
+.business-card h3,.product-card h3,.panel h2,.panel h3,.content h1,.content h2,
+.content h3,.ad h3,.checkin-card h2,.mtp-dialog h3{color:#0A192F!important}
+.business-card p,.product-card p,.panel p,.content p,.ad p,.checkin-card p,
+.mtp-dialog p{color:#334155!important}
+.space-hero,.shop-hero,.hero,.login-hero,.dp-hero{
+ background:rgba(255,255,255,.36)!important;color:#0A192F!important;
+}
+.hero-copy h1,.hero h1,.shop-hero h1,.dp-hero h1{color:#0A192F!important}
+.hero-copy>p,.hero p,.shop-hero p{color:#334155!important}
+.hero-stats small,.hero-stats strong,.hero-bottomline,.planet-label{color:#334155!important}
+input,select,textarea,.input{
+ background:rgba(255,255,255,.92)!important;color:#0A192F!important;
+ border:1px solid rgba(10,25,47,.14)!important;
+}
+input::placeholder,textarea::placeholder{color:#64748b!important}
+.mtp-modal,.modal-backdrop{background:rgba(15,23,42,.36)!important}
+.modal{background:rgba(255,255,255,.94)!important;color:#334155!important}
+.site-footer,.footer{background:rgba(255,255,255,.78)!important;color:#334155!important;border-color:rgba(10,25,47,.08)!important}
+.site-footer a,.footer a{color:#155eaa!important}
+.toast{background:rgba(255,255,255,.94)!important;color:#0A192F!important;border-color:rgba(10,25,47,.12)!important}
+.checkin-card{background:rgba(255,255,255,.82)!important}
+.checkin-card h2 em,.checkin-kicker,.checkin-reward strong{color:#087fbd!important;text-shadow:none!important}
+.checkin-reward{background:rgba(224,247,250,.75)!important;border-color:rgba(8,127,189,.16)!important}
+.checkin-reward span,.checkin-footnote{color:#475569!important}
+.product-art,.business-image,.poster-art,.cover{background-color:#eaf4ff}
+img[src*="/assets/icons/"],img[src^="./assets/icons/"],img[src^="assets/icons/"]{
+ display:inline-block;max-width:100%;object-fit:contain;vertical-align:middle;
+}
+.benefit-item img,.protocol-badge img,.bot-actions .btn img{width:20px!important;height:20px!important;object-fit:contain!important}
+.brand img,.brand-logo-local,.dp-brand img,.top .brand img,.bar .brand img,
+.header .brand img,.s5-header-brand img{
+ display:block!important;width:40px!important;height:40px!important;
+ max-width:40px!important;object-fit:cover!important;border-radius:12px!important;
+ background:#fff!important;flex:none!important;
+}
+.site-footer img[src*="logo"],.footer-brand img[src*="logo"]{width:36px!important;height:36px!important;object-fit:cover!important;border-radius:10px!important}
+body:before,body:after{pointer-events:none!important;opacity:.08!important}

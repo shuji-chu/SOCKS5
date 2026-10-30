@@ -22,15 +22,16 @@ function debounce(fn,delay){
 window.debounce=window.debounce||debounce;
 if(!window.__S5_GLOBAL_ACTION_GUARD__){
  window.__S5_GLOBAL_ACTION_GUARD__=true;
- const cooldownSelector='[data-buy-sku],[data-product-id],#s5-auth-submit,button[onclick*="App.doLogin"],button[onclick*="App.doRegister"]';
- const lockTarget=target=>{
+ const cooldownSelector='[data-buy-sku],[data-product-id],#s5-create-order,.s5-clone-buy,#s5-auth-submit,button[onclick*="App.doLogin"],button[onclick*="App.doRegister"],button[onclick*="App.openModal"][onclick*="login"],button[onclick*="App.openModal"][onclick*="register"]';
+ const lockTarget=(target,deferDisable=false)=>{
   const el=target&&target.closest?target.closest(cooldownSelector):null;
   if(!el)return true;
   if(el.dataset.s5Cooldown==='1')return false;
   const wasDisabled=!!el.disabled;
   el.dataset.s5Cooldown='1';
-  if('disabled' in el)el.disabled=true;
   el.setAttribute('aria-disabled','true');
+  const disable=()=>{if('disabled' in el&&el.dataset.s5Cooldown==='1')el.disabled=true};
+  if(deferDisable)setTimeout(disable,0);else disable();
   setTimeout(()=>{
    el.dataset.s5Cooldown='0';
    if('disabled' in el)el.disabled=wasDisabled||el.dataset.busy==='1';
@@ -41,20 +42,21 @@ if(!window.__S5_GLOBAL_ACTION_GUARD__){
  document.addEventListener('click',event=>{
   const target=event.target&&event.target.closest?event.target.closest(cooldownSelector):null;
   if(!target)return;
-  if(!lockTarget(target)){
+  const deferDisable=target.matches('#s5-auth-submit,#s5-create-order');
+  if(!lockTarget(target,deferDisable)){
    event.preventDefault();
    event.stopImmediatePropagation();
    return;
   }
-  if(target.id==='s5-auth-submit')target.dataset.s5SubmitArmed='1';
+  if(deferDisable)target.dataset.s5SubmitArmed='1';
  },true);
  document.addEventListener('submit',event=>{
   const form=event.target;
-  if(!form||!form.matches||!form.matches('#s5-auth-form'))return;
-  const submit=form.querySelector('#s5-auth-submit');
+  if(!form||!form.matches||!form.matches('#s5-auth-form,#s5-purchase-form'))return;
+  const submit=form.querySelector('#s5-auth-submit,#s5-create-order');
   if(!submit)return;
   if(submit.dataset.s5SubmitArmed==='1'){submit.dataset.s5SubmitArmed='0';return;}
-  lockTarget(submit);
+  lockTarget(submit,true);
  },true);
 }
 

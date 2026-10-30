@@ -47,7 +47,7 @@ function renderUnifiedItem(p){
  const tags=[...new Set([cleanAccountText(p._region||p.region_name||p.region||p.country||p.area||''),...tagList(p).map(cleanAccountText)].filter(Boolean))].slice(0,8);
  const src=p._kind==='账号'?(p._icon||p._image):(p._image||p._icon);
  const fallback='./assets/icons/server.svg';
- const icon=src?'<img src="'+esc(src)+'" alt="" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=\''+fallback+'\'">':'<span aria-hidden="true">'+esc(String(title||'商').trim().slice(0,1).toUpperCase())+'</span>';
+ const icon='<img src="'+esc(src||fallback)+'" alt="" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=\''+fallback+'\';this.classList.add(\'sku-icon-fallback\')">';
  const price=p._priceProvided?'¥'+Number(p._price).toFixed(2):'价格待商家提供';
  return '<article class="sku-row" data-sku="'+esc(p._key)+'">'+
   '<div class="sku-icon">'+icon+'</div>'+
@@ -58,14 +58,26 @@ function renderUnifiedItem(p){
    '<button class="sku-detail" type="button" data-open-sku="'+esc(p._key)+'" aria-label="查看 '+esc(title)+' 的 SKU 详情">查看 SKU 详情</button>'+
   '</div></article>';
 }
-function render({root,products,activeKind='节点',searchTerm='',pageInfo={}}){
+function matchesFilter(p,filter){
+ if(!filter||filter==='全部')return true;
+ const aliases={
+  '小火箭':['小火箭','shadowrocket','rocket','surge'],
+  'V2rayN':['v2rayn','v2ray n','v2ray'],
+  'Clash':['clash','mihomo'],
+  'MTP':['mtp','mtproto']
+ };
+ const terms=aliases[filter]||[filter];
+ const haystack=[p._title,p._desc,p._kind,p._region,p.protocol,p.node_protocol,p.protocols,p.product_type,p.product_category,p.category,p.type,p.platform,p.tags,p.labels,JSON.stringify(p._merchantAttrs||{})].filter(Boolean).join(' ').toLowerCase();
+ return terms.some(term=>haystack.includes(String(term).toLowerCase()));
+}
+function render({root,products,activeKind='节点',searchTerm='',activeFilter='全部',pageInfo={}}){
  if(!root)return;
  const query=String(searchTerm||'').trim().toLowerCase();
- const rows=products.filter(p=>p._kind===activeKind&&(p._title+' '+p._desc+' '+p._kind+' '+(p._region||'')+' '+(p.tags||'')+' '+(p.protocol||'')+' '+JSON.stringify(p._merchantAttrs||{})).toLowerCase().includes(query)).sort((a,b)=>Number(b._premium)-Number(a._premium));
+ const rows=products.filter(p=>p._kind===activeKind&&matchesFilter(p,activeFilter)&&(!query||[p._title,p._desc,p._kind,p._region,p.tags,p.protocol,p.node_protocol,JSON.stringify(p._merchantAttrs||{})].filter(Boolean).join(' ').toLowerCase().includes(query))).sort((a,b)=>Number(b._premium)-Number(a._premium));
  const page=Math.max(1,Number(pageInfo.page)||1),total=Math.max(0,Number(pageInfo.total)||0),totalPages=Math.max(1,Number(pageInfo.totalPages)||1);
- const count=document.getElementById('resultCount');if(count)count.textContent='共 '+total.toLocaleString()+' 件商品 · 每页 15 件';
+ const count=document.getElementById('resultCount');if(count)count.textContent='共 '+total.toLocaleString()+' 件商品 · 当前筛选 '+rows.length+' 件';
  const pagination=()=>'<nav class="sku-pagination" aria-label="商品分页"><button type="button" data-page="prev" '+(page<=1?'disabled':'')+'>上一页</button><span class="sku-page-number">第 '+page+' / '+totalPages+' 页</span><button type="button" data-page="next" '+(page>=totalPages?'disabled':'')+'>下一页</button></nav>';
- if(!rows.length){root.innerHTML='<div class="empty-space"><div><div class="planet"></div><b>暂无商品</b><p>当前分类暂时没有可展示的商品，请稍后再试。</p></div></div>'+pagination();bind();return}
+ if(!rows.length){root.innerHTML='<div class="empty-space"><div><div class="planet"></div><b>当前筛选暂无商品</b><p>接口已返回 '+total.toLocaleString()+' 件商品总量；可切换“全部”查看当前页商品。</p></div></div>'+pagination();bind();return}
  root.innerHTML='<div class="sku-list">'+rows.slice(0,15).map(renderUnifiedItem).join('')+'</div>'+pagination();
  bind();
  function bind(){

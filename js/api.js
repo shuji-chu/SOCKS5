@@ -274,7 +274,7 @@
     const out = keys.filter(([key]) => plan && plan[key] !== null && plan[key] !== undefined && plan[key] !== '' && Number(plan[key]) >= 0)
       .map(([key, label, value]) => ({ key, label, value, price: Number(plan[key]) }));
     if (!out.length && plan) {
-      const yuan = plan._staticPriceYuan ?? plan.price_yuan ?? plan.unit_price_yuan ?? plan.price;
+      const yuan = plan._staticPriceYuan ?? plan.price_yuan ?? (plan.product_type === 'traffic' ? plan.unit_price_yuan : undefined) ?? plan.price;
       const cents = plan.price_cents;
       if (yuan !== undefined && yuan !== null && yuan !== '' && Number.isFinite(Number(yuan)) && Number(yuan) >= 0) {
         out.push({ key: 'month_price', label: '默认套餐', value: 'month_price', price: Math.round(Number(yuan) * 100) });

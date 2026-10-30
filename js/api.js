@@ -303,7 +303,8 @@
       return;
     }
     const periods=periodOptions(plan._rawPlan||plan);
-    if(!periods.length){showError('该套餐没有可购买的周期价格');return}
+    if(!periods.length&&plan._priceProvided&&Number.isFinite(Number(plan._priceCents)))periods.push({key:'month_price',label:'默认套餐',value:'month_price',price:Number(plan._priceCents)});
+    if(!periods.length){showError('该商品没有可购买的价格，请联系商家确认');return}
     if(!paymentChannels.length){showError('暂时无法获取支付通道配置，请稍后重试。');loadConfig();return}
     const periodHtml=periods.map((p,i)=>'<option value="'+esc(p.value)+'"'+(i===0?' selected':'')+'>'+esc(p.label)+' · ¥'+(p.price/100).toFixed(2)+'</option>').join('');
     const paymentHtml=paymentChannels.map((p,i)=>'<label class="s5-checkout-payment"><input type="radio" name="s5-payment" value="'+esc(i)+'"'+(i===0?' checked':'')+'><span>'+esc(p.label)+'</span></label>').join('');

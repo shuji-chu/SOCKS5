@@ -175,6 +175,7 @@
         const payload = await response.json();
         const rows = Array.isArray(payload) ? payload : listFrom(unwrap(payload));
         if (!Array.isArray(rows)) throw new Error('商品数据不是数组');
+        if (!rows.length) throw new Error('静态目录返回空数组');
         if (rows.length) {
           console.info('[S5 home catalog] loaded', kind, rows.length, url);
           return rows;
@@ -182,7 +183,7 @@
         lastError = new Error('静态目录暂时为空');
       } catch (error) {
         lastError = error;
-        console.warn('[S5 home catalog] source unavailable', kind, url, error && error.message);
+        console.error('[S5 home catalog] 请求失败，正在尝试备用源', {kind, url, name:error&&error.name, message:error&&error.message, stack:error&&error.stack});
       } finally {
         clearTimeout(timeout);
       }
@@ -199,7 +200,7 @@
     const results = await Promise.allSettled([
       needLiveNodes ? (API && typeof API.getPlans === 'function' ? API.getPlans() : Promise.reject(new Error('API module unavailable'))) : Promise.resolve([]),
       needLiveAccounts ? (API && typeof API.getClonedProducts === 'function' ? API.getClonedProducts() : Promise.reject(new Error('API module unavailable'))) : Promise.resolve([]),
-      (async()=>{const base=String(window.SOSKS5_PUBLIC_API_BASE||'https://api.lynli.me').replace(/\/+$/,'');const response=await fetch(base+'/api/v1/public/catalog/account-overrides',{headers:{Accept:'application/json'},signal:AbortSignal.timeout?AbortSignal.timeout(5000):undefined});if(!response.ok)throw Error('catalog overrides unavailable');return response.json()})()
+      (async()=>{const base=String(window.SOSKS5_PUBLIC_API_BASE||'https://api.lynli.me').replace(/\/+$/,'');const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),1200);let response;try{response=await fetch(base+'/api/v1/public/catalog/account-overrides',{headers:{Accept:'application/json'},signal:controller.signal})}finally{clearTimeout(timer)}if(!response.ok)throw Error('catalog overrides unavailable');return response.json()})()
     ]);
     const nodesResponse = staticNodes && staticNodes.length ? staticNodes : (results[0].status === 'fulfilled' ? unwrap(results[0].value) : []);
     const accountResponse = staticAccounts && staticAccounts.length ? staticAccounts : (results[1].status === 'fulfilled' ? unwrap(results[1].value) : []);
@@ -233,7 +234,7 @@
     console.info('[S5 home catalog] ready', {nodes:nodes.length, accounts:accounts.length, source:{nodes:staticNodes&&staticNodes.length?'static':'api',accounts:staticAccounts&&staticAccounts.length?'static':'api'}});
     return {nodes, accounts};
   }
-  async function loadHome() {
+  async async function loadHome() {
     const productSection = $$('.content-section').find((section) => /精选数字商品/.test(section.textContent));
     if (productSection) {
       const grid = $('.product-grid', productSection);
@@ -247,12 +248,15 @@
             const weightRaw = p.sort_weight ?? p.sortWeight ?? p.weight;
             const salesRaw = p.sales ?? p.sold_count ?? p.total_sales ?? p.buy_count ?? p.orders_count ?? p.purchase_count;
             const stockRaw = p.stock ?? p.available_stock ?? p.inventory ?? p.quantity;
+            const orderRaw = p.sort ?? p.sort_order ?? p.display_order;
             const weight = weightRaw !== null && weightRaw !== undefined && weightRaw !== '' && Number.isFinite(Number(weightRaw)) ? Number(weightRaw) : null;
             const sales = salesRaw !== null && salesRaw !== undefined && salesRaw !== '' && Number.isFinite(Number(salesRaw)) ? Number(salesRaw) : 0;
             const stock = stockRaw !== null && stockRaw !== undefined && stockRaw !== '' && Number.isFinite(Number(stockRaw)) ? Number(stockRaw) : 0;
-            return {...entry, _rank:weight === null ? sales : weight, _salesRank:sales, _stockRank:stock, _sourceIndex:index};
+            const order = orderRaw !== null && orderRaw !== undefined && orderRaw !== '' && Number.isFinite(Number(orderRaw)) ? Number(orderRaw) : Number.MAX_SAFE_INTEGER;
+            const hot = p.hot === true || p.is_hot === true || p.featured === true ? 1 : 0;
+            return {...entry, _rank:weight === null ? sales : weight, _salesRank:sales, _hotRank:hot, _orderRank:order, _stockRank:stock, _sourceIndex:index};
           })
-          .sort((a,b) => b._rank-a._rank || b._salesRank-a._salesRank || b._stockRank-a._stockRank || a._sourceIndex-b._sourceIndex)
+          .sort((a,b) => b._rank-a._rank || b._salesRank-a._salesRank || b._hotRank-a._hotRank || a._orderRank-b._orderRank || b._stockRank-a._stockRank || a._sourceIndex-b._sourceIndex)
           .slice(0, 50);
         grid.innerHTML = featured.length ? featured.map((entry) => card(entry.item, entry.type)).join('') : emptyState('当前暂无可展示商品');
       } catch (error) {
@@ -423,11 +427,10 @@
     }
   }
   function installStyles() {
-    installCinematicBackground();
     if ($('#s5-live-styles')) return;
     const style = document.createElement('style');
     style.id = 's5-live-styles';
-    style.textContent = '.live-state{grid-column:1/-1;padding:24px 16px;text-align:center;color:var(--muted,#8ca4bf);border:1px solid var(--line,rgba(132,190,230,.17));border-radius:14px;background:rgba(11,23,41,.65)}.live-product-card .product-photo{object-fit:cover}.break-all{overflow-wrap:anywhere;word-break:break-word}.bot-entry{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}.bot-status{color:var(--muted,#8ca4bf)}.mobile-tabbar{display:none}.floating-support{position:fixed;right:16px;bottom:24px;z-index:80;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;width:54px;height:54px;border:1px solid rgba(115,234,255,.4);border-radius:50%;background:#0b2038;color:#73eaff;box-shadow:0 8px 28px #0005;font-size:20px}.floating-support small{font-size:10px}.announcement[hidden]{display:none!important}@media(max-width:650px){body{padding-bottom:76px}.mobile-tabbar{position:fixed;left:0;right:0;bottom:0;z-index:70;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));justify-content:stretch;align-items:center;padding:7px 8px calc(7px + env(safe-area-inset-bottom));min-height:68px;background:rgba(5,13,28,.96);border-top:1px solid var(--line,rgba(132,190,230,.17));backdrop-filter:blur(18px)}.mobile-tabbar a{display:flex;min-width:0;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--muted,#8ca4bf);font-size:10px}.mobile-tabbar a img{display:block;width:22px;height:22px;object-fit:contain}.floating-support img{width:22px;height:22px;object-fit:contain}.mobile-tabbar a small{font-size:10px}.mobile-tabbar a.active{color:var(--cyan,#73eaff)}.floating-support{bottom:calc(82px + env(safe-area-inset-bottom));right:12px;width:48px;height:48px}.bot-entry{align-items:flex-start;flex-direction:column}.site-footer{padding-bottom:88px!important}}';
+    style.textContent = '.live-state{grid-column:1/-1;padding:24px 16px;text-align:center;color:var(--muted,#8ca4bf);border:1px solid var(--line,rgba(132,190,230,.17));border-radius:14px;background:rgba(255,255,255,.88)}.live-product-card .product-photo{object-fit:cover}.break-all{overflow-wrap:anywhere;word-break:break-word}.bot-entry{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}.bot-status{color:var(--muted,#8ca4bf)}.mobile-tabbar{display:none}.floating-support{position:fixed;right:16px;bottom:24px;z-index:80;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;width:54px;height:54px;border:1px solid rgba(115,234,255,.4);border-radius:50%;background:rgba(255,255,255,.96);color:#0055FF;box-shadow:0 8px 28px #0005;font-size:20px}.floating-support small{font-size:10px}.announcement[hidden]{display:none!important}@media(max-width:650px){body{padding-bottom:76px}.mobile-tabbar{position:fixed;left:0;right:0;bottom:0;z-index:70;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));justify-content:stretch;align-items:center;padding:7px 8px calc(7px + env(safe-area-inset-bottom));min-height:68px;background:rgba(5,13,28,.96);border-top:1px solid var(--line,rgba(132,190,230,.17));backdrop-filter:blur(18px)}.mobile-tabbar a{display:flex;min-width:0;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--muted,#8ca4bf);font-size:10px}.mobile-tabbar a img{display:block;width:22px;height:22px;object-fit:contain}.floating-support img{width:22px;height:22px;object-fit:contain}.mobile-tabbar a small{font-size:10px}.mobile-tabbar a.active{color:var(--cyan,#73eaff)}.floating-support{bottom:calc(82px + env(safe-area-inset-bottom));right:12px;width:48px;height:48px}.bot-entry{align-items:flex-start;flex-direction:column}.site-footer{padding-bottom:88px!important}}';
     document.head.appendChild(style);
   }
 

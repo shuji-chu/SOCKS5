@@ -54,7 +54,7 @@
                     </a>
                 `).join('');
             } catch (e) {
-                const list = document.getElementById('product-list'); if (list) list.innerHTML = '<div class="text-center py-10 text-gray-500 text-sm">商品暂时无法加载，请稍后重试。</div>'; // Raw request details are intentionally not exposed.
+                const list = document.getElementById('product-list'); if (list) list.innerHTML = '<div role="alert" style="max-width:560px;margin:22px auto;padding:28px 20px;text-align:center;border:1px solid rgba(71,145,220,.2);border-radius:22px;background:linear-gradient(145deg,#fff,#eef7ff);color:#334b66;box-shadow:0 16px 42px rgba(44,117,190,.12)"><img src="../../assets/icons/network.svg" alt="" aria-hidden="true" style="display:block;width:42px;height:42px;margin:0 auto 14px"><strong style="display:block;color:#0A192F;font-size:18px">商品暂时无法加载</strong><p style="color:#4a6078">商品服务暂时没有响应，请检查网络后重新加载。</p><button type="button" onclick="location.reload()" style="min-width:180px;padding:13px 20px;border:0;border-radius:12px;background:linear-gradient(110deg,#087bff,#0055d9);color:#fff;font-weight:900">重新加载</button></div>'; // Raw request details are intentionally not exposed.
             }
         });
     </script>

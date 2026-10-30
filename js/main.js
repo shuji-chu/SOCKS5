@@ -213,7 +213,7 @@
       if (/node|nodes|proxy|节点|代理|订阅|vless|vmess|hysteria|trojan|shadowsocks|socks5|wireguard|tuic/.test(kind + ' ' + words)) return false;
       return kind === 'account' || kind === 'accounts' || /账号|account/.test(kind) || isSocialAccount(p);
     };
-    const nodes = plans.filter((p) => {
+    const nodes = staticNodes && staticNodes.length ? plans : plans.filter((p) => {
       if (isAccountPlan(p)) return false;
       const kind = String(p.product_type || p.product_category || p.service_type || '').toLowerCase();
       const words = [p.name,p.title,p.content,p.description,p.type,p.protocol,p.node_protocol].join(' ').toLowerCase();

@@ -312,7 +312,7 @@ function normalize(p,i,source){
  if(typeof attrs==='string'){try{attrs=JSON.parse(attrs)}catch(_){attrs={}}}
  const merchant=attrs&&typeof attrs==='object'?attrs:{};
 
- const rawStock=p.sold_out===true||p.in_stock===false?0:(p.in_stock===true?(p.stock??p.available_stock??1):(p.stock??p.available_stock??p.stock_available??p.inventory??p.quantity??p.count??null));
+ const rawStock=p.sold_out===true||p.in_stock===false?0:(p.stock??p.available_stock??p.stock_available??p.inventory??p.quantity??p.count??null);
  const premium=source==='node'&&(/singapore|新加坡|sgp|\bsg\b/i.test([p._region,p.region,p.country,p.area,p.name,p.title,p.location].filter(Boolean).join(' '))||p.premium===true||p.is_premium===true);
 
  const parsedPrice=catalogPriceYuan(p,source);

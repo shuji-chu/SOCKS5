@@ -58,6 +58,14 @@ if(!window.__S5_GLOBAL_ACTION_GUARD__){
   if(submit.dataset.s5SubmitArmed==='1'){submit.dataset.s5SubmitArmed='0';return;}
   lockTarget(submit,true);
  },true);
+ document.addEventListener('keydown',event=>{
+  if(event.key!=='Enter'&&event.key!==' ')return;
+  const target=event.target&&event.target.closest?event.target.closest('[data-buy-sku]'):null;
+  if(target&&!lockTarget(target)){
+   event.preventDefault();
+   event.stopImmediatePropagation();
+  }
+ },true);
 }
 
 const STATIC_CATALOG_URLS={

@@ -87,7 +87,10 @@ function renderUnifiedItem(p,activeFilter='全部'){
 }
 function matchesFilter(p,filter){
  if(!filter||filter==='全部')return true;
- const haystack=[p._title,p._desc,p._kind,p._region,p.protocol,p.node_protocol,p.protocols,p.supported_protocols,p.protocol_list,p.product_type,p.product_category,p.category,p.type,p.platform,p.brand,p.provider,p.account_category,p.traffic_platform,p.tags,p.labels,JSON.stringify(p._merchantAttrs||{})].filter(Boolean).map(x=>typeof x==='object'?JSON.stringify(x):String(x)).join(' ').toLowerCase();
+ const attrs=p._merchantAttrs&&typeof p._merchantAttrs==='object'?p._merchantAttrs:{};
+ const values=['platform','platform_name','account_platform','traffic_platform','target_platform','source_platform','social_platform','product_platform','provider','brand','service','site','app','channel','channel_name','media','email_provider','account_category','platforms','supported_platforms','channels','services'].map(k=>p[k]??attrs[k]).filter(v=>v!==undefined&&v!==null&&v!=='');
+ const title=String(p._title||p.title||p.name||p.product_name||p.sku_name||'');
+ const haystack=values.map(v=>typeof v==='object'?JSON.stringify(v):String(v)).join(' ').toLowerCase()+' '+title.toLowerCase();
  return haystack.includes(String(filter).toLowerCase());
 }
 function render({root,products,activeKind='节点',searchTerm='',activeFilter='全部',pageInfo={}}){

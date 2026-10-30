@@ -55,6 +55,21 @@ function nodeCapabilities(p){if(p._kind!=='节点')return '';const rows=[['流�
 function deliveryPanel(p){const d=val(p.delivery_content,p.delivery_description,p.delivery,p.deliverables,p.delivery_type,p.delivery_method,p._delivery);const text=d==null?'交付方式待商家配置，请以订单交付页实际内容为准。':typeof d==='object'?JSON.stringify(d):String(d);const warranty=val(p.warranty,p.warranty_period,p.after_sales,p.after_sale,p.support_policy,p.guarantee,p._notice);return '<section class="archive-panel"><div class="archive-head"><div><div class="eyebrow">DELIVERY & AFTER-SALES</div><h4>交付内容与售后保障</h4></div><span class="archive-stamp">订单为准</span></div><div class="archive-grid"><div class="archive-item"><span>付款后交付</span><b>'+esc(text)+'</b></div><div class="archive-item"><span>质保 / 售后</span><b>'+esc(warranty==null?'商家未提供具体质保时长，请下单前联系确认。':nice(warranty))+'</b></div></div></section>'}
 function tutorialPanel(p){const t=val(p._tutorial,p.tutorial_markdown,p.tutorial_md,p.tutorial,p.guide_markdown,p.guide,p.content_md);if(t)return '<section class="archive-panel"><div class="archive-head"><div><div class="eyebrow">PRODUCT PLAYBOOK</div><h4>本商品专属使用教程</h4></div><span class="archive-stamp">商家提供</span></div><div class="markdown">'+String(w.SOSKS5_RENDER_MARKDOWN?w.SOSKS5_RENDER_MARKDOWN(t):esc(t).replace(/\n/g,'<br>'))+'</div></section>';let steps=p._kind==='节点'?[['导入配置','在订单交付区复制订阅或配置，导入对应客户端。'],['首次连接','选择本商品支持的协议节点，连接后访问服务商允许的网站。'],['排查连接','连接失败时先更新订阅、切换协议节点并检查客户端时间与网络。']]:p._kind==='账号'?[['核对交付信息','收到账号后先核对登录方式、绑定信息和商家列出的 SKU 属性。'],['安全初始化','首次登录后按平台支持的流程更新密码、绑定恢复方式并启用双重验证。'],['妥善保管','不要共享验证码或恢复凭据；遇到登录异常先联系商家售后。']]:[['核对交付','按订单页面说明领取对应文件、兑换码或服务内容。'],['按说明启用','依照商品交付说明完成导入或激活。'],['保留凭证','保存订单号与交付记录，遇到问题通过官方售后渠道反馈。']];return '<section class="archive-panel"><div class="archive-head"><div><div class="eyebrow">PRODUCT PLAYBOOK</div><h4>上手与安全使用指南</h4></div><span class="archive-stamp">通用指引</span></div><p class="archive-note">商家尚未配置此 SKU 的专属教程，以下为通用操作建议，不代表商家承诺或特定平台规则。</p><div class="guide-steps">'+steps.map((x,i)=>'<div class="guide-step"><b>0'+(i+1)+' · '+esc(x[0])+'</b><p>'+esc(x[1])+'</p></div>').join('')+'</div></section>'}
 
+function localizeCatalogText(value){
+ let text=String(value==null?'':value);
+ const countries={"US":"美国","UK":"英国","GB":"英国","IN":"印度","SG":"新加坡","CA":"加拿大","BR":"巴西","RU":"俄罗斯","CN":"中国","JP":"日本","KR":"韩国","HK":"中国香港","TW":"中国台湾","TH":"泰国","VN":"越南","ID":"印度尼西亚","MY":"马来西亚","PH":"菲律宾","AU":"澳大利亚","NZ":"新西兰","DE":"德国","FR":"法国","IT":"意大利","ES":"西班牙","NL":"荷兰","SE":"瑞典","NO":"挪威","FI":"芬兰","PL":"波兰","TR":"土耳其","MX":"墨西哥","AR":"阿根廷","CL":"智利","CO":"哥伦比亚","ZA":"南非","NG":"尼日利亚","EG":"埃及","AE":"阿联酋","SA":"沙特阿拉伯","IL":"以色列","PK":"巴基斯坦","BD":"孟加拉国","LK":"斯里兰卡","NP":"尼泊尔"};
+ text=text.replace(/\[\s*([A-Z]{2})\s*\]/gi,(match,code)=>countries[code.toUpperCase()]?'['+countries[code.toUpperCase()]+']':match);
+ const rules=[
+  [/\b2FA\s*On\b/gi,'已开2FA'],[/\b2FA\s*Off\b/gi,'无2FA'],[/\bRandom\s+Country\b/gi,'随机国家'],
+  [/\bBlind\s+Box\b/gi,'盲盒'],[/\bFull\s+Account\b/gi,'全功能号'],[/\bDevice\s+Lock\b/gi,'设备锁'],
+  [/\bShared\s+Account\b/gi,'共享账号'],[/\bShared\b/gi,'共享号'],[/\bAged\b/gi,'老号'],
+  [/\bVerified\b/gi,'已验证'],[/\bUnverified\b/gi,'未验证'],[/\bPremium\b/gi,'高级版'],
+  [/\bInstant\s+Delivery\b/gi,'即时交付'],[/\bFull\s+Access\b/gi,'完整权限'],[/\bPhone\s+Verified\b/gi,'手机已验证'],
+  [/\bAvailable\b/gi,'有货'],[/\bIn\s+Stock\b/gi,'有库存'],[/\bWith\s+Token\b/gi,'含令牌'],[/\bToken\b/gi,'令牌']
+ ];
+ rules.forEach(([pattern,replacement])=>{text=text.replace(pattern,replacement)});
+ return text.replace(/\s{2,}/g,' ').trim();
+}
 function cleanAccountText(value){
  const pick=value=>{
   if(value==null)return '';
@@ -65,7 +80,7 @@ function cleanAccountText(value){
   }
   return String(value);
  };
- return pick(value).replace(/[\\[\\]"']/g,'').replace(/\\s*[,，|、;；]+\\s*/g,' · ').replace(/\\s+/g,' ').trim();
+ return localizeCatalogText(pick(value)).replace(/["']/g,'').replace(/\s*[,，|、;；]+\s*/g,' · ').replace(/\s+/g,' ').trim();
 }
 function renderUnifiedItem(p,activeFilter='全部'){
  const title=cleanAccountText(p._title||p.title||p.name||p.product_title||p.display_name||p.sku_title||p.sku_name||p.product_name||p.goods_name||p.item_name||'商品 '+String(p._key||''));
@@ -73,11 +88,11 @@ function renderUnifiedItem(p,activeFilter='全部'){
  const selectedTag=activeFilter&&activeFilter!=='全部'&&matchesFilter(p,activeFilter)?[activeFilter]:[];
  const tags=[...new Set([...selectedTag,...protocolTags,...planMetaTags(p),cleanAccountText(p._region||p.region_name||p.region||p.country||p.area||''),...tagList(p).map(cleanAccountText)].filter(Boolean))].slice(0,8);
  const src=p._image||p._icon;
- const fallback='./assets/icons/server.svg';
- const brand=p._brandIcon||(/\\bsteam\\b/i.test(title)?'steam':/netflix/i.test(title)?'netflix':/midjourney/i.test(title)?'midjourney':/mail\\.ru|mailru/i.test(title)?'mailru':/telegram|电报/i.test(title)?'telegram':/threads/i.test(title)?'threads':/\\bmail\\b|gmail|outlook/i.test(title)?'mail':'generic');
- const brandClass=' brand-'+brand;
- const brandLabel=brand==='steam'?'S':brand==='netflix'?'N':brand==='midjourney'?'MJ':brand==='mailru'?'AT':brand==='telegram'?'TE':brand==='threads'?'TH':brand==='mail'?'✉':brand==='whatsapp'?'WA':brand==='instagram'?'IG':brand==='facebook'?'FB':brand==='discord'?'DC':brand==='tiktok'?'TT':brand==='youtube'?'YT':esc(title.trim().slice(0,2).toUpperCase()||'?');
- const icon=src?'<img src="'+esc(src)+'" alt="'+esc(title)+'" loading="lazy" decoding="async" onerror="this.hidden=true;this.parentElement.classList.add(\'image-missing\')">':brand?'<span class="sku-brand-mark'+brandClass+'" aria-label="'+esc(brand)+'">'+brandLabel+'</span>':'<img src="'+esc(fallback)+'" alt="" loading="lazy" decoding="async" onerror="this.remove()">';
+ const fallback='./assets/icons/network.svg';
+ const brand=p._brandIcon||(/(^|[^a-z])steam([^a-z]|$)/i.test(title)?'steam':/netflix/i.test(title)?'netflix':/midjourney/i.test(title)?'midjourney':/mail\.ru|mailru/i.test(title)?'mailru':/telegram|电报/i.test(title)?'telegram':/threads/i.test(title)?'threads':/discord/i.test(title)?'discord':/tiktok/i.test(title)?'tiktok':/reddit/i.test(title)?'reddit':/gmail|outlook/i.test(title)?'mail':'generic');
+ const brandIcons={telegram:'telegram.svg',threads:'threads.svg',steam:'steam.svg',tiktok:'tiktok.svg',discord:'discord.svg',reddit:'reddit.svg'};
+ const brandIcon=brandIcons[brand];
+ const icon=brandIcon?'<img class="sku-brand-icon" src="./assets/icons/'+brandIcon+'" alt="'+esc(brand)+'" loading="lazy" decoding="async">':src?'<img src="'+esc(src)+'" alt="'+esc(title)+'" loading="lazy" decoding="async" onerror="this.hidden=true;this.parentElement.classList.add(\'image-missing\')">':'<img src="'+esc(fallback)+'" alt="" loading="lazy" decoding="async" onerror="this.remove()">';
  const price=p._priceProvided?'¥'+Number(p._price).toFixed(2):'询价';
  const stockValue=p._stock;
  const stockNumber=stockValue===null||stockValue===''?null:Number(stockValue);
@@ -86,7 +101,7 @@ function renderUnifiedItem(p,activeFilter='全部'){
   '<div class="sku-icon">'+icon+'</div>'+
   '<div class="sku-content">'+
    '<div class="sku-title">'+esc(title)+'</div>'+
-   (tags.length?'<div class="sku-tags">'+tags.map(x=>'<span>'+esc(x)+'</span>').join('')+'</div>':'')+
+   (tags.length?'<div class="sku-tags">'+tags.map(x=>'<span style="display:inline-flex;flex:0 0 auto;white-space:nowrap;word-break:keep-all;overflow-wrap:normal">'+esc(x)+'</span>').join('')+'</div>':'')+
    '<div class="sku-bottom"><span class="sku-price">'+price+'</span><span class="sku-stock">库存：'+esc(stock(p))+'</span></div>'+
  
   '</div></article>';

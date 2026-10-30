@@ -181,7 +181,7 @@ button:disabled{opacity:.48;cursor:not-allowed;transform:none!important}
 </style></head><body>
 <header class="s5-global-header"><a class="s5-header-brand" href="./index.html" aria-label="S5 首页"><img src="assets/logo.png" alt="晴天社区 Logo" width="40" height="40"></a><nav class="s5-header-nav" aria-label="主导航"><a href="./index.html">首页</a><a class="active" href="./shop.html">商城</a><a href="./user.html">我的</a></nav><a class="s5-account-button" href="./user.html">我的账户</a></header>
 <main class="wrap"><section class="page-head"><div class="eyebrow">DIGITAL ASSET MARKET</div><h1 class="title">发现你的下一项数字资产</h1><p class="lead">节点、账号与引流三大品类，商品信息清晰呈现，购买路径简单直接。</p><div class="actions" style="margin-top:20px"><span class="pill live"><i class="status-dot" aria-hidden="true"></i>服务状态正常</span><span class="pill">安全交付 · 全天候服务</span></div></section>
-<section class="section" id="nodes"><div class="section-head"><h2>数字商品目录</h2><div style="text-align:right"><span class="muted" id="resultCount">正在整理商品…</span><div class="muted" id="catalogBreakdown" style="font-size:11px"></div></div></div><div class="actions" id="tabs" style="margin-bottom:18px"><button class="btn ghost" data-kind="节点" aria-pressed="true">节点</button><button class="btn ghost" data-kind="账号" aria-pressed="false">账号</button><button class="btn ghost" data-kind="引流" aria-pressed="false">引流</button></div><div class="catalog-filter-wrap" aria-label="商品协议与平台筛选"><div id="catalogFilters" class="catalog-filter-pills" role="group" aria-label="按当前商品分类筛选"></div></div><div id="products" class="grid products"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div><div id="networkError" class="error-state" hidden><div class="symbol"><img src="./assets/icons/network.svg" alt="" aria-hidden="true"></div><b>商品暂时无法加载</b><p>真实商品接口暂不可用，请检查网络后重新加载。</p><button class="btn" onclick="loadCatalogs()">重新加载</button></div></section></main>
+<section class="section" id="nodes"><div class="section-head"><h2>数字商品目录</h2><div style="text-align:right"><span class="muted" id="resultCount">正在整理商品…</span><div class="muted" id="catalogBreakdown" style="font-size:11px"></div></div></div><div class="actions" id="tabs" style="margin-bottom:18px"><button class="btn ghost" data-kind="节点" aria-pressed="true">节点</button><button class="btn ghost" data-kind="引流" aria-pressed="false">引流</button><button class="btn ghost" data-kind="账号" aria-pressed="false">账号</button></div><div class="catalog-filter-wrap" aria-label="商品协议与平台筛选"><div id="catalogFilters" class="catalog-filter-pills" role="group" aria-label="按当前商品分类筛选"></div></div><div id="products" class="grid products"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div><div id="networkError" class="error-state" hidden><div class="symbol"><img src="./assets/icons/network.svg" alt="" aria-hidden="true"></div><b>商品暂时无法加载</b><p>真实商品接口暂不可用，请检查网络后重新加载。</p><button class="btn" onclick="loadCatalogs()">重新加载</button></div></section></main>
 <div class="modal-backdrop" id="detailModal" role="dialog" aria-modal="true"><div class="modal"><div class="modal-head"><h3 id="detailTitle">商品详情</h3><button class="btn ghost" onclick="closeDetail()" aria-label="关闭详情"><img src="./assets/icons/close.svg" alt="" aria-hidden="true"></button></div><div id="detailContent"></div></div></div><footer class="s5-site-footer" aria-label="晴天社区网站页脚">
  <div class="footer-brandline"><img src="assets/logo.png" alt="晴天社区 Logo"><div><strong>晴天社区 · S5</strong><small>全球节点与数字服务生态</small></div></div>
  
@@ -250,4 +250,49 @@ button:disabled{opacity:.48;cursor:not-allowed;transform:none!important}
  #globalSearch,.catalog-search,.search-box{margin-bottom:12px!important}
 }
 </style>
-</body></html>
+<style id="s5-unified-two-row-pills">
+/* Both category and platform/protocol rows share the same pill geometry. */
+#tabs{
+ display:flex!important;flex-flow:row nowrap!important;align-items:center!important;
+ gap:10px!important;width:100%!important;max-width:100%!important;min-width:0!important;
+ overflow-x:auto!important;overflow-y:hidden!important;white-space:nowrap!important;
+ padding:8px 4px 14px!important;margin:0 0 10px!important;
+ -webkit-overflow-scrolling:touch!important;overscroll-behavior-x:contain!important;
+ touch-action:pan-x!important;scrollbar-width:none!important;scroll-snap-type:x mandatory!important;
+}
+#tabs::-webkit-scrollbar{display:none!important}
+#tabs .btn,
+#catalogFilters .catalog-filter-pill{
+ display:inline-flex!important;flex:0 0 auto!important;flex-shrink:0!important;
+ flex-direction:row!important;align-items:center!important;justify-content:center!important;
+ box-sizing:border-box!important;width:auto!important;min-width:150px!important;max-width:none!important;
+ height:68px!important;min-height:68px!important;padding:0 26px!important;margin:0!important;
+ border-radius:999px!important;gap:11px!important;white-space:nowrap!important;
+ line-height:1!important;scroll-snap-align:start!important;scroll-snap-stop:always!important;
+ font-size:20px!important;font-weight:850!important;
+}
+#tabs .btn{color:#26364a!important;-webkit-text-fill-color:#26364a!important;background:#fff!important;border:2px solid #d5e1ee!important}
+#tabs .btn.primary,#tabs .btn[aria-pressed="true"]{
+ color:#fff!important;-webkit-text-fill-color:#fff!important;
+ background:linear-gradient(135deg,#42a6ed,#1676cf)!important;border:2px solid #2589d8!important;
+ box-shadow:0 7px 16px rgba(23,105,232,.18)!important;
+}
+#catalogFilters .catalog-filter-pill{min-width:150px!important;border:2px solid #d5e1ee!important;box-shadow:0 5px 14px rgba(29,70,110,.07)!important}
+#catalogFilters .catalog-filter-pill.active,
+#catalogFilters .catalog-filter-pill[aria-pressed="true"]{
+ color:#fff!important;-webkit-text-fill-color:#fff!important;
+ background:linear-gradient(135deg,#42a6ed,#1676cf)!important;border-color:#2589d8!important;
+}
+#tabs .btn:focus-visible,#catalogFilters .catalog-filter-pill:focus-visible{outline:3px solid rgba(23,105,232,.3)!important;outline-offset:2px}
+#catalogFilters .catalog-filter-label{font-size:20px!important;font-weight:850!important}
+#catalogFilters .catalog-filter-pill img,#catalogFilters .catalog-filter-glyph{
+ flex:0 0 30px!important;width:30px!important;height:30px!important;max-width:30px!important;max-height:30px!important;object-fit:contain!important
+}
+#catalogFilters .catalog-filter-glyph{border-radius:50%!important;background:#eaf2ff!important;color:#1769e8!important}
+@media(max-width:560px){
+ #tabs{gap:8px!important;padding:6px 2px 12px!important;margin-bottom:8px!important}
+ #tabs .btn,#catalogFilters .catalog-filter-pill{height:58px!important;min-height:58px!important;min-width:132px!important;padding:0 18px!important;gap:9px!important;font-size:17px!important}
+ #catalogFilters .catalog-filter-label{font-size:17px!important}
+ #catalogFilters .catalog-filter-pill img,#catalogFilters .catalog-filter-glyph{flex-basis:26px!important;width:26px!important;height:26px!important;max-width:26px!important;max-height:26px!important}
+}
+</style></body></html>

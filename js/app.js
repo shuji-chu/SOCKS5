@@ -118,33 +118,37 @@ function normalize(p,i,source){
  let image=p.original_image_url||p.product_image_url||p.image_url||p.cover_url||p.image||p.cover||p.thumbnail||p.thumb||p.picture_url||p.logo||'';
  const resolveAsset=u=>{if(!u)return '';u=String(u);if(u.startsWith('data:'))return u;const cdn=assetBase();if(/^https?:\/\//i.test(u)){if(cdn){try{const parsed=new URL(u),apiHost=new URL(API_ROOT).hostname;if(parsed.hostname===apiHost)return cdn+parsed.pathname+parsed.search+parsed.hash}catch(_){}}return u}const path=u.startsWith('/')?u:'/'+(u.startsWith('./')?u.slice(2):u);return cdn?cdn+path:API_ROOT+path};
  if(!icon&&source==='account'){const brand=String(p.platform||p.brand||p.provider||p.email_domain||p.domain||p.name||p.title||p.product_name||'').toLowerCase();if(/gmail|google mail|@gmail|google workspace/.test(brand))icon='https://cdn.simpleicons.org/gmail/EA4335';else if(/outlook|hotmail|live\.com|microsoft/.test(brand))icon='https://cdn.simpleicons.org/microsoftoutlook/0078D4';else if(/yahoo/.test(brand))icon='https://cdn.simpleicons.org/yahoo/6001D2';else if(/icloud|apple/.test(brand))icon='https://cdn.simpleicons.org/icloud/3693F3';else if(/proton/.test(brand))icon='https://cdn.simpleicons.org/protonmail/6D4AFF';}
- const attrs=p.extra_attrs||p.extraAttrs||p.extra_attributes||p.extraAttributes||p.merchant_attrs||p.merchantAttrs||p.attributes||{};
- const merchant=attrs;
+ let attrs=p.extra_attrs||p.extraAttrs||p.extra_attributes||p.extraAttributes||p.merchant_attrs||p.merchantAttrs||p.attributes||{};
+ if(typeof attrs==='string'){try{attrs=JSON.parse(attrs)}catch(_){attrs={}}}
+ const merchant=attrs&&typeof attrs==='object'?attrs:{};
+
  const rawStock=p.available_stock??p.stock_available??p.stock??p.inventory??p.quantity??p.count??attrs.stock??attrs.inventory??null;
  const premium=source==='node'&&(/singapore|新加坡|sgp|\bsg\b/i.test([p._region,p.region,p.country,p.area,p.name,p.title,p.location].filter(Boolean).join(' '))||p.premium===true||p.is_premium===true);
  const firstValue=(obj,keys)=>{for(const key of keys){const value=obj&&obj[key];if(value!==undefined&&value!==null&&value!=='')return value}return null};
- const pricing=p.pricing||p.price_info||p.priceInfo||attrs.pricing||attrs.price_info||attrs.priceInfo||{};
- const priceSource=firstValue(p,['price_yuan','sale_price_yuan','current_price_yuan','unit_price_yuan','price_cents','sale_price_cents','amount_cents','price','sale_price','current_price','unit_price','price_amount','amount','month_price','monthly_price'])??firstValue(pricing,['price_yuan','sale_price_yuan','price_cents','amount_cents','price','amount','value'])??firstValue(attrs,['price_yuan','sale_price_yuan','price_cents','amount_cents','price','sale_price','unit_price','amount','month_price'])??firstValue(p.prices||{},['sale','price','amount'])??null;
- const parseMoney=value=>{
+ const parseJsonObject=value=>{if(typeof value!=='string')return value&&typeof value==='object'?value:{};try{const parsed=JSON.parse(value);return parsed&&typeof parsed==='object'?parsed:{}}catch(_){return {}}};
+ const extraPrice=parseJsonObject(p.extra_attrs??p.extraAttrs??p.extra_attributes??p.extraAttributes??attrs);
+ const pricing=parseJsonObject(p.pricing||p.price_info||p.priceInfo||attrs.pricing||attrs.price_info||attrs.priceInfo||extraPrice.pricing||extraPrice.price_info);
+ const firstEntry=(obj,keys)=>{for(const key of keys){const value=obj&&obj[key];if(value!==undefined&&value!==null&&value!=='')return {value,key}}return null};
+ const priceKeys=['price_yuan','sale_price_yuan','current_price_yuan','unit_price_yuan','monthly_price_yuan','price_cents','sale_price_cents','current_price_cents','unit_price_cents','amount_cents','price_amount_cents','price_amount','sale_price','current_price','unit_price','price','amount','month_price','monthly_price','retail_price','selling_price'];
+ const foundPrice=firstEntry(p,priceKeys)||firstEntry(pricing,priceKeys)||firstEntry(extraPrice,priceKeys)||firstEntry(extraPrice.pricing,priceKeys)||firstEntry(parseJsonObject(p.price),['price_yuan','price_cents','amount','value','price'])||null;
+ const priceSource=foundPrice?foundPrice.value:null;
+ const parseMoney=(value,key)=>{
   if(value==null||value==='')return null;
-  let explicitUnit='';
-  if(typeof value==='object'){
-   explicitUnit=String(value.unit||value.currency_unit||value.currency||'').toLowerCase();
-   value=firstValue(value,['price_yuan','yuan','price_cents','cents','amount','value','price']);
-  }
-  if(value==null)return null;
+  let unit='';
+  if(typeof value==='object'){unit=String(value.unit||value.currency_unit||value.currency||'').toLowerCase();const nested=firstEntry(value,['price_yuan','yuan','price_cents','cents','amount','value','price']);if(!nested)return null;key=nested.key;value=nested.value}
   const raw=String(value).trim(),clean=raw.replace(/,/g,'').replace(/[^0-9.+-]/g,'');
   if(!clean||!/[0-9]/.test(clean))return null;
   const n=Number(clean);if(!Number.isFinite(n)||n<0)return null;
-  const unit=(explicitUnit+' '+String(p.price_unit||p.currency_unit||p.unit||p.pricing?.unit||p.pricing?.currency||attrs.price_unit||attrs.currency_unit||'')).toLowerCase();
-  const key=priceSource===p.price_cents||priceSource===p.sale_price_cents||priceSource===pricing.price_cents||priceSource===attrs.price_cents;
-  if(/cent|分|fen/.test(unit)||key)return n/100;
-  if(/yuan|cny|rmb|元/.test(unit)||/[¥￥]/.test(raw)||/[.]/.test(clean))return n;
-  return Number.isInteger(n)?n/100:n;
+  const declaredUnit=(unit+' '+String(p.price_unit||p.currency_unit||p.unit||p.pricing?.unit||p.pricing?.currency||attrs.price_unit||attrs.currency_unit||'')).toLowerCase();
+  if(/yuan|cny|rmb|元/.test(declaredUnit)||/[¥￥]/.test(raw)||/_yuan$/.test(key))return n;
+  if(/cent|分|fen/.test(declaredUnit)||/_cents?$/.test(key)||/cents/.test(key))return n/100;
+  if(/[.]/.test(clean))return n;
+  return n/100;
  };
- const parsedPrice=parseMoney(priceSource);
+ const parsedPrice=parseMoney(priceSource,foundPrice?.key||'');
  const priceYuan=parsedPrice==null?0:parsedPrice;
  const priceProvided=parsedPrice!=null;
+ if(!priceProvided||priceYuan===0)console.warn('[S5 catalog price audit: missing/zero price]',{id:p.sku_id??p.id??p.product_id,title:p.title||p.name||p.product_name,priceField:foundPrice?.key||null,priceValue:priceSource,extra_attrs:extraPrice,rawProduct:p});
  return {...p,_key:source+'-'+i+'-'+String(p.sku_id??p.id??p.product_id??p.uuid??'sku'),_source:source,_kind:categoryOf(p,source),_title:String(p.title||p.name||p.product_title||p.productTitle||p.display_name||p.displayName||p.sku_title||p.skuTitle||p.sku_name||p.product_name||p.productName||p.goods_name||p.goodsName||p.item_name||p.itemName||p.label||p.en_name||p.name_en||p.english_name||p.description_zh||p.description||'商品 '+String(p.sku_id??p.id??p.product_id??i+1)),_desc:String(p.description_zh||p.chinese_description||p.description_cn||p.description||p.summary||p.content||''),_image:resolveAsset(image),_icon:resolveAsset(icon),_price:Number.isFinite(priceYuan)?priceYuan:0,_priceProvided:priceProvided,_priceCents:Math.round(priceYuan*100),_stock:rawStock,_sales:p.sales??p.sold_count??p.total_sales??p.buy_count,_tutorial:p.tutorial_markdown||p.tutorial_md||p.tutorial||p.guide_markdown||p.guide||p.markdown||p.content_md||'',_delivery:p.delivery_content||p.delivery_description||p.delivery||p.deliverables||p.delivery_type||p.delivery_method||'',_warranty:p.warranty||p.warranty_period||p.after_sales||p.after_sale||p.support_policy||p.guarantee||'',_notice:p.notice||p.notes||p.warning||p.terms||'',_merchantAttrs:merchant,_region:String(p._region||p.region_name||p.region||p.country||p.area||p.location||''),_premium:premium,_period:p.period_name||p.period_label||p.period||p.billing_cycle||''};
 }
 function markdown(md){const lines=String(md||'暂无教程内容').split(String.fromCharCode(10));let out='',listOpen=false;for(const raw of lines){const line=raw.trim();if(!line){if(listOpen){out+='</ul>';listOpen=false}out+='<p></p>';continue}let level=0;while(level<6&&line[level]==='#')level++;if(level>0&&line[level]===' '){if(listOpen){out+='</ul>';listOpen=false}out+='<h'+level+'>'+inlineMd(line.slice(level+1))+'</h'+level+'>';continue}if(line.startsWith('- ')||line.startsWith('* ')){if(!listOpen){out+='<ul>';listOpen=true}out+='<li>'+inlineMd(line.slice(2))+'</li>';continue}if(listOpen){out+='</ul>';listOpen=false}out+='<p>'+inlineMd(line)+'</p>'}if(listOpen)out+='</ul>';return '<div class="markdown">'+out+'</div>'}

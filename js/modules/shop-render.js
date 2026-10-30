@@ -10,6 +10,25 @@ function stock(p){const b=val(p.bulk_available_count,p.wholesale_available_count
 function image(p){const src=p._kind==='账号'?(p._icon||p._image):(p._image||p._icon)||'',initial=esc((p._title||'?').trim().charAt(0).toUpperCase());return '<div class="product-art">'+(src?'<img src="'+esc(src)+'" alt="'+esc(p._title)+'" loading="lazy" decoding="async" onerror="this.hidden=true;this.parentElement.classList.add(\'image-missing\')">':'')+'<span class="product-initial">'+initial+'</span></div>'}
 function localIcon(u){if(!u)return './assets/icons/server.svg';const s=String(u).trim();if(s.startsWith('./assets/icons/'))return s.split(/[?#]/)[0];const marker='/assets/icons/';const i=s.indexOf(marker);if(i>=0){const file=s.slice(i+marker.length).split(/[?#]/)[0];if(/^[a-z0-9_.-]+\.svg$/i.test(file))return './assets/icons/'+file}if(s.startsWith('assets/icons/'))return './'+s.split(/[?#]/)[0];return './assets/icons/server.svg'}
 function protocols(p){if(p._kind!=='节点')return '';const raw=p.protocols||p.supported_protocols||[p.protocol||p.node_protocol||p.type].filter(Boolean),items=Array.isArray(raw)?raw:String(raw).split(/[,，|]/).filter(Boolean),icons=p.protocol_icons||p.protocol_icon_urls||{};if(!items.length)return '<div class="sku-muted">协议信息：商家未提供</div>';return '<div class="protocol-badges">'+items.map(it=>{const n=typeof it==='object'?(it.name||it.protocol||it.type||'协议'):it,k=String(n).toLowerCase().replace(/[^a-z0-9]/g,''),u=(typeof it==='object'&&(it.icon_url||it.icon))||(icons[n]||icons[k])||p.icon_url||p.protocol_icon_url||p._icon||'';return '<span class="protocol-badge"><img loading="lazy" decoding="async" src="'+esc(localIcon(u))+'" onerror="this.onerror=null;this.src=\'./assets/icons/server.svg\'" alt="" aria-hidden="true">'+esc(n)+'</span>'}).join('')+'</div>'}
+function protocolNames(p){
+ if(p._kind!=='节点')return [];
+ let raw=p.protocols||p.supported_protocols||p.protocol_list||p.protocol||p.node_protocol||p.type||[];
+ if(typeof raw==='string')raw=raw.split(/[,，|、;；]+/);
+ if(!Array.isArray(raw))raw=[raw];
+ const aliases={vless:'VLESS',hysteria:'Hysteria2',hysteria2:'Hysteria2',trojan:'Trojan',vmess:'VMess',shadowsocks:'Shadowsocks',ss:'Shadowsocks',tuic:'TUIC',anytls:'AnyTLS',ssr:'SSR',shadowsocksr:'SSR',mtproto:'MTProto',mtp:'MTProto'};
+ return [...new Set(raw.map(x=>typeof x==='object'?(x.name||x.protocol||x.type||x.value||''):x).map(x=>String(x||'').trim()).filter(Boolean).map(x=>aliases[x.toLowerCase().replace(/[^a-z0-9]/g,'')]||x))];
+}
+function planMetaTags(p){
+ if(p._kind!=='节点')return [];
+ const tags=[];
+ const quota=val(p.traffic_limit,p.bandwidth_quota,p.data_limit,p.quota,p.traffic,p.traffic_quota,p.flow_limit);
+ if(quota!=null)tags.push('流量 '+String(quota));
+ const periods=[['month_price','月付'],['quarter_price','季付'],['half_year_price','半年付'],['year_price','年付']];
+ periods.forEach(([key,label])=>{if(p[key]!==undefined&&p[key]!==null&&p[key]!==''&&Number.isFinite(Number(p[key])))tags.push(label)});
+ const cycle=val(p.billing_cycle,p.period,p.pay_period,p.duration_label);
+ if(cycle!=null)tags.push(String(cycle));
+ return tags;
+}
 function tagList(p){
  let raw=val(p.tags,p.labels,p.badges,p.features,p.tagline,p.selling_points,attrs(p).tags,attrs(p).labels,attrs(p).features,attrs(p).tagline);
  if(raw==null)return [];
@@ -42,9 +61,11 @@ function cleanAccountText(value){
  const raw=typeof value==='string'?value:(value&&typeof value==='object'?JSON.stringify(value):String(value??''));
  return raw.replace(/[\\[\\]"']/g,'').replace(/\\s*[,，|、;；]+\\s*/g,' · ').replace(/\\s+/g,' ').trim();
 }
-function renderUnifiedItem(p){
+function renderUnifiedItem(p,activeFilter='全部'){
  const title=cleanAccountText(p._title||p.title||p.name||p.product_title||p.display_name||p.sku_title||p.sku_name||p.product_name||p.goods_name||p.item_name||'商品 '+String(p._key||''));
- const tags=[...new Set([cleanAccountText(p._region||p.region_name||p.region||p.country||p.area||''),...tagList(p).map(cleanAccountText)].filter(Boolean))].slice(0,8);
+ const protocolTags=protocolNames(p);
+ const selectedTag=activeFilter&&activeFilter!=='全部'&&matchesFilter(p,activeFilter)?[activeFilter]:[];
+ const tags=[...new Set([...selectedTag,...protocolTags,...planMetaTags(p),cleanAccountText(p._region||p.region_name||p.region||p.country||p.area||''),...tagList(p).map(cleanAccountText)].filter(Boolean))].slice(0,8);
  const src=p._kind==='账号'?(p._icon||p._image):(p._image||p._icon);
  const fallback='./assets/icons/server.svg';
  const icon='<img src="'+esc(src||fallback)+'" alt="" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=\''+fallback+'\';this.classList.add(\'sku-icon-fallback\')">';
@@ -61,13 +82,17 @@ function renderUnifiedItem(p){
 function matchesFilter(p,filter){
  if(!filter||filter==='全部')return true;
  const aliases={
-  '小火箭':['小火箭','shadowrocket','rocket','surge'],
-  'V2rayN':['v2rayn','v2ray n','v2ray'],
-  'Clash':['clash','mihomo'],
-  'MTP':['mtp','mtproto']
+  'VLESS':['vless'],'Hysteria2':['hysteria2','hysteria'],'Trojan':['trojan'],'VMess':['vmess'],
+  'Shadowsocks':['shadowsocks','shadowsocks-r','ss'],'TUIC':['tuic'],'AnyTLS':['anytls'],
+  'SSR':['ssr','shadowsocksr'],'MTProto':['mtproto','mtp'],
+  'Gmail':['gmail'],'Outlook':['outlook','hotmail','microsoft outlook'],'TikTok':['tiktok'],
+  'Instagram':['instagram'],'Discord':['discord'],'Microsoft':['microsoft'],'Yahoo':['yahoo'],
+  'iCloud':['icloud'],'Proton':['proton'],'Telegram':['telegram'],'YouTube':['youtube'],
+  'WhatsApp':['whatsapp'],'Facebook':['facebook']
  };
- const terms=aliases[filter]||[filter];
- const haystack=[p._title,p._desc,p._kind,p._region,p.protocol,p.node_protocol,p.protocols,p.product_type,p.product_category,p.category,p.type,p.platform,p.tags,p.labels,JSON.stringify(p._merchantAttrs||{})].filter(Boolean).join(' ').toLowerCase();
+ const terms=aliases[filter]||[String(filter).toLowerCase()];
+ const protocolText=protocolNames(p).join(' ');
+ const haystack=[p._title,p._desc,p._kind,p._region,p.protocol,p.node_protocol,p.protocols,p.supported_protocols,p.protocol_list,p.product_type,p.product_category,p.category,p.type,p.platform,p.tags,p.labels,p.traffic_limit,p.bandwidth_quota,p.data_limit,JSON.stringify(p._merchantAttrs||{}),protocolText].filter(Boolean).map(x=>typeof x==='object'?JSON.stringify(x):String(x)).join(' ').toLowerCase();
  return terms.some(term=>haystack.includes(String(term).toLowerCase()));
 }
 function render({root,products,activeKind='节点',searchTerm='',activeFilter='全部',pageInfo={}}){
@@ -78,7 +103,7 @@ function render({root,products,activeKind='节点',searchTerm='',activeFilter='�
  const count=document.getElementById('resultCount');if(count)count.textContent='共 '+total.toLocaleString()+' 件商品 · 当前筛选 '+rows.length+' 件';
  const pagination=()=>'<nav class="sku-pagination" aria-label="商品分页"><button type="button" data-page="prev" '+(page<=1?'disabled':'')+'>上一页</button><span class="sku-page-number">第 '+page+' / '+totalPages+' 页</span><button type="button" data-page="next" '+(page>=totalPages?'disabled':'')+'>下一页</button></nav>';
  if(!rows.length){root.innerHTML='<div class="empty-space"><div><div class="planet"></div><b>当前筛选暂无商品</b><p>接口已返回 '+total.toLocaleString()+' 件商品总量；可切换“全部”查看当前页商品。</p></div></div>'+pagination();bind();return}
- root.innerHTML='<div class="sku-list">'+rows.slice(0,15).map(renderUnifiedItem).join('')+'</div>'+pagination();
+ root.innerHTML='<div class="sku-list">'+rows.slice(0,15).map(p=>renderUnifiedItem(p,activeFilter)).join('')+'</div>'+pagination();
  bind();
  function bind(){
   root.querySelectorAll('[data-open-sku]').forEach(btn=>btn.addEventListener('click',()=>{if(typeof w.openDetail==='function')w.openDetail(btn.dataset.openSku)}));

@@ -5,7 +5,9 @@ const localIcon=u=>{if(!u)return '';const s=String(u).trim();if(s.startsWith('./
 const API_V1='https://web.lynli.me/api/v1';
 const requestedCategory=new URLSearchParams(location.search).get('category')||'节点';
 let liveProducts=[],activeKind=['节点','账号','引流'].includes(requestedCategory)?requestedCategory:'节点',searchTerm='',paymentMethods=[];
-let catalogPage=1,catalogTotal=0,catalogTotalPages=1,catalogLoading=false,catalogRequestId=0;\nconst CATALOG_PAGE_SIZE=15;\nfunction catalogEndpoint(kind){return kind==='节点'?'/user/plan/fetch':kind==='账号'?'/account/products':'/user/cloned_products'};
+let catalogPage=1,catalogTotal=0,catalogTotalPages=1,catalogLoading=false,catalogRequestId=0;
+const CATALOG_PAGE_SIZE=15;
+function catalogEndpoint(kind){return kind==='节点'?'/user/plan/fetch':kind==='账号'?'/account/products':'/user/cloned_products'};
 function catalogRows(response,kind){return kind==='节点'?groupedNodeRows(response):listify(response)};
 function catalogMeta(response,rows,page){let root=response;for(let i=0;i<5&&root&&typeof root==='object';i++){const total=root.total??root.total_count??root.totalCount??root.total_items??root.count??root.pagination?.total??root.meta?.total;if(total!==undefined&&Number.isFinite(Number(total)))return {total:Number(total),pages:Math.max(1,Number(root.total_pages??root.totalPages??root.last_page??root.pagination?.total_pages??root.pagination?.last_page??Math.ceil(Number(total)/CATALOG_PAGE_SIZE))||1)};root=root.data??root.result??root.payload;}return {total:rows.length===CATALOG_PAGE_SIZE?(page+1)*CATALOG_PAGE_SIZE:((page-1)*CATALOG_PAGE_SIZE+rows.length),pages:rows.length===CATALOG_PAGE_SIZE?page+1:page}}
 const escHtml=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

@@ -51,6 +51,14 @@
       if (submit.dataset.s5SubmitArmed === '1') { submit.dataset.s5SubmitArmed = '0'; return; }
       lock(submit, true);
     }, true);
+    document.addEventListener('keydown', function (event) {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      const target = event.target && event.target.closest ? event.target.closest('[data-buy-sku]') : null;
+      if (target && !lock(target, false)) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+      }
+    }, true);
   }
 
   const STATIC_DATA_URLS = {

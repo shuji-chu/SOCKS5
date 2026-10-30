@@ -178,7 +178,20 @@ button:disabled{opacity:.48;cursor:not-allowed;transform:none!important}
  #products.sku-page-grid,.sku-page-grid{grid-template-columns:minmax(0,1fr)!important}
 }
 </style>
-</head><body>
+
+<style id="account-long-list-layout">
+#products.account-long-list,.account-long-list{display:flex!important;flex-direction:column!important;gap:10px!important;width:100%!important;overflow:visible!important}
+.account-long-list>.account-row{display:flex!important;flex-direction:row!important;align-items:flex-start!important;gap:12px!important;width:100%!important;min-width:0!important;padding:12px 10px!important;margin:0!important;border:0!important;border-bottom:1px solid #e5e9ef!important;border-radius:0!important;background:#fff!important;box-shadow:none!important;color:#263445!important}
+.account-row .account-platform-logo{display:flex;align-items:center;justify-content:center;flex:0 0 46px;width:46px;height:46px;border-radius:10px;background:#f3f6fa;overflow:hidden;color:#315b91;font-size:20px;font-weight:800}
+.account-row .account-platform-logo img{display:block;width:100%;height:100%;padding:5px;object-fit:contain}
+.account-row .account-row-content{flex:1 1 auto!important;min-width:0!important;width:auto!important}
+.account-row .account-full-title{display:block!important;margin:0 0 9px!important;color:#253247!important;font-size:14px!important;font-weight:500!important;line-height:1.65!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;overflow-wrap:anywhere!important;word-break:break-word!important}
+.account-row .account-price-stock{display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;width:100%!important}
+.account-row .account-price{color:#e0444e!important;font-size:17px!important;font-weight:800!important;white-space:nowrap}
+.account-row .account-stock{color:#15965a!important;font-size:12px!important;font-weight:700!important;text-align:right;overflow-wrap:anywhere}
+.account-row .account-detail{margin-top:8px!important;min-height:30px!important;padding:4px 9px!important;font-size:11px!important;border-radius:6px!important}
+@media(max-width:480px){.account-long-list>.account-row{gap:10px!important;padding:11px 7px!important}.account-row .account-platform-logo{flex-basis:42px;width:42px;height:42px}.account-row .account-full-title{font-size:14px!important;line-height:1.6!important}}
+</style></head><body>
 <header class="s5-global-header"><a class="s5-header-brand" href="./index.html" aria-label="S5 首页"><img src="assets/logo.png" alt="晴天社区 Logo" width="40" height="40"></a><nav class="s5-header-nav" aria-label="主导航"><a href="./index.html">首页</a><a class="active" href="./shop.html">商城</a><a href="./user.html">我的</a></nav><a class="s5-account-button" href="./user.html">我的账户</a></header>
 <main class="wrap"><section class="page-head"><div class="eyebrow">DIGITAL ASSET MARKET</div><h1 class="title">发现你的下一项数字资产</h1><p class="lead">节点、账号与引流三大品类，商品信息清晰呈现，购买路径简单直接。</p><div class="actions" style="margin-top:20px"><span class="pill live"><i class="status-dot" aria-hidden="true"></i>服务状态正常</span><span class="pill">安全交付 · 全天候服务</span></div></section>
 <section class="section" id="nodes"><div class="section-head"><h2>数字商品目录</h2><div style="text-align:right"><span class="muted" id="resultCount">正在整理商品…</span><div class="muted" id="catalogBreakdown" style="font-size:11px"></div></div></div><div class="actions" id="tabs" style="margin-bottom:18px"><button class="btn ghost" data-kind="节点" aria-pressed="true">节点</button><button class="btn ghost" data-kind="账号" aria-pressed="false">账号</button><button class="btn ghost" data-kind="引流" aria-pressed="false">引流</button></div><div style="margin:0 0 16px"><input id="globalSearch" class="input" type="search" placeholder="搜索地区 / 协议" autocomplete="off" aria-label="全局搜索商品"></div><div id="products" class="grid products"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div><div id="networkError" class="error-state" hidden><div class="symbol"><img src="./assets/icons/network.svg" alt="" aria-hidden="true"></div><b>商品暂时无法加载</b><p>真实商品接口暂不可用，请检查网络后重新加载。</p><button class="btn" onclick="loadCatalogs()">重新加载</button></div></section></main>

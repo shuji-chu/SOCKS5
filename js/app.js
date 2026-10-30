@@ -23,7 +23,7 @@ function catalogFacet(p,kind){
  if(kind==='节点'){
   const v=read(['protocol','node_protocol','protocol_name','network_protocol','type']);
   if(Array.isArray(v))return v.map(String);
-  if(typeof v==='string'&&v.trim())return v.split(/[,，|/、]/).map(x=>x.trim()).filter(Boolean);
+  if(typeof v==='string'&&v.trim())return v.split(/[,，|\/、]/).map(x=>x.trim()).filter(Boolean);
   const many=read(['protocols','supported_protocols','protocol_list']);
   return Array.isArray(many)?many.map(String):[];
  }
@@ -31,7 +31,7 @@ function catalogFacet(p,kind){
  const values=Array.isArray(v)?v:[v];
  const extra=read(['platforms','supported_platforms','channels','services']);
  if(Array.isArray(extra))values.push(...extra);
- return [...new Set(values.flatMap(x=>String(x||'').split(/[,，|/、]/).map(y=>y.trim()).filter(Boolean)))];
+ return [...new Set(values.flatMap(x=>String(x||'').split(/[,，|\/、]/).map(y=>y.trim()).filter(Boolean)))];
 }
 function renderCatalogFilters(){
  const root=document.getElementById('catalogFilters');if(!root)return;
@@ -41,7 +41,7 @@ function renderCatalogFilters(){
  if(!options.includes(activeFilter))activeFilter='全部';
  root.innerHTML=options.map(label=>{
   const icon=label==='全部'?'./assets/icons/shop.svg':facets.get(label);
-  return '<button type="button" class="catalog-filter-pill'+(label===activeFilter?' active':'')+'" data-catalog-filter="'+escHtml(label)+'" aria-pressed="'+String(label===activeFilter)+'"><img src="'+escHtml(icon)+'" alt="" aria-hidden="true" loading="lazy" onerror="this.onerror=null;this.src=\\'./assets/icons/network.svg\\'"><span>'+escHtml(label)+'</span></button>';
+  return '<button type="button" class="catalog-filter-pill'+(label===activeFilter?' active':'')+'" data-catalog-filter="'+escHtml(label)+'" aria-pressed="'+String(label===activeFilter)+'"><img src="'+escHtml(icon)+'" alt="" aria-hidden="true" loading="lazy"><span>'+escHtml(label)+'</span></button>';
  }).join('');
 }
 function catalogEndpoint(kind){return kind==='节点'?'/user/plan/fetch':'/user/cloned_products';}

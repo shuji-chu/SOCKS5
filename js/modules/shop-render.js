@@ -114,8 +114,23 @@ function matchesFilter(p,filter){
 function render({root,products,activeKind='节点',searchTerm='',activeFilter='全部',pageInfo={}}){
  if(!root)return;
  const query=String(searchTerm||'').trim().toLowerCase();
- const rows=products.filter(p=>p._kind===activeKind&&matchesFilter(p,activeFilter)&&(!query||[p._title,p._desc,p._kind,p._region,p.tags,p.protocol,p.node_protocol,p.platform,p.brand,p.provider,p.account_category,p.traffic_platform,JSON.stringify(p._merchantAttrs||{})].filter(Boolean).join(' ').toLowerCase().includes(query))).sort((a,b)=>{
+ const platformPriority={Telegram:100,Threads:90,Steam:80,TikTok:70,Discord:60,Netflix:50,Instagram:45,Facebook:40,WhatsApp:35,Reddit:30,YouTube:25,Google:20,Gmail:20,Outlook:15,Yahoo:10,iCloud:8};
+ const accountPriority=p=>{
+  if(p._kind!=='账号')return 0;
+  const name=[p.account_category,p.platform,p.brand,p.provider,p.email_domain,p.domain,p._title,p.title,p.name,p.product_name].filter(Boolean).join(' ').toLowerCase();
+  if(/(?:^|[^a-z0-9])(?:list\\.ru|ink\\.ru)(?:$|[^a-z0-9])/i.test(name))return -1000;
+  for(const [platform,priority] of Object.entries(platformPriority)){
+   const pattern=new RegExp('(?:^|[^a-z0-9])'+platform.replace(/[.*+?^${}()|[\\]\\\\]/g,'\\ const rows=products.filter(p=>p._kind===activeKind&&matchesFilter(p,activeFilter)&&(!query||[p._title,p._desc,p._kind,p._region,p.tags,p.protocol,p.node_protocol,p.platform,p.brand,p.provider,p.account_category,p.traffic_platform,JSON.stringify(p._merchantAttrs||{})].filter(Boolean).join(' ').toLowerCase().includes(query))).sort((a,b)=>{
   const weight=p=>{const raw=p.sort_weight??p._sortWeight??p.weight;const n=Number(raw);if(raw!==undefined&&raw!==null&&raw!==''&&Number.isFinite(n))return n;const stock=Number(p._stock??p.stock??p.available_stock??p.inventory??p.quantity??0);return Number.isFinite(stock)?stock:0};
+  return weight(b)-weight(a)||Number(b._premium)-Number(a._premium);
+ });')+'(?:$|[^a-z0-9])','i');
+   if(pattern.test(name))return priority;
+  }
+  return 0;
+ };
+ const rows=products.filter(p=>p._kind===activeKind&&matchesFilter(p,activeFilter)&&(!query||[p._title,p._desc,p._kind,p._region,p.tags,p.protocol,p.node_protocol,p.platform,p.brand,p.provider,p.account_category,p.traffic_platform,JSON.stringify(p._merchantAttrs||{})].filter(Boolean).join(' ').toLowerCase().includes(query))).sort((a,b)=>{
+  if(activeKind==='账号'){const priorityDiff=accountPriority(b)-accountPriority(a);if(priorityDiff)return priorityDiff;}
+  const weight=p=>{const raw=p.sort_weight??p._sortWeight??p.weight;if(raw!==undefined&&raw!==null&&raw!==''&&Number.isFinite(Number(raw)))return Number(raw);const stockRaw=p._stock??p.stock??p.available_stock??p.inventory??p.quantity;const stock=stockRaw===undefined||stockRaw===null||stockRaw===''?0:Number(stockRaw);return Number.isFinite(stock)?stock:0};
   return weight(b)-weight(a)||Number(b._premium)-Number(a._premium);
  });
  const page=Math.max(1,Number(pageInfo.page)||1),total=Math.max(0,Number(pageInfo.total)||0),totalPages=pageInfo.serverPaginated?Math.max(1,Number(pageInfo.totalPages)||1):Math.max(1,Math.ceil(rows.length/15));

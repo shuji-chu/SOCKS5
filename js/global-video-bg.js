@@ -10,5 +10,7 @@ applySource();
 var resizeTimer;window.addEventListener('resize',function(){clearTimeout(resizeTimer);resizeTimer=setTimeout(applySource,150);},{passive:true});
 document.querySelectorAll('link[rel~="icon"],link[rel="apple-touch-icon"]').forEach(function(link){link.href='/assets/logo.png';link.type='image/png';});
 document.querySelectorAll('img').forEach(function(img){var src=img.getAttribute('src')||'';if(/(?:assets\/images\/logo\.svg|assets\/logo\.svg|logo\.svg)$/i.test(src)){img.src='/assets/logo.png';img.alt='晴天社区 Logo';}});
-document.querySelectorAll('.brand-mark').forEach(function(mark){var img=document.createElement('img');img.src='/assets/logo.png';img.alt='晴天社区 Logo';img.className='brand-logo-local';mark.replaceWith(img);});\ndocument.querySelectorAll('.s5-header-brand').forEach(function(link){link.setAttribute('aria-label','晴天社区首页');});\ndocument.querySelectorAll('.footer-brandline strong').forEach(function(label){label.textContent=label.textContent.replace(/\s*[·•|]\s*S5/gi,'').trim();});
+document.querySelectorAll('.brand-mark').forEach(function(mark){var img=document.createElement('img');img.src='/assets/logo.png';img.alt='晴天社区 Logo';img.className='brand-logo-local';mark.replaceWith(img);});
+document.querySelectorAll('.s5-header-brand').forEach(function(link){link.setAttribute('aria-label','晴天社区首页');});
+document.querySelectorAll('.footer-brandline strong').forEach(function(label){label.textContent=label.textContent.replace(/\s*[·•|]\s*S5/gi,'').trim();});
 })();

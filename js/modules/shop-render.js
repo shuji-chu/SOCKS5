@@ -43,7 +43,7 @@ function cleanAccountText(value){
  return raw.replace(/[\\[\\]"']/g,'').replace(/\\s*[,，|、;；]+\\s*/g,' · ').replace(/\\s+/g,' ').trim();
 }
 function accountLogo(p){
- const src=p._image||p._icon||'';
+ const src=p._image||p.icon_url||p.brand_icon_url||p.logo||p.brand_logo||'';
  const first=String(p._title||'账').trim().slice(0,1).toUpperCase();
  return '<div class="account-platform-logo">'+(src?'<img src="'+esc(src)+'" alt="" loading="lazy">':esc(first))+'</div>';
 }

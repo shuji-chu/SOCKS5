@@ -288,7 +288,7 @@ function localizeTrafficTitle(value){
   [/\[\s*LK\s*\]/gi,'[斯里兰卡]'],
   [/\[\s*NP\s*\]/gi,'[尼泊尔]'],
   [/\bAPI\s+Login\b/gi,'API登录'],[/\biOS\s+Real\s+Device\b/gi,'iOS真机'],[/\bBlind\s+Box\b/gi,'盲盒'],
-  [/\bFull\s+Account\b/gi,'全功能账号'],[/\bShared\s+Account\b/gi,'共享账号'],[/\bShared\b/gi,'共享号'],
+  [/\bFull\s+Account\b/gi,'全功能号'],[/\bShared\s+Account\b/gi,'共享账号'],[/\bShared\b/gi,'共享号'],
   [/\bAged\b/gi,'老号'],[/\bBulk\s+Available\b/gi,'大量有货'],[/\bPhone\s+Verified\b/gi,'手机已验证'],
   [/\bLevel\s+(\d+)\b/gi,'$1级'],[/\b30d\b/gi,'30天'],[/\b1m\b/gi,'1个月'],
   [/\[\s*US\s*\]/gi,'[美国]'],[/\[\s*UK\s*\]/gi,'[英国]'],[/\[\s*CN\s*\]/gi,'[中国]'],

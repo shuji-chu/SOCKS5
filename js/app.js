@@ -59,16 +59,30 @@ function groupedNodeRows(response){
  return Array.from(unique.values());
 }
 function normalize(p,i,source){
+ const nested=[p.product,p.goods,p.item,p.sku,p.detail].filter(v=>v&&typeof v==='object'&&!Array.isArray(v));
+ p=Object.assign({},...nested,p);
  const icon=p.icon_url||p.brand_icon_url||p.protocol_icon_url||'';
  let image=p.image_url||p.cover_url||p.image||p.cover||p.thumbnail||p.thumb||p.logo||'';
  const resolveAsset=u=>{if(!u)return '';u=String(u);if(u.startsWith('data:'))return u;const cdn=assetBase();if(/^https?:\/\//i.test(u)){if(cdn){try{const parsed=new URL(u),apiHost=new URL(API_ROOT).hostname;if(parsed.hostname===apiHost)return cdn+parsed.pathname+parsed.search+parsed.hash}catch(_){}}return u}const path=u.startsWith('/')?u:'/'+(u.startsWith('./')?u.slice(2):u);return cdn?cdn+path:API_ROOT+path};
  const merchant=p.merchant_attrs||p.merchantAttrs||p.attributes||{};
  const rawStock=p.available_stock??p.stock_available??p.stock??p.inventory??p.quantity??p.count??null;
  const premium=source==='node'&&(/singapore|新加坡|sgp|\bsg\b/i.test([p._region,p.region,p.country,p.area,p.name,p.title,p.location].filter(Boolean).join(' '))||p.premium===true||p.is_premium===true);
- const priceRaw=p.price_cents??p.price??p.sale_price??p.amount??p.month_price??p.monthly_price??p.price_yuan??0;
- const priceYuan=p.price_yuan!=null?Number(p.price_yuan):Number(priceRaw)/100;
- const priceProvided=[p.price_yuan,p.sale_price_yuan,p.price_cents,p.price,p.sale_price,p.amount,p.month_price,p.monthly_price].some(v=>v!==undefined&&v!==null&&v!=='');
- return {...p,_key:source+'-'+i+'-'+String(p.sku_id??p.id??p.product_id??p.uuid??'sku'),_source:source,_kind:categoryOf(p,source),_title:String(p.sku_name||p.name||p.title||p.product_name||p.label||'未命名 SKU'),_desc:String(p.description_zh||p.chinese_description||p.description_cn||p.description||p.summary||p.content||''),_image:resolveAsset(image),_icon:localIcon(icon),_price:Number.isFinite(priceYuan)?priceYuan:0,_priceProvided:priceProvided,_priceCents:Number(priceRaw)||0,_stock:rawStock,_sales:p.sales??p.sold_count??p.total_sales??p.buy_count,_tutorial:p.tutorial_markdown||p.tutorial_md||p.tutorial||p.guide_markdown||p.guide||p.markdown||p.content_md||'',_delivery:p.delivery_content||p.delivery_description||p.delivery||p.deliverables||p.delivery_type||p.delivery_method||'',_warranty:p.warranty||p.warranty_period||p.after_sales||p.after_sale||p.support_policy||p.guarantee||'',_notice:p.notice||p.notes||p.warning||p.terms||'',_merchantAttrs:merchant,_region:String(p._region||p.region_name||p.region||p.country||p.area||p.location||''),_premium:premium,_period:p.period_name||p.period_label||p.period||p.billing_cycle||''};
+ const priceSource=p.price_yuan??p.sale_price_yuan??p.price_cents??p.price??p.sale_price??p.amount??p.month_price??p.monthly_price??p.pricing?.price??p.pricing?.amount??p.prices?.sale??p.prices?.price??null;
+ const parseMoney=value=>{
+  if(value==null||value==='')return null;
+  if(typeof value==='object')value=value.amount??value.value??value.price??value.price_yuan??value.cents??null;
+  if(value==null)return null;
+  const raw=String(value).trim(),n=Number(raw.replace(/[^0-9.+-]/g,''));
+  if(!Number.isFinite(n))return null;
+  const unit=String(p.price_unit||p.currency_unit||p.unit||p.pricing?.unit||p.pricing?.currency||'').toLowerCase();
+  if(p.price_yuan!=null||p.sale_price_yuan!=null||/yuan|cny|rmb|元|¥/i.test(unit)||/[.]/.test(raw.replace(/[^0-9.]/g,'')))return n;
+  if(p.price_cents!=null||Number.isInteger(n))return n/100;
+  return n;
+ };
+ const parsedPrice=parseMoney(priceSource);
+ const priceYuan=parsedPrice==null?0:parsedPrice;
+ const priceProvided=parsedPrice!=null;
+ return {...p,_key:source+'-'+i+'-'+String(p.sku_id??p.id??p.product_id??p.uuid??'sku'),_source:source,_kind:categoryOf(p,source),_title:String(p.title||p.name||p.product_title||p.display_name||p.sku_title||p.sku_name||p.product_name||p.label||p.goods_name||p.item_name||p.en_name||p.name_en||p.description_zh||p.description||'商品 '+String(p.sku_id??p.id??p.product_id??i+1)),_desc:String(p.description_zh||p.chinese_description||p.description_cn||p.description||p.summary||p.content||''),_image:resolveAsset(image),_icon:localIcon(icon),_price:Number.isFinite(priceYuan)?priceYuan:0,_priceProvided:priceProvided,_priceCents:Number(priceRaw)||0,_stock:rawStock,_sales:p.sales??p.sold_count??p.total_sales??p.buy_count,_tutorial:p.tutorial_markdown||p.tutorial_md||p.tutorial||p.guide_markdown||p.guide||p.markdown||p.content_md||'',_delivery:p.delivery_content||p.delivery_description||p.delivery||p.deliverables||p.delivery_type||p.delivery_method||'',_warranty:p.warranty||p.warranty_period||p.after_sales||p.after_sale||p.support_policy||p.guarantee||'',_notice:p.notice||p.notes||p.warning||p.terms||'',_merchantAttrs:merchant,_region:String(p._region||p.region_name||p.region||p.country||p.area||p.location||''),_premium:premium,_period:p.period_name||p.period_label||p.period||p.billing_cycle||''};
 }
 function markdown(md){const lines=String(md||'暂无教程内容').split(String.fromCharCode(10));let out='',listOpen=false;for(const raw of lines){const line=raw.trim();if(!line){if(listOpen){out+='</ul>';listOpen=false}out+='<p></p>';continue}let level=0;while(level<6&&line[level]==='#')level++;if(level>0&&line[level]===' '){if(listOpen){out+='</ul>';listOpen=false}out+='<h'+level+'>'+inlineMd(line.slice(level+1))+'</h'+level+'>';continue}if(line.startsWith('- ')||line.startsWith('* ')){if(!listOpen){out+='<ul>';listOpen=true}out+='<li>'+inlineMd(line.slice(2))+'</li>';continue}if(listOpen){out+='</ul>';listOpen=false}out+='<p>'+inlineMd(line)+'</p>'}if(listOpen)out+='</ul>';return '<div class="markdown">'+out+'</div>'}
 function inlineMd(v){let s=escHtml(safeModalText(v));s=s.split('**').map((x,i)=>i%2?'<strong>'+x+'</strong>':x).join('');s=s.split('`').map((x,i)=>i%2?'<code>'+x+'</code>':x).join('');return s}
@@ -100,6 +114,7 @@ async function loadCatalogPage(page=1,kind=activeKind){
   const endpoint=catalogEndpoint(kind),response=await api(endpoint+'?page='+catalogPage+'&size='+CATALOG_PAGE_SIZE),rawRows=catalogRows(response,kind);
   if(requestId!==catalogRequestId)return;
   const rows=rawRows.filter(p=>{const k=categoryOf(p,kind==='节点'?'node':kind==='账号'?'account':'traffic');return k===kind});
+  if(rows.length){const sample=rows[0],nested=sample.product||sample.goods||sample.item||sample.sku||{};console.info('[S5 catalog JSON keys]',{category:kind,rowCount:rawRows.length,topLevelKeys:Object.keys(sample),nestedKeys:nested&&typeof nested==='object'?Object.keys(nested):[]});}
   liveProducts=rows.map((p,i)=>normalize(p,i,kind==='节点'?'node':kind==='账号'?'account':'traffic'));
   const meta=catalogMeta(response,rawRows,catalogPage);catalogTotal=meta.total;catalogTotalPages=Math.max(meta.pages,catalogPage);if(rawRows.length<CATALOG_PAGE_SIZE)catalogTotalPages=Math.min(catalogTotalPages,catalogPage);
   const breakdown=document.getElementById('catalogBreakdown');if(breakdown)breakdown.textContent='每页 '+CATALOG_PAGE_SIZE+' 件 · '+(kind==='节点'?'节点套餐':kind==='账号'?'账号商品':'引流服务');

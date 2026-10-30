@@ -87,17 +87,17 @@ function renderUnifiedItem(p,activeFilter='全部'){
 }
 function matchesFilter(p,filter){
  if(!filter||filter==='全部')return true;
+ const facets=Array.isArray(p._platformFacets)?p._platformFacets:[];
+ if(facets.some(x=>String(x).toLocaleLowerCase()===String(filter).toLocaleLowerCase()))return true;
  const attrs=p._merchantAttrs&&typeof p._merchantAttrs==='object'?p._merchantAttrs:{};
- const values=['platform','platform_name','account_platform','traffic_platform','target_platform','source_platform','social_platform','product_platform','provider','brand','service','site','app','channel','channel_name','media','email_provider','account_category','platforms','supported_platforms','channels','services'].map(k=>p[k]??attrs[k]).filter(v=>v!==undefined&&v!==null&&v!=='');
- const title=String(p._title||p.title||p.name||p.product_name||p.sku_name||'');
- const haystack=values.map(v=>typeof v==='object'?JSON.stringify(v):String(v)).join(' ').toLowerCase()+' '+title.toLowerCase();
- return haystack.includes(String(filter).toLowerCase());
+ const haystack=[p.platform,p.platform_name,p.provider,p.brand,p.service,p.site,p.app,p.channel,p.channel_name,p.media,JSON.stringify(attrs),p._title].filter(Boolean).join(' ').toLocaleLowerCase();
+ return haystack.includes(String(filter).toLocaleLowerCase());
 }
 function render({root,products,activeKind='节点',searchTerm='',activeFilter='全部',pageInfo={}}){
  if(!root)return;
  const query=String(searchTerm||'').trim().toLowerCase();
  const rows=products.filter(p=>p._kind===activeKind&&matchesFilter(p,activeFilter)&&(!query||[p._title,p._desc,p._kind,p._region,p.tags,p.protocol,p.node_protocol,p.platform,p.brand,p.provider,p.account_category,p.traffic_platform,JSON.stringify(p._merchantAttrs||{})].filter(Boolean).join(' ').toLowerCase().includes(query))).sort((a,b)=>Number(b._premium)-Number(a._premium));
- const page=Math.max(1,Number(pageInfo.page)||1),total=Math.max(0,Number(pageInfo.total)||0),totalPages=Math.max(1,Number(pageInfo.totalPages)||1);
+ const page=Math.max(1,Number(pageInfo.page)||1),total=Math.max(0,Number(pageInfo.total)||0),totalPages=pageInfo.serverPaginated?Math.max(1,Number(pageInfo.totalPages)||1):Math.max(1,Math.ceil(rows.length/15));
  const count=document.getElementById('resultCount');if(count)count.textContent='共 '+total.toLocaleString()+' 件商品 · 当前筛选 '+rows.length+' 件';
  const pagination=()=>'<nav class="sku-pagination" aria-label="商品分页"><button type="button" data-page="prev" '+(page<=1?'disabled':'')+'>上一页</button><span class="sku-page-number">第 '+page+' / '+totalPages+' 页</span><button type="button" data-page="next" '+(page>=totalPages?'disabled':'')+'>下一页</button></nav>';
  if(!rows.length){root.innerHTML='<div class="empty-space"><div><div class="planet"></div><b>当前筛选暂无商品</b><p>接口已返回 '+total.toLocaleString()+' 件商品总量；可切换“全部”查看当前页商品。</p></div></div>'+pagination();bind();return}

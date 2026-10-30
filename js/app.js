@@ -130,7 +130,7 @@ function catalogFacet(p,kind){
  const title=String(p._title||p.title||p.name||p.product_name||p.sku_name||'');
  APP_ALIASES.forEach(([name,pattern])=>{if(pattern.test(title))found.set(name.toLowerCase(),name)});
  // Titles beginning with an app name (e.g. "Telegram [US] +1 Account") are a reliable fallback.
- const leading=title.match(/^\s*([A-Za-z][A-Za-z0-9.+_-]{1,24})(?=\s|\\[|【|：|:)/);
+ const leading=title.match(/^\s*([A-Za-z][A-Za-z0-9.+_-]{1,24})(?=\s|\[|【|：|:)/);
  if(leading&&!/^(high|quality|premium|aged|verified|account|followers|likes|views|traffic|bulk|cheap|highquality)$/i.test(leading[1])){
   const candidate=leading[1],known=APP_ALIASES.find(([name,pattern])=>pattern.test(candidate));
   found.set((known?known[0]:candidate).toLowerCase(),known?known[0]:candidate);
@@ -231,7 +231,7 @@ function localizeTrafficTitle(value){
  const dictionary=[
   [/\bFull\s+Account\b/gi,'全功能账号'],[/\bAged\b/gi,'老号'],[/\bShared\s+Account\b/gi,'共享账号'],
   [/\bBulk\s+Available\b/gi,'大量有货'],[/\bPhone\s+Verified\b/gi,'手机已验证'],
-  [/\bLevel\s+(\\d+)\b/gi,'$1级'],[/\\[\s*US\s*\\]/gi,'[美国]'],[/\\[\s*UK\s*\\]/gi,'[英国]'],[/\\[\s*CN\s*\\]/gi,'[中国]'],
+  [/\bLevel\s+(\d+)\b/gi,'$1级'],[/\[\s*US\s*\]/gi,'[美国]'],[/\[\s*UK\s*\]/gi,'[英国]'],[/\[\s*CN\s*\]/gi,'[中国]'],
   [/\bFull\s+Access\b/gi,'完整权限'],[/\bVerified\b/gi,'已验证'],[/\bUnverified\b/gi,'未验证'],
   [/\bPrivate\b/gi,'独享'],[/\bPremium\b/gi,'高级版'],[/\bInstant\s+Delivery\b/gi,'即时交付'],
   [/\bWith\s+Token\b/gi,'含令牌'],[/\bToken\b/gi,'令牌'],[/\bAvailable\b/gi,'有货'],[/\bIn\s+Stock\b/gi,'有库存']

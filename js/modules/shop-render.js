@@ -118,9 +118,11 @@ function render({root,products,activeKind='节点',searchTerm='',activeFilter='�
  const accountPriority=p=>{
   if(p._kind!=='账号')return 0;
   const name=[p.account_category,p.platform,p.brand,p.provider,p.email_domain,p.domain,p._title,p.title,p.name,p.product_name].filter(Boolean).join(' ').toLowerCase();
-  if(/(?:^|[^a-z0-9])(?:list\\.ru|ink\\.ru)(?:$|[^a-z0-9])/i.test(name))return -1000;
-  for(const [platform,priority] of Object.entries(platformPriority)){
-   const pattern=new RegExp('(?:^|[^a-z0-9])'+platform.replace(/[.*+?^${}()|[\\]\\\\]/g,'\\ const rows=products.filter(p=>p._kind===activeKind&&matchesFilter(p,activeFilter)&&(!query||[p._title,p._desc,p._kind,p._region,p.tags,p.protocol,p.node_protocol,p.platform,p.brand,p.provider,p.account_category,p.traffic_platform,JSON.stringify(p._merchantAttrs||{})].filter(Boolean).join(' ').toLowerCase().includes(query))).sort((a,b)=>{
+  if(/list[.]ru|ink[.]ru/i.test(name))return -1000;
+  for(const [platform,priority] of Object.entries(platformPriority)){if(name.includes(platform.toLowerCase()))return priority;}
+  return 0;
+ };
+ const rows=products.filter(p=>p._kind===activeKind&&matchesFilter(p,activeFilter)&&(!query||[p._title,p._desc,p._kind,p._region,p.tags,p.protocol,p.node_protocol,p.platform,p.brand,p.provider,p.account_category,p.traffic_platform,JSON.stringify(p._merchantAttrs||{})].filter(Boolean).join(' ').toLowerCase().includes(query))).sort((a,b)=>{
   const weight=p=>{const raw=p.sort_weight??p._sortWeight??p.weight;const n=Number(raw);if(raw!==undefined&&raw!==null&&raw!==''&&Number.isFinite(n))return n;const stock=Number(p._stock??p.stock??p.available_stock??p.inventory??p.quantity??0);return Number.isFinite(stock)?stock:0};
   return weight(b)-weight(a)||Number(b._premium)-Number(a._premium);
  });')+'(?:$|[^a-z0-9])','i');

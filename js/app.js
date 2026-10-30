@@ -334,7 +334,7 @@ async function loadCatalogPage(page=1,kind=activeKind){
     if(kind!=='账号')return true;
     const fields=['title','name','product_title','product_name','display_name','sku_title','sku_name','goods_name','item_name','category','category_zh','category_en','category_slug','product_category','product_type','account_category','tags','tag','labels','platform','brand','provider'];
     const values=fields.map(key=>row[key]).filter(value=>value!=null).map(value=>typeof value==='string'?value:JSON.stringify(value)).join(' ');
-    if(/lynli\\.me|lynli\\.com|admin/i.test(values)){blockedInternal++;return false;}
+    if(/lynli[.]me|lynli[.]com|admin/i.test(values)){blockedInternal++;return false;}
     return true;
    })
    .map((row,index)=>{

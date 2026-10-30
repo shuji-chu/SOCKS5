@@ -16,14 +16,15 @@
   window.debounce = window.debounce || debounce;
   if (!window.__S5_GLOBAL_ACTION_GUARD__) {
     window.__S5_GLOBAL_ACTION_GUARD__ = true;
-    const selector = '[data-buy-sku],[data-product-id],#s5-auth-submit,button[onclick*="App.doLogin"],button[onclick*="App.doRegister"]';
-    const lock = function (el) {
+    const selector = '[data-buy-sku],[data-product-id],#s5-create-order,.s5-clone-buy,#s5-auth-submit,button[onclick*="App.doLogin"],button[onclick*="App.doRegister"],button[onclick*="App.openModal"][onclick*="login"],button[onclick*="App.openModal"][onclick*="register"]';
+    const lock = function (el, deferDisable) {
       if (!el || !el.matches || !el.matches(selector)) return true;
       if (el.dataset.s5Cooldown === '1') return false;
       const wasDisabled = !!el.disabled;
       el.dataset.s5Cooldown = '1';
-      if ('disabled' in el) el.disabled = true;
       el.setAttribute('aria-disabled', 'true');
+      const disable = function () { if ('disabled' in el && el.dataset.s5Cooldown === '1') el.disabled = true; };
+      if (deferDisable) setTimeout(disable, 0); else disable();
       setTimeout(function () {
         el.dataset.s5Cooldown = '0';
         if ('disabled' in el) el.disabled = wasDisabled || el.dataset.busy === '1';
@@ -34,20 +35,21 @@
     document.addEventListener('click', function (event) {
       const el = event.target && event.target.closest ? event.target.closest(selector) : null;
       if (!el) return;
-      if (!lock(el)) {
+      const deferDisable = el.matches('#s5-auth-submit,#s5-create-order');
+      if (!lock(el, deferDisable)) {
         event.preventDefault();
         event.stopImmediatePropagation();
         return;
       }
-      if (el.id === 's5-auth-submit') el.dataset.s5SubmitArmed = '1';
+      if (deferDisable) el.dataset.s5SubmitArmed = '1';
     }, true);
     document.addEventListener('submit', function (event) {
       const form = event.target;
-      if (!form || !form.matches || !form.matches('#s5-auth-form')) return;
-      const submit = form.querySelector('#s5-auth-submit');
+      if (!form || !form.matches || !form.matches('#s5-auth-form,#s5-purchase-form')) return;
+      const submit = form.querySelector('#s5-auth-submit,#s5-create-order');
       if (!submit) return;
       if (submit.dataset.s5SubmitArmed === '1') { submit.dataset.s5SubmitArmed = '0'; return; }
-      lock(submit);
+      lock(submit, true);
     }, true);
   }
 
@@ -537,7 +539,7 @@
       }));
     } catch (error) {
       box.dataset.loaded = "0";
-      box.innerHTML = '<div class="s5-clone-heading"><div><h2>海外精选数字商品</h2><p class="s5-clone-intro">商品目录暂时无法读取，请稍后重试。</p></div></div><button type="button" class="s5-clone-retry">重新加载</button>';
+      box.innerHTML = '<div class="s5-clone-heading"><div><h2>海外精选数字商品</h2><p class="s5-clone-intro">商品目录暂时无法读取，请稍后重试。</p></div></div><button type="button" class="s5-clone-retry">点击重试</button>';
       box.querySelector(".s5-clone-retry")?.addEventListener("click", loadClonedProducts);
       // Optional catalog errors are handled by the UI without logging internals.
     }

@@ -97,20 +97,29 @@ function normalize(p,i,source){
  let image=p.original_image_url||p.product_image_url||p.image_url||p.cover_url||p.image||p.cover||p.thumbnail||p.thumb||p.picture_url||p.logo||'';
  const resolveAsset=u=>{if(!u)return '';u=String(u);if(u.startsWith('data:'))return u;const cdn=assetBase();if(/^https?:\/\//i.test(u)){if(cdn){try{const parsed=new URL(u),apiHost=new URL(API_ROOT).hostname;if(parsed.hostname===apiHost)return cdn+parsed.pathname+parsed.search+parsed.hash}catch(_){}}return u}const path=u.startsWith('/')?u:'/'+(u.startsWith('./')?u.slice(2):u);return cdn?cdn+path:API_ROOT+path};
  if(!icon&&source==='account'){const brand=String(p.platform||p.brand||p.provider||p.email_domain||p.domain||p.name||p.title||p.product_name||'').toLowerCase();if(/gmail|google mail|@gmail|google workspace/.test(brand))icon='https://cdn.simpleicons.org/gmail/EA4335';else if(/outlook|hotmail|live\.com|microsoft/.test(brand))icon='https://cdn.simpleicons.org/microsoftoutlook/0078D4';else if(/yahoo/.test(brand))icon='https://cdn.simpleicons.org/yahoo/6001D2';else if(/icloud|apple/.test(brand))icon='https://cdn.simpleicons.org/icloud/3693F3';else if(/proton/.test(brand))icon='https://cdn.simpleicons.org/protonmail/6D4AFF';}
- const merchant=p.merchant_attrs||p.merchantAttrs||p.attributes||{};
- const rawStock=p.available_stock??p.stock_available??p.stock??p.inventory??p.quantity??p.count??null;
+ const attrs=p.extra_attrs||p.extraAttrs||p.extra_attributes||p.extraAttributes||p.merchant_attrs||p.merchantAttrs||p.attributes||{};
+ const merchant=attrs;
+ const rawStock=p.available_stock??p.stock_available??p.stock??p.inventory??p.quantity??p.count??attrs.stock??attrs.inventory??null;
  const premium=source==='node'&&(/singapore|新加坡|sgp|\bsg\b/i.test([p._region,p.region,p.country,p.area,p.name,p.title,p.location].filter(Boolean).join(' '))||p.premium===true||p.is_premium===true);
- const priceSource=p.price_yuan??p.sale_price_yuan??p.price_cents??p.price??p.sale_price??p.current_price??p.unit_price??p.price_amount??p.amount??p.month_price??p.monthly_price??p.pricing?.price_yuan??p.pricing?.price??p.pricing?.amount??p.prices?.sale??p.prices?.price??null;
+ const firstValue=(obj,keys)=>{for(const key of keys){const value=obj&&obj[key];if(value!==undefined&&value!==null&&value!=='')return value}return null};
+ const pricing=p.pricing||p.price_info||p.priceInfo||attrs.pricing||attrs.price_info||attrs.priceInfo||{};
+ const priceSource=firstValue(p,['price_yuan','sale_price_yuan','current_price_yuan','unit_price_yuan','price_cents','sale_price_cents','amount_cents','price','sale_price','current_price','unit_price','price_amount','amount','month_price','monthly_price'])??firstValue(pricing,['price_yuan','sale_price_yuan','price_cents','amount_cents','price','amount','value'])??firstValue(attrs,['price_yuan','sale_price_yuan','price_cents','amount_cents','price','sale_price','unit_price','amount','month_price'])??firstValue(p.prices||{},['sale','price','amount'])??null;
  const parseMoney=value=>{
   if(value==null||value==='')return null;
-  if(typeof value==='object')value=value.amount??value.value??value.price??value.price_yuan??value.cents??null;
+  let explicitUnit='';
+  if(typeof value==='object'){
+   explicitUnit=String(value.unit||value.currency_unit||value.currency||'').toLowerCase();
+   value=firstValue(value,['price_yuan','yuan','price_cents','cents','amount','value','price']);
+  }
   if(value==null)return null;
-  const raw=String(value).trim(),n=Number(raw.replace(/[^0-9.+-]/g,''));
-  if(!Number.isFinite(n))return null;
-  const unit=String(p.price_unit||p.currency_unit||p.unit||p.pricing?.unit||p.pricing?.currency||'').toLowerCase();
-  if(p.price_yuan!=null||p.sale_price_yuan!=null||/yuan|cny|rmb|元|¥/i.test(unit)||/[.]/.test(raw.replace(/[^0-9.]/g,'')))return n;
-  if(p.price_cents!=null||Number.isInteger(n))return n/100;
-  return n;
+  const raw=String(value).trim(),clean=raw.replace(/,/g,'').replace(/[^0-9.+-]/g,'');
+  if(!clean||!/[0-9]/.test(clean))return null;
+  const n=Number(clean);if(!Number.isFinite(n)||n<0)return null;
+  const unit=(explicitUnit+' '+String(p.price_unit||p.currency_unit||p.unit||p.pricing?.unit||p.pricing?.currency||attrs.price_unit||attrs.currency_unit||'')).toLowerCase();
+  const key=priceSource===p.price_cents||priceSource===p.sale_price_cents||priceSource===pricing.price_cents||priceSource===attrs.price_cents;
+  if(/cent|分|fen/.test(unit)||key)return n/100;
+  if(/yuan|cny|rmb|元/.test(unit)||/[¥￥]/.test(raw)||/[.]/.test(clean))return n;
+  return Number.isInteger(n)?n/100:n;
  };
  const parsedPrice=parseMoney(priceSource);
  const priceYuan=parsedPrice==null?0:parsedPrice;
@@ -147,7 +156,7 @@ async function loadCatalogPage(page=1,kind=activeKind){
   const endpoint=catalogEndpoint(kind),response=await api(endpoint+'?page='+catalogPage+'&size='+CATALOG_PAGE_SIZE),rawRows=catalogRows(response,kind);
   if(requestId!==catalogRequestId)return;
   const rows=rawRows.filter(p=>{const k=categoryOf(p,kind==='节点'?'node':kind==='账号'?'account':'traffic');return k===kind});
-  const sample=rawRows[0]||null,nested=sample&&(sample.product||sample.goods||sample.item||sample.sku)||{};console.info('[S5 catalog JSON audit]',{category:kind,endpoint,rawArrayLength:rawRows.length,acceptedRows:rows.length,page:catalogPage,topLevelKeys:sample?Object.keys(sample):[],nestedKeys:nested&&typeof nested==='object'?Object.keys(nested):[],responseKeys:response&&typeof response==='object'?Object.keys(response):[]});
+  const sample=rawRows[0]||null,nested=sample&&(sample.product||sample.goods||sample.item||sample.sku)||{};console.info('[S5 catalog JSON audit]',{category:kind,endpoint,rawArrayLength:rawRows.length,acceptedRows:rows.length,page:catalogPage,firstProductJSON:sample,topLevelKeys:sample?Object.keys(sample):[],nestedKeys:nested&&typeof nested==='object'?Object.keys(nested):[],extraAttrsKeys:sample&&typeof(sample.extra_attrs||sample.extraAttrs)==='object'?Object.keys(sample.extra_attrs||sample.extraAttrs):[],responseKeys:response&&typeof response==='object'?Object.keys(response):[]});
   liveProducts=rows.map((p,i)=>normalize(p,i,kind==='节点'?'node':kind==='账号'?'account':'traffic'));
   const meta=catalogMeta(response,rawRows,catalogPage);catalogTotal=meta.total;catalogTotalPages=meta.hasServerTotal?Math.max(meta.pages,catalogPage):Math.max(meta.pages,catalogPage);
   const breakdown=document.getElementById('catalogBreakdown');if(breakdown)breakdown.textContent='每页 '+CATALOG_PAGE_SIZE+' 件 · '+(kind==='节点'?'节点套餐':kind==='账号'?'账号商品':'引流服务');

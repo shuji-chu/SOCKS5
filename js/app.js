@@ -204,7 +204,8 @@ function categoryOf(p,source){
  if(/account|账号|帐号|chatgpt|telegram|google|gmail|outlook/.test(raw))return '账号';return '其他';
 }
 function catalogDisplayText(value){if(value==null)return '';if(Array.isArray(value))return value.map(catalogDisplayText).filter(Boolean).join(' · ');if(typeof value==='object'){for(const key of ['name','text','label','title','value','display_name'])if(value[key]!=null&&value[key]!=='')return catalogDisplayText(value[key]);return Object.entries(value).filter(([,v])=>v===true).map(([k])=>k).join(' · ')}return String(value)}
-function moneyOf(p){const yuan=p.price_yuan??(p._source==='traffic'?p.unit_price_yuan:undefined);if(yuan!==undefined&&yuan!==null&&yuan!==''){const n=Number(yuan);return Number.isFinite(n)&&n>=0?n:0}const cents=p.price_cents;if(cents!==undefined&&cents!==null&&cents!==''){const n=Number(cents);return Number.isFinite(n)&&n>=0?n/100:0}return 0}
+function catalogPriceYuan(p,source){const yuan=p&&p.price_yuan!=null&&p.price_yuan!==''?p.price_yuan:(source==='traffic'?p?.unit_price_yuan:undefined);if(yuan!==undefined&&yuan!==null&&yuan!==''){const n=Number(yuan);return Number.isFinite(n)&&n>=0?n:null}const cents=p&&p.price_cents;if(cents!==undefined&&cents!==null&&cents!==''){const n=Number(cents);return Number.isFinite(n)&&n>=0?n/100:null}return null}
+function moneyOf(p){const value=catalogPriceYuan(p,p&&p._source);return value===null?0:value}
 function groupedNodeRows(response){
  const root=unpack(response);
  const findGrouped=(value,depth=0)=>{if(!value||typeof value!=='object'||depth>5)return null;if(Object.prototype.hasOwnProperty.call(value,'grouped'))return value.grouped;for(const key of ['data','result','payload','response']){const found=findGrouped(value[key],depth+1);if(found!==null&&found!==undefined)return found;}return null};
@@ -268,9 +269,7 @@ function normalize(p,i,source){
  const rawStock=p.sold_out===true||p.in_stock===false?0:(p.in_stock===true?(p.stock??p.available_stock??1):(p.stock??p.available_stock??p.stock_available??p.inventory??p.quantity??p.count??null));
  const premium=source==='node'&&(/singapore|新加坡|sgp|\bsg\b/i.test([p._region,p.region,p.country,p.area,p.name,p.title,p.location].filter(Boolean).join(' '))||p.premium===true||p.is_premium===true);
 
- const yuanValue=p.price_yuan??(source==='traffic'?p.unit_price_yuan:undefined);
- const centsValue=p.price_cents;
- const parsedPrice=yuanValue!==undefined&&yuanValue!==null&&yuanValue!==''?Number(yuanValue):(centsValue!==undefined&&centsValue!==null&&centsValue!==''?Number(centsValue)/100:null);
+ const parsedPrice=catalogPriceYuan(p,source);
  const priceYuan=parsedPrice!==null&&Number.isFinite(parsedPrice)&&parsedPrice>=0?parsedPrice:0;
  const priceProvided=parsedPrice!==null&&Number.isFinite(parsedPrice)&&parsedPrice>=0;
  if(!priceProvided)console.warn('[S5 static catalog: price missing]',{source,id:p.id,title:p.name||p.title,price_yuan:p.price_yuan,unit_price_yuan:p.unit_price_yuan,price_cents:p.price_cents});

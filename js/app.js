@@ -39,19 +39,22 @@ if(!window.__S5_GLOBAL_ACTION_GUARD__){
   return true;
  };
  document.addEventListener('click',event=>{
-  if(!lockTarget(event.target)){
+  const target=event.target&&event.target.closest?event.target.closest(cooldownSelector):null;
+  if(!target)return;
+  if(!lockTarget(target)){
    event.preventDefault();
    event.stopImmediatePropagation();
+   return;
   }
+  if(target.id==='s5-auth-submit')target.dataset.s5SubmitArmed='1';
  },true);
  document.addEventListener('submit',event=>{
   const form=event.target;
   if(!form||!form.matches||!form.matches('#s5-auth-form'))return;
   const submit=form.querySelector('#s5-auth-submit');
-  if(submit&&!lockTarget(submit)){
-   event.preventDefault();
-   event.stopImmediatePropagation();
-  }
+  if(!submit)return;
+  if(submit.dataset.s5SubmitArmed==='1'){submit.dataset.s5SubmitArmed='0';return;}
+  lockTarget(submit);
  },true);
 }
 

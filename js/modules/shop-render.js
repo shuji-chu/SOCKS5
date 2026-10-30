@@ -88,10 +88,7 @@ function renderUnifiedItem(p,activeFilter='全部'){
 function matchesFilter(p,filter){
  if(!filter||filter==='全部')return true;
  const facets=Array.isArray(p._platformFacets)?p._platformFacets:[];
- if(facets.some(x=>String(x).toLocaleLowerCase()===String(filter).toLocaleLowerCase()))return true;
- const attrs=p._merchantAttrs&&typeof p._merchantAttrs==='object'?p._merchantAttrs:{};
- const haystack=[p.platform,p.platform_name,p.provider,p.brand,p.service,p.site,p.app,p.channel,p.channel_name,p.media,JSON.stringify(attrs),p._title].filter(Boolean).join(' ').toLocaleLowerCase();
- return haystack.includes(String(filter).toLocaleLowerCase());
+ return facets.some(x=>String(x).toLocaleLowerCase()===String(filter).toLocaleLowerCase());
 }
 function render({root,products,activeKind='节点',searchTerm='',activeFilter='全部',pageInfo={}}){
  if(!root)return;

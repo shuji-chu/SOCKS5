@@ -9,32 +9,47 @@ let catalogPage=1,catalogTotal=0,catalogTotalPages=1,catalogLoading=false,catalo
 const catalogAllRowsLoaded={节点:false,账号:false,引流:false};
 const CATALOG_PAGE_SIZE=15;
 const catalogFacetIcon=(p,kind,label)=>{
+ if(kind==='节点')return '';
  const backend=p.platform_icon_url||p.icon_url||p.brand_icon_url||p.brand_logo||p.platform_icon||p.platform_logo||p.logo_url||p.icon?.url||'';
  if(backend)return String(backend);
  const slug=String(label||'').normalize('NFKD').toLowerCase().replace(/[^a-z0-9]+/g,'');
  return slug?'https://cdn.simpleicons.org/'+encodeURIComponent(slug):'';
 };
+const NODE_PROTOCOLS=['VLESS','Hysteria2','Trojan','VMess','Shadowsocks','TUIC','AnyTLS','SSR','MTProto'];
+const APP_ALIASES=[
+ ['Telegram',/telegram/i],['TikTok',/tiktok/i],['Instagram',/instagram/i],['Facebook',/facebook|\bfb\b/i],['Threads',/threads/i],['WhatsApp',/whatsapp/i],['Discord',/discord/i],['Steam',/steam/i],['Netflix',/netflix/i],['Gmail',/gmail|google mail/i],['Outlook',/outlook|hotmail/i],['Yahoo',/yahoo mail/i],['iCloud',/icloud/i],['YouTube',/youtube/i],['X',/(?:^|[^a-z])twitter(?:$|[^a-z])|(?:^|\s)X(?:\s|$)/i],['Reddit',/reddit/i],['Snapchat',/snapchat/i],['Pinterest',/pinterest/i],['LinkedIn',/linkedin/i],['Twitch',/twitch/i],['Spotify',/spotify/i],['Midjourney',/midjourney/i],['Google',/google(?:\s+voice)?/i],['Apple',/apple id/i]
+];
 function catalogFacet(p,kind){
- const values=[],seen=new Set(),keyPattern=/(platform|provider|brand|service|site|app|channel|media|social|email.?provider|account.?category)/i,ignored=/(icon|logo|url|image|id|count|price|stock|quantity|description)/i;
- const add=value=>{
+ if(kind==='节点'){
+  const raw=p.protocols||p.supported_protocols||p.protocol||p.node_protocol||p.type||[];
+  const values=Array.isArray(raw)?raw:String(raw).split(/[,，|、;；]+/);
+  const found=new Set(values.map(v=>String(typeof v==='object'?(v.name||v.protocol||v.type||''):v).trim().toLowerCase().replace(/[^a-z0-9]/g,'')));
+  return NODE_PROTOCOLS.filter(name=>found.has(name.toLowerCase().replace(/[^a-z0-9]/g,'')));
+ }
+ const found=new Map(),add=value=>{
   if(value==null||value==='')return;
   if(Array.isArray(value)){value.forEach(add);return}
-  if(typeof value==='object'){const named=value.name??value.platform??value.title??value.label??value.value;if(named!=null)add(named);return}
-  String(value).split(/[,，|、;；]+/).map(x=>x.trim()).filter(x=>x&&x.length<=40).forEach(x=>{const k=x.toLocaleLowerCase();if(!seen.has(k)){seen.add(k);values.push(x)}});
+  if(typeof value==='object'){add(value.name??value.platform??value.app_name??value.title??value.label??value.value);return}
+  String(value).split(/[,，|、;；]+/).map(x=>x.trim()).filter(x=>x&&x.length<=40).forEach(x=>found.set(x.toLowerCase(),x));
  };
- const walk=(obj,depth=0)=>{if(!obj||typeof obj!=='object'||depth>4)return;if(Array.isArray(obj)){obj.forEach(x=>walk(x,depth+1));return}Object.entries(obj).forEach(([key,value])=>{if(ignored.test(key))return;if(keyPattern.test(key))add(value);if(value&&typeof value==='object')walk(value,depth+1)})};
- walk(p);walk(p._merchantAttrs||p.extra_attrs||p.extraAttrs||p.extra_attributes||p.extraAttributes||p.attributes);
+ const fields=['platform','platform_name','app','app_name','appName','account_platform','traffic_platform','target_platform','source_platform','social_platform','product_platform','provider','site','website','media_platform','channel_platform'];
+ const objects=[p,p._merchantAttrs||{},p.extra_attrs||{},p.extraAttrs||{},p.extra_attributes||{},p.extraAttributes||{},p.attributes||{}];
+ objects.forEach(obj=>{if(obj&&typeof obj==='object'&&!Array.isArray(obj))fields.forEach(key=>add(obj[key]))});
  const title=String(p._title||p.title||p.name||p.product_name||p.sku_name||'');
- const candidates=[...title.matchAll(/[【［[(]([^】］)\]]{2,32})[】］)\]]/g)].map(m=>m[1]);
- const prefix=title.match(/^([A-Za-z][A-Za-z0-9._ -]{1,30}?)(?=\s*(?:账号|帐号|账户|粉丝|关注|引流|群|频道|注册|$))/i);
- if(prefix)candidates.push(prefix[1]);
- candidates.forEach(candidate=>{const cleaned=candidate.replace(/\b(?:account|accounts|premium|aged|verified|shared|full|access|followers|likes|views|traffic|service|product)\b/gi,' ').replace(/账号|帐号|账户|粉丝|关注|引流|群|频道|注册/g,' ').replace(/[|·:_-]+/g,' ').trim();if(cleaned&&cleaned.length<=30&&/[A-Za-z\u4e00-\u9fff]/.test(cleaned))add(cleaned)});
- return values;
+ APP_ALIASES.forEach(([name,pattern])=>{if(pattern.test(title))found.set(name.toLowerCase(),name)});
+ // Titles beginning with an app name (e.g. "Telegram [US] +1 Account") are a reliable fallback.
+ const leading=title.match(/^\s*([A-Za-z][A-Za-z0-9.+_-]{1,24})(?=\s|\\[|【|：|:)/);
+ if(leading&&!/^(high|quality|premium|aged|verified|account|followers|likes|views|traffic|bulk|cheap|highquality)$/i.test(leading[1])){
+  const candidate=leading[1],known=APP_ALIASES.find(([name,pattern])=>pattern.test(candidate));
+  found.set((known?known[0]:candidate).toLowerCase(),known?known[0]:candidate);
+ }
+ return [...found.values()];
 }
 function renderCatalogFilters(){
  const root=document.getElementById('catalogFilters');if(!root)return;
  const facets=new Map();
- liveProducts.forEach(p=>catalogFacet(p,activeKind).forEach(label=>{if(!facets.has(label))facets.set(label,catalogFacetIcon(p,activeKind,label))}));
+ if(activeKind==='节点')NODE_PROTOCOLS.forEach(label=>facets.set(label,''));
+ else liveProducts.forEach(p=>catalogFacet(p,activeKind).forEach(label=>{if(!facets.has(label))facets.set(label,catalogFacetIcon(p,activeKind,label))}));
  const options=['全部',...Array.from(facets.keys()).sort((a,b)=>a.localeCompare(b))];
  if(!options.includes(activeFilter))activeFilter='全部';
  root.innerHTML=options.map(label=>{
@@ -122,15 +137,15 @@ function groupedNodeRows(response){
 function localizeTrafficTitle(value){
  let title=String(value??'');
  const dictionary=[
-  [/\\bFull\\s+Account\\b/gi,'全功能账号'],[/\\bAged\\b/gi,'老号'],[/\\bShared\\s+Account\\b/gi,'共享账号'],
-  [/\\bBulk\\s+Available\\b/gi,'大量有货'],[/\\bPhone\\s+Verified\\b/gi,'手机已验证'],
-  [/\\bLevel\\s+(\\d+)\\b/gi,'$1级'],[/\\[\\s*US\\s*\\]/gi,'[美国]'],[/\\[\\s*UK\\s*\\]/gi,'[英国]'],[/\\[\\s*CN\\s*\\]/gi,'[中国]'],
-  [/\\bFull\\s+Access\\b/gi,'完整权限'],[/\\bVerified\\b/gi,'已验证'],[/\\bUnverified\\b/gi,'未验证'],
-  [/\\bPrivate\\b/gi,'独享'],[/\\bPremium\\b/gi,'高级版'],[/\\bInstant\\s+Delivery\\b/gi,'即时交付'],
-  [/\\bWith\\s+Token\\b/gi,'含令牌'],[/\\bToken\\b/gi,'令牌'],[/\\bAvailable\\b/gi,'有货'],[/\\bIn\\s+Stock\\b/gi,'有库存']
+  [/\bFull\s+Account\b/gi,'全功能账号'],[/\bAged\b/gi,'老号'],[/\bShared\s+Account\b/gi,'共享账号'],
+  [/\bBulk\s+Available\b/gi,'大量有货'],[/\bPhone\s+Verified\b/gi,'手机已验证'],
+  [/\bLevel\s+(\\d+)\b/gi,'$1级'],[/\\[\s*US\s*\\]/gi,'[美国]'],[/\\[\s*UK\s*\\]/gi,'[英国]'],[/\\[\s*CN\s*\\]/gi,'[中国]'],
+  [/\bFull\s+Access\b/gi,'完整权限'],[/\bVerified\b/gi,'已验证'],[/\bUnverified\b/gi,'未验证'],
+  [/\bPrivate\b/gi,'独享'],[/\bPremium\b/gi,'高级版'],[/\bInstant\s+Delivery\b/gi,'即时交付'],
+  [/\bWith\s+Token\b/gi,'含令牌'],[/\bToken\b/gi,'令牌'],[/\bAvailable\b/gi,'有货'],[/\bIn\s+Stock\b/gi,'有库存']
  ];
  dictionary.forEach(([pattern,replacement])=>{title=title.replace(pattern,replacement)});
- return title.replace(/\\s{2,}/g,' ').trim();
+ return title.replace(/\s{2,}/g,' ').trim();
 }
 function normalize(p,i,source){
  const nested=[p.product,p.goods,p.item,p.sku,p.detail].filter(v=>v&&typeof v==='object'&&!Array.isArray(v));
@@ -179,7 +194,7 @@ function normalize(p,i,source){
  const rawTitle=String((source==='traffic'?(p.name||p.title||p.product_title||p.productTitle||p.sku_name||p.skuName||p.product_name||p.productName||p.goods_name||p.goodsName||p.item_name||p.itemName||p.display_name||p.displayName||p.label||merchant.name||merchant.title||merchant.product_title||merchant.sku_name||merchant.product_name||''):(p.title||p.name||p.product_title||p.productTitle||p.display_name||p.displayName||p.sku_title||p.skuTitle||p.sku_name||p.product_name||p.productName||p.goods_name||p.goodsName||p.item_name||p.itemName||p.label||p.en_name||p.name_en||p.english_name||p.description_zh||p.description||''))||'商品 '+String(p.sku_id??p.id??p.product_id??i+1));
  const finalTitle=(source==='traffic'||source==='account')?localizeTrafficTitle(rawTitle).replace(/\bShared\b/gi,'共享').replace(/高级版\s+共享/gi,'高级共享账号').replace(/\s*\(\s*1m\s*\)/gi,' (1个月)').replace(/\bSteamGuard\b/gi,'令牌').replace(/\bSteam\s*Guard\b/gi,'令牌'):rawTitle;
  const brandText=(rawTitle+' '+String(p.platform||p.brand||p.provider||'')).toLowerCase();
- const brandIcon=source==='traffic'?(brandText.includes('steam')?'steam':brandText.includes('netflix')?'netflix':brandText.includes('midjourney')?'midjourney':/\\bmail\\b|gmail|outlook/.test(brandText)?'mail':''):'';
+ const brandIcon=source==='traffic'?(brandText.includes('steam')?'steam':brandText.includes('netflix')?'netflix':brandText.includes('midjourney')?'midjourney':/\bmail\b|gmail|outlook/.test(brandText)?'mail':''):'';
  return {...p,_brandIcon:brandIcon,_key:source+'-'+i+'-'+String(p.sku_id??p.id??p.product_id??p.uuid??'sku'),_source:source,_kind:categoryOf(p,source),_title:finalTitle,_desc:String(p.description_zh||p.chinese_description||p.description_cn||p.description||p.summary||p.content||''),_image:resolveAsset(image),_icon:resolveAsset(icon),_price:Number.isFinite(priceYuan)?priceYuan:0,_priceProvided:priceProvided,_priceCents:Math.round(priceYuan*100),_stock:rawStock,_sales:p.sales??p.sold_count??p.total_sales??p.buy_count,_tutorial:p.tutorial_markdown||p.tutorial_md||p.tutorial||p.guide_markdown||p.guide||p.markdown||p.content_md||'',_delivery:p.delivery_content||p.delivery_description||p.delivery||p.deliverables||p.delivery_type||p.delivery_method||'',_warranty:p.warranty||p.warranty_period||p.after_sales||p.after_sale||p.support_policy||p.guarantee||'',_notice:p.notice||p.notes||p.warning||p.terms||'',_merchantAttrs:merchant,_region:String(p._region||p.region_name||p.region||p.country||p.area||p.location||''),_premium:premium,_period:p.period_name||p.period_label||p.period||p.billing_cycle||''};
 }
 function markdown(md){const lines=String(md||'暂无教程内容').split(String.fromCharCode(10));let out='',listOpen=false;for(const raw of lines){const line=raw.trim();if(!line){if(listOpen){out+='</ul>';listOpen=false}out+='<p></p>';continue}let level=0;while(level<6&&line[level]==='#')level++;if(level>0&&line[level]===' '){if(listOpen){out+='</ul>';listOpen=false}out+='<h'+level+'>'+inlineMd(line.slice(level+1))+'</h'+level+'>';continue}if(line.startsWith('- ')||line.startsWith('* ')){if(!listOpen){out+='<ul>';listOpen=true}out+='<li>'+inlineMd(line.slice(2))+'</li>';continue}if(listOpen){out+='</ul>';listOpen=false}out+='<p>'+inlineMd(line)+'</p>'}if(listOpen)out+='</ul>';return '<div class="markdown">'+out+'</div>'}

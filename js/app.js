@@ -19,7 +19,7 @@ const token=()=>localStorage.getItem('sosks5_token')||localStorage.getItem('tgx_
 function unpack(r){return r&&r.data!==undefined?r.data:r}
 function listify(d){d=unpack(d);if(Array.isArray(d))return d;for(const k of ['items','list','products','plans','nodes','accounts','rows','data'])if(Array.isArray(d?.[k]))return d[k];throw Error('商品目录 JSON 结构不正确：未找到商品数组')}
 async function api(path,method='GET',body){const headers={Accept:'application/json','Content-Type':'application/json'};if(token())headers.Authorization='Bearer '+token();let r;try{r=await fetch(API_V1+path,{method,headers,signal:AbortSignal.timeout?AbortSignal.timeout(12000):undefined,...(body!==undefined?{body:JSON.stringify(body)}:{})})}catch(e){throw Error(e.name==='TimeoutError'||e.name==='AbortError'?'请求超时，请检查网络后重试':'网络连接失败，请检查网络后重试')}let d;try{d=await r.json()}catch{throw Error('服务端返回的 JSON 格式不正确，请稍后重试')}const hs=d&&d.http_status!==undefined?Number(d.http_status):null;if(!r.ok||hs!==null&&hs!==200||d?.success===false||d?.status==='fail'||d?.error)throw Error(safeUiMessage(d?.message||d?.msg||d?.detail||d?.error||('请求未成功（HTTP '+(hs!==null&&hs!==200?hs:r.status)+'）')));return d}
-function categoryOf(p,source){const raw=String(p.category||p.product_type||p.product_category||p.type||p.kind||p.tag||'').toLowerCase();if(/traffic|flow|引流|流量包|traffic_pack|增长|推广|群发|机器人|growth|接码|短信|验证码|查询|查号|sms|lookup|query/.test(raw))return '引流';if(/node|proxy|vpn|节点|线路|订阅|vless|vmess|trojan|hysteria/.test(raw)||source==='node')return '节点';if(/account|账号|帐号|chatgpt|telegram|google/.test(raw)||source==='account')return '账号';return '其他'}
+function categoryOf(p,source){const raw=String(p.category||p.product_type||p.product_category||p.type||p.kind||p.tag||'').toLowerCase();if(/traffic|flow|引流|流量包|traffic_pack|增长|推广|群发|机器人|growth|接码|短信|验证码|查询|查号|sms|lookup|query/.test(raw))return '引流';if(/node|proxy|vpn|节点|线路|订阅|vless|vmess|trojan|hysteria/.test(raw)||source==='node')return '节点';if(/account|账号|帐号|chatgpt|telegram|google/.test(raw)||source==='account')return '账号';if(source==='traffic')return '引流';return '其他'}
 function moneyOf(p){let v=p.price_yuan??p.sale_price_yuan??p.price??p.sale_price??p.amount??p.month_price??p.monthly_price??0;v=Number(v);if(!Number.isFinite(v))return 0;const unit=String(p.price_unit||p.currency_unit||p.unit||'').toLowerCase();if(['yuan','cny','元','rmb'].includes(unit)||p.price_yuan!=null||p.sale_price_yuan!=null)return v;return v/100}
 function groupedNodeRows(response){
  const root=unpack(response);
@@ -83,7 +83,7 @@ function productImage(p){
 function stockLabel(p){const single=p._stock??'—';const bulk=p.bulk_available_count??p.wholesale_available_count??p.batch_stock??p.bulk_stock??p.wholesale_stock??p.available_batches??null;return bulk!=null?'可成批数 '+String(bulk):String(single)}
 function renderProducts(){
  const root=document.getElementById('products');
- if(window.ShopRender){window.ShopRender.render({root,products:liveProducts,activeKind,searchTerm,onOpen:'openDetail'});return}
+ if(window.ShopRender){window.ShopRender.render({root,products:liveProducts,activeKind,searchTerm,pageInfo:{page:catalogPage,size:CATALOG_PAGE_SIZE,total:catalogTotal,totalPages:catalogTotalPages}});return}
  root.innerHTML='<div class="error-state">商品渲染模块未加载，请刷新页面。</div>';
 }
 

@@ -92,7 +92,7 @@ function renderUnifiedItem(p,activeFilter='全部'){
  const brand=p._brandIcon||(/(^|[^a-z])steam([^a-z]|$)/i.test(title)?'steam':/netflix/i.test(title)?'netflix':/midjourney/i.test(title)?'midjourney':/mail\.ru|mailru/i.test(title)?'mailru':/telegram|电报/i.test(title)?'telegram':/threads/i.test(title)?'threads':/discord/i.test(title)?'discord':/tiktok/i.test(title)?'tiktok':/reddit/i.test(title)?'reddit':/gmail|outlook/i.test(title)?'mail':'generic');
  const brandIcons={telegram:'telegram.svg',threads:'threads.svg',steam:'steam.svg',tiktok:'tiktok.svg',discord:'discord.svg',reddit:'reddit.svg'};
  const brandIcon=brandIcons[brand];
- const icon=brandIcon?'<img class="sku-brand-icon" src="./assets/icons/'+brandIcon+'" alt="'+esc(brand)+'" loading="lazy" decoding="async">':src?'<img src="'+esc(src)+'" alt="'+esc(title)+'" loading="lazy" decoding="async" onerror="this.hidden=true;this.parentElement.classList.add(\'image-missing\')">':'<img src="'+esc(fallback)+'" alt="" loading="lazy" decoding="async" onerror="this.remove()">';
+ const icon=brandIcon?'<img class="sku-brand-icon" style="display:block;width:100%;height:100%;object-fit:contain" src="./assets/icons/'+brandIcon+'" alt="'+esc(brand)+'" loading="lazy" decoding="async">':src?'<img src="'+esc(src)+'" alt="'+esc(title)+'" loading="lazy" decoding="async" onerror="this.hidden=true;this.parentElement.classList.add(\'image-missing\')">':'<img src="'+esc(fallback)+'" alt="" loading="lazy" decoding="async" onerror="this.remove()">';
  const price=p._priceProvided?'¥'+Number(p._price).toFixed(2):'询价';
  const stockValue=p._stock;
  const stockNumber=stockValue===null||stockValue===''?null:Number(stockValue);

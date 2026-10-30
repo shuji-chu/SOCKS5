@@ -199,4 +199,42 @@ button:disabled{opacity:.48;cursor:not-allowed;transform:none!important}
 #catalogFilters .catalog-filter-pill img{display:block;width:19px;height:19px;object-fit:contain;flex:0 0 19px;border-radius:4px}
 #catalogFilters .catalog-filter-pill span{white-space:nowrap}
 </style>
+
+<style id="s5-final-mobile-pills-and-brand-icons">
+/* Category pills: a single touch-scrollable row; never squeeze child buttons. */
+#catalogFilters{
+ display:flex!important;
+ flex-direction:row!important;
+ flex-wrap:nowrap!important;
+ align-items:center!important;
+ overflow-x:auto!important;
+ overflow-y:hidden!important;
+ white-space:nowrap!important;
+ scrollbar-width:none!important;
+ -ms-overflow-style:none!important;
+ -webkit-overflow-scrolling:touch!important;
+ touch-action:pan-x!important;
+ overscroll-behavior-x:contain!important;
+ width:100%!important;
+ max-width:100%!important;
+ min-width:0!important;
+ gap:8px!important;
+}
+#catalogFilters::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}
+#catalogFilters .catalog-filter-pill{display:inline-flex!important;flex:0 0 auto!important;flex-shrink:0!important;white-space:nowrap!important}
+#globalSearch,.catalog-search,.search-box{display:block!important;width:100%!important;max-width:100%!important;min-width:0!important;box-sizing:border-box!important}
+.catalog-filter-wrap{width:100%!important;max-width:100%!important;min-width:0!important;overflow:hidden!important}
+#products .sku-brand-mark{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;height:100%!important;border-radius:10px!important;font-size:23px!important;font-weight:950!important;line-height:1!important;color:#fff!important;letter-spacing:-.04em!important}
+#products .sku-brand-mark.brand-steam{background:linear-gradient(145deg,#263b55,#101820)!important}
+#products .sku-brand-mark.brand-netflix{background:linear-gradient(145deg,#e50914,#8b0008)!important;font-family:Arial,sans-serif!important}
+#products .sku-brand-mark.brand-midjourney{background:linear-gradient(145deg,#242438,#6666a8)!important}
+#products .sku-brand-mark.brand-mail{background:linear-gradient(145deg,#2876d2,#45b6e8)!important}
+#products .sku-row.sku-out-of-stock{opacity:.72!important;cursor:not-allowed!important}
+#products .sku-row.sku-out-of-stock:after{content:"暂时缺货";display:inline-flex;align-self:center;flex:0 0 auto;padding:5px 8px;border-radius:7px;background:#f1f3f5;color:#778397;font-size:11px;font-weight:800}
+@media(max-width:560px){
+ #catalogFilters{gap:7px!important;padding:5px 2px 9px!important}
+ #catalogFilters .catalog-filter-pill{flex-shrink:0!important}
+ #globalSearch,.catalog-search,.search-box{margin-bottom:12px!important}
+}
+</style>
 </body></html>

@@ -43,3 +43,12 @@ input::placeholder,textarea::placeholder{color:#64748b!important}
 .home-carousel-slide:not(.theme-dark){color:#0A192F!important}
 .home-carousel-slide p{color:#334155!important}
 @media(prefers-reduced-motion:reduce){#s5-vanta-bg canvas{display:none!important}}
+
+/* Sunny Community brand blue icon normalization across every page */
+img[src*="assets/icons/"],img[src*="/icons/"],.protocol-badge img,.sku-detail-btn img,.modal-head button img,.node-config-panel img,.feature-icon img,.icon img{filter:brightness(0) saturate(100%) invert(19%) sepia(99%) saturate(5247%) hue-rotate(222deg) brightness(101%) contrast(106%)!important}
+.bottom-nav a,.home-bottom-nav a,.mobile-tabbar a{color:#1555ad!important}
+.bottom-nav a.active,.home-bottom-nav a.active,.mobile-tabbar a.active{color:#0055FF!important}
+.bottom-nav a img,.home-bottom-nav a img,.mobile-tabbar a img{filter:brightness(0) saturate(100%) invert(19%) sepia(99%) saturate(5247%) hue-rotate(222deg) brightness(101%) contrast(106%)!important}
+.bottom-nav a.active img,.home-bottom-nav a.active img,.mobile-tabbar a.active img{filter:brightness(0) saturate(100%) invert(19%) sepia(99%) saturate(5247%) hue-rotate(222deg) brightness(101%) contrast(106%)!important}
+.protocol-badge svg,.feature-icon svg,.icon svg,button svg,.button svg,.btn svg{color:#0055FF!important}
+.protocol-badge svg [stroke],.feature-icon svg [stroke],.icon svg [stroke],button svg [stroke],.button svg [stroke],.btn svg [stroke]{stroke:#0055FF!important}

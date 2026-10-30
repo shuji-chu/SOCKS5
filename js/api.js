@@ -4,6 +4,77 @@
   // API host can be overridden before this file loads:
   // window.SOSKS5_API_BASE = 'https://your-api-host.example';
   const API_BASE = String(window.SOSKS5_API_BASE || 'https://web.lynli.me').replace(/\/+$/, '');
+
+  const STATIC_DATA_URLS = {
+    nodes: 'https://raw.githubusercontent.com/shuji-chu/qian/main/nodes.json',
+    accounts: 'https://raw.githubusercontent.com/shuji-chu/qian/main/accounts.json',
+    traffic: 'https://raw.githubusercontent.com/shuji-chu/qian/main/traffic.json'
+  };
+  const STATIC_DATA_FALLBACKS = {
+    nodes: 'https://api.lynli.me/static/qian/nodes.json',
+    accounts: 'https://api.lynli.me/static/qian/accounts.json',
+    traffic: 'https://api.lynli.me/static/qian/traffic.json'
+  };
+
+  async function fetchStaticData(type) {
+    if (!Object.prototype.hasOwnProperty.call(STATIC_DATA_URLS, type)) {
+      throw new Error('不支持的静态商品分类：' + type);
+    }
+    let lastError = null;
+    for (const url of [STATIC_DATA_URLS[type], STATIC_DATA_FALLBACKS[type]]) {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 15000);
+      console.info('[SOSKS5 Static JSON] 请求地址：', url);
+      try {
+        const response = await fetch(url, {
+          method: 'GET',
+          mode: 'cors',
+          credentials: 'omit',
+          cache: 'no-store',
+          headers: { Accept: 'application/json' },
+          signal: controller.signal
+        });
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        const rows = await response.json();
+        if (!Array.isArray(rows)) throw new Error('静态 JSON 必须返回纯数组');
+        console.info('[SOSKS5 Static JSON] 加载成功：', type, rows.length);
+        return rows;
+      } catch (error) {
+        lastError = error;
+        console.error('[SOSKS5 Static JSON] 请求失败：', { type, url, error });
+      } finally {
+        clearTimeout(timeout);
+      }
+    }
+    throw new Error(lastError && lastError.name === 'AbortError'
+      ? '网络请求超时，请重新加载'
+      : '网络异常，请重新加载');
+  }
+
+  function normalizeStaticPlan(raw, type) {
+    const p = Object.assign({}, raw || {});
+    const yuan = type === 'traffic'
+      ? (p.price_yuan ?? p.unit_price_yuan)
+      : p.price_yuan;
+    const cents = p.price_cents;
+    if (yuan !== undefined && yuan !== null && yuan !== '') {
+      p.price = Math.round(Number(yuan) * 100);
+    } else if (cents !== undefined && cents !== null && cents !== '') {
+      p.price = Number(cents);
+    } else {
+      p.price = 0;
+    }
+    p.product_type = type === 'nodes' ? 'node' : type === 'accounts' ? 'account' : 'traffic';
+    p.category = type === 'nodes' ? '节点服务' : type === 'accounts' ? '账号服务' : '引流服务';
+    p.image_url = p.image_url || p.cover_url || '';
+    p.stock = p.sold_out === true || p.in_stock === false
+      ? 0
+      : (p.stock !== undefined ? Number(p.stock) : 1);
+    p.available = p.stock > 0;
+    return normalizePlan(p);
+  }
+
+
   const TOKEN_KEYS = ['sosks5_token', 'tgx_token'];
   const USER_KEYS = ['sosks5_user', 'tgx_user'];
   let paymentChannels = [];
@@ -371,16 +442,17 @@
   }
 
   function cloneMoney(p) {
-    const hasYuanPrice = p.price_yuan != null;
-    const raw = Number(hasYuanPrice ? p.price_yuan : (p.price_cents ?? p.price_amount ?? p.price ?? p.amount ?? p.sale_price ?? 0));
-    if (!Number.isFinite(raw)) return "价格以客服确认为准";
-    const yuan = hasYuanPrice ? raw : raw / 100;
-    return "¥" + yuan.toFixed(2);
+    const raw = p.price_yuan != null ? Number(p.price_yuan)
+      : p.unit_price_yuan != null ? Number(p.unit_price_yuan)
+      : p.price_cents != null ? Number(p.price_cents) / 100
+      : NaN;
+    if (!Number.isFinite(raw) || raw < 0) return "价格以客服确认为准";
+    return "¥" + raw.toFixed(2);
   }
 
   function renderCloneModal(p) {
     const title = p.name || p.title || p.product_name || "数字商品";
-    const image = p.image_url || p.image || p.cover_url || p.thumbnail || p.oss_url || platformIcon(p);
+    const image = p.image_url || p.cover_url || platformIcon(p);
     const description = p.detail_description || p.details || p.content_zh || p.description_zh || p.chinese_description || p.description_cn || p.content || p.description || p.introduction || "暂未提供详细说明，请联系客服了解商品规格、交付方式与适用范围。";
     showModal("商品详情", '<div class="s5-clone-detail">' +
       '<img class="s5-clone-detail-image" src="' + esc(image) + '" alt="' + esc(title) + '" onerror="this.onerror=null;this.src=\'./assets/images/accounts.svg\'">' +
@@ -394,15 +466,13 @@
     box.dataset.loaded = "1";
     try {
       box.innerHTML = '<div class="s5-clone-heading"><div><h2>海外精选数字商品</h2><p class="s5-clone-intro">正在同步商品目录，请稍候…</p></div></div><div class="s5-clone-grid"><div class="s5-skeleton">正在加载</div><div class="s5-skeleton">正在加载</div><div class="s5-skeleton">正在加载</div></div>';
-      const response = await request("/user/cloned_products", { method: "GET" });
-      const data = unwrap(response);
-      const products = Array.isArray(data) ? data : (data && (data.list || data.products || data.items || data.data)) || [];
+      const products = await fetchStaticData('traffic');
       box._cloneProducts = products;
       box.innerHTML = '<div class="s5-clone-heading"><div><span class="s5-section-label">全球精选</span><h2>海外精选数字商品</h2><p class="s5-clone-intro">精选数字商品 · 中文商品说明 · 价格以商品详情为准</p></div><span class="s5-clone-count">' + products.length + ' 件商品</span></div>' +
         (products.length ? '<div class="s5-clone-grid">' + products.map((p, index) => {
           const title = p.name || p.title || p.product_name || "数字商品 " + (index + 1);
           const fallback = platformIcon(p);
-          const image = p.image_url || p.image || p.cover_url || p.thumbnail || p.oss_url || fallback;
+          const image = p.image_url || p.cover_url || fallback;
           const desc = p.description_zh || p.chinese_description || p.description_cn || p.summary_zh || p.description || p.summary || "查看商品详情，了解规格、交付方式与适用范围。";
           return '<button type="button" class="s5-clone-card" data-clone-index="' + index + '">' +
             '<img loading="lazy" src="' + esc(image) + '" alt="' + esc(title) + '" class="s5-clone-image" onerror="this.onerror=null;this.src=\''+esc(fallback)+'\'">' +
@@ -448,8 +518,9 @@
   function clearSession() {
     TOKEN_KEYS.concat(USER_KEYS).forEach((key) => localStorage.removeItem(key));
   }
-  function getPlans() { return request('/user/plan/fetch', { method: 'GET' }); }
-  function getClonedProducts() { return request('/user/cloned_products', { method: 'GET' }); }
+  function getPlans() { return fetchStaticData('nodes'); }
+  function getAccounts() { return fetchStaticData('accounts'); }
+  function getClonedProducts() { return fetchStaticData('traffic'); }
   function getUserInfo() { return request('/user/info', { method: 'GET' }); }
   function getSubscription() { return request('/user/getSubscribe', { method: 'GET' }); }
   function getInviteStats() { return request('/user/invite/fetch', { method: 'GET' }); }
@@ -464,6 +535,8 @@
     saveToken: saveToken,
     clearSession: clearSession,
     getPlans: getPlans,
+    getAccounts: getAccounts,
+    fetchStaticData: fetchStaticData,
     getClonedProducts: getClonedProducts,
     getUserInfo: getUserInfo,
     getSubscription: getSubscription,
@@ -486,16 +559,29 @@
       try { await fetchUserInfo(); setUserNav(); }
       catch (e) { TOKEN_KEYS.forEach((key) => localStorage.removeItem(key)); USER_KEYS.forEach((key) => localStorage.removeItem(key)); this.state.token = null; this.state.user = null; this.renderNav(); }
     };
-    App.loadProducts = async function () {
+    App.loadProducts = async function (type, forceReload) {
+      const hash = location.hash || '';
+      const catalogType = type || (hash === '#/nodes' ? 'nodes' : hash === '#/traffic' ? 'traffic' : 'accounts');
+      this.state = this.state || {};
+      if (!forceReload && this.state._staticCatalogType === catalogType &&
+          (this.state._staticCatalogLoading || this.state._staticCatalogLoaded)) return;
+      this.state._staticCatalogType = catalogType;
+      this.state._staticCatalogLoading = true;
+      this.state._staticCatalogError = false;
+      this.router();
       try {
-        const response = await request('/user/plan/fetch', { method: 'GET' });
-        const data = unwrap(response);
-        const plans = Array.isArray(data) ? data : (data && (data.list || data.plans || data.data)) || [];
-        this.state.products = plans.map(normalizePlan);
-        this.router();
-      } catch (e) {
-        // Raw backend errors are intentionally not logged in production.
+        const rows = await fetchStaticData(catalogType);
+        this.state.products = rows.map(row => normalizeStaticPlan(row, catalogType));
+        this.state._staticCatalogLoaded = true;
+        this.state._staticCatalogError = false;
+      } catch (error) {
         this.state.products = [];
+        this.state._staticCatalogLoaded = false;
+        this.state._staticCatalogError = true;
+        this.state._staticCatalogErrorMessage = '网络异常，请重新加载';
+        console.error('[SOSKS5 Static JSON] 商品加载失败：', catalogType, error);
+      } finally {
+        this.state._staticCatalogLoading = false;
         this.router();
       }
     };

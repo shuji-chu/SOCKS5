@@ -9,7 +9,16 @@ let catalogPage=1,catalogTotal=0,catalogTotalPages=1,catalogLoading=false,catalo
 const CATALOG_PAGE_SIZE=15;
 function catalogEndpoint(kind){return kind==='节点'?'/user/plan/fetch':kind==='账号'?'/account/products':'/user/cloned_products'};
 function catalogRows(response,kind){return kind==='节点'?groupedNodeRows(response):listify(response)};
-function catalogMeta(response,rows,page){let root=response;for(let i=0;i<5&&root&&typeof root==='object';i++){const total=root.total??root.total_count??root.totalCount??root.total_items??root.count??root.pagination?.total??root.meta?.total;if(total!==undefined&&Number.isFinite(Number(total)))return {total:Number(total),pages:Math.max(1,Number(root.total_pages??root.totalPages??root.last_page??root.pagination?.total_pages??root.pagination?.last_page??Math.ceil(Number(total)/CATALOG_PAGE_SIZE))||1)};root=root.data??root.result??root.payload;}return {total:rows.length===CATALOG_PAGE_SIZE?(page+1)*CATALOG_PAGE_SIZE:((page-1)*CATALOG_PAGE_SIZE+rows.length),pages:rows.length===CATALOG_PAGE_SIZE?page+1:page}}
+function catalogMeta(response,rows,page){
+ let root=response;
+ for(let i=0;i<7&&root&&typeof root==='object';i++){
+  const total=root.total??root.total_count??root.totalCount??root.total_items??root.count??root.pagination?.total??root.meta?.total??root.meta?.pagination?.total;
+  const pages=root.total_pages??root.totalPages??root.last_page??root.lastPage??root.pagination?.total_pages??root.pagination?.last_page??root.meta?.total_pages??root.meta?.last_page??root.meta?.pagination?.total_pages;
+  if(total!==undefined&&Number.isFinite(Number(total)))return {total:Number(total),pages:Math.max(1,Number(pages)||Math.ceil(Number(total)/CATALOG_PAGE_SIZE)),hasServerTotal:true};
+  root=root.data??root.result??root.payload??root.response;
+ }
+ return {total:rows.length===CATALOG_PAGE_SIZE?(page+1)*CATALOG_PAGE_SIZE:((page-1)*CATALOG_PAGE_SIZE+rows.length),pages:rows.length===CATALOG_PAGE_SIZE?page+1:page,hasServerTotal:false};
+}
 const escHtml=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const safeModalText=v=>String(v??'').replace(/https?:\/\/[^\s"'<>]+/gi,'[链接已隐藏]').replace(/\b(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}(?::\d+)?\b/gi,'[地址已隐藏]');
 const safeUiMessage=value=>String(value??'操作未完成').replace(/Bearer\s+\S+/gi,'[凭据已隐藏]').replace(/\b(access[_-]?token|refresh[_-]?token|api[_-]?key|secret|password|authorization)\s*[:=]\s*["']?[^,\s"';&]+/gi,'$1=[凭据已隐藏]').replace(/(?:\b[0-9a-f]{1,4}:){2,}[0-9a-f:.]{1,}/gi,'[IP地址已隐藏]').replace(/https?:\/\/[^\s"'<>]+/gi,'[链接已隐藏]').replace(/\b(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}(?::\d+)?\b/gi,'[地址已隐藏]').replace(/\b(?:\d{1,3}\.){3}\d{1,3}(?::\d+)?\b/g,'[地址已隐藏]').replace(/(?:^|\n)\s*at\s+[^\n]+/g,'').replace(/\s{2,}/g,' ').trim().slice(0,240)||'操作未完成，请稍后重试。';window.safeUiMessage=safeUiMessage;
@@ -126,9 +135,9 @@ async function loadCatalogPage(page=1,kind=activeKind){
   const endpoint=catalogEndpoint(kind),response=await api(endpoint+'?page='+catalogPage+'&size='+CATALOG_PAGE_SIZE),rawRows=catalogRows(response,kind);
   if(requestId!==catalogRequestId)return;
   const rows=rawRows.filter(p=>{const k=categoryOf(p,kind==='节点'?'node':kind==='账号'?'account':'traffic');return k===kind});
-  if(rows.length){const sample=rows[0],nested=sample.product||sample.goods||sample.item||sample.sku||{};console.info('[S5 catalog JSON keys]',{category:kind,rowCount:rawRows.length,topLevelKeys:Object.keys(sample),nestedKeys:nested&&typeof nested==='object'?Object.keys(nested):[]});}
+  const sample=rawRows[0]||null,nested=sample&&(sample.product||sample.goods||sample.item||sample.sku)||{};console.info('[S5 catalog JSON audit]',{category:kind,endpoint,rawArrayLength:rawRows.length,acceptedRows:rows.length,page:catalogPage,topLevelKeys:sample?Object.keys(sample):[],nestedKeys:nested&&typeof nested==='object'?Object.keys(nested):[],responseKeys:response&&typeof response==='object'?Object.keys(response):[]});
   liveProducts=rows.map((p,i)=>normalize(p,i,kind==='节点'?'node':kind==='账号'?'account':'traffic'));
-  const meta=catalogMeta(response,rawRows,catalogPage);catalogTotal=meta.total;catalogTotalPages=Math.max(meta.pages,catalogPage);if(rawRows.length<CATALOG_PAGE_SIZE)catalogTotalPages=Math.min(catalogTotalPages,catalogPage);
+  const meta=catalogMeta(response,rawRows,catalogPage);catalogTotal=meta.total;catalogTotalPages=meta.hasServerTotal?Math.max(meta.pages,catalogPage):Math.max(meta.pages,catalogPage);
   const breakdown=document.getElementById('catalogBreakdown');if(breakdown)breakdown.textContent='每页 '+CATALOG_PAGE_SIZE+' 件 · '+(kind==='节点'?'节点套餐':kind==='账号'?'账号商品':'引流服务');
   renderProducts();
  }catch(e){if(requestId!==catalogRequestId)return;liveProducts=[];const breakdown=document.getElementById('catalogBreakdown');if(breakdown)breakdown.textContent='真实商品目录暂不可用';if(hint)hint.textContent='加载失败';root.innerHTML='<div class="error-state"><div class="symbol"><img src="./assets/icons/network.svg" alt="" aria-hidden="true"></div><b>真实商品目录暂时无法加载</b><p>'+escHtml(safeUiMessage(e.message))+'</p><button class="btn" type="button" onclick="loadCatalogs()">重新加载</button></div>';

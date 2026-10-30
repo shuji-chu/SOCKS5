@@ -21,8 +21,8 @@
 .s5-site-footer .ecosystem-item{display:flex;align-items:center;gap:8px;min-width:0;padding:9px 12px;border:1px solid rgba(55,125,205,.13);border-radius:13px;background:rgba(255,255,255,.76);color:#526780;font-size:12px;font-weight:750}
 .s5-site-footer .ecosystem-item img{width:23px;height:23px;object-fit:contain}
 .s5-site-footer .footer-copyright{margin-top:20px;color:#60748b;font-size:11px}
-.bottom-nav,.mobile-tabbar{z-index:100!important}
-body:has(.bottom-nav),body:has(.mobile-tabbar){padding-bottom:calc(86px + env(safe-area-inset-bottom))}
+ .bottom-nav,.mobile-tabbar,.home-bottom-nav{z-index:100!important}
+body:has(.bottom-nav),body:has(.mobile-tabbar),body:has(.home-bottom-nav){padding-bottom:calc(86px + env(safe-area-inset-bottom))}
 @media(max-width:760px){
  .site-footer,.s5-site-footer,.footer,.dp-footer{width:100%;margin-top:26px;padding:24px 18px calc(130px + env(safe-area-inset-bottom));border-radius:22px 22px 0 0}
  .s5-site-footer .footer-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 16px}

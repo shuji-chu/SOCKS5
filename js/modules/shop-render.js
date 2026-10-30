@@ -44,30 +44,33 @@ function cleanAccountText(value){
 }
 function renderUnifiedItem(p){
  const title=cleanAccountText(p._title||p.title||p.name||p.product_title||p.display_name||p.sku_title||p.sku_name||p.product_name||p.goods_name||p.item_name||'商品 '+String(p._key||''));
- const description=cleanAccountText(p._desc||'');
- const tags=tagList(p);
- const region=cleanAccountText(p._region||p.region_name||p.region||p.country||p.area||'');
- const attrsLine=[...new Set([region,...tags].filter(Boolean))];
- const src=p._image||p._icon||p.icon_url||p.logo||'';
- const initial=String(title||'商').trim().slice(0,1).toUpperCase();
- const icon='<div class="unified-icon">'+(src?'<img src="'+esc(src)+'" alt="" loading="lazy" decoding="async" onerror="this.hidden=true">':'<span>'+esc(initial)+'</span>')+'</div>';
- const titleHtml='<div class="unified-title">'+esc(title)+'</div>';
- const desc=description&&description!==title?'<div class="unified-description">'+esc(description)+'</div>':'';
- const tagsHtml=attrsLine.length?'<div class="unified-tags">'+attrsLine.map(x=>'<span>'+esc(x)+'</span>').join('')+'</div>':'';
+ const tags=[...new Set([cleanAccountText(p._region||p.region_name||p.region||p.country||p.area||''),...tagList(p).map(cleanAccountText)].filter(Boolean))].slice(0,8);
+ const src=p._kind==='账号'?(p._icon||p._image):(p._image||p._icon);
+ const fallback='./assets/icons/server.svg';
+ const icon=src?'<img src="'+esc(src)+'" alt="" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=\''+fallback+'\'">':'<span aria-hidden="true">'+esc(String(title||'商').trim().slice(0,1).toUpperCase())+'</span>';
  const price=p._priceProvided?'¥'+Number(p._price).toFixed(2):'价格待商家提供';
- const meta='<div class="unified-price-stock"><span class="unified-price">'+price+'</span><span class="unified-stock">库存：'+esc(stock(p))+'</span></div>';
- return '<div class="unified-list-item" data-sku="'+esc(p._key)+'">'+icon+'<div class="unified-info">'+titleHtml+desc+tagsHtml+meta+'<button class="btn primary unified-detail" type="button" onclick="openDetail(&#39;'+esc(p._key)+'&#39;)">查看 SKU 详情</button></div></div>';
+ return '<article class="sku-row" data-sku="'+esc(p._key)+'">'+
+  '<div class="sku-icon">'+icon+'</div>'+
+  '<div class="sku-content">'+
+   '<div class="sku-title">'+esc(title)+'</div>'+
+   (tags.length?'<div class="sku-tags">'+tags.map(x=>'<span>'+esc(x)+'</span>').join('')+'</div>':'')+
+   '<div class="sku-bottom"><span class="sku-price">'+price+'</span><span class="sku-stock">库存：'+esc(stock(p))+'</span></div>'+
+   '<button class="sku-detail" type="button" data-open-sku="'+esc(p._key)+'" aria-label="查看 '+esc(title)+' 的 SKU 详情">查看 SKU 详情</button>'+
+  '</div></article>';
 }
-function render({root,products,activeKind='节点',searchTerm='',pageInfo={}}){if(!root)return;
+function render({root,products,activeKind='节点',searchTerm='',pageInfo={}}){
+ if(!root)return;
  const query=String(searchTerm||'').trim().toLowerCase();
- const rows=products.filter(p=>(p._kind===activeKind)&&(p._title+' '+p._desc+' '+p._kind+' '+(p._region||'')+' '+(p.tags||'')+' '+(p.protocol||'')+' '+JSON.stringify(p._merchantAttrs||{})).toLowerCase().includes(query)).sort((a,b)=>Number(b._premium)-Number(a._premium));
+ const rows=products.filter(p=>p._kind===activeKind&&(p._title+' '+p._desc+' '+p._kind+' '+(p._region||'')+' '+(p.tags||'')+' '+(p.protocol||'')+' '+JSON.stringify(p._merchantAttrs||{})).toLowerCase().includes(query)).sort((a,b)=>Number(b._premium)-Number(a._premium));
  const page=Math.max(1,Number(pageInfo.page)||1),total=Math.max(0,Number(pageInfo.total)||0),totalPages=Math.max(1,Number(pageInfo.totalPages)||1);
  const count=document.getElementById('resultCount');if(count)count.textContent='共 '+total.toLocaleString()+' 件商品 · 每页 15 件';
- const pagination=()=>'<nav class="sku-pagination" aria-label="商品分页"><button type="button" data-page="prev" '+(page<=1?'disabled':'')+'><img src="./assets/icons/chevron-left.svg" alt="" aria-hidden="true"> 上一页</button><span class="sku-page-number">第 '+page+' / '+totalPages+' 页</span><button type="button" data-page="next" '+(page>=totalPages?'disabled':'')+'>下一页 <img src="./assets/icons/chevron-right.svg" alt="" aria-hidden="true"></button></nav>';
- if(!rows.length){root.innerHTML='<div class="empty-space"><div><div class="planet"></div><b>暂无商品</b><p>当前分类暂时没有可展示的商品，请稍后再试。</p></div></div>'+pagination();bindPagination();return}
- const cards=rows.slice(0,15).map(renderUnifiedItem).join('');
-;
- root.innerHTML='<div class="unified-list-container">'+cards+'</div>'+pagination();bindPagination();
- function bindPagination(){root.querySelectorAll('[data-page]').forEach(btn=>btn.addEventListener('click',()=>{if(btn.disabled)return;const next=page+(btn.dataset.page==='next'?1:-1);if(typeof w.loadCatalogPage==='function'){w.loadCatalogPage(next,activeKind);const target=document.getElementById('products');if(target)target.scrollIntoView({behavior:'smooth',block:'start'});}}));}
+ const pagination=()=>'<nav class="sku-pagination" aria-label="商品分页"><button type="button" data-page="prev" '+(page<=1?'disabled':'')+'>上一页</button><span class="sku-page-number">第 '+page+' / '+totalPages+' 页</span><button type="button" data-page="next" '+(page>=totalPages?'disabled':'')+'>下一页</button></nav>';
+ if(!rows.length){root.innerHTML='<div class="empty-space"><div><div class="planet"></div><b>暂无商品</b><p>当前分类暂时没有可展示的商品，请稍后再试。</p></div></div>'+pagination();bind();return}
+ root.innerHTML='<div class="sku-list">'+rows.slice(0,15).map(renderUnifiedItem).join('')+'</div>'+pagination();
+ bind();
+ function bind(){
+  root.querySelectorAll('[data-open-sku]').forEach(btn=>btn.addEventListener('click',()=>{if(typeof w.openDetail==='function')w.openDetail(btn.dataset.openSku)}));
+  root.querySelectorAll('[data-page]').forEach(btn=>btn.addEventListener('click',()=>{if(btn.disabled)return;const next=page+(btn.dataset.page==='next'?1:-1);if(typeof w.loadCatalogPage==='function'){w.loadCatalogPage(next,activeKind);const target=document.getElementById('products');if(target)target.scrollIntoView({behavior:'smooth',block:'start'});}}));
+ }
 }
 w.ShopRender={render,merchantDashboard,productImage:image,stockLabel:stock,protocolBadges:protocols,nodeCapabilities,deliveryPanel,tutorialPanel,tagList};})(window);

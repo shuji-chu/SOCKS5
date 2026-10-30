@@ -253,3 +253,17 @@ input::placeholder,textarea::placeholder{color:#64748b!important}
 /* Keep the panda/video background recognizable instead of washing it out */
 #global-bg-overlay{background:rgba(255,255,255,.56)!important;-webkit-backdrop-filter:blur(1px)!important;backdrop-filter:blur(1px)!important}
 #global-bg-video{filter:brightness(1.12) contrast(1.18) saturate(1.08)!important}
+
+
+/* Repository-wide forced light-surface layer requested by design QA */
+html,body,div,section,header,footer,main,.container,.card,.dialog,.modal{
+ background-color:transparent!important;
+}
+.dark-card,.terminal-box,.bottom-nav,.footer{
+ background:rgba(255,255,255,.85)!important;
+ -webkit-backdrop-filter:blur(20px)!important;
+ backdrop-filter:blur(20px)!important;
+ color:#0A192F!important;
+ border:1px solid rgba(0,0,0,.05)!important;
+}
+.dark-card *, .terminal-box *, .bottom-nav *, .footer *{color:inherit}

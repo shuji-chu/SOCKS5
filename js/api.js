@@ -943,7 +943,7 @@
       return hero + '<section class="s5-subpage-content"><div class="s5-product-grid">' + skeleton + '</div></section>';
     }
     if (App.state._staticCatalogError) {
-      return hero + '<section class="s5-subpage-content"><div class="s5-glass-card p-8 text-center"><h2>网络异常，请重新加载</h2><p>暂时无法获取商品数据，请检查网络连接后重试。</p><button type="button" class="s5-small-cta" onclick="App.loadProducts(\'' + staticType + '\', true)">重新加载</button></div></section>';
+      return hero + '<section class="s5-subpage-content"><div class="s5-glass-card p-8 text-center"><h2>网络异常，请点击重试</h2><p>暂时无法获取商品数据，请检查网络连接后重试。</p><button type="button" class="s5-small-cta" onclick="App.loadProducts(\'' + staticType + '\', true)">点击重试</button></div></section>';
     }
     const cards = matches.length ? matches.map((p) => {
       const periods = periodOptions(p._rawPlan || p);

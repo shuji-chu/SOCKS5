@@ -102,8 +102,6 @@ async function fetchStaticCatalog(kind){
 
 const catalogFacetIcon=(p,kind,label)=>{
  if(kind==='节点')return '';
- const backend=p.platform_icon_url||p.icon_url||p.brand_icon_url||p.brand_logo||p.platform_icon||p.platform_logo||p.logo_url||p.icon?.url||'';
- if(backend)return String(backend);
  const name=String(label||'').toLowerCase();
  const brands=[
   [/telegram|电报/,'telegram','26A5E4'],[/tiktok|抖音/,'tiktok','25F4EE'],[/instagram|ins/,'instagram','E4405F'],
@@ -115,7 +113,9 @@ const catalogFacetIcon=(p,kind,label)=>{
   [/x\b|twitter|推特/,'x','1D9BF0'],[/linkedin/,'linkedin','0A66C2']
  ];
  const found=brands.find(([pattern])=>pattern.test(name));
- return found?'https://cdn.simpleicons.org/'+found[1]+'/'+found[2]:'';
+ if(found)return 'https://cdn.simpleicons.org/'+found[1]+'/'+found[2];
+ const backend=p.platform_icon_url||p.icon_url||p.brand_icon_url||p.brand_logo||p.platform_icon||p.platform_logo||p.logo_url||p.icon?.url||'';
+ return backend?String(backend):'';
 };
 const NODE_PROTOCOLS=['VLESS','Hysteria2','Trojan','VMess','Shadowsocks','TUIC','AnyTLS','SSR','MTProto'];
 const APP_ALIASES=[

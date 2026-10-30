@@ -7,6 +7,8 @@ const requestedCategory=new URLSearchParams(location.search).get('category')||'�
 let liveProducts=[],activeKind=['节点','账号','引流'].includes(requestedCategory)?requestedCategory:'节点',searchTerm='',activeFilter='全部',paymentMethods=[];
 let catalogPage=1,catalogTotal=0,catalogTotalPages=1,catalogLoading=false,catalogRequestId=0;
 const catalogAllRowsLoaded={节点:false,账号:false,引流:false};
+const catalogCache={节点:null,账号:null,引流:null};
+const catalogPrefetching=new Set();
 const CATALOG_PAGE_SIZE=15;
 const catalogFacetIcon=(p,kind,label)=>{
  if(kind==='节点')return '';
@@ -219,8 +221,38 @@ function renderProducts(){
  root.innerHTML='<div class="error-state">商品渲染模块未加载，请刷新页面。</div>';
 }
 
+async function prefetchCatalogKind(kind){
+ if(catalogCache[kind]||catalogPrefetching.has(kind))return;
+ catalogPrefetching.add(kind);
+ try{
+  const endpoint=catalogEndpoint(kind),requestedSize=kind==='节点'?CATALOG_PAGE_SIZE:100;
+  const pagedEndpoint=kind==='节点'?endpoint:endpoint+'?page=1&size='+requestedSize;
+  const response=await api(pagedEndpoint),firstRows=catalogRows(response,kind);
+  let rawRows=firstRows.slice(),meta=catalogMeta(response,firstRows,1),complete=kind==='节点';
+  if(kind!=='节点'&&meta.hasServerTotal){
+   const pageSize=Math.max(1,Number(meta.pageSize)||requestedSize),totalPages=Math.max(1,Number(meta.pages)||Math.ceil(meta.total/pageSize));
+   const pageNumbers=Array.from({length:Math.max(0,totalPages-1)},(_,i)=>i+2);
+   for(let offset=0;offset<pageNumbers.length;offset+=4){
+    const batch=pageNumbers.slice(offset,offset+4);
+    const responses=await Promise.all(batch.map(n=>api(endpoint+'?page='+n+'&size='+pageSize)));
+    responses.forEach((result,index)=>{try{rawRows.push(...catalogRows(result,kind))}catch(e){console.warn('[S5 catalog prefetch] skipped page',batch[index],e.message)}});
+   }
+   complete=rawRows.length>=meta.total;
+  }
+  const rows=kind==='节点'?rawRows.filter(p=>categoryOf(p,'node')==='节点'):rawRows;
+  const products=rows.map((p,i)=>{const item=normalize(p,i,kind==='节点'?'node':kind==='账号'?'account':'traffic');item._platformFacets=catalogFacet(item,kind);return item});
+  const total=meta.hasServerTotal?meta.total:rows.length;
+  const pages=complete?Math.max(1,Math.ceil(products.length/CATALOG_PAGE_SIZE)):meta.pages;
+  catalogCache[kind]={products,total,pages,complete};
+  catalogAllRowsLoaded[kind]=complete;
+ }catch(e){console.warn('[S5 catalog prefetch] '+kind+' unavailable',safeUiMessage(e.message))}
+ finally{catalogPrefetching.delete(kind)}
+}
+
 async function loadCatalogPage(page=1,kind=activeKind){
  const root=document.getElementById('products');if(!root)return;
+ const cached=catalogCache[kind];
+ if(cached){catalogRequestId++;activeKind=kind;catalogPage=Math.max(1,Number(page)||1);liveProducts=cached.products;catalogTotal=cached.total;catalogTotalPages=cached.pages;catalogAllRowsLoaded[kind]=cached.complete;catalogLoading=false;root.removeAttribute('aria-busy');renderCatalogFilters();renderProducts();return}
  if(kind===activeKind&&catalogAllRowsLoaded[kind]&&page!==1){catalogPage=Math.max(1,Number(page)||1);renderProducts();return}
  const requestId=++catalogRequestId;catalogLoading=true;catalogPage=Math.max(1,Number(page)||1);activeKind=kind;
  root.setAttribute('aria-busy','true');root.innerHTML=Array.from({length:6},()=>'<div class="skeleton-card"><div class="skeleton-cover"></div><div class="skeleton-line" style="width:62%"></div><div class="skeleton-line" style="width:40%"></div></div>').join('');
@@ -247,8 +279,10 @@ async function loadCatalogPage(page=1,kind=activeKind){
   liveProducts=rows.map((p,i)=>{const item=normalize(p,i,kind==='节点'?'node':kind==='账号'?'account':'traffic');item._platformFacets=catalogFacet(item,kind);return item});
   catalogAllRowsLoaded[kind]=complete;catalogTotal=meta.hasServerTotal?meta.total:rows.length;
   catalogTotalPages=complete?Math.max(1,Math.ceil(liveProducts.length/CATALOG_PAGE_SIZE)):meta.pages;catalogPage=1;
+  catalogCache[kind]={products:liveProducts,total:catalogTotal,pages:catalogTotalPages,complete};
   const breakdown=document.getElementById('catalogBreakdown');if(breakdown)breakdown.textContent=(complete?'已扫描全部 '+rows.length.toLocaleString()+' 件':'后端总数 '+catalogTotal.toLocaleString()+' 件')+' · 已识别 '+new Set(liveProducts.flatMap(p=>p._platformFacets||[]).map(x=>x.toLowerCase())).size+' 个平台';
   renderCatalogFilters();renderProducts();
+  ['节点','引流','账号'].filter(other=>other!==kind).forEach(other=>prefetchCatalogKind(other));
  }catch(e){
   if(requestId!==catalogRequestId)return;liveProducts=[];catalogAllRowsLoaded[kind]=false;renderCatalogFilters();
   const breakdown=document.getElementById('catalogBreakdown');if(breakdown)breakdown.textContent='真实商品目录暂不可用';

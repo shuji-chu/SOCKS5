@@ -1,4 +1,4 @@
-/* SOSKS5 community + profile front-end. API contracts are documented in /src/docs/. */
+/* S5 community + profile front-end. API contracts are documented in /src/docs/. */
 (() => {
   const style = document.createElement('style');
   style.textContent = `
@@ -27,7 +27,7 @@
   const shell = (inner) => '<section class="s5-shell">' + inner + '</section>';
   const communityHome = () => shell(`
     <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-5 mb-8">
-      <div><div class="text-xs tracking-[.25em] text-sky-300 font-bold mb-3">SOSKS5 · DISCOVER</div>
+      <div><div class="text-xs tracking-[.25em] text-sky-300 font-bold mb-3">S5 · 晴天社区</div>
       <h1 class="text-3xl md:text-5xl font-black text-white mb-3">让好内容被发现</h1>
       <p class="s5-muted max-w-2xl leading-7">发现工具、教程、资源与服务；分享真实有用的链接，让需要的人找到它。</p></div>
       <a class="s5-btn shrink-0" href="#/traffic/new">＋ 发布分享</a>

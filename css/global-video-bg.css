@@ -46,3 +46,27 @@ input::placeholder,textarea::placeholder{color:#64748b!important}
 .home-carousel-slide:not(.theme-dark){color:#0A192F!important}
 .home-carousel-slide p{color:#334155!important}
 @media(prefers-reduced-motion:reduce){
+/* Bottom navigation: white glass and brand blue */
+.bottom-nav,.home-bottom-nav,.mobile-tabbar{
+ background:rgba(255,255,255,.96)!important;
+ background-color:rgba(255,255,255,.96)!important;
+ border-top:1px solid rgba(0,85,255,.12)!important;
+ border-color:rgba(0,85,255,.12)!important;
+ box-shadow:0 -8px 28px rgba(15,23,42,.08)!important;
+ -webkit-backdrop-filter:blur(22px)!important;
+ backdrop-filter:blur(22px)!important;
+}
+.bottom-nav a,.home-bottom-nav a,.mobile-tabbar a{
+ color:#0055FF!important;
+}
+.bottom-nav a.active,.home-bottom-nav a.active,.mobile-tabbar a.active{
+ color:#0055FF!important;
+ font-weight:900!important;
+ text-shadow:0 0 12px rgba(0,85,255,.22)!important;
+}
+.bottom-nav a img,.home-bottom-nav a img,.mobile-tabbar a img{
+ filter:brightness(0) saturate(100%) invert(20%) sepia(100%) saturate(7480%) hue-rotate(239deg) brightness(100%) contrast(145%)!important;
+}
+.bottom-nav a.active img,.home-bottom-nav a.active img,.mobile-tabbar a.active img{
+ filter:brightness(0) saturate(100%) invert(20%) sepia(100%) saturate(7480%) hue-rotate(239deg) brightness(100%) contrast(145%)!important;
+}

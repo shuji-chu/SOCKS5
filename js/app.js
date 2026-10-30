@@ -104,8 +104,18 @@ const catalogFacetIcon=(p,kind,label)=>{
  if(kind==='节点')return '';
  const backend=p.platform_icon_url||p.icon_url||p.brand_icon_url||p.brand_logo||p.platform_icon||p.platform_logo||p.logo_url||p.icon?.url||'';
  if(backend)return String(backend);
- const slug=String(label||'').normalize('NFKD').toLowerCase().replace(/[^a-z0-9]+/g,'');
- return slug?'https://cdn.simpleicons.org/'+encodeURIComponent(slug):'';
+ const name=String(label||'').toLowerCase();
+ const brands=[
+  [/telegram|电报/,'telegram','26A5E4'],[/tiktok|抖音/,'tiktok','25F4EE'],[/instagram|ins/,'instagram','E4405F'],
+  [/facebook|脸书/,'facebook','0866FF'],[/threads/,'threads','6C63FF'],[/whatsapp/,'whatsapp','25D366'],
+  [/discord/,'discord','5865F2'],[/steam/,'steam','1688D4'],[/netflix/,'netflix','E50914'],
+  [/gmail|google/,'gmail','EA4335'],[/outlook|hotmail/,'microsoftoutlook','0078D4'],[/yahoo/,'yahoo','6001D2'],
+  [/icloud|apple/,'icloud','3693F3'],[/youtube|油管/,'youtube','FF0033'],[/reddit/,'reddit','FF4500'],
+  [/midjourney/,'midjourney','5865F2'],[/mail\.ru|mailru/,'maildotru','168DE2'],[/spotify/,'spotify','1DB954'],
+  [/x\b|twitter|推特/,'x','1D9BF0'],[/linkedin/,'linkedin','0A66C2']
+ ];
+ const found=brands.find(([pattern])=>pattern.test(name));
+ return found?'https://cdn.simpleicons.org/'+found[1]+'/'+found[2]:'';
 };
 const NODE_PROTOCOLS=['VLESS','Hysteria2','Trojan','VMess','Shadowsocks','TUIC','AnyTLS','SSR','MTProto'];
 const APP_ALIASES=[
@@ -121,8 +131,8 @@ function catalogFacet(p,kind){
  const found=new Map(),add=value=>{
   if(value==null||value==='')return;
   if(Array.isArray(value)){value.forEach(add);return}
-  if(typeof value==='object'){add(value.name??value.platform??value.app_name??value.title??value.label??value.value);return}
-  String(value).split(/[,，|、;；]+/).map(x=>x.trim()).filter(x=>x&&x.length<=40).forEach(x=>found.set(x.toLowerCase(),x));
+  if(typeof value==='object'){add(value.name??value.text??value.platform??value.app_name??value.title??value.label??value.value);return}
+  String(value).split(/[,，|、;；]+/).map(x=>x.trim()).filter(x=>x&&x.length<=40&&!/^(通用|general|generic|all|global|universal|other|others|全部|all platforms)$/i.test(x)).forEach(x=>found.set(x.toLowerCase(),x));
  };
  const fields=['platform','platform_name','app','app_name','appName','account_platform','traffic_platform','target_platform','source_platform','social_platform','product_platform','provider','site','website','media_platform','channel_platform'];
  const objects=[p,p._merchantAttrs||{},p.extra_attrs||{},p.extraAttrs||{},p.extra_attributes||{},p.extraAttributes||{},p.attributes||{}];
@@ -193,7 +203,7 @@ function categoryOf(p,source){
  if(/node|proxy|vpn|节点|线路|订阅|vless|vmess|trojan|hysteria/.test(raw))return '节点';
  if(/account|账号|帐号|chatgpt|telegram|google|gmail|outlook/.test(raw))return '账号';return '其他';
 }
-function moneyOf(p){let v=p.price_yuan??p.sale_price_yuan??p.price??p.sale_price??p.amount??p.month_price??p.monthly_price??0;v=Number(v);if(!Number.isFinite(v))return 0;const unit=String(p.price_unit||p.currency_unit||p.unit||'').toLowerCase();if(['yuan','cny','元','rmb'].includes(unit)||p.price_yuan!=null||p.sale_price_yuan!=null)return v;return v/100}
+function moneyOf(p){const yuan=p.price_yuan??p.unit_price_yuan;if(yuan!==undefined&&yuan!==null&&yuan!==''){const n=Number(yuan);return Number.isFinite(n)&&n>=0?n:0}const cents=p.price_cents;if(cents!==undefined&&cents!==null&&cents!==''){const n=Number(cents);return Number.isFinite(n)&&n>=0?n/100:0}return 0}
 function groupedNodeRows(response){
  const root=unpack(response);
  const findGrouped=(value,depth=0)=>{if(!value||typeof value!=='object'||depth>5)return null;if(Object.prototype.hasOwnProperty.call(value,'grouped'))return value.grouped;for(const key of ['data','result','payload','response']){const found=findGrouped(value[key],depth+1);if(found!==null&&found!==undefined)return found;}return null};
@@ -229,9 +239,11 @@ function groupedNodeRows(response){
 function localizeTrafficTitle(value){
  let title=String(value??'');
  const dictionary=[
-  [/\bFull\s+Account\b/gi,'全功能账号'],[/\bAged\b/gi,'老号'],[/\bShared\s+Account\b/gi,'共享账号'],
-  [/\bBulk\s+Available\b/gi,'大量有货'],[/\bPhone\s+Verified\b/gi,'手机已验证'],
-  [/\bLevel\s+(\d+)\b/gi,'$1级'],[/\[\s*US\s*\]/gi,'[美国]'],[/\[\s*UK\s*\]/gi,'[英国]'],[/\[\s*CN\s*\]/gi,'[中国]'],
+  [/\bAPI\s+Login\b/gi,'API登录'],[/\biOS\s+Real\s+Device\b/gi,'iOS真机'],[/\bBlind\s+Box\b/gi,'盲盒'],
+  [/\bFull\s+Account\b/gi,'全功能账号'],[/\bShared\s+Account\b/gi,'共享账号'],[/\bShared\b/gi,'共享号'],
+  [/\bAged\b/gi,'老号'],[/\bBulk\s+Available\b/gi,'大量有货'],[/\bPhone\s+Verified\b/gi,'手机已验证'],
+  [/\bLevel\s+(\d+)\b/gi,'$1级'],[/\b30d\b/gi,'30天'],[/\b1m\b/gi,'1个月'],
+  [/\[\s*US\s*\]/gi,'[美国]'],[/\[\s*UK\s*\]/gi,'[英国]'],[/\[\s*CN\s*\]/gi,'[中国]'],
   [/\bFull\s+Access\b/gi,'完整权限'],[/\bVerified\b/gi,'已验证'],[/\bUnverified\b/gi,'未验证'],
   [/\bPrivate\b/gi,'独享'],[/\bPremium\b/gi,'高级版'],[/\bInstant\s+Delivery\b/gi,'即时交付'],
   [/\bWith\s+Token\b/gi,'含令牌'],[/\bToken\b/gi,'令牌'],[/\bAvailable\b/gi,'有货'],[/\bIn\s+Stock\b/gi,'有库存']
@@ -255,7 +267,7 @@ function normalize(p,i,source){
  const rawStock=p.sold_out===true||p.in_stock===false?0:(p.in_stock===true?(p.stock??p.available_stock??1):(p.stock??p.available_stock??p.stock_available??p.inventory??p.quantity??p.count??null));
  const premium=source==='node'&&(/singapore|新加坡|sgp|\bsg\b/i.test([p._region,p.region,p.country,p.area,p.name,p.title,p.location].filter(Boolean).join(' '))||p.premium===true||p.is_premium===true);
 
- const yuanValue=source==='traffic'?(p.price_yuan??p.unit_price_yuan):(p.price_yuan);
+ const yuanValue=p.price_yuan??(source==='traffic'?p.unit_price_yuan:undefined);
  const centsValue=p.price_cents;
  const parsedPrice=yuanValue!==undefined&&yuanValue!==null&&yuanValue!==''?Number(yuanValue):(centsValue!==undefined&&centsValue!==null&&centsValue!==''?Number(centsValue)/100:null);
  const priceYuan=parsedPrice!==null&&Number.isFinite(parsedPrice)&&parsedPrice>=0?parsedPrice:0;
@@ -263,8 +275,8 @@ function normalize(p,i,source){
  if(!priceProvided)console.warn('[S5 static catalog: price missing]',{source,id:p.id,title:p.name||p.title,price_yuan:p.price_yuan,unit_price_yuan:p.unit_price_yuan,price_cents:p.price_cents});
  const rawTitle=String((source==='traffic'?(p.name||p.title||p.product_title||p.productTitle||p.sku_name||p.skuName||p.product_name||p.productName||p.goods_name||p.goodsName||p.item_name||p.itemName||p.display_name||p.displayName||p.label||merchant.name||merchant.title||merchant.product_title||merchant.sku_name||merchant.product_name||''):(p.title||p.name||p.product_title||p.productTitle||p.display_name||p.displayName||p.sku_title||p.skuTitle||p.sku_name||p.product_name||p.productName||p.goods_name||p.goodsName||p.item_name||p.itemName||p.label||p.en_name||p.name_en||p.english_name||p.description_zh||p.description||''))||'商品 '+String(p.sku_id??p.id??p.product_id??i+1));
  const finalTitle=(source==='traffic'||source==='account')?localizeTrafficTitle(rawTitle).replace(/\bShared\b/gi,'共享').replace(/高级版\s+共享/gi,'高级共享账号').replace(/\s*\(\s*1m\s*\)/gi,' (1个月)').replace(/\bSteamGuard\b/gi,'令牌').replace(/\bSteam\s*Guard\b/gi,'令牌'):rawTitle;
- const brandText=(rawTitle+' '+String(p.platform||p.brand||p.provider||'')).toLowerCase();
- const brandIcon=source==='traffic'?(brandText.includes('steam')?'steam':brandText.includes('netflix')?'netflix':brandText.includes('midjourney')?'midjourney':/\bmail\b|gmail|outlook/.test(brandText)?'mail':''):'';
+ const brandText=(rawTitle+' '+String(p.platform||p.brand||p.provider||p.account_category||'')).toLowerCase();
+ const brandIcon=/telegram|电报/.test(brandText)?'telegram':/threads/.test(brandText)?'threads':/tiktok|抖音/.test(brandText)?'tiktok':/instagram|\bins\b/.test(brandText)?'instagram':/facebook|脸书/.test(brandText)?'facebook':/whatsapp/.test(brandText)?'whatsapp':/discord/.test(brandText)?'discord':/steam/.test(brandText)?'steam':/netflix/.test(brandText)?'netflix':/midjourney/.test(brandText)?'midjourney':/mail\.ru|mailru/.test(brandText)?'mailru':/gmail|google mail/.test(brandText)?'gmail':/outlook|hotmail/.test(brandText)?'outlook':/yahoo/.test(brandText)?'yahoo':/icloud|apple/.test(brandText)?'icloud':/youtube|油管/.test(brandText)?'youtube':/reddit/.test(brandText)?'reddit':/\bmail\b/.test(brandText)?'mail':'';
  return {...p,_brandIcon:brandIcon,_key:source+'-'+i+'-'+String(p.sku_id??p.id??p.product_id??p.uuid??'sku'),_source:source,_kind:categoryOf(p,source),_title:finalTitle,_desc:String(p.description_zh||p.chinese_description||p.description_cn||p.description||p.summary||p.content||''),_image:resolveAsset(image),_icon:resolveAsset(icon),_price:Number.isFinite(priceYuan)?priceYuan:0,_priceProvided:priceProvided,_priceCents:Math.round(priceYuan*100),_stock:rawStock,_sales:p.sales??p.sold_count??p.total_sales??p.buy_count,_tutorial:p.tutorial_markdown||p.tutorial_md||p.tutorial||p.guide_markdown||p.guide||p.markdown||p.content_md||'',_delivery:p.delivery_content||p.delivery_description||p.delivery||p.deliverables||p.delivery_type||p.delivery_method||'',_warranty:p.warranty||p.warranty_period||p.after_sales||p.after_sale||p.support_policy||p.guarantee||'',_notice:p.notice||p.notes||p.warning||p.terms||'',_merchantAttrs:merchant,_region:String(p._region||p.region_name||p.region||p.country||p.area||p.location||''),_premium:premium,_period:p.period_name||p.period_label||p.period||p.billing_cycle||''};
 }
 function markdown(md){const lines=String(md||'暂无教程内容').split(String.fromCharCode(10));let out='',listOpen=false;for(const raw of lines){const line=raw.trim();if(!line){if(listOpen){out+='</ul>';listOpen=false}out+='<p></p>';continue}let level=0;while(level<6&&line[level]==='#')level++;if(level>0&&line[level]===' '){if(listOpen){out+='</ul>';listOpen=false}out+='<h'+level+'>'+inlineMd(line.slice(level+1))+'</h'+level+'>';continue}if(line.startsWith('- ')||line.startsWith('* ')){if(!listOpen){out+='<ul>';listOpen=true}out+='<li>'+inlineMd(line.slice(2))+'</li>';continue}if(listOpen){out+='</ul>';listOpen=false}out+='<p>'+inlineMd(line)+'</p>'}if(listOpen)out+='</ul>';return '<div class="markdown">'+out+'</div>'}

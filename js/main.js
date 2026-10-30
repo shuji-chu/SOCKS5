@@ -17,8 +17,9 @@
   const unwrap = (response) => API.unwrap(response);
   const listFrom = (value) => Array.isArray(value) ? value : (value && (value.list || value.items || value.products || value.plans || value.data || value.rows)) || [];
   const money = (value, alreadyYuan) => {
+    if (value === null || value === undefined || value === '') return '询价';
     const n = Number(value);
-    if (!Number.isFinite(n)) return '¥0.00';
+    if (!Number.isFinite(n) || n < 0) return '询价';
     return '¥' + (alreadyYuan ? n : n / 100).toFixed(2);
   };
   const fmtCount = (n) => (Number(n) || 0).toLocaleString('zh-CN');
@@ -91,17 +92,29 @@
   function productDescription(item) {
     return item.detail_description || item.description_zh || item.description || item.content || item.introduction || item.details || '暂无商品说明';
   }
+  function priceUnitIsYuan(item) {
+    return ['yuan','cny','rmb','元'].includes(String(item.price_unit || item.currency_unit || item.unit || '').trim().toLowerCase());
+  }
   function clonePrice(item) {
-    if (item.price_yuan != null) return money(item.price_yuan, true);
-    const raw = item.price_cents ?? item.price_amount ?? item.price ?? item.amount ?? item.sale_price ?? 0;
-    return money(raw, false);
+    const yuan = item.price_yuan ?? item.unit_price_yuan ?? item.amount_yuan;
+    if (yuan !== null && yuan !== undefined && yuan !== '') return money(yuan, true);
+    const raw = item.price_cents ?? item.price_amount ?? item.price ?? item.amount ?? item.sale_price;
+    if (raw === null || raw === undefined || raw === '') return '询价';
+    return money(raw, priceUnitIsYuan(item));
   }
   function planPrice(item) {
-    const prices = ['month_price','quarter_price','half_year_price','year_price','two_year_price','three_year_price','onetime_price','reset_price']
-      .map((key) => item[key]).filter((value) => value !== null && value !== '' && value !== undefined && Number.isFinite(Number(value)) && Number(value) >= 0);
-    if (prices.length) return money(Math.min.apply(null, prices), false);
-    if (item.price_yuan != null) return money(item.price_yuan, true);
-    return money(item.price ?? item.sale_price ?? 0, false);
+    const keys = ['month_price','quarter_price','half_year_price','year_price','two_year_price','three_year_price','onetime_price','reset_price'];
+    const unitIsYuan = priceUnitIsYuan(item);
+    const prices = keys.map((key) => {
+      const yuan = item[key + '_yuan'];
+      const raw = yuan !== null && yuan !== undefined && yuan !== '' ? yuan : item[key];
+      if (raw === null || raw === undefined || raw === '') return null;
+      const n = Number(raw);
+      if (!Number.isFinite(n) || n < 0) return null;
+      return yuan !== null && yuan !== undefined && yuan !== '' ? n : (unitIsYuan ? n : n / 100);
+    }).filter((value) => value !== null);
+    if (prices.length) return money(Math.min.apply(null, prices), true);
+    return clonePrice(item);
   }
   function card(item, type) {
     const title = productName(item);
@@ -146,15 +159,55 @@
    return Array.from(unique.values());
   }
   
-async function fetchCatalog() {
+  const HOME_STATIC_URLS = {
+    nodes: ['https://api.lynli.me/static/qian/nodes.json', 'https://raw.githubusercontent.com/shuji-chu/qian/main/nodes.json'],
+    accounts: ['https://api.lynli.me/static/qian/accounts.json', 'https://raw.githubusercontent.com/shuji-chu/qian/main/accounts.json']
+  };
+  async function fetchHomeStatic(kind) {
+    const urls = HOME_STATIC_URLS[kind] || [];
+    let lastError = null;
+    for (const url of urls) {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 5000);
+      try {
+        const response = await fetch(url, {method:'GET', mode:'cors', credentials:'omit', cache:'no-store', headers:{Accept:'application/json'}, signal:controller.signal});
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        const payload = await response.json();
+        const rows = Array.isArray(payload) ? payload : listFrom(unwrap(payload));
+        if (!Array.isArray(rows)) throw new Error('商品数据不是数组');
+        if (rows.length) {
+          console.info('[S5 home catalog] loaded', kind, rows.length, url);
+          return rows;
+        }
+        lastError = new Error('静态目录暂时为空');
+      } catch (error) {
+        lastError = error;
+        console.warn('[S5 home catalog] source unavailable', kind, url, error && error.message);
+      } finally {
+        clearTimeout(timeout);
+      }
+    }
+    throw lastError || new Error('静态目录不可用');
+  }
+
+  async function fetchCatalog() {
     if (!requireApi()) return {nodes: [], accounts: []};
-    const results = await Promise.allSettled([API.getPlans(), API.getClonedProducts(), (async()=>{const base=String(window.SOSKS5_PUBLIC_API_BASE||'https://api.lynli.me').replace(/\/+$/,'');const response=await fetch(base+'/api/v1/public/catalog/account-overrides',{headers:{Accept:'application/json'},signal:AbortSignal.timeout?AbortSignal.timeout(5000):undefined});if(!response.ok)throw Error('catalog overrides unavailable');return response.json()})()]);
-    const nodesResponse = results[0].status === 'fulfilled' ? unwrap(results[0].value) : [];
-    const accountResponse = results[1].status === 'fulfilled' ? unwrap(results[1].value) : [];
-    if (results[0].status === 'rejected') toast('节点商品加载失败：' + results[0].reason.message);
-    if (results[1].status === 'rejected') toast('账号商品加载失败：' + results[1].reason.message);
+    const staticResults = await Promise.allSettled([fetchHomeStatic('nodes'), fetchHomeStatic('accounts')]);
+    const staticNodes = staticResults[0].status === 'fulfilled' ? staticResults[0].value : null;
+    const staticAccounts = staticResults[1].status === 'fulfilled' ? staticResults[1].value : null;
+    const needLiveNodes = !staticNodes || !staticNodes.length;
+    const needLiveAccounts = !staticAccounts || !staticAccounts.length;
+    const results = await Promise.allSettled([
+      needLiveNodes ? API.getPlans() : Promise.resolve([]),
+      needLiveAccounts ? API.getClonedProducts() : Promise.resolve([]),
+      (async()=>{const base=String(window.SOSKS5_PUBLIC_API_BASE||'https://api.lynli.me').replace(/\\/+$/,'');const response=await fetch(base+'/api/v1/public/catalog/account-overrides',{headers:{Accept:'application/json'},signal:AbortSignal.timeout?AbortSignal.timeout(5000):undefined});if(!response.ok)throw Error('catalog overrides unavailable');return response.json()})()
+    ]);
+    const nodesResponse = staticNodes && staticNodes.length ? staticNodes : (results[0].status === 'fulfilled' ? unwrap(results[0].value) : []);
+    const accountResponse = staticAccounts && staticAccounts.length ? staticAccounts : (results[1].status === 'fulfilled' ? unwrap(results[1].value) : []);
+    if (needLiveNodes && results[0].status === 'rejected') toast('节点商品加载失败：' + results[0].reason.message);
+    if (needLiveAccounts && results[1].status === 'rejected') toast('账号商品加载失败：' + results[1].reason.message);
     const plans = groupedNodeRows(nodesResponse);
-    const isSocialAccount = (p) => /facebook|脸书|instagram|tiktok|twitter|推特|telegram|电报|whatsapp|google|gmail|youtube|油管|discord|reddit|snapchat|linkedin|outlook|apple id|meta account/.test([p.name,p.title,p.content,p.description,p.type,p.product_type,p.product_category].join(' ').toLowerCase());
+    const isSocialAccount = (p) => /facebook|脸书|instagram|tiktok|twitter|推特|telegram|电报|whatsapp|google|gmail|youtube|油管|discord|reddit|snapchat|linkedin|outlook|apple id|meta account|threads|steam|netflix/.test([p.name,p.title,p.content,p.description,p.type,p.product_type,p.product_category,p.platform,p.brand].join(' ').toLowerCase());
     const isAccountPlan = (p) => {
       const kind = String(p.product_type || p.product_category || p.service_type || p.type || '').toLowerCase();
       const words = [p.name,p.title,p.content,p.description,p.protocol,p.node_protocol].join(' ').toLowerCase();
@@ -178,6 +231,7 @@ async function fetchCatalog() {
       if (seen.has(key)) return false;
       seen.add(key); return true;
     }).map((item) => Object.assign({}, item, {category: '账号服务', product_type: 'account', account_category: item.account_category || item.platform || accountCategoryName(item)}));
+    console.info('[S5 home catalog] ready', {nodes:nodes.length, accounts:accounts.length, source:{nodes:staticNodes?'static':'api',accounts:staticAccounts?'static':'api'}});
     return {nodes, accounts};
   }
   async function loadHome() {
@@ -187,10 +241,20 @@ async function fetchCatalog() {
       setBusy(grid, '正在加载精选商品…');
       try {
         const catalog = await fetchCatalog();
-        const featured = catalog.accounts.slice(0, 2).map((p) => ({item:p,type:'account'}))
-          .concat(catalog.nodes.slice(0, 1).map((p) => ({item:p,type:'node'})))
-          .concat(catalog.accounts.slice(2).map((p) => ({item:p,type:'account'})))
-          .concat(catalog.nodes.slice(1).map((p) => ({item:p,type:'node'}))).slice(0, 3);
+        const featured = catalog.accounts.map((item) => ({item,type:'account'}))
+          .concat(catalog.nodes.map((item) => ({item,type:'node'})))
+          .map((entry,index) => {
+            const p = entry.item;
+            const weightRaw = p.sort_weight ?? p.sortWeight ?? p.weight;
+            const salesRaw = p.sales ?? p.sold_count ?? p.total_sales ?? p.buy_count ?? p.orders_count ?? p.purchase_count;
+            const stockRaw = p.stock ?? p.available_stock ?? p.inventory ?? p.quantity;
+            const weight = weightRaw !== null && weightRaw !== undefined && weightRaw !== '' && Number.isFinite(Number(weightRaw)) ? Number(weightRaw) : null;
+            const sales = salesRaw !== null && salesRaw !== undefined && salesRaw !== '' && Number.isFinite(Number(salesRaw)) ? Number(salesRaw) : 0;
+            const stock = stockRaw !== null && stockRaw !== undefined && stockRaw !== '' && Number.isFinite(Number(stockRaw)) ? Number(stockRaw) : 0;
+            return {...entry, _rank:weight === null ? sales : weight, _salesRank:sales, _stockRank:stock, _sourceIndex:index};
+          })
+          .sort((a,b) => b._rank-a._rank || b._salesRank-a._salesRank || b._stockRank-a._stockRank || a._sourceIndex-b._sourceIndex)
+          .slice(0, 50);
         grid.innerHTML = featured.length ? featured.map((entry) => card(entry.item, entry.type)).join('') : emptyState('当前暂无可展示商品');
       } catch (error) {
         grid.innerHTML = productErrorState();

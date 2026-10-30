@@ -335,7 +335,7 @@ async function loadCatalogPage(page=1,kind=activeKind){
   renderCatalogFilters();
   const breakdown=document.getElementById('catalogBreakdown');if(breakdown)breakdown.textContent='静态商品目录暂不可用';
   if(hint)hint.textContent='加载失败';
-  root.innerHTML='<div class="error-state"><div class="symbol"><img src="./assets/icons/network.svg" alt="" aria-hidden="true"></div><b>网络异常，请点击重试</b><p>'+escHtml(safeUiMessage(error.message))+'</p><button class="btn" type="button" data-static-catalog-retry>重新加载</button></div>';
+  root.innerHTML='<div class="error-state"><div class="symbol"><img src="./assets/icons/network.svg" alt="" aria-hidden="true"></div><b>网络异常，请点击重试</b><p>'+escHtml(safeUiMessage(error.message))+'</p><button class="btn" type="button" data-static-catalog-retry>点击重试</button></div>';
   root.querySelector('[data-static-catalog-retry]')?.addEventListener('click',()=>loadCatalogs(true));
  }finally{
   if(requestId===catalogRequestId){catalogLoading=false;root.removeAttribute('aria-busy')}

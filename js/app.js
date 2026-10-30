@@ -11,15 +11,59 @@ const catalogCache={节点:null,账号:null,引流:null};
 const catalogPrefetching=new Set();
 const CATALOG_PAGE_SIZE=15;
 
+function debounce(fn,delay){
+ let timer;
+ return function(...args){
+  const context=this;
+  clearTimeout(timer);
+  timer=setTimeout(()=>fn.apply(context,args),Math.max(0,Number(delay)||0));
+ };
+}
+window.debounce=window.debounce||debounce;
+if(!window.__S5_GLOBAL_ACTION_GUARD__){
+ window.__S5_GLOBAL_ACTION_GUARD__=true;
+ const cooldownSelector='[data-buy-sku],[data-product-id],#s5-auth-submit,button[onclick*="App.doLogin"],button[onclick*="App.doRegister"]';
+ const lockTarget=target=>{
+  const el=target&&target.closest?target.closest(cooldownSelector):null;
+  if(!el)return true;
+  if(el.dataset.s5Cooldown==='1')return false;
+  const wasDisabled=!!el.disabled;
+  el.dataset.s5Cooldown='1';
+  if('disabled' in el)el.disabled=true;
+  el.setAttribute('aria-disabled','true');
+  setTimeout(()=>{
+   el.dataset.s5Cooldown='0';
+   if('disabled' in el)el.disabled=wasDisabled||el.dataset.busy==='1';
+   if(!wasDisabled&&el.dataset.busy!=='1')el.removeAttribute('aria-disabled');
+  },3000);
+  return true;
+ };
+ document.addEventListener('click',event=>{
+  if(!lockTarget(event.target)){
+   event.preventDefault();
+   event.stopImmediatePropagation();
+  }
+ },true);
+ document.addEventListener('submit',event=>{
+  const form=event.target;
+  if(!form||!form.matches||!form.matches('#s5-auth-form'))return;
+  const submit=form.querySelector('#s5-auth-submit');
+  if(submit&&!lockTarget(submit)){
+   event.preventDefault();
+   event.stopImmediatePropagation();
+  }
+ },true);
+}
+
 const STATIC_CATALOG_URLS={
- '节点':'https://raw.githubusercontent.com/shuji-chu/qian/main/nodes.json',
- '账号':'https://raw.githubusercontent.com/shuji-chu/qian/main/accounts.json',
- '引流':'https://raw.githubusercontent.com/shuji-chu/qian/main/traffic.json'
-};
-const STATIC_CATALOG_FALLBACKS={
  '节点':'https://api.lynli.me/static/qian/nodes.json',
  '账号':'https://api.lynli.me/static/qian/accounts.json',
  '引流':'https://api.lynli.me/static/qian/traffic.json'
+};
+const STATIC_CATALOG_FALLBACKS={
+ '节点':'https://raw.githubusercontent.com/shuji-chu/qian/main/nodes.json',
+ '账号':'https://raw.githubusercontent.com/shuji-chu/qian/main/accounts.json',
+ '引流':'https://raw.githubusercontent.com/shuji-chu/qian/main/traffic.json'
 };
 async function fetchStaticCatalog(kind){
  const urls=[STATIC_CATALOG_URLS[kind],STATIC_CATALOG_FALLBACKS[kind]].filter(Boolean);
@@ -27,7 +71,7 @@ async function fetchStaticCatalog(kind){
  for(const url of urls){
   console.info('[S5 static catalog] fetching JSON:',url);
   const controller=new AbortController();
-  const timeout=setTimeout(()=>controller.abort(),15000);
+  const timeout=setTimeout(()=>controller.abort(),5000);
   try{
    const response=await fetch(url,{method:'GET',mode:'cors',credentials:'omit',cache:'no-store',headers:{Accept:'application/json'},signal:controller.signal});
    if(!response.ok)throw new Error('HTTP '+response.status);
@@ -40,7 +84,7 @@ async function fetchStaticCatalog(kind){
    console.error('[S5 static catalog] request failed:',{kind,url,error});
   }finally{clearTimeout(timeout)}
  }
- throw new Error(lastError&&lastError.name==='AbortError'?'网络请求超时，请重新加载':'网络异常，请重新加载');
+ throw new Error(lastError&&lastError.name==='AbortError'?'网络请求超时，请重新加载':'网络异常，请点击重试');
 }
 
 const catalogFacetIcon=(p,kind,label)=>{
@@ -286,7 +330,7 @@ async function loadCatalogPage(page=1,kind=activeKind){
   renderCatalogFilters();
   const breakdown=document.getElementById('catalogBreakdown');if(breakdown)breakdown.textContent='静态商品目录暂不可用';
   if(hint)hint.textContent='加载失败';
-  root.innerHTML='<div class="error-state"><div class="symbol"><img src="./assets/icons/network.svg" alt="" aria-hidden="true"></div><b>网络异常，请重新加载</b><p>'+escHtml(safeUiMessage(error.message))+'</p><button class="btn" type="button" data-static-catalog-retry>重新加载</button></div>';
+  root.innerHTML='<div class="error-state"><div class="symbol"><img src="./assets/icons/network.svg" alt="" aria-hidden="true"></div><b>网络异常，请点击重试</b><p>'+escHtml(safeUiMessage(error.message))+'</p><button class="btn" type="button" data-static-catalog-retry>重新加载</button></div>';
   root.querySelector('[data-static-catalog-retry]')?.addEventListener('click',()=>loadCatalogs(true));
  }finally{
   if(requestId===catalogRequestId){catalogLoading=false;root.removeAttribute('aria-busy')}
@@ -299,9 +343,20 @@ function loadCatalogs(force=false){
 }
 window.loadCatalogPage=loadCatalogPage;
 window.loadCatalogs=loadCatalogs;
-document.querySelectorAll('[data-kind]').forEach(b=>{b.className=b.dataset.kind===activeKind?'btn primary':'btn ghost';b.setAttribute('aria-pressed',String(b.dataset.kind===activeKind));b.addEventListener('click',()=>{if(activeKind===b.dataset.kind)return;activeKind=b.dataset.kind;activeFilter='全部';catalogPage=1;document.querySelectorAll('[data-kind]').forEach(x=>{x.className=x.dataset.kind===activeKind?'btn primary':'btn ghost';x.setAttribute('aria-pressed',String(x.dataset.kind===activeKind))});renderCatalogFilters();loadCatalogPage(1,activeKind)})});
+const applyCatalogKind=debounce(kind=>{
+ if(activeKind===kind)return;
+ activeKind=kind;activeFilter='全部';catalogPage=1;
+ document.querySelectorAll('[data-kind]').forEach(x=>{x.className=x.dataset.kind===activeKind?'btn primary':'btn ghost';x.setAttribute('aria-pressed',String(x.dataset.kind===activeKind))});
+ renderCatalogFilters();loadCatalogPage(1,activeKind);
+},300);
+document.querySelectorAll('[data-kind]').forEach(b=>{b.className=b.dataset.kind===activeKind?'btn primary':'btn ghost';b.setAttribute('aria-pressed',String(b.dataset.kind===activeKind));b.addEventListener('click',()=>applyCatalogKind(b.dataset.kind))});
 const catalogFilterRoot=document.getElementById('catalogFilters');
-catalogFilterRoot?.addEventListener('click',e=>{const b=e.target.closest('[data-catalog-filter]');if(!b||!catalogFilterRoot.contains(b))return;activeFilter=b.dataset.catalogFilter||'全部';catalogPage=1;catalogFilterRoot.querySelectorAll('[data-catalog-filter]').forEach(x=>{const selected=x===b;x.classList.toggle('active',selected);x.setAttribute('aria-pressed',String(selected))});renderProducts()});
+const applyCatalogFilter=debounce(label=>{
+ activeFilter=label||'全部';catalogPage=1;
+ catalogFilterRoot?.querySelectorAll('[data-catalog-filter]').forEach(x=>{const selected=x.dataset.catalogFilter===activeFilter;x.classList.toggle('active',selected);x.setAttribute('aria-pressed',String(selected))});
+ renderProducts();
+},300);
+catalogFilterRoot?.addEventListener('click',e=>{const b=e.target.closest('[data-catalog-filter]');if(!b||!catalogFilterRoot.contains(b))return;applyCatalogFilter(b.dataset.catalogFilter)});
 const productListRoot=document.getElementById('products');
 productListRoot?.addEventListener('click',event=>{const card=event.target.closest('[data-buy-sku]');if(!card||!productListRoot.contains(card))return;const product=liveProducts.find(item=>String(item._key)===String(card.dataset.buySku));if(!product)return;if(typeof window.S5_OPEN_PURCHASE!=='function'){console.error('[S5 checkout] purchase modal is unavailable');return}window.S5_OPEN_PURCHASE(product)});
 productListRoot?.addEventListener('keydown',event=>{if(event.key!=='Enter'&&event.key!==' ')return;const card=event.target.closest('[data-buy-sku]');if(!card||!productListRoot.contains(card))return;event.preventDefault();const product=liveProducts.find(item=>String(item._key)===String(card.dataset.buySku));if(product&&typeof window.S5_OPEN_PURCHASE==='function')window.S5_OPEN_PURCHASE(product)});

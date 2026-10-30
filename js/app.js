@@ -25,10 +25,10 @@ function catalogFacet(p,kind){
  keys.forEach(k=>{const v=p[k]??attrs[k];if(v!==undefined&&v!==null&&v!=='')values.push(v)});
  const extra=p.platforms??p.supported_platforms??p.channels??p.services??attrs.platforms??attrs.supported_platforms??attrs.channels??attrs.services;
  if(Array.isArray(extra))values.push(...extra);else if(extra)values.push(extra);
- const labels=values.flatMap(v=>String(typeof v==='object'?(v.name||v.platform||v.title||''):v).split(/[,，|\\/、;；]+/).map(x=>x.trim()).filter(Boolean));
+ const labels=values.flatMap(v=>String(typeof v==='object'?(v.name||v.platform||v.title||''):v).split(/[,，|、;；]+/).map(x=>x.trim()).filter(Boolean));
  const title=String(p._title||p.title||p.name||p.product_name||p.sku_name||'');
  const known=[
-  [/\\btelegram\\b|电报/i,'Telegram'],[/\\bsteam\\b/i,'Steam'],[/\\bnetflix\\b/i,'Netflix'],[/\\bgmail\\b|\\bgoogle\\s*mail\\b/i,'Gmail'],[/mail\\.ru|\\bmailru\\b/i,'Mail.ru'],[/\\btiktok\\b|抖音/i,'TikTok'],[/\\binstagram\\b|\\big\\b/i,'Instagram'],[/\\bfacebook\\b/i,'Facebook'],[/\\bwhatsapp\\b/i,'WhatsApp'],[/\\bdiscord\\b/i,'Discord'],[/\\byoutube\\b/i,'YouTube'],[/\\breddit\\b/i,'Reddit'],[/\\btwitter\\b|\\bx\\s*账号/i,'X']
+  [/\btelegram\b|电报/i,'Telegram'],[/\bsteam\b/i,'Steam'],[/\bnetflix\b/i,'Netflix'],[/\bgmail\b|\bgoogle\s*mail\b/i,'Gmail'],[/mail\.ru|\bmailru\b/i,'Mail.ru'],[/\btiktok\b|抖音/i,'TikTok'],[/\binstagram\b|\big\b/i,'Instagram'],[/\bfacebook\b/i,'Facebook'],[/\bwhatsapp\b/i,'WhatsApp'],[/\bdiscord\b/i,'Discord'],[/\byoutube\b/i,'YouTube'],[/\breddit\b/i,'Reddit'],[/\btwitter\b|\bx\s*账号/i,'X']
  ];
  known.forEach(([re,name])=>{if(re.test(title+' '+labels.join(' ')))labels.push(name)});
  return [...new Set(labels.map(x=>x.trim()).filter(x=>x&&x.length<=40))];

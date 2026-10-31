@@ -137,7 +137,7 @@ const balanceAmount=balanceYuan!==null?Number(balanceYuan):balanceUsdt!==null?Nu
 $('profileBalance').textContent=Number.isFinite(balanceAmount)?'¥'+balanceAmount.toFixed(2):'¥—';
 const finance={info,stats,user};
 const commissionYuan=findValue(finance,['commission_balance_yuan','available_commission_yuan','withdrawable_commission_yuan']);
-const commissionUsdt=findValue(finance,['commission_balance_usdt','available_commission_usdt','withdrawable_commission_usdt','commission_balance','available_commission','withdrawable_commission']);
+const commissionUsdt=findValue(finance,['commission_balance_usdt','available_commission_usdt','withdrawable_commission_usdt','commission_balance','available_commission','withdrawable_commission','available_balance']);
 const commissionRaw=findValue(finance,['commission_balance_cents','available_commission_cents']);
 const commissionAmount=commissionYuan!==null?Number(commissionYuan):commissionUsdt!==null?Number(commissionUsdt)*8:commissionRaw!==null?Number(commissionRaw)/100:NaN;
 $('profileCommissionBalance').textContent=Number.isFinite(commissionAmount)?'¥'+commissionAmount.toFixed(2):'¥—';

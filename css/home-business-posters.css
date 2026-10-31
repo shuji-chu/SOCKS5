@@ -33,3 +33,7 @@
 @media(max-width:760px){.business-feature-grid{gap:16px}.business-feature-grid .business-image{aspect-ratio:1.48/1;min-height:175px;border-radius:21px 21px 0 0}.business-feature-grid>.business-card{border-radius:22px!important}.business-feature-grid .business-card-copy{padding:17px 17px 19px}.poster-eyebrow{left:12px;right:12px;bottom:11px;padding:9px 10px;font-size:9px;letter-spacing:1px}.poster-watermark{right:13px;top:10px;font-size:21px}.account-passport{width:82%}.network-routes{width:100%;left:0}}
 @media(max-width:420px){.business-feature-grid .business-image{aspect-ratio:1.5/1;min-height:165px}.business-feature-grid .business-card-copy h3{font-size:20px}.business-feature-grid .business-card-copy p{font-size:12px}}
 @media(prefers-reduced-motion:reduce){.account-passport,.network-scan{animation:none!important}.business-feature-grid>.business-card{transition:none}}
+
+
+/* S5 ICE BLUE: image placeholders use a pale surface before artwork loads */
+.business-feature-grid .business-image{background:#eaf4ff!important}

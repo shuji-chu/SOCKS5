@@ -286,7 +286,10 @@
             showCustomAlert('退出登录', content, btns);
         }
         function doLogout() {
-            localStorage.clear();
+            ['sosks5_token','tgx_token','socks5_token','sosks5_user','tgx_user','socks5_user'].forEach(key => {
+                localStorage.removeItem(key);
+                sessionStorage.removeItem(key);
+            });
             window.location.href = './login.html';
         }
     </script>

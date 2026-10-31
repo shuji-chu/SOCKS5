@@ -7,6 +7,7 @@ const App = {
         token: localStorage.getItem('sosks5_token') || null,
         user: JSON.parse(localStorage.getItem('sosks5_user')) || null,
         cart: JSON.parse(localStorage.getItem('sosks5_cart')) || [],
+        pendingCheckout: JSON.parse(localStorage.getItem('sosks5_pending_checkout') || 'null'),
         products: [],
         nodes: []
     },
@@ -128,63 +129,80 @@ const App = {
         cart() {
             if (!App.state.user) {
                 setTimeout(() => App.openModal('login'), 100);
-                return `<div class="text-center py-20 text-gray-500">Please sign in to view your cart.</div>`;
+                return `<div class="text-center py-20 text-gray-500"><h2 class="text-xl font-bold text-slate-900 mb-3">请先登录</h2><p>登录后即可查看和管理购物车。</p><button type="button" onclick="App.openModal('login')" class="mt-5 bg-primary text-white px-6 py-3 rounded-xl">立即登录</button></div>`;
             }
-            if (App.state.cart.length === 0) {
-                return `<div class="text-center py-20"><h2 class="text-2xl text-slate-900 mb-4">Your cart is empty</h2><a href="#/products" class="bg-primary text-white px-6 py-2 rounded-lg">Browse Products</a></div>`;
+            if (!App.state.cart.length) {
+                return `<div class="text-center py-20"><div class="text-4xl mb-4">🛒</div><h2 class="text-2xl text-slate-900 mb-4">购物车还是空的</h2><a href="#/products" class="bg-primary text-white px-6 py-3 rounded-xl">浏览商品</a></div>`;
             }
-            const items = App.state.cart.map(item => `
-                <div class="bg-white rounded-xl p-4 border border-gray-200 flex items-center justify-between mb-4 shadow-sm">
-                    <div class="flex-1">
-                        <h3 class="text-slate-900 font-bold text-sm">${item.title}</h3>
-                        <p class="text-xs text-gray-500 mt-1">Qty: ${item.qty} | $${item.price.toFixed(2)}</p>
+            const items = App.state.cart.map(item => {
+                const qty = Math.max(1, Number(item.qty) || 1);
+                const stock = Math.max(0, Number(item.stock) || 0);
+                const price = Number(item.price) || 0;
+                const invalid = qty > stock || stock <= 0;
+                return `
+                <article class="bg-white rounded-xl p-4 border border-gray-200 flex flex-wrap sm:flex-nowrap items-center gap-4 mb-3 shadow-sm">
+                    <div class="min-w-0 flex-1">
+                        <h3 class="text-slate-900 font-bold text-sm break-words">${App.escapeHtml(item.title || '商品')}</h3>
+                        <p class="text-xs text-gray-500 mt-1">单价：¥${price.toFixed(2)} · 库存：${stock}</p>
+                        ${invalid ? '<p class="text-xs text-red-600 mt-1">库存不足，请调整数量或移除商品</p>' : ''}
                     </div>
-                    <div class="font-bold text-slate-900 w-20 text-right">$${(item.price * item.qty).toFixed(2)}</div>
-                    <button onclick="App.removeFromCart(${item.id})" class="ml-4 text-red-500 text-sm hover:underline">Remove</button>
-                </div>`).join('');
-            const total = App.state.cart.reduce((s, i) => s + (i.price * i.qty), 0);
+                    <div class="flex items-center gap-2">
+                        <button type="button" aria-label="减少数量" onclick="App.updateCartQty(${Number(item.id)}, -1)" class="w-10 h-10 rounded-lg border border-gray-200 text-slate-700" ${qty <= 1 ? 'disabled' : ''}>−</button>
+                        <span class="min-w-7 text-center font-semibold">${qty}</span>
+                        <button type="button" aria-label="增加数量" onclick="App.updateCartQty(${Number(item.id)}, 1)" class="w-10 h-10 rounded-lg border border-gray-200 text-slate-700" ${qty >= stock ? 'disabled' : ''}>＋</button>
+                    </div>
+                    <strong class="w-24 text-right text-slate-900">¥${(price * qty).toFixed(2)}</strong>
+                    <button type="button" onclick="App.removeFromCart(${Number(item.id)})" class="px-3 py-2 text-sm text-red-600">移除</button>
+                </article>`;
+            }).join('');
+            const total = App.cartTotal();
+            const hasInvalid = App.state.cart.some(i => Number(i.qty) > Number(i.stock) || Number(i.stock) <= 0);
             return `
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div class="lg:col-span-2">
-                    <h1 class="text-2xl font-bold text-slate-900 mb-6">Shopping Cart</h1>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <section class="lg:col-span-2">
+                    <div class="flex items-center justify-between mb-5"><h1 class="text-2xl font-bold text-slate-900">我的购物车</h1><a href="#/products" class="text-primary text-sm">继续购物</a></div>
                     ${items}
-                </div>
-                <div>
-                    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-                        <div class="flex justify-between font-bold text-slate-900 text-lg mb-6 border-b border-gray-100 pb-4">
-                            <span>Total</span><span>$${total.toFixed(2)}</span>
-                        </div>
-                        <a href="#/checkout" class="block text-center w-full bg-primary text-white font-bold py-3 rounded-lg hover:bg-blue-700">Proceed to Checkout</a>
+                </section>
+                <aside>
+                    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm lg:sticky lg:top-24">
+                        <h2 class="text-lg font-bold text-slate-900 mb-5">订单摘要</h2>
+                        <div class="flex justify-between text-sm mb-3"><span>商品数量</span><span>${App.state.cart.reduce((n,i)=>n+(Number(i.qty)||0),0)} 件</span></div>
+                        <div class="flex justify-between font-bold text-slate-900 text-xl border-t border-gray-100 pt-4 mb-5"><span>合计</span><span>¥${total.toFixed(2)}</span></div>
+                        <button type="button" onclick="location.hash='#/checkout'" ${hasInvalid ? 'disabled' : ''} class="w-full bg-primary text-white font-bold py-3 rounded-xl disabled:opacity-40 disabled:cursor-not-allowed">前往结算</button>
+                        ${hasInvalid ? '<p class="text-xs text-red-600 mt-3">请先处理库存不足的商品。</p>' : ''}
                     </div>
-                </div>
+                </aside>
             </div>`;
         },
 
         checkout() {
-            const total = App.state.cart.reduce((s, i) => s + (i.price * i.qty), 0);
+            if (!App.state.user) {
+                setTimeout(() => App.openModal('login'), 100);
+                return `<div class="text-center py-20 text-gray-500">请先登录后再结算。</div>`;
+            }
+            if (!App.state.cart.length) return `<div class="text-center py-20"><h2 class="text-xl font-bold mb-4">购物车为空</h2><a href="#/products" class="text-primary">返回商品列表</a></div>`;
+            const total = App.cartTotal();
+            const invalid = App.state.cart.some(i => !Number.isFinite(Number(i.price)) || Number(i.price) < 0 || Number(i.qty) < 1 || Number(i.qty) > Number(i.stock) || Number(i.stock) <= 0);
+            const pending = App.state.pendingCheckout;
             return `
-            <h1 class="text-2xl font-bold text-slate-900 mb-6">Checkout</h1>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-                    <h2 class="text-lg text-slate-900 font-bold mb-4">Order Summary</h2>
-                    ${App.state.cart.map(i => `<div class="flex justify-between text-sm mb-2"><span>${i.title} x${i.qty}</span><span>$${(i.price * i.qty).toFixed(2)}</span></div>`).join('')}
-                    <div class="flex justify-between font-bold text-slate-900 text-xl mt-4 pt-4 border-t border-gray-100">
-                        <span>Total</span><span>$${total.toFixed(2)}</span>
-                    </div>
-                </div>
-                <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-                    <h2 class="text-lg text-slate-900 font-bold mb-4">Payment Method</h2>
-                    <label class="block bg-gray-50 p-4 rounded-lg border border-primary mb-4 cursor-pointer">
-                        <div class="flex items-center gap-3">
-                            <input type="radio" checked class="text-primary focus:ring-0">
-                            <div>
-                                <div class="text-slate-900 font-bold">Wallet Balance</div>
-                                <div class="text-sm text-gray-500">Available: $${(App.state.user ? App.state.user.balance : 0).toFixed(2)}</div>
-                            </div>
-                        </div>
-                    </label>
-                    <button onclick="App.placeOrder()" class="w-full bg-primary text-white font-bold py-3 rounded-lg hover:bg-blue-700">Place Order</button>
-                    <p class="text-xs text-gray-400 mt-3 text-center">Virtual goods only. Credentials auto-delivered after payment.</p>
+            <div class="max-w-5xl mx-auto">
+                <div class="flex items-center justify-between mb-6"><h1 class="text-2xl font-bold text-slate-900">确认订单</h1><a href="#/cart" class="text-primary text-sm">返回购物车修改</a></div>
+                ${pending ? `<div class="rounded-xl border border-amber-200 bg-amber-50 p-4 mb-5 text-sm text-amber-800"><b>已有一笔订单请求正在确认中。</b><p class="mt-1">为避免重复下单，系统暂时锁定再次提交。请先到订单记录核实该笔订单状态。</p><a href="#/orders" class="inline-block mt-2 font-bold underline">查看我的订单</a><button type="button" onclick="App.clearPendingCheckout()" class="block mt-3 text-xs underline">已确认没有生成订单，解除提交锁</button></div>` : ''}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <section class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+                        <h2 class="text-lg font-bold text-slate-900 mb-4">商品清单</h2>
+                        ${App.state.cart.map(i => `<div class="flex justify-between gap-4 text-sm py-2 border-b border-gray-100"><span class="min-w-0">${App.escapeHtml(i.title || '商品')} × ${Number(i.qty)||1}</span><b class="whitespace-nowrap">¥${((Number(i.price)||0)*(Number(i.qty)||1)).toFixed(2)}</b></div>`).join('')}
+                        <div class="flex justify-between font-bold text-slate-900 text-xl mt-5"><span>应付金额</span><span>¥${total.toFixed(2)}</span></div>
+                    </section>
+                    <section class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+                        <h2 class="text-lg font-bold text-slate-900 mb-4">支付与备注</h2>
+                        <p class="text-sm text-slate-600 mb-4">订单将提交至平台订单服务。支付是否完成以服务器返回的订单状态为准。</p>
+                        <label for="checkout-notes" class="block text-sm text-gray-600 mb-2">订单备注（选填）</label>
+                        <textarea id="checkout-notes" maxlength="200" rows="3" class="w-full border border-gray-200 rounded-xl p-3 text-slate-800" placeholder="填写订单备注，最多 200 字"></textarea>
+                        <button id="place-order-button" type="button" onclick="App.placeOrder()" ${invalid || pending ? 'disabled' : ''} class="w-full mt-5 bg-primary text-white font-bold py-3 rounded-xl disabled:opacity-40 disabled:cursor-not-allowed">${pending ? '订单确认中' : '提交订单'}</button>
+                        ${invalid ? '<p class="text-xs text-red-600 mt-3">购物车商品库存或数量异常，请返回购物车调整。</p>' : ''}
+                        <p class="text-xs text-gray-400 mt-3">提交成功不等于支付成功；未收到服务端明确的已支付状态前，购物车商品会保留。</p>
+                    </section>
                 </div>
             </div>`;
         },
@@ -438,22 +456,79 @@ const App = {
         this.router();
     },
 
+    escapeHtml(value) {
+        return String(value == null ? '' : value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+    },
+
+    cartTotal() {
+        return this.state.cart.reduce((sum, item) => sum + (Number(item.price) || 0) * (Number(item.qty) || 0), 0);
+    },
+
+    updateCartQty(id, delta) {
+        const item = this.state.cart.find(x => Number(x.id) === Number(id));
+        if (!item) return;
+        const next = (Number(item.qty) || 1) + Number(delta || 0);
+        const stock = Number(item.stock) || 0;
+        if (next < 1) return;
+        if (next > stock) return this.showToast('库存不足，无法增加数量', 'bg-red-600');
+        item.qty = next;
+        localStorage.setItem('sosks5_cart', JSON.stringify(this.state.cart));
+        this.renderNav();
+        this.router();
+    },
+
+    clearPendingCheckout() {
+        if (!window.confirm('只有在订单列表确认没有生成该订单时，才可以解除提交锁。确定继续吗？')) return;
+        this.state.pendingCheckout = null;
+        localStorage.removeItem('sosks5_pending_checkout');
+        this.router();
+    },
+
     async placeOrder() {
-        const items = this.state.cart.map(i => ({ product_id: i.id, qty: i.qty }));
-        if (!items.length) return this.showToast('Cart is empty', 'bg-red-600');
+        if (!this.state.token || !this.state.user) {
+            this.openModal('login');
+            return;
+        }
+        if (!this.state.cart.length) return this.showToast('购物车为空', 'bg-red-600');
+        if (this.state.pendingCheckout) return this.showToast('已有订单请求待核实，请先查看订单记录', 'bg-red-600');
+        const invalid = this.state.cart.some(i => !Number.isFinite(Number(i.id)) || !Number.isFinite(Number(i.price)) || Number(i.price) < 0 || !Number.isInteger(Number(i.qty)) || Number(i.qty) < 1 || Number(i.qty) > Number(i.stock) || Number(i.stock) <= 0);
+        if (invalid) return this.showToast('商品库存或数量异常，请返回购物车检查', 'bg-red-600');
+        const button = document.getElementById('place-order-button');
+        if (button) { button.disabled = true; button.textContent = '正在提交订单…'; }
+        const items = this.state.cart.map(i => ({ product_id: i.id, qty: Number(i.qty) }));
+        const notes = (document.getElementById('checkout-notes')?.value || '').trim().slice(0, 200);
         try {
-            const r = await this.api('/orders', { method: 'POST', body: JSON.stringify({ items }) });
-            if (r.ok) {
+            const r = await this.api('/orders', { method: 'POST', body: JSON.stringify({ items, notes }) });
+            if (!r || r.ok !== true) throw new Error((r && r.message) || '订单提交失败，请稍后重试');
+            const data = r.data || r.order || {};
+            const status = String(data.payment_status || data.pay_status || data.status || r.payment_status || r.status || '').toLowerCase();
+            const paid = ['paid','success','completed','complete','delivered','已支付','已完成'].includes(status);
+            const orderNo = data.order_no || data.orderNo || data.trade_no || data.id || r.order_no || r.orderNo || '';
+            const paymentUrl = data.payment_url || data.pay_url || data.checkout_url || r.payment_url || r.pay_url || '';
+            if (paid) {
                 this.state.cart = [];
                 localStorage.setItem('sosks5_cart', '[]');
                 this.renderNav();
-                this.showToast('Payment successful! Credentials delivered.');
-                setTimeout(() => { window.location.hash = '#/orders'; this.router(); }, 1000);
-            } else {
-                this.showToast(r.message || 'Order failed', 'bg-red-600');
+                this.showToast('服务器已确认支付成功', 'bg-green-600');
+                setTimeout(() => { window.location.hash = '#/orders'; this.router(); }, 900);
+                return;
             }
+            this.state.pendingCheckout = { orderNo: String(orderNo || ''), createdAt: Date.now(), status: status || 'pending' };
+            localStorage.setItem('sosks5_pending_checkout', JSON.stringify(this.state.pendingCheckout));
+            this.router();
+            if (paymentUrl) {
+                const safeUrl = String(paymentUrl);
+                if (/^https:\/\//i.test(safeUrl)) {
+                    const note = document.createElement('div');
+                    note.className = 'fixed inset-x-4 bottom-20 z-50 mx-auto max-w-md rounded-xl border border-blue-200 bg-white p-4 shadow-xl';
+                    note.innerHTML = '<p class="font-bold text-slate-900 mb-2">订单已创建，等待支付</p><a class="block rounded-lg bg-blue-600 p-3 text-center font-bold text-white" target="_blank" rel="noopener noreferrer" href="' + this.escapeHtml(safeUrl) + '">打开支付页面</a>';
+                    document.body.appendChild(note);
+                }
+            }
+            this.showToast(orderNo ? '订单已创建，请完成支付或核实订单状态' : '订单请求已提交，请到订单列表核实状态', 'bg-green-600');
         } catch (e) {
-            this.showToast('Network error', 'bg-red-600');
+            this.showToast(e.message || '网络异常，订单状态未确认', 'bg-red-600');
+            if (button) { button.disabled = false; button.textContent = '重试提交'; }
         }
     },
 

@@ -429,27 +429,48 @@
     const updateTotal=()=>{const p=periods.find(x=>String(x.value)===$('s5-period').value)||periods[0];$('s5-total-price').textContent='¥'+(p.price/100).toFixed(2);$('s5-total-note').textContent='商品金额将在服务端创建订单时再次核验'};
     $('s5-period').addEventListener('change',updateTotal);
     $('s5-coupon-verify').addEventListener('click',()=>{$('s5-coupon-status').textContent=$('s5-coupon-code').value.trim()?'待后端接入：优惠码尚未校验，金额未改变。':'请先输入优惠码；校验接口待后端接入。'});
+    let pendingTradeNo = '';
+    let orderSaveOutcomeUnknown = false;
     $('s5-purchase-form').addEventListener('submit',async event=>{
       event.preventDefault();
-      const button=$('s5-create-order');button.disabled=true;button.textContent='正在创建订单…';
+      const button=$('s5-create-order');
+      if(orderSaveOutcomeUnknown){showError('订单创建结果暂时无法确认。请先到订单列表核对，确认不存在订单后再重新购买，避免重复扣款。');return}
+      button.disabled=true;button.textContent=pendingTradeNo?'正在重新获取支付方式…':'正在创建订单…';
       try{
-        const paymentIndex=Number(document.querySelector('input[name="s5-payment"]:checked')?.value);
-        const paymentChoice=paymentChannels[paymentIndex];if(!paymentChoice)throw new Error('请选择有效支付方式');
-        const period=$('s5-period').value;
-        const orderResponse=await request('/user/order/save',{method:'POST',body:JSON.stringify({plan_id:plan.id,period,payment:paymentChoice.value})});
-        const order=unwrap(orderResponse)||{};
-        const tradeNo=(typeof order==='string'?order:'')||order.trade_no||order.tradeNo||order.order_no||order.orderNo;
-        if(!tradeNo)throw new Error(order.message||'订单已提交，但接口没有返回 trade_no');
+        if(!pendingTradeNo){
+          const paymentIndex=Number(document.querySelector('input[name="s5-payment"]:checked')?.value);
+          const paymentChoice=paymentChannels[paymentIndex];if(!paymentChoice)throw new Error('请选择有效支付方式');
+          const period=$('s5-period').value;
+          let orderResponse;
+          try{
+            orderResponse=await request('/user/order/save',{method:'POST',body:JSON.stringify({plan_id:plan.id,period,payment:paymentChoice.value})});
+          }catch(error){
+            orderSaveOutcomeUnknown=true;
+            throw new Error('订单创建结果暂时无法确认。请先到订单列表核对，切勿直接重复提交。'+(error.message?' '+error.message:''));
+          }
+          const order=unwrap(orderResponse)||{};
+          const tradeNo=(typeof order==='string'?order:'')||order.trade_no||order.tradeNo||order.order_no||order.orderNo;
+          if(!tradeNo){
+            orderSaveOutcomeUnknown=true;
+            throw new Error('订单接口未返回订单号，无法确认是否已创建。请先到订单列表核对，避免重复下单。');
+          }
+          pendingTradeNo=String(tradeNo);
+        }
         button.textContent='正在获取支付方式…';
-        const checkoutResponse=await request('/user/order/checkout',{method:'POST',body:JSON.stringify({trade_no:tradeNo})});
+        const checkoutResponse=await request('/user/order/checkout',{method:'POST',body:JSON.stringify({trade_no:pendingTradeNo})});
         const checkout=unwrap(checkoutResponse)||{};
         const payUrl=(typeof checkout==='string'?checkout:'')||checkout.url||checkout.pay_url||checkout.payment_url||checkout.checkout_url||'';
         const qr=checkout.qrcode||checkout.qr_code||checkout.qrCode||checkout.qr_url||'';
         const safePayUrl=/^https:\/\//i.test(String(payUrl))?String(payUrl):'';
         const safeQr=/^https:\/\//i.test(String(qr))||/^data:image\/(?:png|jpeg|webp);base64,/i.test(String(qr))?String(qr):'';
-        const resultHtml='<div class="rounded-xl border border-blue-100 bg-blue-50 p-4"><p class="text-sm text-slate-500 mb-1">订单号</p><p class="font-mono font-bold text-slate-900 break-all">'+esc(tradeNo)+'</p><p class="mt-2 text-xs text-slate-600">订单已创建，当前状态待支付。请完成支付后以个人中心订单状态为准。</p></div>'+(safeQr?'<div class="mt-4 text-center"><p class="mb-2 text-sm font-semibold">扫码支付</p><img alt="支付二维码" class="mx-auto max-h-64 rounded-xl border border-slate-200 bg-white p-2" src="'+esc(safeQr)+'"></div>':'')+(safePayUrl?'<a class="mt-4 block w-full rounded-xl bg-blue-600 py-3 text-center font-bold text-white" href="'+esc(safePayUrl)+'" target="_blank" rel="noopener noreferrer">打开支付页面</a>':'<p class="mt-4 text-sm text-amber-700">未收到有效的 HTTPS 支付入口。订单可能已创建但尚未支付，请先在订单记录中核对状态，不要重复下单。</p>');
+        const resultHtml='<div class="rounded-xl border border-blue-100 bg-blue-50 p-4"><p class="text-sm text-slate-500 mb-1">订单号</p><p class="font-mono font-bold text-slate-900 break-all">'+esc(pendingTradeNo)+'</p><p class="mt-2 text-xs text-slate-600">订单已创建，当前状态待支付。请完成支付后以个人中心订单状态为准。</p></div>'+(safeQr?'<div class="mt-4 text-center"><p class="mb-2 text-sm font-semibold">扫码支付</p><img alt="支付二维码" class="mx-auto max-h-64 rounded-xl border border-slate-200 bg-white p-2" src="'+esc(safeQr)+'"></div>':'')+(safePayUrl?'<a class="mt-4 block w-full rounded-xl bg-blue-600 py-3 text-center font-bold text-white" href="'+esc(safePayUrl)+'" target="_blank" rel="noopener noreferrer">打开支付页面</a>':'<p class="mt-4 text-sm text-amber-700">未收到有效的 HTTPS 支付入口。订单可能已创建但尚未支付，请先在订单记录中核对状态，不要重复下单。</p>');
+        pendingTradeNo='';
         showModal('订单待支付',resultHtml);
-      }catch(e){showError(e.message||'创建订单失败');button.disabled=false;button.textContent='重试'}
+      }catch(e){
+        showError(pendingTradeNo?'订单已创建（订单号：'+pendingTradeNo+'），支付信息获取失败。再次点击只会重试获取支付信息，不会重复创建订单。 '+(e.message||''):(e.message||'创建订单失败'));
+        button.disabled=orderSaveOutcomeUnknown;
+        button.textContent=orderSaveOutcomeUnknown?'请先核对订单':pendingTradeNo?'重试获取支付':'重试';
+      }
     });
   }
 

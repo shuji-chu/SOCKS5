@@ -297,7 +297,10 @@
   }
 
   function saveToken(token) {
-    TOKEN_KEYS.forEach((key) => localStorage.setItem(key, token));
+    TOKEN_KEYS.forEach((key) => {
+      sessionStorage.removeItem(key);
+      localStorage.setItem(key, token);
+    });
     if (window.App) App.state.token = token;
   }
 
@@ -562,7 +565,15 @@
   }
 
   function clearSession() {
-    TOKEN_KEYS.concat(USER_KEYS).forEach((key) => localStorage.removeItem(key));
+    TOKEN_KEYS.concat(USER_KEYS).forEach((key) => {
+      localStorage.removeItem(key);
+      sessionStorage.removeItem(key);
+    });
+    if (window.App) {
+      App.state.token = null;
+      App.state.user = null;
+      if (typeof App.renderNav === 'function') App.renderNav();
+    }
   }
   function getPlans() { return fetchStaticData('nodes'); }
   function getAccounts() { return fetchStaticData('accounts'); }
@@ -603,7 +614,7 @@
     const originalFetchMe = App.fetchMe && App.fetchMe.bind(App);
     App.fetchMe = async function () {
       try { await fetchUserInfo(); setUserNav(); }
-      catch (e) { TOKEN_KEYS.forEach((key) => localStorage.removeItem(key)); USER_KEYS.forEach((key) => localStorage.removeItem(key)); this.state.token = null; this.state.user = null; this.renderNav(); }
+      catch (e) { clearSession(); this.state.token = null; this.state.user = null; this.renderNav(); }
     };
     App.loadProducts = async function (type, forceReload) {
       const hash = location.hash || '';

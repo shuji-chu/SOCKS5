@@ -481,10 +481,13 @@ async function purchase(p){const validPeriods=periodOptionsFor(p);if(!p._pricePr
   const pay=unpack(await api('/user/order/checkout','POST',{trade_no:pendingNodeTradeNo}));
   const payUrl=typeof pay==='string'?pay:pay.pay_url||pay.payment_url||pay.checkout_url||pay.url||'';
   const safePayUrl=/^https:\/\//i.test(String(payUrl))?String(payUrl):'';
-  const qr=pay.qrcode||pay.qr_code||pay.qrCode||pay.qr_url||'';
+  const qrValue=pay.qrcode||pay.qr_code||pay.qrCode||pay.qr_url||'';
+  const qr=typeof qrValue==='string'?qrValue:'';
+  const qrImage=/^https:\/\//i.test(qr)||/^data:image\/(?:png|jpeg|webp);base64,/i.test(qr);
+  const qrPayload=!!qr&&!qrImage&&qr.length<=4096;
   const currentTradeNo=pendingNodeTradeNo;
-  document.getElementById('detailContent').innerHTML='<div class="panel"><b>订单已创建</b><p>订单号：'+escHtml(currentTradeNo)+'</p>'+(qr&&/^https?:\/\//i.test(qr)?'<img loading="lazy" src="'+escHtml(qr)+'" alt="支付二维码" style="display:block;width:220px;height:220px;object-fit:contain;background:white;padding:8px;border-radius:12px;margin:16px auto">':'')+(qr&&!/^https?:\/\//i.test(qr)?'<div id="payQr" style="width:220px;height:220px;background:white;padding:8px;margin:16px auto;border-radius:12px"></div>':'')+(safePayUrl?'<a class="btn primary" style="display:block;text-align:center" href="'+escHtml(safePayUrl)+'" target="_blank" rel="noopener noreferrer">打开支付页面</a>':'<p class="muted">未收到有效 HTTPS 支付入口。请先核对订单状态，不要重复下单。</p>')+'<p class="muted">支付状态以服务端订单记录为准。</p></div>';
-  if(qr&&!/^https?:\/\//i.test(qr)&&window.QRCode)new QRCode(document.getElementById('payQr'),{text:String(qr),width:204,height:204});else if(qr&&!/^https?:\/\//i.test(qr))document.getElementById('payQr').textContent=String(qr);
+  document.getElementById('detailContent').innerHTML='<div class="panel"><b>订单已创建</b><p>订单号：'+escHtml(currentTradeNo)+'</p>'+(qrImage?'<img loading="lazy" src="'+escHtml(qr)+'" alt="支付二维码" style="display:block;width:220px;height:220px;object-fit:contain;background:white;padding:8px;border-radius:12px;margin:16px auto">':'')+(qrPayload?'<div id="payQr" style="width:220px;height:220px;background:white;padding:8px;margin:16px auto;border-radius:12px"></div>':'')+(safePayUrl?'<a class="btn primary" style="display:block;text-align:center" href="'+escHtml(safePayUrl)+'" target="_blank" rel="noopener noreferrer">打开支付页面</a>':'<p class="muted">未收到有效 HTTPS 支付入口。请先核对订单状态，不要重复下单。</p>')+'<p class="muted">支付状态以服务端订单记录为准。</p></div>';
+  if(qrPayload&&window.QRCode)new QRCode(document.getElementById('payQr'),{text:qr,width:204,height:204});else if(qrPayload)document.getElementById('payQr').textContent=qr;
   pendingNodeTradeNo='';
  }catch(e){
   let message=e.message||'创建订单失败';

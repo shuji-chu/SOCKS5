@@ -545,23 +545,35 @@ const App = {
         if (!this.state.user) return this.openModal('login');
         try {
             const r = await this.api('/orders');
-            if (!r.ok || !r.data.length) {
-                box.innerHTML = '<div class="text-center py-10 text-gray-400">No orders yet</div>';
+            const orders = Array.isArray(r && r.data) ? r.data : [];
+            if (this.state.pendingCheckout && this.state.pendingCheckout.orderNo) {
+                const pending = orders.find(o => String(o.order_no || o.orderNo || o.trade_no || o.id || '') === String(this.state.pendingCheckout.orderNo));
+                const status = String(pending && (pending.payment_status || pending.pay_status || pending.status) || '').toLowerCase();
+                if (['paid','completed','complete','delivered','已支付','已完成'].includes(status)) {
+                    this.state.cart = [];
+                    this.state.pendingCheckout = null;
+                    localStorage.setItem('sosks5_cart', '[]');
+                    localStorage.removeItem('sosks5_pending_checkout');
+                    this.renderNav();
+                }
+            }
+            if (!r || r.ok !== true || !orders.length) {
+                box.innerHTML = '<div class="text-center py-10 text-gray-400">暂无订单记录</div>';
                 return;
             }
-            box.innerHTML = r.data.map(o => `
-                <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm flex items-center justify-between">
-                    <div>
-                        <div class="font-bold text-slate-900 text-sm">${o.order_no}</div>
-                        <div class="text-xs text-gray-500 mt-1">${o.created_at} · $${o.total.toFixed(2)}</div>
+            box.innerHTML = orders.map(o => `
+                <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm flex items-center justify-between gap-3">
+                    <div class="min-w-0">
+                        <div class="font-bold text-slate-900 text-sm break-all">${this.escapeHtml(o.order_no || o.orderNo || ('订单 #' + o.id))}</div>
+                        <div class="text-xs text-gray-500 mt-1">${this.escapeHtml(o.created_at || '')} · $${(Number(o.total) || 0).toFixed(2)}</div>
                     </div>
                     <div class="flex items-center gap-3">
-                        <span class="text-xs bg-green-50 text-green-700 px-2 py-1 rounded border border-green-100">${o.status}</span>
-                        <button onclick="App.viewOrder(${o.id})" class="text-primary text-sm font-bold hover:underline">View</button>
+                        <span class="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded border border-blue-100">${this.escapeHtml(o.status || '处理中')}</span>
+                        <button type="button" onclick="App.viewOrder(${Number(o.id)})" class="text-primary text-sm font-bold hover:underline">查看</button>
                     </div>
                 </div>`).join('');
         } catch (e) {
-            box.innerHTML = '<div class="text-center py-10 text-gray-400">Failed to load orders</div>';
+            box.innerHTML = '<div class="text-center py-10 text-gray-400">订单加载失败，请稍后重试</div>';
         }
     },
 

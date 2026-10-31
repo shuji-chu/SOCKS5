@@ -40,3 +40,17 @@
 .s5-account-button{box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;height:36px;min-height:36px;padding:0 14px;border:1px solid rgba(85,232,255,.38);border-radius:10px;background:linear-gradient(110deg,#087f9c,#2864c7);color:#fff!important;font-size:12px;font-weight:800;line-height:1;text-decoration:none;white-space:nowrap}
 @media(max-width:640px){.s5-global-header{padding-left:14px;padding-right:14px}.s5-header-nav{gap:14px}.s5-header-nav a{font-size:11px}.s5-account-button{height:34px;min-height:34px;padding:0 11px;font-size:11px}}
 @media(max-width:360px){.s5-header-nav{gap:9px}.s5-header-nav a{font-size:10px}.s5-account-button{padding:0 8px;font-size:10px}}
+
+
+/* S5 ICE BLUE NAVIGATION COLORS */
+
+/* S5 ICE BLUE NAVIGATION COLORS — retain exact sizing and positioning */
+.site-header,.header,.top,.dp-header,.s5-global-header{background:rgba(255,255,255,.92)!important;border-color:rgba(10,25,47,.09)!important;color:#0A192F!important;box-shadow:0 4px 20px rgba(15,23,42,.045)!important}
+.main-nav,.s5-header-nav{color:#334155!important}
+.main-nav a,.s5-header-nav a{color:#334155!important}
+.main-nav a.active,.main-nav a:hover,.s5-header-nav a.active{color:#0055FF!important;border-bottom-color:#0055FF!important}
+.bottom-nav,.home-bottom-nav,.mobile-tabbar{background:rgba(255,255,255,.94)!important;border-color:rgba(10,25,47,.1)!important;box-shadow:0 -4px 18px rgba(15,23,42,.045)!important}
+.bottom-nav a,.home-bottom-nav a,.mobile-tabbar a{color:#475569!important}
+.bottom-nav a.active,.home-bottom-nav a.active,.mobile-tabbar a.active{color:#0055FF!important}
+.s5-account-button{background:linear-gradient(110deg,#258cf0,#0055FF)!important;border-color:#0055FF!important;color:#fff!important}
+

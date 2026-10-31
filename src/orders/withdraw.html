@@ -23,58 +23,12 @@
     </header>
 
     <main class="px-4 py-6 max-w-lg mx-auto">
-        <!-- 余额展示 -->
-        <div class="text-center mb-8">
-            <p class="text-[13px] text-slate-500 mb-1">当前可提现佣金（人民币）</p>
-            <p class="text-[36px] font-bold text-green-600" id="withdraw-page-balance">¥—</p>
-            <p class="text-[12px] text-slate-400 mt-1">最低提现额度 15 USDT（折合 ¥120.00）</p>
-        </div>
-
-        <div class="card p-5 space-y-5">
-            <!-- 提现方式选择 -->
-            <div>
-                <label class="text-[14px] font-bold text-slate-700 mb-3 block">选择提现方式</label>
-                <div class="grid grid-cols-2 gap-3">
-                    <div onclick="switchTab('alipay')" id="tab-alipay" class="border-2 border-blue-500 bg-gray-50 text-black font-bold text-[14px] py-3 rounded-lg text-center cursor-pointer transition">支付宝提现</div>
-                    <div onclick="switchTab('usdt')" id="tab-usdt" class="border border-gray-200 text-slate-600 font-bold text-[14px] py-3 rounded-lg text-center cursor-pointer transition">USDT (TRC20)</div>
-                </div>
-            </div>
-
-            <!-- 表单区：支付宝 -->
-            <div id="form-alipay" class="space-y-4">
-                <div>
-                    <label class="text-[13px] font-bold text-slate-700 mb-1.5 block">支付宝账号</label>
-                    <input type="text" class="input-flat" placeholder="请输入支付宝手机号或邮箱">
-                </div>
-                <div>
-                    <label class="text-[13px] font-bold text-slate-700 mb-1.5 block">真实姓名</label>
-                    <input type="text" class="input-flat" placeholder="请输入支付宝实名认证姓名">
-                </div>
-            </div>
-
-            <!-- 表单区：USDT -->
-            <div id="form-usdt" class="space-y-4 hidden">
-                <div>
-                    <label class="text-[13px] font-bold text-slate-700 mb-1.5 block">USDT 收款地址 (TRC20)</label>
-                    <input type="text" class="input-flat" placeholder="请务必填写正确的 TRC20 地址">
-                </div>
-            </div>
-
-            <!-- 提现金额 -->
-            <div>
-                <label class="text-[13px] font-bold text-slate-700 mb-1.5 block">提现金额（人民币）</label>
-                <input type="number" class="input-flat" placeholder="最低 ¥120.00" value="120" min="120">
-            </div>
-
-            <!-- 提示 -->
-            <div class="bg-slate-50 p-3 rounded-lg border border-gray-200">
-                <p class="text-[11px] text-slate-500 leading-relaxed">提现申请需经过财务人工审核，预计 24 小时内到账。请务必核对收款信息，因信息填写错误导致的资金损失由用户自行承担。</p>
-            </div>
-
-            <!-- 提交按钮 -->
-            <button onclick="submitWithdraw()" class="w-full py-3.5 affiliate-primary text-white font-bold rounded-lg text-[16px] active:opacity-80 transition shadow-sm shadow-blue-500/20 mt-2">确认提现</button>
-        </div>
-    </main>
+        <section class="card p-6 text-center" role="status" aria-live="polite">
+            <p class="text-[18px] font-bold text-slate-800 mb-3">提现服务暂未开放</p>
+            <p class="text-[13px] text-slate-500 leading-relaxed mb-4">提现服务端接口尚未接入。为避免误导或收集无法处理的收款资料，当前不接受提现申请，也不展示未经核实的最低额度或到账时效。</p>
+            <a href="./commission.html" class="affiliate-primary inline-block px-5 py-3 font-bold rounded-lg text-[14px]">返回返佣中心</a>
+        </section>
+    </main>ain>
 
     <!-- 提示弹窗 -->
     <script>

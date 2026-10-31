@@ -78,79 +78,88 @@
         }
         
         const API_BASE = '/api';
-        document.getElementById('send-code-btn').addEventListener('click', async function() {
-            const email = document.getElementById('email').value;
-            if(!email || !email.includes('@')) { showToast('请输入正确邮箱'); return; }
-            this.disabled = true; this.innerText = '发送中...';
+
+        document.getElementById('send-code-btn').addEventListener('click', async function () {
+            const email = document.getElementById('email').value.trim();
+            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                showToast('请输入正确邮箱');
+                return;
+            }
+
+            const btn = this;
+            btn.disabled = true;
+            btn.innerText = '发送中...';
             try {
                 const res = await fetch(API_BASE + '/auth/send-code', {
-                    method: 'POST', headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ email: email })
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
                 });
                 const data = await res.json();
-                if (data.ok) {
-                    showToast('验证码已发送');
-                    let cd = 60; const btn = this;
-                    const timer = setInterval(() => { cd--; btn.innerText = `${cd}s`; if(cd <= 0) { clearInterval(timer); btn.disabled = false; btn.innerText = '获取验证码'; } }, 1000);
-                } else { showToast(data.message || '发送失败'); this.disabled = false; this.innerText = '获取验证码'; }
-            } catch (e) { showToast('网络错误'); this.disabled = false; this.innerText = '获取验证码'; }
+                if (!res.ok || !data.ok) {
+                    throw new Error(data.message || '发送失败');
+                }
+
+                showToast('验证码已发送');
+                let remaining = 60;
+                btn.innerText = remaining + 's';
+                const timer = setInterval(() => {
+                    remaining -= 1;
+                    if (remaining <= 0) {
+                        clearInterval(timer);
+                        btn.disabled = false;
+                        btn.innerText = '获取验证码';
+                    } else {
+                        btn.innerText = remaining + 's';
+                    }
+                }, 1000);
+            } catch (error) {
+                showToast(error.message || '网络错误');
+                btn.disabled = false;
+                btn.innerText = '获取验证码';
+            }
         });
-                if (res.ok) {
-                    showToast('验证码已发送');
-                    let cd = 60; const btn = this;
-                    const timer = setInterval(() => { cd--; btn.innerText = `${cd}s`; if(cd <= 0) { clearInterval(timer); btn.disabled = false; btn.innerText = '获取验证码'; } }, 1000);
-                } else { showToast('发送失败'); this.disabled = false; this.innerText = '获取验证码'; }
-            } catch (e) { showToast('网络错误'); this.disabled = false; this.innerText = '获取验证码'; }
-        });
-        
-        document.getElementById('reg-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if (!document.getElementById('agree-check').checked) { showToast('请先同意协议'); return; }
+
+        document.getElementById('reg-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            if (!document.getElementById('agree-check').checked) {
+                showToast('请先同意协议');
+                return;
+            }
+
             const btn = document.getElementById('submit-btn');
-            const email = document.getElementById('email').value;
-            const code = document.getElementById('code').value;
+            const email = document.getElementById('email').value.trim();
+            const code = document.getElementById('code').value.trim();
             const password = document.getElementById('password').value;
-            if(!code) { showToast('请输入验证码'); return; }
-            btn.innerText = '正在进入...'; btn.disabled = true;
+            if (!email || !code || !password) {
+                showToast('请填写完整的注册信息');
+                return;
+            }
+
+            btn.innerText = '正在注册...';
+            btn.disabled = true;
             try {
                 const res = await fetch(API_BASE + '/auth/register', {
-                    method: 'POST', headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ email: email, code: code, password: password })
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, code, password })
                 });
                 const data = await res.json();
-                if (data.ok && data.token) {
-                    localStorage.setItem('sosks5_token', data.token);
-                    localStorage.setItem('sosks5_user', JSON.stringify(data.user));
-                    showToast('注册成功');
-                    setTimeout(() => { window.location.href = '../index.html'; }, 600);
-                } else {
-                    showToast(data.message || '注册异常'); btn.innerText = '立即注册'; btn.disabled = false;
+                if (!res.ok || !data.ok || !data.token) {
+                    throw new Error(data.message || '注册未成功');
                 }
-            } catch (err) {
-                showToast('网络错误'); btn.innerText = '立即注册'; btn.disabled = false;
+
+                localStorage.setItem('sosks5_token', data.token);
+                localStorage.setItem('sosks5_user', JSON.stringify(data.user || {}));
+                showToast('注册成功');
+                setTimeout(() => { window.location.href = '../index.html'; }, 600);
+            } catch (error) {
+                showToast(error.message || '网络错误');
+                btn.innerText = '立即注册';
+                btn.disabled = false;
             }
         });
-                const data = await res.json();
-                if (res.ok && data.data) {
-                    localStorage.setItem('socks5_email', data.data.email);
-                    localStorage.setItem('socks5_token', data.data.token);
-                    localStorage.setItem('socks5_nickname', data.data.nickname);
-                    localStorage.setItem('socks5_user_id', data.data.user_id);
-                    localStorage.setItem('socks5_app_secret', data.data.app_secret);
-                    localStorage.setItem('socks5_user_id', data.data.user_id);
-                    localStorage.setItem('socks5_app_secret', data.data.app_secret);
-                    localStorage.setItem('socks5_avatar', data.data.avatar);
-                    
-                    // 直接跳转主页
-                    window.location.href = '/index.html';
-                } else { 
-                    showToast('注册异常'); btn.innerText = '立即注册'; btn.disabled = false; 
-                }
-            } catch (err) { 
-                showToast('网络错误'); btn.innerText = '立即注册'; btn.disabled = false; 
-            }
-        });
-        
+
         const modalContent = {
             'privacy': { title: '隐私政策', text: '我们深知个人信息对您的重要性，并会尽全力保护您的个人信息安全可靠。未经您的同意，我们绝不会向任何第三方提供您的个人信息。' },
             'terms': { title: '用户协议', text: '欢迎使用 SOCKS5 服务。本协议是您与 SOCKS5 之间关于您使用本服务所订立的协议。您在使用本服务时，必须遵守相关法律法规。' }

@@ -8,7 +8,13 @@
     const t=token(); if(!t) throw new Error('登录状态已失效，请重新登录');
     const r=await fetch(API_BASE+path,{headers:{Accept:'application/json',Authorization:'Bearer '+t},signal:AbortSignal.timeout?AbortSignal.timeout(12000):undefined});
     let b={}; try{b=await r.json()}catch(_){throw new Error('服务器返回格式错误')}
-    if(r.status===401 || b.code===401) throw new Error('登录状态已失效，请重新登录');
+    if(r.status===401 || b.code===401) {
+      ['sosks5_token','tgx_token','socks5_token','sosks5_user','tgx_user','socks5_user'].forEach(key => {
+        localStorage.removeItem(key);
+        sessionStorage.removeItem(key);
+      });
+      throw new Error('登录状态已失效，请重新登录');
+    }
     if(!r.ok || b.success===false || b.status==='fail' || b.code!==undefined && ![0,200].includes(Number(b.code))) throw new Error(b.message||b.msg||'数据读取失败（HTTP '+r.status+'）');
     return unwrap(b);
   }
@@ -45,7 +51,8 @@
     const inviteText=document.getElementById('commission-invite-url'); if(inviteText)inviteText.textContent=url||'暂未获取真实邀请链接';
     const copyButton=document.getElementById('copy-commission-invite'); if(copyButton)copyButton.onclick=()=>url?copy(url):toast('尚未获取真实 short_id，无法生成邀请链接');
     const count=find(stats,['invite_count','invited_count','total_invites','total','count']);
-    set('invite-count',count===null?String(customers.length):String(count));
+    const countValue=count!==null?String(count):(jobs[2].status==='fulfilled'?String(customers.length):'—');
+    set('invite-count',countValue);
     const balance=cny({info,stats,user},
       ['balance_yuan','account_balance_yuan','wallet_balance_yuan'],
       ['balance_usdt','account_balance_usdt'],

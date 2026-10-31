@@ -46,7 +46,7 @@
                 <p class="text-[11px] text-slate-500 mt-1">已邀请人数</p>
             </div>
             <div class="text-center">
-                <p class="text-[20px] font-bold text-slate-800">0 <span class="text-[12px] font-normal text-slate-400">单</span></p>
+                <p class="text-[20px] font-bold text-slate-800">— <span class="text-[12px] font-normal text-slate-400">单</span></p>
                 <p class="text-[11px] text-slate-500 mt-1">本月邀请订单</p>
             </div>
             <div class="text-center">
@@ -59,7 +59,7 @@
         <div class="card p-5 bg-gradient-to-br from-blue-600 to-blue-800 text-white">
             <p class="text-[13px] text-blue-100 mb-1">账户余额（人民币）</p>
             <p class="text-[36px] font-bold mb-2" id="affiliate-account-balance">¥—</p>
-            <p class="text-[11px] text-blue-200 mb-5">返佣完成后实时计入余额，可直接消费或申请提现</p>
+            <p class="text-[11px] text-blue-200 mb-5">余额与返佣数据以服务端账本返回为准；提现功能尚未开放</p>
             
             <div class="grid grid-cols-2 gap-4 pt-4 border-t border-white/20">
                 <div>
@@ -76,7 +76,7 @@
         <!-- 推广链接模块 -->
         <div class="card p-5">
             <h3 class="text-[15px] font-bold text-slate-800 mb-2">我的专属推广链接</h3>
-            <p class="text-[12px] text-slate-500 mb-3">好友通过此链接注册并购买商品，订单完成后您可获得 15% 返佣。</p>
+            <p class="text-[12px] text-slate-500 mb-3">规则展示比例为 15%，实际返佣以服务端账本记录为准。</p>
             <div class="flex gap-2">
                 <input type="text" id="promo-link" value="" placeholder="正在读取真实推广链接…" readonly class="flex-1 bg-slate-50 border border-gray-200 rounded-lg px-3 py-2 text-[13px] font-mono text-slate-600 outline-none">
                 <button onclick="copyLink()" class="affiliate-primary font-bold px-4 py-2 rounded-lg text-[13px] active:opacity-80">复制链接</button>
@@ -103,8 +103,8 @@
                 <div class="flex gap-3 items-start">
                     <div class="w-6 h-6 rounded bg-gray-50 text-black text-[12px] font-bold flex items-center justify-center shrink-0">03</div>
                     <div>
-                        <p class="text-[13px] font-bold text-slate-800">返佣自动入账</p>
-                        <p class="text-[11px] text-slate-500">订单完成按 15% 实时计入余额</p>
+                        <p class="text-[13px] font-bold text-slate-800">服务端账本确认返佣</p>
+                        <p class="text-[11px] text-slate-500">一级展示比例为 15%，实际入账以服务端订单和账本为准</p>
                     </div>
                 </div>
             </div>
@@ -114,26 +114,17 @@
         <div class="card p-5">
             <div class="flex justify-between items-center mb-1">
                 <h3 class="text-[14px] font-bold text-slate-800">近 7 天返佣趋势</h3>
-                <span class="text-[11px] text-gray-500 bg-gray-50 px-1.5 py-0.5 rounded">较上周期 0%</span>
+                <span class="text-[11px] text-gray-500 bg-gray-50 px-1.5 py-0.5 rounded">趋势数据待接入</span>
             </div>
-            <div class="bar-chart">
-                <div class="bar-col"><div class="bar-fill" style="height: 4px;"></div><div class="bar-label">周五</div></div>
-                <div class="bar-col"><div class="bar-fill" style="height: 4px;"></div><div class="bar-label">周六</div></div>
-                <div class="bar-col"><div class="bar-fill" style="height: 4px;"></div><div class="bar-label">周日</div></div>
-                <div class="bar-col"><div class="bar-fill" style="height: 4px;"></div><div class="bar-label">周一</div></div>
-                <div class="bar-col"><div class="bar-fill" style="height: 4px;"></div><div class="bar-label">周二</div></div>
-                <div class="bar-col"><div class="bar-fill" style="height: 4px;"></div><div class="bar-label">周三</div></div>
-                <div class="bar-col"><div class="bar-fill" style="height: 4px; background: #3b82f6;"></div><div class="bar-label text-gray-900">今天</div></div>
-            </div>
-            <p class="text-center text-[11px] text-slate-400 mt-4">近 7 天暂无返佣入账，分享推广链接开始赚取佣金</p>
+            <div class="empty-state" role="status">返佣趋势接口尚未接入，当前不展示模拟统计。</div>
         </div>
 
         <!-- 明细数据 (Tab 切换) -->
         <div class="card">
             <div class="flex border-b border-gray-200">
-                <div class="tab-btn active" onclick="switchTab('invite')">邀请明细</div>
-                <div class="tab-btn" onclick="switchTab('commission')">返佣记录</div>
-                <div class="tab-btn" onclick="switchTab('withdraw')">提现记录</div>
+                <div class="tab-btn active" onclick="switchTab('invite', this)">邀请明细</div>
+                <div class="tab-btn" onclick="switchTab('commission', this)">返佣记录</div>
+                <div class="tab-btn" onclick="switchTab('withdraw', this)">提现记录</div>
             </div>
             <div class="p-4">
                 <div id="tab-invite" class="block">
@@ -159,28 +150,36 @@
 
         <!-- 底部操作与规则 -->
         <div class="text-center pb-8 space-y-4">
-            <a href="./withdraw.html" class="affiliate-primary block w-full py-3 font-bold rounded-lg text-[15px] active:opacity-80 transition shadow-sm">申请提现</a>
+            <button type="button" disabled aria-disabled="true" class="affiliate-primary block w-full py-3 font-bold rounded-lg text-[15px] opacity-60 cursor-not-allowed" title="提现服务端接口尚未接入">提现暂未开放</button>
             
             <div class="text-left bg-slate-50 p-4 rounded-lg border border-gray-200">
                 <p class="text-[12px] font-bold text-slate-700 mb-1">规则说明：</p>
-                <p class="text-[11px] text-slate-500 leading-relaxed">邀请好友注册并完成订单后，系统按订单实付金额的 15% 自动返佣（一级），多级推广与分站商户按平台规则另行计算；返佣实时计入余额，可直接消费或前往提现页申请提现；订单退款时对应返佣将同步扣回，返佣金额以后台实际入账为准。</p>
+                <p class="text-[11px] text-slate-500 leading-relaxed">平台展示的一级返佣比例为 15%；实际返佣资格、金额、入账时间及退款冲回均以服务端订单状态和账本记录为准。提现接口尚未接入，当前暂不受理提现申请。</p>
             </div>
         </div>
     </main>
 
     <script>
-        function copyLink() {
-            const link = document.getElementById('promo-link').value;
-            if(navigator.clipboard) {
-                navigator.clipboard.writeText(link).then(() => {
-                    alert('专属推广链接已复制！');
-                });
+        async function copyLink() {
+            const link = document.getElementById('promo-link').value.trim();
+            if (!link) { alert('真实推广链接尚未加载，请稍后重试。'); return; }
+            try {
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(link);
+                } else {
+                    const field = document.getElementById('promo-link');
+                    field.focus(); field.select();
+                    if (!document.execCommand('copy')) throw new Error('copy failed');
+                }
+                alert('专属推广链接已复制！');
+            } catch (_) {
+                alert('复制失败，请手动选择推广链接复制。');
             }
         }
 
-        function switchTab(tab) {
+        function switchTab(tab, trigger) {
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            event.target.classList.add('active');
+            if (trigger) trigger.classList.add('active');
 
             document.getElementById('tab-invite').classList.add('hidden');
             document.getElementById('tab-commission').classList.add('hidden');

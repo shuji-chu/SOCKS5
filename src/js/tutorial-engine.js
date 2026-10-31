@@ -11,6 +11,8 @@ function renderAutoTutorial(sections, containerId) {
         // 移除要求把完整卡密交给 AI 的交互块，以及已知第三方在线 2FA 工具入口。
         body = body.replace(/<div[^>]*class=["'][^"']*ai-prompt-box[^"']*["'][^>]*>[\\s\\S]*?<\\/div>\\s*<\\/div>/gi, '<p class="text-amber-700">为保护账号安全，请勿将完整卡密提交给 AI 或第三方。请仅在官方页面完成登录和验证。</p>');
         body = body.replace(/<a\\b[^>]*href=["']https?:\\/\\/(?:www\\.)?2fa\\.(?:vip|run)[^"']*["'][^>]*>[\\s\\S]*?<\\/a>/gi, '<span class="text-amber-700">请使用可信的本地身份验证器；不要把密钥粘贴到第三方网站。</span>');
+        body = body.replace(/[^。；<]{0,50}(?:将|把|复制|粘贴|提交|上传)[^。；<]{0,35}(?:完整卡密|2FA密钥|Cookie|Token)[^。；<]{0,60}[。；]?/gi, '请勿向第三方提交密码、完整卡密、2FA 密钥、Cookie 或 Token；仅使用平台官方登录与可信的本地验证工具。');
+        body = body.replace(/https?:\\/\\/[^\\s"'<>]*(?:GetCodeSMS|token=)[^\\s"'<>]*/gi, '[敏感接码链接已隐藏，请勿向第三方转发]');
         if (riskyTitle) {
             body = '<div class="p-4 text-[13px] text-slate-600 leading-relaxed space-y-2"><p>此类操作因账号安全、平台规则或商品权限差异，不提供 Cookie/Token 导入、接码代验证、批量养号、规避风控、解绑换绑或刷机解限步骤。</p><p>请仅使用平台官方登录和安全设置。是否包含邮箱、手机号控制权或修改权限，以当前 SKU 的交付清单为准；未明确写出的能力视为未确认。</p><p>遇到验证或限制提示时按平台官方流程处理，并通过订单售后提交脱敏截图。</p></div>';
         }

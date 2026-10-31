@@ -8,6 +8,7 @@ const App = {
         user: JSON.parse(localStorage.getItem('sosks5_user')) || null,
         cart: JSON.parse(localStorage.getItem('sosks5_cart')) || [],
         pendingCheckout: JSON.parse(localStorage.getItem('sosks5_pending_checkout') || 'null'),
+        isPlacingOrder: false,
         products: [],
         nodes: []
     },
@@ -491,8 +492,10 @@ const App = {
         }
         if (!this.state.cart.length) return this.showToast('购物车为空', 'bg-red-600');
         if (this.state.pendingCheckout) return this.showToast('已有订单请求待核实，请先查看订单记录', 'bg-red-600');
+        if (this.state.isPlacingOrder) return;
         const invalid = this.state.cart.some(i => !Number.isFinite(Number(i.id)) || !Number.isFinite(Number(i.price)) || Number(i.price) < 0 || !Number.isInteger(Number(i.qty)) || Number(i.qty) < 1 || Number(i.qty) > Number(i.stock) || Number(i.stock) <= 0);
         if (invalid) return this.showToast('商品库存或数量异常，请返回购物车检查', 'bg-red-600');
+        this.state.isPlacingOrder = true;
         const button = document.getElementById('place-order-button');
         if (button) { button.disabled = true; button.textContent = '正在提交订单…'; }
         const items = this.state.cart.map(i => ({ product_id: i.id, qty: Number(i.qty) }));
@@ -501,8 +504,10 @@ const App = {
             const r = await this.api('/orders', { method: 'POST', body: JSON.stringify({ items, notes }) });
             if (!r || r.ok !== true) throw new Error((r && r.message) || '订单提交失败，请稍后重试');
             const data = r.data || r.order || {};
-            const status = String(data.payment_status || data.pay_status || data.status || r.payment_status || r.status || '').toLowerCase();
-            const paid = ['paid','success','completed','complete','delivered','已支付','已完成'].includes(status);
+            const paymentStatus = String(data.payment_status || data.pay_status || r.payment_status || '').toLowerCase();
+            const orderStatus = String(data.status || '').toLowerCase();
+            const status = paymentStatus || orderStatus || 'pending';
+            const paid = ['paid','completed','complete','delivered','已支付','已完成'].includes(paymentStatus) || ['paid','completed','complete','delivered','已支付','已完成'].includes(orderStatus);
             const orderNo = data.order_no || data.orderNo || data.trade_no || data.id || r.order_no || r.orderNo || '';
             const paymentUrl = data.payment_url || data.pay_url || data.checkout_url || r.payment_url || r.pay_url || '';
             if (paid) {
@@ -529,6 +534,8 @@ const App = {
         } catch (e) {
             this.showToast(e.message || '网络异常，订单状态未确认', 'bg-red-600');
             if (button) { button.disabled = false; button.textContent = '重试提交'; }
+        } finally {
+            this.state.isPlacingOrder = false;
         }
     },
 

@@ -45,7 +45,8 @@
     const inviteText=document.getElementById('commission-invite-url'); if(inviteText)inviteText.textContent=url||'暂未获取真实邀请链接';
     const copyButton=document.getElementById('copy-commission-invite'); if(copyButton)copyButton.onclick=()=>url?copy(url):toast('尚未获取真实 short_id，无法生成邀请链接');
     const count=find(stats,['invite_count','invited_count','total_invites','total','count']);
-    set('invite-count',count===null?String(customers.length):String(count));
+    const countValue=count!==null?String(count):(jobs[2].status==='fulfilled'?String(customers.length):'—');
+    set('invite-count',countValue);
     const balance=cny({info,stats,user},
       ['balance_yuan','account_balance_yuan','wallet_balance_yuan'],
       ['balance_usdt','account_balance_usdt'],

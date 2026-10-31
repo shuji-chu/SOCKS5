@@ -580,6 +580,12 @@
       if (typeof App.renderNav === 'function') App.renderNav();
     }
   }
+  window.addEventListener('storage', (event) => {
+    if ((event.key === null || TOKEN_KEYS.includes(event.key)) && event.newValue === null) {
+      clearSession();
+    }
+  });
+
   function getPlans() { return fetchStaticData('nodes'); }
   function getAccounts() { return fetchStaticData('accounts'); }
   function getClonedProducts() { return fetchStaticData('traffic'); }

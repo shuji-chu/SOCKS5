@@ -306,7 +306,7 @@
       const info = unwrap(infoResponse) || {};
       const user = info.user || info.profile || info.account || info.member || info;
       const shortId = String(user.short_id || user.shortId || info.short_id || info.shortId || '').trim();
-      if (!/^\\d{5}$/.test(shortId)) throw new Error('用户接口未返回 5 位 short_id');
+      if (!/^\d{5}$/.test(shortId)) throw new Error('用户接口未返回 5 位 short_id');
       const inviteUrl = location.origin + '/login.html?mode=register&short_id=' + encodeURIComponent(shortId);
       inviteUrlNode.textContent = inviteUrl;
       $('#invite-note').textContent = '当前账户邀请码：' + shortId;

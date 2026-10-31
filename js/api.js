@@ -302,10 +302,9 @@
   }
 
   function saveToken(token) {
-    TOKEN_KEYS.forEach((key) => {
-      sessionStorage.removeItem(key);
-      localStorage.setItem(key, token);
-    });
+    localStorage.setItem('sosks5_token', token);
+    ['sosks5_token', 'tgx_token'].forEach((key) => sessionStorage.removeItem(key));
+    localStorage.removeItem('tgx_token');
     if (window.App) App.state.token = token;
   }
 

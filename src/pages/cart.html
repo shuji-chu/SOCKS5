@@ -50,7 +50,7 @@
                                     <span class="px-3 text-slate-900 text-sm" x-text="item.qty"></span>
                                     <button @click="if(item.qty<item.stock) {item.qty++; $store.app.saveCart()}" class="px-3 py-1 text-slate-900 hover:bg-gray-100">+</button>
                                 </div>
-                                <div class="w-20 text-right font-bold text-slate-900" x-text="'$' + (item.price * item.qty).toFixed(2)"></div>
+                                <div class="w-20 text-right font-bold text-slate-900" x-text="'¥' + (item.price * item.qty).toFixed(2)"></div>
                                 <button @click="if(confirm('Are you sure to remove this item?')) $store.app.removeFromCart(item.id)" class="text-red-500 hover:text-red-400 text-sm">Remove</button>
                             </div>
                         </div>
@@ -63,10 +63,10 @@
         <div>
             <div class="bg-white rounded-xl p-6 border border-gray-200 sticky top-24">
                 <h2 class="text-lg font-bold text-slate-900 mb-4">Order Summary</h2>
-                <div class="flex justify-between text-sm mb-2"><span>Subtotal</span><span x-text="'$' + $store.app.cartTotal.toFixed(2)"></span></div>
-                <div class="flex justify-between text-sm mb-4"><span>Tax</span><span>$0.00</span></div>
+                <div class="flex justify-between text-sm mb-2"><span>Subtotal</span><span x-text="'¥' + $store.app.cartTotal.toFixed(2)"></span></div>
+                <div class="flex justify-between text-sm mb-4"><span>Tax</span><span>¥0.00</span></div>
                 <div class="border-t border-gray-200 pt-4 flex justify-between font-bold text-slate-900 mb-6">
-                    <span>Total</span><span x-text="'$' + $store.app.cartTotal.toFixed(2)"></span>
+                    <span>Total</span><span x-text="'¥' + $store.app.cartTotal.toFixed(2)"></span>
                 </div>
                 <a href="./checkout.html" class="block text-center w-full bg-primary text-slate-900 font-bold py-3 rounded-lg hover:bg-blue-600" :class="{'opacity-50 pointer-events-none': $store.app.cart.length === 0 || $store.app.cart.some(i => i.qty > i.stock)}">
                     Proceed to Checkout

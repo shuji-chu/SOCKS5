@@ -164,19 +164,13 @@
         if(!tok){showError('请先登录后查看订单详情。订单卡密、订阅链接等内容不会在未登录状态下显示。');return}
         if(!key){showError('缺少订单编号，请从个人中心的订单列表进入。');return}
         let order=null,last='服务端订单列表接口不可用';
-        const listItems=data=>{if(Array.isArray(data))return data;if(!data||typeof data!=='object')return[];for(const k of ['orders','items','list','records','results'])if(Array.isArray(data[k]))return data[k];return data.data&&typeof data.data==='object'?listItems(data.data):[]};
-        for(let page=1;page<=100;page++){
-          try{
-            const data=await getOrderPage(page,tok);
-            const rows=listItems(data);
-            order=findOrder(data,key);
-            if(order)break;
-            if(rows.length<100)break;
-          }catch(e){
-            if(/登录状态已失效/.test(e.message)){showError(e.message);return}
-            last=safeUiMessage(e.message);
-            break;
-          }
+        const requestedPage=Math.max(1,Math.min(100000,Number(params.get('page'))||1));
+        try{
+          const data=await getOrderPage(requestedPage,tok);
+          order=findOrder(data,key);
+        }catch(e){
+          if(/登录状态已失效/.test(e.message)){showError(e.message);return}
+          last=safeUiMessage(e.message);
         }
         if(!order){showError('无法读取该订单的真实详情：'+last+'。为保护账户数据，本页不会使用示例商品、示例卡密或虚构支付状态。');return}
         const title=first(order,['product_name','plan_name','goods_name','name','title','subject'])||'商品名称未返回';

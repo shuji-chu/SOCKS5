@@ -27,7 +27,7 @@
   }
   function list(v){if(Array.isArray(v))return v;for(const k of ['list','items','records','customers','users','rows','results'])if(Array.isArray(v&&v[k]))return v[k];return [];}
   function shortId(root){const v=String(find(root,['short_id','shortId','user_short_id','userShortId','invite_code'])||'').trim();return /^\d{5}$/.test(v)?v:'';}
-  function referral(id){return id ? location.origin+'/invite/'+encodeURIComponent(id) : '';}
+  function referral(id){return id ? location.origin+'/login.html?mode=register&short_id='+encodeURIComponent(id) : '';}
   function set(id,value){const el=document.getElementById(id);if(el)el.textContent=value;}
   function toast(msg){let el=document.getElementById('affiliateToast');if(!el){el=document.createElement('div');el.id='affiliateToast';el.style.cssText='position:fixed;z-index:99999;left:50%;bottom:24px;transform:translateX(-50%);max-width:calc(100vw - 32px);padding:11px 16px;border-radius:12px;background:#0a3f83;color:#fff;font-size:13px;font-weight:700;box-shadow:0 10px 28px #0055ff22';document.body.appendChild(el)}el.textContent=msg;el.hidden=false;clearTimeout(window.__affiliateToastTimer);window.__affiliateToastTimer=setTimeout(()=>el.hidden=true,3200);}
   async function load() {

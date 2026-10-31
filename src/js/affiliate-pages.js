@@ -52,20 +52,20 @@
       ['balance','account_balance','wallet_balance']);
     const available=cny({info,stats,user},
       ['available_commission_yuan','commission_balance_yuan','withdrawable_commission_yuan','available_balance_yuan'],
-      ['available_commission_usdt','commission_balance_usdt','withdrawable_commission_usdt','available_balance_usdt'],
-      ['available_commission','commission_balance','withdrawable_commission','available_balance','commission_available']);
+      ['available_commission_usdt','commission_balance_usdt','withdrawable_commission_usdt','available_balance_usdt','available_commission','commission_balance','withdrawable_commission','available_balance','commission_available'],
+      []);
     const total=cny({info,stats,user},
       ['total_commission_yuan','commission_total_yuan','total_reward_yuan'],
       ['total_commission_usdt','commission_total_usdt','total_reward_usdt'],
       ['total_commission','commission_total','total_reward','commission']);
     const withdrawn=cny({info,stats,user},
       ['withdrawn_total_yuan','withdrawn_yuan','total_withdrawn_yuan'],
-      ['withdrawn_total_usdt','withdrawn_usdt','total_withdrawn_usdt'],
-      ['withdrawn_total','withdrawn','total_withdrawn']);
+      ['withdrawn_total_usdt','withdrawn_usdt','total_withdrawn_usdt','withdrawn_total','withdrawn','total_withdrawn'],
+      []);
     const locked=cny({info,stats,user},
       ['pending_commission_yuan','pending_balance_yuan','pending_reward_yuan'],
-      ['pending_commission_usdt','pending_balance_usdt','pending_reward_usdt'],
-      ['pending_commission','pending_balance','pending_reward']);
+      ['pending_commission_usdt','pending_balance_usdt','pending_reward_usdt','pending_commission','pending_balance','pending_reward'],
+      []);
     set('affiliate-account-balance',balance); set('affiliate-available-balance',available); set('affiliate-total-commission',total); set('affiliate-withdrawn-total',withdrawn); set('affiliate-pending-total',locked);
     set('available-balance',available); set('withdraw-modal-balance',available); set('withdraw-page-balance',available);
     const rateEls=document.querySelectorAll('[data-affiliate-rate]');rateEls.forEach(el=>el.textContent='15%');

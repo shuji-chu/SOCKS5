@@ -307,7 +307,7 @@
       const user = info.user || info;
       const shortId = String(user.short_id || info.short_id || info.shortId || '');
       if (!shortId) throw new Error('用户接口未返回 short_id');
-      const inviteUrl = location.origin + '/invite/' + encodeURIComponent(shortId);
+      const inviteUrl = location.origin + '/login.html?mode=register&short_id=' + encodeURIComponent(shortId);
       inviteUrlNode.textContent = inviteUrl;
       $('#invite-note').textContent = '当前账户邀请码：' + shortId;
       $('#copy-invite').addEventListener('click', () => UI.copy(inviteUrl));

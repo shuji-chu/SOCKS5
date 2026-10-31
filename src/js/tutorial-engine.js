@@ -14,7 +14,7 @@ function renderAutoTutorial(sections, containerId) {
         if (riskyTitle) {
             body = '<div class="p-4 text-[13px] text-slate-600 leading-relaxed space-y-2"><p>此类操作因账号安全、平台规则或商品权限差异，不提供 Cookie/Token 导入、接码代验证、批量养号、规避风控、解绑换绑或刷机解限步骤。</p><p>请仅使用平台官方登录和安全设置。是否包含邮箱、手机号控制权或修改权限，以当前 SKU 的交付清单为准；未明确写出的能力视为未确认。</p><p>遇到验证或限制提示时按平台官方流程处理，并通过订单售后提交脱敏截图。</p></div>';
         }
-        return {title:title,content:body};
+        return {title:riskyTitle?'账号安全与平台规则':title,content:body};
     });
     let html = safeNotice;
     safeSections.forEach(function(sec,index) {

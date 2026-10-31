@@ -23,7 +23,7 @@
     <main class="max-w-lg mx-auto">
         <!-- Tabs -->
         <div class="flex border-b border-gray-200 bg-white sticky top-[53px] z-40">
-            <button onclick="switchTab('details')" id="tab-details" class="flex-1 py-3.5 text-[14px] font-bold text-black border-b-2 border-blue-600">佣金明细</button>
+            <button onclick="switchTab('details')" id="tab-details" class="flex-1 py-3.5 text-[14px] font-bold text-blue-600 border-b-2 border-blue-600">佣金明细</button>
             <button onclick="switchTab('subordinates')" id="tab-subordinates" class="flex-1 py-3.5 text-[14px] font-bold text-slate-500 border-b-2 border-transparent">我的下级</button>
             <button onclick="switchTab('rebates')" id="tab-rebates" class="flex-1 py-3.5 text-[14px] font-bold text-slate-500 border-b-2 border-transparent">返佣订单</button>
         </div>
@@ -44,22 +44,8 @@
     <script>
         let currentTab = 'details';
 
-        const mockData = {
-            details: [
-                { title: '下级消费返佣', id: 'OD20261022140001', amount: '+ $1.50', time: '2026-10-22 14:30' },
-                { title: '下级消费返佣', id: 'OD20261021090002', amount: '+ $0.45', time: '2026-10-21 09:15' },
-                { title: '邀请注册奖励', id: 'REG20261020180001', amount: '+ $2.00', time: '2026-10-20 18:00' }
-            ],
-            subordinates: [
-                { title: '用户 boss_01', id: '注册时间: 2026-10-22', amount: '有效', time: '消费 10 单' },
-                { title: '用户 king_88', id: '注册时间: 2026-10-20', amount: '有效', time: '消费 3 单' },
-                { title: '用户 test_user', id: '注册时间: 2026-10-15', amount: '未消费', time: '消费 0 单' }
-            ],
-            rebates: [
-                { title: '手机号二要素认证 接口消费', id: '订单号: RB123456789', amount: '+ $0.045', time: '返佣比例: 15%' },
-                { title: 'Gmail 卡密购买', id: '订单号: RB987654321', amount: '+ $1.200', time: '返佣比例: 15%' }
-            ]
-        };
+        // No demo finance records: show an empty state until the real history API is connected.
+        const mockData = { details: [], subordinates: [], rebates: [] };
 
         function switchTab(tab) {
             currentTab = tab;
@@ -93,7 +79,7 @@
                     </div>
                 `;
             });
-            container.innerHTML = html;
+            container.innerHTML = html || '<div class="px-4 py-10 text-center text-[13px] text-slate-400">暂无真实记录</div>';
         }
 
         document.addEventListener('DOMContentLoaded', () => {

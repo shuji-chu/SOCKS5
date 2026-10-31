@@ -267,3 +267,48 @@ html,body,div,section,header,footer,main,.container,.card,.dialog,.modal{
  border:1px solid rgba(0,0,0,.05)!important;
 }
 .dark-card *, .terminal-box *, .bottom-nav *, .footer *{color:inherit}
+
+
+/* S5 GLOBAL BLUE-WHITE MINIMAL MOTION BACKGROUND */
+html{
+ background:#f7fbff!important;
+ background-color:#f7fbff!important;
+}
+body{
+ position:relative!important;
+ isolation:isolate!important;
+ background:transparent!important;
+ background-color:transparent!important;
+ background-image:none!important;
+}
+#global-bg-video,#global-bg-overlay{
+ display:none!important;
+ visibility:hidden!important;
+}
+body::before{
+ content:""!important;
+ position:fixed!important;
+ inset:-18%!important;
+ z-index:-1!important;
+ display:block!important;
+ pointer-events:none!important;
+ opacity:1!important;
+ background:
+  radial-gradient(ellipse at 18% 22%,rgba(176,218,255,.48) 0%,rgba(176,218,255,0) 38%),
+  radial-gradient(ellipse at 82% 28%,rgba(211,235,255,.72) 0%,rgba(211,235,255,0) 42%),
+  radial-gradient(ellipse at 58% 88%,rgba(198,229,255,.5) 0%,rgba(198,229,255,0) 40%),
+  linear-gradient(145deg,#fafdff 0%,#f0f7ff 48%,#ffffff 100%)!important;
+ background-size:100% 100%!important;
+ transform:translate3d(-1.5%,0,0) scale(1.04);
+ animation:s5BlueWhiteDrift 30s ease-in-out infinite alternate!important;
+ will-change:transform;
+}
+body::after{display:none!important;content:none!important}
+@keyframes s5BlueWhiteDrift{
+ 0%{transform:translate3d(-1.5%,-.5%,0) scale(1.04)}
+ 50%{transform:translate3d(1%,.8%,0) scale(1.07)}
+ 100%{transform:translate3d(-.5%,1.2%,0) scale(1.05)}
+}
+@media(prefers-reduced-motion:reduce){
+ body::before{animation:none!important;transform:none!important;will-change:auto}
+}

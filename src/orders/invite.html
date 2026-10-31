@@ -25,6 +25,7 @@
         .bar-col { display: flex; flex-direction: column; align-items: center; width: 12%; }
         .bar-fill { width: 100%; background: #e2e8f0; border-radius: 4px 4px 0 0; transition: height 0.3s; min-height: 4px; }
         .bar-label { font-size: 10px; color: #94a3b8; margin-top: 8px; }
+    .affiliate-primary{background:linear-gradient(110deg,#087bff,#0055ff 58%,#1746c8)!important;color:#fff!important;border:0!important;box-shadow:0 9px 22px rgba(0,85,255,.2)}
     </style>
     <link rel="stylesheet" href="../css/style.css">
 <link rel="icon" type="image/png" href="../../assets/logo.png"><link rel="apple-touch-icon" href="../../assets/logo.png"><link rel="stylesheet" href="../../css/global-video-bg.css"></head>
@@ -34,14 +35,14 @@
             <a href="../auth/profile.html" class="text-slate-600 text-xl font-bold px-2">←</a>
             <h1 class="text-[17px] font-bold text-slate-800">返佣联盟</h1>
         </div>
-        <span class="bg-gray-50 text-black text-[11px] px-2 py-1 rounded border border-blue-100 font-bold">一级返佣 5%</span>
+        <span class="bg-gray-50 text-black text-[11px] px-2 py-1 rounded border border-blue-100 font-bold">一级返佣 15%</span>
     </header>
 
     <main class="px-4 py-4 max-w-lg mx-auto">
         <!-- 顶部推广数据 -->
         <div class="flex justify-between px-2 mb-4">
             <div class="text-center">
-                <p class="text-[20px] font-bold text-slate-800" id="invite-count">0</p>
+                <p class="text-[20px] font-bold text-slate-800" id="invite-count">—</p>
                 <p class="text-[11px] text-slate-500 mt-1">已邀请人数</p>
             </div>
             <div class="text-center">
@@ -49,25 +50,25 @@
                 <p class="text-[11px] text-slate-500 mt-1">本月邀请订单</p>
             </div>
             <div class="text-center">
-                <p class="text-[20px] font-bold text-gray-500">5%</p>
+                <p class="text-[20px] font-bold text-gray-500" data-affiliate-rate>15%</p>
                 <p class="text-[11px] text-slate-500 mt-1">返佣比例</p>
             </div>
         </div>
 
         <!-- 资产看板 -->
         <div class="card p-5 bg-gradient-to-br from-blue-600 to-blue-800 text-white">
-            <p class="text-[13px] text-blue-100 mb-1">当前余额 (含返佣 USDT)</p>
-            <p class="text-[36px] font-bold mb-2">$ 0.00</p>
+            <p class="text-[13px] text-blue-100 mb-1">账户余额（人民币）</p>
+            <p class="text-[36px] font-bold mb-2" id="affiliate-account-balance">¥—</p>
             <p class="text-[11px] text-blue-200 mb-5">返佣完成后实时计入余额，可直接消费或申请提现</p>
             
             <div class="grid grid-cols-2 gap-4 pt-4 border-t border-white/20">
                 <div>
                     <p class="text-[11px] text-blue-200 mb-1">累计返佣</p>
-                    <p class="text-[16px] font-bold">$ 0.00</p>
+                    <p class="text-[16px] font-bold" id="affiliate-total-commission">¥—</p>
                 </div>
                 <div>
                     <p class="text-[11px] text-blue-200 mb-1">已提现</p>
-                    <p class="text-[16px] font-bold">$ 0.00</p>
+                    <p class="text-[16px] font-bold" id="affiliate-withdrawn-total">¥—</p>
                 </div>
             </div>
         </div>
@@ -75,10 +76,10 @@
         <!-- 推广链接模块 -->
         <div class="card p-5">
             <h3 class="text-[15px] font-bold text-slate-800 mb-2">我的专属推广链接</h3>
-            <p class="text-[12px] text-slate-500 mb-3">好友通过此链接注册并购买商品，订单完成后您可获得 5% 返佣。</p>
+            <p class="text-[12px] text-slate-500 mb-3">好友通过此链接注册并购买商品，订单完成后您可获得 15% 返佣。</p>
             <div class="flex gap-2">
-                <input type="text" id="promo-link" value="https://web.lynli.me/register.html?ref=10001" readonly class="flex-1 bg-slate-50 border border-gray-200 rounded-lg px-3 py-2 text-[13px] font-mono text-slate-600 outline-none">
-                <button onclick="copyLink()" class="bg-black text-white font-bold px-4 py-2 rounded-lg text-[13px] active:opacity-80">复制链接</button>
+                <input type="text" id="promo-link" value="" placeholder="正在读取真实推广链接…" readonly class="flex-1 bg-slate-50 border border-gray-200 rounded-lg px-3 py-2 text-[13px] font-mono text-slate-600 outline-none">
+                <button onclick="copyLink()" class="affiliate-primary font-bold px-4 py-2 rounded-lg text-[13px] active:opacity-80">复制链接</button>
             </div>
         </div>
 
@@ -103,7 +104,7 @@
                     <div class="w-6 h-6 rounded bg-gray-50 text-black text-[12px] font-bold flex items-center justify-center shrink-0">03</div>
                     <div>
                         <p class="text-[13px] font-bold text-slate-800">返佣自动入账</p>
-                        <p class="text-[11px] text-slate-500">订单完成按 5% 实时计入余额</p>
+                        <p class="text-[11px] text-slate-500">订单完成按 15% 实时计入余额</p>
                     </div>
                 </div>
             </div>
@@ -158,11 +159,11 @@
 
         <!-- 底部操作与规则 -->
         <div class="text-center pb-8 space-y-4">
-            <a href="./withdraw.html" class="block w-full py-3 bg-black text-white font-bold rounded-lg text-[15px] active:opacity-80 transition shadow-sm">申请提现</a>
+            <a href="./withdraw.html" class="affiliate-primary block w-full py-3 font-bold rounded-lg text-[15px] active:opacity-80 transition shadow-sm">申请提现</a>
             
             <div class="text-left bg-slate-50 p-4 rounded-lg border border-gray-200">
                 <p class="text-[12px] font-bold text-slate-700 mb-1">规则说明：</p>
-                <p class="text-[11px] text-slate-500 leading-relaxed">邀请好友注册并完成订单后，系统按订单实付金额的 5% 自动返佣（一级），多级推广与分站商户按平台规则另行计算；返佣实时计入余额，可直接消费或前往提现页申请提现；订单退款时对应返佣将同步扣回，返佣金额以后台实际入账为准。</p>
+                <p class="text-[11px] text-slate-500 leading-relaxed">邀请好友注册并完成订单后，系统按订单实付金额的 15% 自动返佣（一级），多级推广与分站商户按平台规则另行计算；返佣实时计入余额，可直接消费或前往提现页申请提现；订单退款时对应返佣将同步扣回，返佣金额以后台实际入账为准。</p>
             </div>
         </div>
     </main>
@@ -190,6 +191,7 @@
             if(tab === 'withdraw') document.getElementById('tab-withdraw').classList.remove('hidden');
         }
     </script>
+    <script src="../js/affiliate-pages.js"></script>
     <script src="../js/ai-widget.js"></script>
     
 

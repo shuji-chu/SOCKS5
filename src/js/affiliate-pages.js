@@ -31,7 +31,7 @@
   function set(id,value){const el=document.getElementById(id);if(el)el.textContent=value;}
   function toast(msg){let el=document.getElementById('affiliateToast');if(!el){el=document.createElement('div');el.id='affiliateToast';el.style.cssText='position:fixed;z-index:99999;left:50%;bottom:24px;transform:translateX(-50%);max-width:calc(100vw - 32px);padding:11px 16px;border-radius:12px;background:#0a3f83;color:#fff;font-size:13px;font-weight:700;box-shadow:0 10px 28px #0055ff22';document.body.appendChild(el)}el.textContent=msg;el.hidden=false;clearTimeout(window.__affiliateToastTimer);window.__affiliateToastTimer=setTimeout(()=>el.hidden=true,3200);}
   async function load() {
-    if(!token()){location.href='../login.html?redirect='+encodeURIComponent(location.pathname.split('/').pop());return;}
+    if(!token()){location.href='../../login.html?redirect='+encodeURIComponent(location.pathname.split('/').pop());return;}
     const jobs=await Promise.allSettled([get('/user/info'),get('/user/invite/fetch'),get('/user/invite/customers')]);
     const failed=jobs.find(x=>x.status==='rejected' && /登录状态/.test(x.reason&&x.reason.message||'')); if(failed){location.href='../login.html?redirect='+encodeURIComponent(location.pathname.split('/').pop());return;}
     const info=jobs[0].status==='fulfilled'?jobs[0].value:{};
@@ -74,6 +74,7 @@
     window.S5Affiliate={user,info,stats,customers,shortId:id,inviteUrl:url,availableCny:available};
   }
   async function copy(value){try{if(navigator.clipboard&&navigator.clipboard.writeText)await navigator.clipboard.writeText(value);else{const t=document.createElement('textarea');t.value=value;t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.select();document.execCommand('copy');t.remove();}toast('推广链接已复制');}catch(_){toast('复制失败，请检查浏览器权限');}}
+  window.copyCommissionInvite=function(){const url=window.S5Affiliate&&window.S5Affiliate.inviteUrl;if(url)copy(url);else toast('尚未获取真实 short_id，无法生成邀请链接');};
   window.copyLink=function(){const el=document.getElementById('promo-link');if(el&&el.value)copy(el.value);else toast('尚未获取真实邀请链接');};
   window.submitWithdraw=function(){toast('提现申请接口尚未接入，未提交任何申请');};
   document.addEventListener('DOMContentLoaded',()=>load().catch(e=>{set('available-balance','¥—');set('affiliate-available-balance','¥—');set('withdraw-page-balance','¥—');const note=document.getElementById('affiliate-data-status');if(note)note.textContent='分销数据读取失败：'+(e.message||'请稍后重试');toast(e.message||'分销数据读取失败');}));

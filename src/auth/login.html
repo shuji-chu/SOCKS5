@@ -27,8 +27,8 @@
 <body class="bg-[#f8f9fa]">
     <div class="card text-center relative overflow-hidden">
         <!-- 品牌 Logo 占位 -->
-        <div class="w-16 h-16 bg-black rounded-lg mx-auto flex items-center justify-center mb-5 shadow-sm shadow-blue-500/30">
-            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+        <div class="w-[45px] h-[45px] mx-auto flex items-center justify-center mb-5">
+            <img src="../../assets/logo.png" alt="SOCKS5" class="w-[45px] h-[45px] object-contain">
         </div>
         
         <h1 class="text-[24px] font-extrabold text-slate-800 mb-1">SOCKS5 平台</h1>
@@ -36,7 +36,7 @@
 
         <!-- 登录/注册切换 Tab -->
         <div class="flex bg-slate-100 p-1 rounded-lg mb-6">
-            <button onclick="switchTab('login')" id="tab-login" class="flex-1 py-2 text-[14px] font-bold bg-white text-black rounded-lg shadow-sm transition-all">登录</button>
+            <button onclick="switchTab('login')" id="tab-login" class="flex-1 py-2 text-[14px] font-bold bg-white text-[#0A192F] rounded-lg shadow-sm transition-all">登录</button>
             <button onclick="switchTab('register')" id="tab-register" class="flex-1 py-2 text-[14px] font-bold text-slate-500 rounded-lg transition-all">注册</button>
         </div>
 
@@ -63,22 +63,22 @@
             
             <div class="flex justify-between items-center text-[12px]">
                 <label class="flex items-center gap-1.5 text-slate-500 cursor-pointer">
-                    <input type="checkbox" checked class="w-3.5 h-3.5 rounded border-slate-300 text-black focus:ring-blue-500">
+                    <input type="checkbox" checked class="w-3.5 h-3.5 rounded border-slate-300 text-[#0A192F] focus:ring-blue-500">
                     记住我
                 </label>
-                <span onclick="openForgotModal()" class="text-black active:opacity-60 cursor-pointer font-medium">忘记密码？</span>
+                <span onclick="openForgotModal()" class="text-[#0A192F] active:opacity-60 cursor-pointer font-medium">忘记密码？</span>
             </div>
         </div>
 
-        <button onclick="doAuth()" id="btn-submit" class="w-full py-3.5 bg-black text-white font-bold rounded-lg text-[16px] active:opacity-80 transition shadow-sm shadow-blue-500/20 mb-6">立即登录</button>
+        <button onclick="doAuth()" id="btn-submit" class="w-full py-3.5 bg-[#0055FF] text-white font-bold rounded-lg text-[16px] active:opacity-80 transition shadow-sm shadow-blue-500/20 mb-6">立即登录</button>
 
         <!-- 底部合规协议 -->
         <div class="mt-8 text-center">
             <p class="text-[11px] text-slate-400">
                 登录或注册即表示同意 
-                <span onclick="openLegal('agreement')" class="text-black font-bold cursor-pointer active:opacity-60">用户协议</span> 
+                <span onclick="openLegal('agreement')" class="text-[#0A192F] font-bold cursor-pointer active:opacity-60">用户协议</span> 
                 与 
-                <span onclick="openLegal('privacy')" class="text-black font-bold cursor-pointer active:opacity-60">隐私政策</span>
+                <span onclick="openLegal('privacy')" class="text-[#0A192F] font-bold cursor-pointer active:opacity-60">隐私政策</span>
             </p>
         </div>
     </div>
@@ -106,7 +106,7 @@
             </div>
             <div class="flex gap-3">
                 <button onclick="closeModal('forgot-modal')" class="flex-1 py-2.5 bg-slate-100 text-slate-600 font-bold rounded-lg active:bg-slate-200 transition">取消</button>
-                <button onclick="submitForgotPassword()" class="flex-1 py-2.5 bg-black text-white font-bold rounded-lg active:opacity-80 transition">确认重置</button>
+                <button onclick="submitForgotPassword()" class="flex-1 py-2.5 bg-[#0055FF] text-white font-bold rounded-lg active:opacity-80 transition">确认重置</button>
             </div>
         </div>
     </div>
@@ -116,7 +116,7 @@
         <div class="modal-box text-center">
             <h3 class="text-[17px] font-bold text-slate-800 mb-2" id="tip-title">提示</h3>
             <p class="toast-text mb-6" id="tip-msg"></p>
-            <button onclick="closeModal('tip-modal')" class="w-full py-2.5 bg-black text-white font-bold rounded-lg active:opacity-80 transition">我知道了</button>
+            <button onclick="closeModal('tip-modal')" class="w-full py-2.5 bg-[#0055FF] text-white font-bold rounded-lg active:opacity-80 transition">我知道了</button>
         </div>
     </div>
 
@@ -141,13 +141,13 @@
             const btnSubmit = document.getElementById('btn-submit');
 
             if (mode === 'login') {
-                tabLogin.className = 'flex-1 py-2 text-[14px] font-bold bg-white text-black rounded-lg shadow-sm transition-all';
+                tabLogin.className = 'flex-1 py-2 text-[14px] font-bold bg-white text-[#0A192F] rounded-lg shadow-sm transition-all';
                 tabRegister.className = 'flex-1 py-2 text-[14px] font-bold text-slate-500 rounded-lg transition-all';
                 subtitle.innerText = '登录您的账号以继续';
                 codeBox.classList.add('hidden');
                 btnSubmit.innerText = '立即登录';
             } else {
-                tabRegister.className = 'flex-1 py-2 text-[14px] font-bold bg-white text-black rounded-lg shadow-sm transition-all';
+                tabRegister.className = 'flex-1 py-2 text-[14px] font-bold bg-white text-[#0A192F] rounded-lg shadow-sm transition-all';
                 tabLogin.className = 'flex-1 py-2 text-[14px] font-bold text-slate-500 rounded-lg transition-all';
                 subtitle.innerText = '注册一个全新的账号';
                 codeBox.classList.remove('hidden');

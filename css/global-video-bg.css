@@ -343,3 +343,112 @@ input::placeholder,textarea::placeholder{color:#64748b!important}
 #global-bg-video,#global-bg-overlay{display:none!important;visibility:hidden!important}
 body:before{opacity:.035!important}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+
+/* S5 design tokens: consistent controls, icons, radii and elevation */
+:root{
+  --s5-blue:#0055FF;
+  --s5-blue-hover:#0648d8;
+  --s5-blue-soft:#EAF3FF;
+  --s5-ink:#0A192F;
+  --s5-body:#334155;
+  --s5-line:rgba(10,25,47,.10);
+  --s5-radius-card:18px;
+  --s5-radius-control:12px;
+  --s5-shadow-card:0 8px 24px rgba(15,35,65,.055);
+  --s5-shadow-float:0 12px 32px rgba(15,35,65,.10);
+}
+/* One radius rhythm across page modules */
+.panel,.card,.product-card,.business-card,.content-card,.stat-card,.feature-card,
+.login-card,.auth-card,.form-card,.profile-card,.settings-card,.order-card,
+.wallet-card,.invite-card,.traffic-card,.faq-card,.docs-card,.api-card,
+.modal-box,.modal-content,.modal-panel,.detail-modal,.table-wrap,.table-container,
+.archive-panel,.node-config-panel,.checkin-card,.announcement,.shop-card,
+.product-item,.dashboard-card,.code-card,.terminal-box,.blindbox{
+  border-radius:var(--s5-radius-card)!important;
+  box-shadow:var(--s5-shadow-card)!important;
+  border-color:var(--s5-line)!important;
+}
+/* Consistent buttons; keep destructive actions semantically distinct */
+button:not(.danger):not(.btn-danger):not(.is-danger):not([data-variant="danger"]),
+.button:not(.danger):not(.btn-danger):not(.is-danger),
+.btn:not(.danger):not(.btn-danger):not(.is-danger),
+[role="button"]:not(.danger):not(.btn-danger):not(.is-danger),
+input[type="button"]:not(.danger),input[type="submit"]:not(.danger){
+  border-radius:var(--s5-radius-control)!important;
+  transition:background-color .18s ease,border-color .18s ease,box-shadow .18s ease,transform .18s ease!important;
+  font-weight:600;
+}
+button:not(.danger):not(.btn-danger):not(.is-danger):not([data-variant="danger"]),
+.button:not(.danger):not(.btn-danger):not(.is-danger),
+.btn:not(.danger):not(.btn-danger):not(.is-danger),
+input[type="button"]:not(.danger),input[type="submit"]:not(.danger){
+  background:#0055FF!important;
+  color:#fff!important;
+  border:1px solid #0055FF!important;
+  box-shadow:0 4px 12px rgba(0,85,255,.13)!important;
+}
+button:not(.danger):not(.btn-danger):not(.is-danger):hover,
+.button:not(.danger):not(.btn-danger):not(.is-danger):hover,
+.btn:not(.danger):not(.btn-danger):not(.is-danger):hover,
+input[type="button"]:not(.danger):hover,input[type="submit"]:not(.danger):hover{
+  background:#0648d8!important;border-color:#0648d8!important;
+  box-shadow:0 6px 16px rgba(0,85,255,.18)!important;transform:translateY(-1px)
+}
+button:disabled,.button:disabled,.btn:disabled{opacity:.55!important;transform:none!important;box-shadow:none!important;cursor:not-allowed!important}
+/* Secondary and quiet actions */
+button.ghost,button.secondary,.button-ghost,.btn-ghost,.btn-secondary,
+.button.secondary,.button.outline,.btn.outline,[data-variant="secondary"]{
+  background:#fff!important;color:#155eaa!important;
+  border:1px solid rgba(21,94,170,.20)!important;box-shadow:none!important
+}
+button.ghost:hover,button.secondary:hover,.button-ghost:hover,.btn-ghost:hover,
+.btn-secondary:hover,.button.secondary:hover,.button.outline:hover,.btn.outline:hover{
+  background:#EAF3FF!important;color:#0055FF!important
+}
+/* Preserve danger semantics, but keep the same geometry */
+button.danger,button.btn-danger,.button.danger,.btn-danger,[data-variant="danger"]{
+  border-radius:var(--s5-radius-control)!important;
+  box-shadow:0 4px 12px rgba(220,38,38,.10)!important
+}
+/* Icon language: blue line icons on pale surfaces; white icons on primary controls */
+.icon-btn,.icon-button,.toolbar-icon,.nav-icon,.action-icon{
+  border-radius:12px!important;
+}
+.icon-btn:not(.primary),.icon-button:not(.primary),.toolbar-icon{
+  background:var(--s5-blue-soft)!important;color:#0055FF!important;
+  border:1px solid rgba(0,85,255,.10)!important;box-shadow:none!important
+}
+.icon-btn svg,.icon-button svg,.toolbar-icon svg,.nav-icon svg,
+button svg,.button svg,.btn svg{
+  width:1.05em;height:1.05em;flex:0 0 auto;
+  stroke-width:1.8;vertical-align:middle
+}
+button:not(.ghost):not(.secondary):not(.button-ghost):not(.btn-ghost) svg,
+.button:not(.button-ghost):not(.secondary) svg,.btn:not(.btn-ghost):not(.btn-secondary) svg{
+  color:currentColor
+}
+svg.lucide,[data-lucide],.lucide{stroke-width:1.8}
+a.icon-link,.icon-link{color:#155eaa!important}
+a.icon-link:hover,.icon-link:hover{color:#0055FF!important}
+/* Inputs, selects and compact chips share the same geometry */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+select,textarea,.input,.search-input{
+  border-radius:var(--s5-radius-control)!important;
+  border-color:rgba(10,25,47,.14)!important;
+}
+.chip,.tag,.badge,.pill,.category-pill,.filter-pill,.status-chip{
+  border-radius:999px!important;
+}
+:focus-visible{
+  outline:3px solid rgba(0,85,255,.22)!important;
+  outline-offset:2px!important;
+}
+/* Keep elevation restrained and consistent on hover */
+.card:hover,.product-card:hover,.business-card:hover,.feature-card:hover,
+.stat-card:hover,.order-card:hover,.shop-card:hover{
+  box-shadow:var(--s5-shadow-float)!important;
+}
+@media(prefers-reduced-motion:reduce){
+  button,.button,.btn,.card,.product-card,.business-card{transition:none!important}
+}

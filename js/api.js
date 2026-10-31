@@ -397,52 +397,6 @@
     return options.map(x => '<option value="' + esc(x.toLowerCase()) + '"' + (current === x.toUpperCase() ? ' selected' : '') + '>' + esc(x) + '</option>').join('');
   }
 
-  const S5_REGION_POOL = {
-    us:{name:'美国',domains:['us1.de5.net','us2.de5.net'],ips:['192.0.2.11','192.0.2.12','192.0.2.13','192.0.2.14','192.0.2.15','192.0.2.16','192.0.2.17']},
-    sg:{name:'新加坡',domains:['sg1.de5.net','sg2.de5.net'],ips:['198.51.100.21','198.51.100.22','198.51.100.23','198.51.100.24','198.51.100.25','198.51.100.26','198.51.100.27']},
-    jp:{name:'日本',domains:['jp1.de5.net','jp2.de5.net'],ips:['203.0.113.31','203.0.113.32','203.0.113.33','203.0.113.34','203.0.113.35','203.0.113.36','203.0.113.37']},
-    hk:{name:'香港',domains:['hk1.de5.net','hk2.de5.net'],ips:['192.0.2.41','192.0.2.42','192.0.2.43','192.0.2.44','192.0.2.45','192.0.2.46','192.0.2.47']},
-    de:{name:'德国',domains:['de1.de5.net','de2.de5.net'],ips:['198.51.100.51','198.51.100.52','198.51.100.53','198.51.100.54','198.51.100.55','198.51.100.56','198.51.100.57']},
-    uk:{name:'英国',domains:['uk1.de5.net','uk2.de5.net'],ips:['203.0.113.61','203.0.113.62','203.0.113.63','203.0.113.64','203.0.113.65','203.0.113.66','203.0.113.67']}
-  };
-
-  function s5FlagSvg(region) {
-    const common='viewBox="0 0 60 40" role="img" aria-hidden="true" class="s5-region-flag"';
-    const flags={
-      us:'<svg '+common+'><rect width="60" height="40" fill="#fff"/>'+Array.from({length:7},(_,i)=>'<rect y="'+(i*6.16)+'" width="60" height="3.08" fill="#c83b4b"/>').join('')+'<rect width="26" height="21.6" fill="#244477"/>'+Array.from({length:4},(_,r)=>Array.from({length:5},(_,c)=>'<circle cx="'+(3+c*4.8+(r%2?1.8:0))+'" cy="'+(3+r*5.2)+'" r="1" fill="#fff"/>').join('')).join('')+'</svg>',
-      sg:'<svg '+common+'><rect width="60" height="20" fill="#e34b55"/><rect y="20" width="60" height="20" fill="#fff"/><circle cx="17" cy="10" r="6.2" fill="#fff"/><circle cx="19.5" cy="8.5" r="5.2" fill="#e34b55"/>'+Array.from({length:5},(_,i)=>'<circle cx="'+(27+Math.cos(i*1.256)*5)+'" cy="'+(10+Math.sin(i*1.256)*5)+'" r="1.15" fill="#fff"/>').join('')+'</svg>',
-      jp:'<svg '+common+'><rect width="60" height="40" fill="#fff"/><circle cx="30" cy="20" r="10.5" fill="#bc3446"/></svg>',
-      hk:'<svg '+common+'><rect width="60" height="40" fill="#d83248"/><g fill="#fff" transform="translate(30 20)">'+Array.from({length:5},(_,i)=>'<ellipse cx="0" cy="-8" rx="3.1" ry="7" transform="rotate('+(i*72)+' 0 0)"/>').join('')+'<circle r="2.1" fill="#d83248"/></g></svg>',
-      de:'<svg '+common+'><rect width="60" height="13.34" fill="#202124"/><rect y="13.33" width="60" height="13.34" fill="#c83b42"/><rect y="26.66" width="60" height="13.34" fill="#e9b83f"/></svg>',
-      uk:'<svg '+common+'><rect width="60" height="40" fill="#244477"/><path d="M0 0 60 40M60 0 0 40" stroke="#fff" stroke-width="9"/><path d="M0 0 60 40M60 0 0 40" stroke="#c83b4b" stroke-width="4"/><path d="M30 0v40M0 20h60" stroke="#fff" stroke-width="13"/><path d="M30 0v40M0 20h60" stroke="#c83b4b" stroke-width="7"/></svg>'
-    };
-    return flags[region]||'';
-  }
-
-  function s5RegionSurcharge(plan, region, period) {
-    const raw=plan&&plan._rawPlan||plan||{};
-    const exact=raw.region_prices||raw.regionPrices||raw.prices_by_region||raw.pricesByRegion||{};
-    const regionValue=exact[region];
-    const periodKey=period&&period.key;
-    const exactValue=regionValue&&typeof regionValue==='object'?(regionValue[periodKey]??regionValue.price_cents??regionValue.price??regionValue.amount):regionValue;
-    const asMoney=(value,unit)=>{const n=Number(value);if(!Number.isFinite(n))return null;return unit==='yuan'?Math.round(n*100):Math.round(n)};
-    if(exactValue!==undefined&&exactValue!==null&&exactValue!==''){
-      if(typeof exactValue==='object'){
-        if(exactValue.price_yuan!=null)return asMoney(exactValue.price_yuan,'yuan');
-        if(exactValue.price_cents!=null)return asMoney(exactValue.price_cents,'cents');
-        if(exactValue.surcharge_yuan!=null)return (period?.price||0)+asMoney(exactValue.surcharge_yuan,'yuan');
-        if(exactValue.surcharge_cents!=null)return (period?.price||0)+asMoney(exactValue.surcharge_cents,'cents');
-        if(exactValue.unit==='yuan')return asMoney(exactValue.amount,'yuan');
-        if(exactValue.unit==='cents')return asMoney(exactValue.amount,'cents');
-      }else return asMoney(exactValue,'cents');
-    }
-    const cents=raw.region_surcharge_cents||raw.regionSurchargeCents||raw.region_extra_cents||{};
-    const yuan=raw.region_surcharge_yuan||raw.regionSurchargeYuan||raw.region_extra_yuan||{};
-    if(cents[region]!=null)return (period?.price||0)+asMoney(cents[region],'cents');
-    if(yuan[region]!=null)return (period?.price||0)+asMoney(yuan[region],'yuan');
-    return period?.price||0;
-  }
-
   window.S5_OPEN_PURCHASE = function(plan){ if(plan) openPurchase(plan); };
 
   function openPurchase(plan) {
@@ -463,7 +417,6 @@
     if(!paymentChannels.length){showError('暂时无法获取支付通道配置，请稍后重试。');loadConfig();return}
     const periodHtml=periods.map((p,i)=>'<option value="'+esc(p.value)+'"'+(i===0?' selected':'')+'>'+esc(p.label)+' · ¥'+(p.price/100).toFixed(2)+'</option>').join('');
     const paymentHtml=paymentChannels.map((p,i)=>'<label class="s5-checkout-payment"><input type="radio" name="s5-payment" value="'+esc(i)+'"'+(i===0?' checked':'')+'><span>'+esc(p.label)+'</span></label>').join('');
-    const regionOptions=Object.entries(S5_REGION_POOL).map(([id,r])=>'<button type="button" class="s5-region-option" data-region="'+id+'">'+s5FlagSvg(id)+'<span>'+esc(r.name)+'</span><span class="s5-option-check">✓</span></button>').join('');
     const styles='<style id="s5-region-checkout-style">.s5-checkout{color:#203047}.s5-checkout label{display:block;font-size:13px;font-weight:750;margin:15px 0 7px;color:#34445b}.s5-custom-select{position:relative}.s5-select-trigger{width:100%;min-height:54px;display:flex;align-items:center;gap:11px;text-align:left;padding:10px 14px;border:1px solid #dce5f0;border-radius:14px;background:rgba(255,255,255,.94);color:#243247;box-shadow:0 5px 18px rgba(35,65,105,.055);transition:border-color .2s,box-shadow .2s}.s5-select-trigger[aria-expanded=true]{border-color:#0055ff;box-shadow:0 0 0 3px rgba(0,85,255,.10)}.s5-select-trigger .s5-chevron{margin-left:auto;color:#7d8ba0;transition:transform .22s}.s5-select-trigger[aria-expanded=true] .s5-chevron{transform:rotate(180deg)}.s5-region-flag{width:30px;height:20px;flex:0 0 30px;border-radius:4px;box-shadow:0 1px 4px #142b481c;overflow:hidden}.s5-select-menu{position:absolute;z-index:30;top:calc(100% + 7px);left:0;right:0;padding:6px;border:1px solid #dce6f2;border-radius:15px;background:rgba(255,255,255,.98);box-shadow:0 16px 38px rgba(28,54,90,.16);opacity:0;visibility:hidden;transform:translateY(-7px) scale(.985);transform-origin:top;transition:opacity .18s ease,transform .18s ease,visibility .18s}.s5-select-menu.is-open{opacity:1;visibility:visible;transform:translateY(0) scale(1)}.s5-region-option,.s5-endpoint-option{display:flex;align-items:center;gap:11px;width:100%;min-height:45px;padding:9px 10px;border:0;border-radius:10px;background:transparent;color:#25364d;text-align:left;font-size:14px}.s5-region-option:hover,.s5-endpoint-option:hover{background:#f0f5ff}.s5-region-option.is-selected,.s5-endpoint-option.is-selected{background:#eaf1ff;color:#0055ff;font-weight:750}.s5-option-check{margin-left:auto;opacity:0;color:#0055ff}.is-selected .s5-option-check{opacity:1}.s5-endpoint-tabs{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:10px 0}.s5-endpoint-tabs button{padding:9px;border:1px solid #dce5f0;border-radius:10px;background:#fff;color:#53647b;font-size:13px;font-weight:700}.s5-endpoint-tabs button.active{border-color:#0055ff;background:#edf4ff;color:#0055ff}.s5-endpoint-option{justify-content:space-between}.s5-endpoint-option small{color:#8291a5;font-size:11px}.s5-resource-note{margin-top:8px;padding:9px 11px;border-radius:10px;background:#f4f7fc;color:#738198;font-size:11px;line-height:1.5}.s5-total{display:flex;justify-content:space-between;align-items:center;margin:15px 0;padding:13px 14px;border-radius:13px;background:linear-gradient(110deg,#edf4ff,#f8fbff);border:1px solid #dce8fb}.s5-total strong{font-size:23px;color:#0055ff}.s5-checkout-payment{display:flex!important;align-items:center;gap:9px;margin:0!important;padding:11px;border:1px solid #e1e8f1;border-radius:11px;background:#fff}.s5-checkout-payment input{accent-color:#0055ff}.s5-checkout select,.s5-checkout input:not([type=radio]){width:100%;padding:11px;border:1px solid #dce5f0;border-radius:11px;background:#fff;color:#25364d}.s5-checkout .s5-primary{width:100%;padding:14px;border:0;border-radius:12px;background:#0055ff;color:#fff;font-weight:800;box-shadow:0 7px 18px #0055ff30}.s5-checkout .s5-primary:disabled{opacity:.6}.s5-checkout .s5-field-error{display:none;color:#d23d50;font-size:12px;margin-top:6px}.s5-checkout .s5-field-error.show{display:block}@media(prefers-reduced-motion:reduce){.s5-select-menu,.s5-select-trigger .s5-chevron{transition:none}}</style>';
     const checkoutTitle=plan.title||plan.name||plan.product_name||'所选商品';const checkoutPrice=periods[0].price;const form='<form id="s5-purchase-form" class="s5-checkout"><section class="s5-picked-product" style="padding:14px;border:1px solid #dce8fb;border-radius:14px;background:linear-gradient(110deg,#f4f8ff,#fff)"><div style="font-size:11px;color:#71829a;font-weight:700;margin-bottom:5px">当前选购商品</div><div style="font-size:15px;line-height:1.55;font-weight:800;color:#203047;word-break:break-word">'+esc(checkoutTitle)+'</div><div style="margin-top:7px;font-size:21px;font-weight:900;color:#e34f62">¥'+(checkoutPrice/100).toFixed(2)+'</div></section>'+
       ''+

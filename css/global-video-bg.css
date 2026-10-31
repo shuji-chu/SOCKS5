@@ -534,3 +534,18 @@ body{
 @media(prefers-reduced-motion:reduce){
   html{scroll-behavior:auto!important}
 }
+
+
+/* Minimum comfortable touch target without enlarging compact filter pills */
+button:not(.catalog-filter-pill):not(.compact):not(.btn-compact),
+.button:not(.catalog-filter-pill):not(.compact):not(.btn-compact),
+.btn:not(.catalog-filter-pill):not(.compact):not(.btn-compact),
+input[type="button"],input[type="submit"]{
+  min-height:44px;
+}
+.icon-button,.icon-btn,.toolbar-icon{
+  min-width:44px!important;min-height:44px!important;
+}
+#tabs .btn,.catalog-filter-pill,.filter-pill.compact{
+  min-height:36px;
+}

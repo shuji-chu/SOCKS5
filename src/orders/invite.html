@@ -46,7 +46,7 @@
                 <p class="text-[11px] text-slate-500 mt-1">已邀请人数</p>
             </div>
             <div class="text-center">
-                <p class="text-[20px] font-bold text-slate-800">0 <span class="text-[12px] font-normal text-slate-400">单</span></p>
+                <p class="text-[20px] font-bold text-slate-800">— <span class="text-[12px] font-normal text-slate-400">单</span></p>
                 <p class="text-[11px] text-slate-500 mt-1">本月邀请订单</p>
             </div>
             <div class="text-center">
@@ -59,7 +59,7 @@
         <div class="card p-5 bg-gradient-to-br from-blue-600 to-blue-800 text-white">
             <p class="text-[13px] text-blue-100 mb-1">账户余额（人民币）</p>
             <p class="text-[36px] font-bold mb-2" id="affiliate-account-balance">¥—</p>
-            <p class="text-[11px] text-blue-200 mb-5">返佣完成后实时计入余额，可直接消费或申请提现</p>
+            <p class="text-[11px] text-blue-200 mb-5">余额与返佣数据以服务端账本返回为准；提现功能尚未开放</p>
             
             <div class="grid grid-cols-2 gap-4 pt-4 border-t border-white/20">
                 <div>
@@ -76,7 +76,7 @@
         <!-- 推广链接模块 -->
         <div class="card p-5">
             <h3 class="text-[15px] font-bold text-slate-800 mb-2">我的专属推广链接</h3>
-            <p class="text-[12px] text-slate-500 mb-3">好友通过此链接注册并购买商品，订单完成后您可获得 15% 返佣。</p>
+            <p class="text-[12px] text-slate-500 mb-3">规则展示比例为 15%，实际返佣以服务端账本记录为准。</p>
             <div class="flex gap-2">
                 <input type="text" id="promo-link" value="" placeholder="正在读取真实推广链接…" readonly class="flex-1 bg-slate-50 border border-gray-200 rounded-lg px-3 py-2 text-[13px] font-mono text-slate-600 outline-none">
                 <button onclick="copyLink()" class="affiliate-primary font-bold px-4 py-2 rounded-lg text-[13px] active:opacity-80">复制链接</button>
@@ -114,18 +114,9 @@
         <div class="card p-5">
             <div class="flex justify-between items-center mb-1">
                 <h3 class="text-[14px] font-bold text-slate-800">近 7 天返佣趋势</h3>
-                <span class="text-[11px] text-gray-500 bg-gray-50 px-1.5 py-0.5 rounded">较上周期 0%</span>
+                <span class="text-[11px] text-gray-500 bg-gray-50 px-1.5 py-0.5 rounded">趋势数据待接入</span>
             </div>
-            <div class="bar-chart">
-                <div class="bar-col"><div class="bar-fill" style="height: 4px;"></div><div class="bar-label">周五</div></div>
-                <div class="bar-col"><div class="bar-fill" style="height: 4px;"></div><div class="bar-label">周六</div></div>
-                <div class="bar-col"><div class="bar-fill" style="height: 4px;"></div><div class="bar-label">周日</div></div>
-                <div class="bar-col"><div class="bar-fill" style="height: 4px;"></div><div class="bar-label">周一</div></div>
-                <div class="bar-col"><div class="bar-fill" style="height: 4px;"></div><div class="bar-label">周二</div></div>
-                <div class="bar-col"><div class="bar-fill" style="height: 4px;"></div><div class="bar-label">周三</div></div>
-                <div class="bar-col"><div class="bar-fill" style="height: 4px; background: #3b82f6;"></div><div class="bar-label text-gray-900">今天</div></div>
-            </div>
-            <p class="text-center text-[11px] text-slate-400 mt-4">近 7 天暂无返佣入账，分享推广链接开始赚取佣金</p>
+            <div class="empty-state" role="status">返佣趋势接口尚未接入，当前不展示模拟统计。</div>
         </div>
 
         <!-- 明细数据 (Tab 切换) -->

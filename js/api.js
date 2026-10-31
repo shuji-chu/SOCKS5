@@ -460,12 +460,15 @@
         const checkoutResponse=await request('/user/order/checkout',{method:'POST',body:JSON.stringify({trade_no:pendingTradeNo})});
         const checkout=unwrap(checkoutResponse)||{};
         const payUrl=(typeof checkout==='string'?checkout:'')||checkout.url||checkout.pay_url||checkout.payment_url||checkout.checkout_url||'';
-        const qr=checkout.qrcode||checkout.qr_code||checkout.qrCode||checkout.qr_url||'';
+        const qrValue=checkout.qrcode||checkout.qr_code||checkout.qrCode||checkout.qr_url||checkout.qr_code_url||checkout.qr_data||checkout.code_url||'';
+        const qr=typeof qrValue==='string'?qrValue:'';
         const safePayUrl=/^https:\/\//i.test(String(payUrl))?String(payUrl):'';
-        const safeQr=/^https:\/\//i.test(String(qr))||/^data:image\/(?:png|jpeg|webp);base64,/i.test(String(qr))?String(qr):'';
-        const resultHtml='<div class="rounded-xl border border-blue-100 bg-blue-50 p-4"><p class="text-sm text-slate-500 mb-1">订单号</p><p class="font-mono font-bold text-slate-900 break-all">'+esc(pendingTradeNo)+'</p><p class="mt-2 text-xs text-slate-600">订单已创建，当前状态待支付。请完成支付后以个人中心订单状态为准。</p></div>'+(safeQr?'<div class="mt-4 text-center"><p class="mb-2 text-sm font-semibold">扫码支付</p><img alt="支付二维码" class="mx-auto max-h-64 rounded-xl border border-slate-200 bg-white p-2" src="'+esc(safeQr)+'"></div>':'')+(safePayUrl?'<a class="mt-4 block w-full rounded-xl bg-blue-600 py-3 text-center font-bold text-white" href="'+esc(safePayUrl)+'" target="_blank" rel="noopener noreferrer">打开支付页面</a>':'<p class="mt-4 text-sm text-amber-700">未收到有效的 HTTPS 支付入口。订单可能已创建但尚未支付，请先在订单记录中核对状态，不要重复下单。</p>');
+        const safeQr=/^https:\/\//i.test(qr)||/^data:image\/(?:png|jpeg|webp);base64,/i.test(qr)?qr:'';
+        const rawQr=qr&&!safeQr&&!/^https?:\/\//i.test(qr)&&qr.length<=2048?qr:'';
+        const resultHtml='<div class="rounded-xl border border-blue-100 bg-blue-50 p-4"><p class="text-sm text-slate-500 mb-1">订单号</p><p class="font-mono font-bold text-slate-900 break-all">'+esc(pendingTradeNo)+'</p><p class="mt-2 text-xs text-slate-600">订单已创建，当前状态待支付。请完成支付后以个人中心订单状态为准。</p></div>'+(safeQr?'<div class="mt-4 text-center"><p class="mb-2 text-sm font-semibold">扫码支付</p><img alt="支付二维码" class="mx-auto max-h-64 rounded-xl border border-slate-200 bg-white p-2" src="'+esc(safeQr)+'"></div>':rawQr?'<div class="mt-4 text-center"><p class="mb-2 text-sm font-semibold">扫码支付</p><div id="s5-payment-qr" class="mx-auto inline-flex rounded-xl border border-slate-200 bg-white p-2"></div></div>':'')+(safePayUrl?'<a class="mt-4 block w-full rounded-xl bg-blue-600 py-3 text-center font-bold text-white" href="'+esc(safePayUrl)+'" target="_blank" rel="noopener noreferrer">打开支付页面</a>':'<p class="mt-4 text-sm text-amber-700">未收到有效的 HTTPS 支付入口。订单可能已创建但尚未支付，请先在订单记录中核对状态，不要重复下单。</p>');
         pendingTradeNo='';
         showModal('订单待支付',resultHtml);
+        if(rawQr&&window.QRCode){new QRCode($('s5-payment-qr'),{text:rawQr,width:220,height:220});}
       }catch(e){
         showError(pendingTradeNo?'订单已创建（订单号：'+pendingTradeNo+'），支付信息获取失败。再次点击只会重试获取支付信息，不会重复创建订单。 '+(e.message||''):(e.message||'创建订单失败'));
         button.disabled=orderSaveOutcomeUnknown;

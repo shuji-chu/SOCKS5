@@ -1,79 +1,52 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shopping Cart - S5 · 晴天社区</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>tailwind.config = { theme: { extend: { colors: { primary: '#2563eb' } } } }</script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <link rel="stylesheet" href="../css/style.css">
-<link rel="stylesheet" href="../../css/footer-ecosystem.css"><link rel="icon" type="image/png" href="../../assets/logo.png"><link rel="apple-touch-icon" href="../../assets/logo.png"><link rel="stylesheet" href="../../css/global-video-bg.css"></head>
-<body class="bg-[#f8fafc] text-slate-700 font-sans min-h-screen" x-data>
-    <!-- 导航栏简版 -->
-    <nav class="bg-white border-b border-gray-200 px-4 py-4">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <a href="./index.html" class="text-slate-900 font-bold text-xl">S5 · 晴天社区</a>
-            <a href="./index.html" class="text-sm text-primary hover:underline">&larr; Continue Shopping</a>
-        </div>
-    </nav>
-
-    <div class="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8" x-init="$store.app.requireAuth('/cart.html')">
-        
-        <!-- 左侧：购物车列表 -->
-        <div class="lg:col-span-2">
-            <h1 class="text-2xl font-bold text-slate-900 mb-6">Shopping Cart</h1>
-            
-            <!-- 空状态 -->
-            <template x-if="$store.app.cart.length === 0">
-                <div class="bg-white rounded-xl p-12 text-center border border-gray-200">
-                    <div class="text-4xl mb-4">🛒</div>
-                    <p class="text-gray-500 mb-6">Your cart is empty</p>
-                    <a href="./index.html" class="bg-primary text-slate-900 px-6 py-2 rounded-lg">Browse Products</a>
-                </div>
-            </template>
-
-            <!-- 列表 -->
-            <template x-if="$store.app.cart.length > 0">
-                <div class="space-y-4">
-                    <template x-for="item in $store.app.cart" :key="item.id">
-                        <div class="bg-white rounded-xl p-4 border border-gray-200 flex items-center gap-4">
-                            <div class="text-3xl" x-text="item.icon"></div>
-                            <div class="flex-1">
-                                <h3 class="text-slate-900 font-bold text-sm" x-text="item.title"></h3>
-                                <p class="text-xs text-gray-500 mt-1">Stock: <span :class="item.qty > item.stock ? 'text-red-500' : 'text-green-500'" x-text="item.stock"></span></p>
-                                <p class="text-xs text-red-400 mt-1" x-show="item.qty > item.stock">Not enough stock available</p>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <div class="flex items-center bg-[#f8fafc] border border-gray-200 rounded-lg">
-                                    <button @click="if(item.qty>1) {item.qty--; $store.app.saveCart()}" class="px-3 py-1 text-slate-900 hover:bg-gray-100">-</button>
-                                    <span class="px-3 text-slate-900 text-sm" x-text="item.qty"></span>
-                                    <button @click="if(item.qty<item.stock) {item.qty++; $store.app.saveCart()}" class="px-3 py-1 text-slate-900 hover:bg-gray-100">+</button>
-                                </div>
-                                <div class="w-20 text-right font-bold text-slate-900" x-text="'¥' + (item.price * item.qty).toFixed(2)"></div>
-                                <button @click="if(confirm('Are you sure to remove this item?')) $store.app.removeFromCart(item.id)" class="text-red-500 hover:text-red-400 text-sm">Remove</button>
-                            </div>
-                        </div>
-                    </template>
-                </div>
-            </template>
-        </div>
-
-        <!-- 右侧：结算卡片 -->
-        <div>
-            <div class="bg-white rounded-xl p-6 border border-gray-200 sticky top-24">
-                <h2 class="text-lg font-bold text-slate-900 mb-4">Order Summary</h2>
-                <div class="flex justify-between text-sm mb-2"><span>Subtotal</span><span x-text="'¥' + $store.app.cartTotal.toFixed(2)"></span></div>
-                <div class="flex justify-between text-sm mb-4"><span>Tax</span><span>¥0.00</span></div>
-                <div class="border-t border-gray-200 pt-4 flex justify-between font-bold text-slate-900 mb-6">
-                    <span>Total</span><span x-text="'¥' + $store.app.cartTotal.toFixed(2)"></span>
-                </div>
-                <a href="./checkout.html" class="block text-center w-full bg-primary text-slate-900 font-bold py-3 rounded-lg hover:bg-blue-600" :class="{'opacity-50 pointer-events-none': $store.app.cart.length === 0 || $store.app.cart.some(i => i.qty > i.stock)}">
-                    Proceed to Checkout
-                </a>
-            </div>
-        </div>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#FFFFFF">
+  <title>购物车 - S5 晴天社区</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{primary:'#0055FF'}}}}</script>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../../css/footer-ecosystem.css">
+  <link rel="stylesheet" href="../../css/global-video-bg.css">
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <style>
+    body{background:#F0F4F8;color:#334155}
+    .s5-cart-nav{background:rgba(255,255,255,.9);backdrop-filter:blur(18px);border-bottom:1px solid #e5edf7}
+    .s5-cart-nav a{min-height:44px;display:inline-flex;align-items:center}
+    button:disabled{cursor:not-allowed}
+  </style>
+  <script>if(!location.hash)location.hash='#/cart';</script>
+  <script defer src="../js/app.js?v=cart-checkout-repair-20261031"></script>
+</head>
+<body class="min-h-screen antialiased">
+  <header class="s5-cart-nav sticky top-0 z-40">
+    <div class="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between gap-4">
+      <a href="./index.html" class="gap-3 text-slate-900 font-bold">
+        <img src="../../assets/logo.png" alt="晴天社区" width="36" height="36" class="rounded-lg object-contain">
+        <span>S5 · 晴天社区</span>
+      </a>
+      <nav class="flex items-center gap-3 text-sm">
+        <a href="./index.html#/products" class="text-slate-600 hover:text-blue-600">继续购物</a>
+        <a href="./index.html#/orders" class="text-slate-600 hover:text-blue-600">我的订单</a>
+        <div id="nav-user-area" class="flex items-center gap-2"></div>
+      </nav>
     </div>
-<footer class="s5-site-footer" aria-label="晴天社区网站页脚"><div class="footer-brandline"><img src="../../assets/logo.png" alt="晴天社区 Logo"><div><strong>晴天社区 · S5</strong><small>全球节点与数字服务生态</small></div></div><div class="footer-ecosystem"><div class="footer-ecosystem-title">更多即将上线</div><div class="ecosystem-items"><div class="ecosystem-item"><img src="../../assets/icons/sms-service.svg" alt="" aria-hidden="true"><span>接码服务</span></div><div class="ecosystem-item"><img src="../../assets/icons/domain-routing.svg" alt="" aria-hidden="true"><span>域名分发</span></div><div class="ecosystem-item"><img src="../../assets/icons/ai-platform.svg" alt="" aria-hidden="true"><span>AI 开放平台</span></div></div></div><div class="footer-copyright">© 2026 晴天社区 · S5 官方平台</div></footer>
-<script src="../../js/global-video-bg.js" defer></script></body>
+  </header>
+  <main class="mx-auto max-w-7xl px-4 py-8 md:py-12">
+    <div id="app-view" aria-live="polite"><div class="rounded-xl bg-white p-8 text-center text-slate-500">正在加载页面…</div></div>
+  </main>
+  <footer class="s5-site-footer" aria-label="晴天社区网站页脚">
+    <div class="footer-brandline"><img src="../../assets/logo.png" alt="晴天社区 Logo"><div><strong>晴天社区 · S5</strong><small>全球节点与数字服务生态</small></div></div>
+    <div class="footer-ecosystem"><div class="footer-ecosystem-title">更多即将上线</div><div class="ecosystem-items"><div class="ecosystem-item"><img src="../../assets/icons/sms-service.svg" alt="" aria-hidden="true"><span>接码服务</span></div><div class="ecosystem-item"><img src="../../assets/icons/domain-routing.svg" alt="" aria-hidden="true"><span>域名分发</span></div><div class="ecosystem-item"><img src="../../assets/icons/ai-platform.svg" alt="" aria-hidden="true"><span>AI 开放平台</span></div></div></div>
+    <div class="footer-copyright">© 2026 晴天社区 · S5 官方平台</div>
+  </footer>
+  <div id="modal-overlay" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4" role="dialog" aria-modal="true">
+    <div id="modal-content" class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl"></div>
+    <button type="button" onclick="App.closeModal()" aria-label="关闭弹窗" class="absolute right-5 top-5 rounded-full bg-white px-3 py-2 text-slate-700">×</button>
+  </div>
+  <div id="toast" class="hidden fixed bottom-8 left-1/2 z-[110] -translate-x-1/2 rounded-xl px-5 py-3 text-white shadow-xl" role="status" aria-live="polite"></div>
+  <script src="../../js/global-video-bg.js" defer></script>
+</body>
 </html>

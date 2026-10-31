@@ -435,37 +435,7 @@
   }
 
   function installCinematicBackground() {
-    if (!document.body || document.getElementById('s5-cinematic-bg')) return;
-    const video = document.createElement('video');
-    video.id = 's5-cinematic-bg';
-    video.setAttribute('autoplay', '');
-    video.setAttribute('muted', '');
-    video.setAttribute('loop', '');
-    video.setAttribute('playsinline', '');
-    video.setAttribute('webkit-playsinline', '');
-    video.setAttribute('aria-hidden', 'true');
-    video.preload = 'none';
-    video.muted = true;
-    video.defaultMuted = true;
-    video.src = 'https://assets.mixkit.co/videos/preview/mixkit-stars-in-space-1610-large.mp4';
-    video.addEventListener('error', () => { video.classList.add('video-fallback'); video.removeAttribute('src'); video.load(); }, { once: true });
-    document.body.prepend(video);
-    const style = document.createElement('style');
-    style.id = 's5-cinematic-background-style';
-    style.textContent = 'html,body{background-color:#061326!important;background-image:radial-gradient(ellipse at 75% 0%,rgba(28,89,160,.24),transparent 50%),linear-gradient(180deg,#061326,#030b1a)!important}#s5-cinematic-bg{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:-2;pointer-events:none;opacity:.34;background:#061326}body:before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(180deg,rgba(3,12,29,.76),rgba(4,15,34,.88)),radial-gradient(ellipse at 70% 0%,rgba(24,93,160,.2),transparent 55%)}#s5-cinematic-bg.video-fallback{display:none}body{isolation:isolate}.site-header,.site-footer{background-color:rgba(5,13,28,.72)!important;backdrop-filter:blur(16px)}.panel,.product-card,.business-card,.announcement{backdrop-filter:blur(14px)}@media(max-width:650px){#s5-cinematic-bg{opacity:.22}body:before{background:linear-gradient(180deg,rgba(3,12,29,.82),rgba(4,15,34,.92))}}@media(prefers-reduced-motion:reduce){#s5-cinematic-bg{display:none}}';
-    document.head.appendChild(style);
-    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-    const saveData = !!(connection && connection.saveData);
-    const slowNetwork = !!(connection && (connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g' || (Number(connection.downlink) > 0 && Number(connection.downlink) < 1.2)));
-    const mobile = window.matchMedia('(max-width: 768px)').matches || /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
-    if (reduce || saveData || slowNetwork || mobile) { video.removeAttribute('autoplay'); video.pause(); video.removeAttribute('src'); video.load(); video.style.display = 'none'; return; }
-    const play = () => video.play().catch(() => { video.classList.add('video-fallback'); video.removeAttribute('src'); video.load(); });
-    if (document.visibilityState === 'visible') { video.load(); play(); }
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible' && !reduce && !saveData) play();
-      else video.pause();
-    });
+    // Disabled: the shared blue-white CSS theme owns the page background.
   }
 
   function loadLogin() {

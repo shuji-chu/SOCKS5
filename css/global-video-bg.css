@@ -312,3 +312,34 @@ body::after{display:none!important;content:none!important}
 @media(prefers-reduced-motion:reduce){
  body::before{animation:none!important;transform:none!important;will-change:auto}
 }
+
+
+/* Final authoritative blue-white layer for legacy and account pages */
+:root{color-scheme:light!important;--bg:#F0F4F8!important;--panel:rgba(255,255,255,.88)!important;--panel2:#fff!important;--line:rgba(10,25,47,.10)!important;--text:#0A192F!important;--muted:#334155!important;--cyan:#087fbd!important;--blue:#0055FF!important}
+html,body{min-height:100%;background:#F0F4F8!important;color:#334155!important}
+body{background:linear-gradient(145deg,#F0F4F8 0%,#E0F7FA 52%,#fff 100%)!important;color:#334155!important}
+h1,h2,h3,h4,h5,h6,strong,b,.title,.page-title,.section-heading{color:#0A192F!important}
+p,small,label,li,dt,dd,figcaption,.muted,.eyebrow,.description,.lead{color:#334155!important}
+a{color:#155eaa}
+.head,.header,.top,.bar,.site-header,.s5-global-header,.dp-header,nav{background:rgba(255,255,255,.92)!important;background-color:rgba(255,255,255,.92)!important;color:#0A192F!important;border-color:rgba(10,25,47,.09)!important;backdrop-filter:blur(20px)!important;box-shadow:0 4px 20px rgba(15,23,42,.045)!important}
+.panel,.card,.business-card,.product-card,.content,.content-box,.archive-panel,.archive-head,.node-config-panel,.checkin-card,.modal-box,.modal-content,.modal-panel,.detail-modal,.shop-card,.product-item,.api-card,.feature-card,.stat-card,.dashboard-card,.invite-card,.traffic-card,.faq-item,.faq-card,.skeleton-card,.node-speed-panel,.blindbox,.announcement,.order-card,.wallet-card,.table-wrap,.table-container,.dp-glass,.login-card,.auth-card,.form-card,.code-card,.docs-card,.profile-card,.terminal-box,.dark-card{
+ background:rgba(255,255,255,.88)!important;background-color:rgba(255,255,255,.88)!important;color:#334155!important;
+ border:1px solid rgba(10,25,47,.08)!important;box-shadow:0 8px 28px rgba(15,23,42,.055)!important;
+ -webkit-backdrop-filter:blur(18px)!important;backdrop-filter:blur(18px)!important
+}
+.panel *, .card *, .dp-glass *, .dark-card *, .terminal-box *{color:inherit}
+button,.button,.btn,.checkin-button,.home-carousel-cta,.s5-account-button,.dp-btn{background:linear-gradient(110deg,#258cf0,#0055FF)!important;color:#fff!important;border-color:transparent!important;box-shadow:0 7px 20px rgba(0,85,255,.14)!important}
+button.ghost,.button-ghost,.btn.ghost,.button.button-ghost{background:rgba(255,255,255,.92)!important;color:#155eaa!important;border:1px solid rgba(21,94,170,.18)!important;box-shadow:none!important}
+input,select,textarea,.input,.search{background:#fff!important;color:#0A192F!important;border:1px solid rgba(10,25,47,.14)!important}
+input::placeholder,textarea::placeholder{color:#64748b!important}
+.money,.price,.amount{color:#087fbd!important}
+.status,.status-chip,.demo-chip{background:rgba(224,247,250,.72)!important;color:#155eaa!important;border-color:rgba(21,94,170,.16)!important}
+.bottom-nav,.home-bottom-nav,.mobile-tabbar,.mobile{background:rgba(255,255,255,.96)!important;background-color:rgba(255,255,255,.96)!important;color:#0055FF!important;border-color:rgba(0,85,255,.12)!important;box-shadow:0 -8px 28px rgba(15,23,42,.07)!important;backdrop-filter:blur(22px)!important}
+.bottom-nav a,.home-bottom-nav a,.mobile-tabbar a,.bottom-nav a.active,.home-bottom-nav a.active,.mobile-tabbar a.active{color:#0055FF!important}
+.detail-grid,.search,.input-flat{background:rgba(240,244,248,.88)!important;color:#0A192F!important}
+.modal-overlay,.modal-backdrop,.mtp-modal{background:rgba(15,23,42,.34)!important}
+.site-footer,.footer{background:rgba(255,255,255,.86)!important;background-color:rgba(255,255,255,.86)!important;color:#334155!important;border-color:rgba(10,25,47,.08)!important}
+.site-footer a,.footer a{color:#155eaa!important}
+#global-bg-video,#global-bg-overlay{display:none!important;visibility:hidden!important}
+body:before{opacity:.035!important}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}

@@ -172,8 +172,9 @@
 
                 document.getElementById('p-title').innerText = currentProduct.title;
                 
-                const symbol = currentProduct.currency === 'USDT' ? '$' : '¥';
-                document.getElementById('p-price').innerText = `${symbol} ${currentProduct.price.toFixed(2)}`;
+                const isUsdt = currentProduct.currency === 'USDT';
+                const displayPrice = isUsdt ? currentProduct.price * 8 : currentProduct.price;
+                document.getElementById('p-price').innerText = `¥ ${displayPrice.toFixed(2)}` + (isUsdt ? `（${currentProduct.price.toFixed(2)} USDT）` : '');
                 document.getElementById('p-stock').innerText = currentProduct.stock;
                 document.getElementById('p-desc').innerHTML = currentProduct.desc;
                 
@@ -195,10 +196,12 @@
         function updateTotal() {
             if(!currentProduct) return;
             const qty = parseInt(document.getElementById('buy-qty').value);
-            const total = (qty * currentProduct.price).toFixed(2);
-            const symbol = currentProduct.currency === 'USDT' ? '$' : '¥';
-            document.getElementById('total-amount').innerText = `${symbol} ${total}`;
-            document.getElementById('bottom-amount').innerText = `${symbol} ${total}`;
+            const rawTotal = qty * currentProduct.price;
+            const isUsdt = currentProduct.currency === 'USDT';
+            const total = (isUsdt ? rawTotal * 8 : rawTotal).toFixed(2);
+            const suffix = isUsdt ? `（${rawTotal.toFixed(2)} USDT）` : '';
+            document.getElementById('total-amount').innerText = `¥ ${total}` + suffix;
+            document.getElementById('bottom-amount').innerText = `¥ ${total}` + suffix;
         }
 
         function selectPayType(type) {

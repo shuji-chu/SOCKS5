@@ -198,6 +198,11 @@
     let body;
     try { body = await response.json(); } catch (_) { throw new Error('服务端返回的 JSON 格式不正确，请稍后重试'); }
     const logicalStatus = body && body.http_status !== undefined ? Number(body.http_status) : null;
+    const isAuthEndpoint = /^\/passport\/auth\/(?:login|register|send-code)(?:[/?]|$)/.test(String(path || ''));
+    if ((response.status === 401 || logicalStatus === 401) && token && !isAuthEndpoint) {
+      clearSession();
+      throw new Error('登录状态已失效，请重新登录');
+    }
     const message = body && (body.message || body.msg || body.detail || body.error || body.error_message);
     if (!response.ok) throw new Error(safeUiMessage(String(message || ('请求未成功（HTTP ' + response.status + '）'))));
     // This API may wrap errors in HTTP 200; http_status is the authoritative business status.

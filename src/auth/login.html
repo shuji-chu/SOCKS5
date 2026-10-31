@@ -269,10 +269,6 @@
                 }
             }).catch(() => { showTip('网络错误'); });
         }
-            // 模拟提交成功
-            closeModal('forgot-modal');
-            showTip('密码重置成功，请使用新密码登录');
-        }
 
         // 弹窗通用控制
         function openModal(id) { document.getElementById(id).classList.add('active'); }

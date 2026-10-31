@@ -144,7 +144,7 @@ const App = {
                 <article class="bg-white rounded-xl p-4 border border-gray-200 flex flex-wrap sm:flex-nowrap items-center gap-4 mb-3 shadow-sm">
                     <div class="min-w-0 flex-1">
                         <h3 class="text-slate-900 font-bold text-sm break-words">${App.escapeHtml(item.title || '商品')}</h3>
-                        <p class="text-xs text-gray-500 mt-1">单价：¥${price.toFixed(2)} · 库存：${stock}</p>
+                        <p class="text-xs text-gray-500 mt-1">单价：$${price.toFixed(2)} · 库存：${stock}</p>
                         ${invalid ? '<p class="text-xs text-red-600 mt-1">库存不足，请调整数量或移除商品</p>' : ''}
                     </div>
                     <div class="flex items-center gap-2">
@@ -152,7 +152,7 @@ const App = {
                         <span class="min-w-7 text-center font-semibold">${qty}</span>
                         <button type="button" aria-label="增加数量" onclick="App.updateCartQty(${Number(item.id)}, 1)" class="w-10 h-10 rounded-lg border border-gray-200 text-slate-700" ${qty >= stock ? 'disabled' : ''}>＋</button>
                     </div>
-                    <strong class="w-24 text-right text-slate-900">¥${(price * qty).toFixed(2)}</strong>
+                    <strong class="w-24 text-right text-slate-900">$${(price * qty).toFixed(2)}</strong>
                     <button type="button" onclick="App.removeFromCart(${Number(item.id)})" class="px-3 py-2 text-sm text-red-600">移除</button>
                 </article>`;
             }).join('');
@@ -168,7 +168,7 @@ const App = {
                     <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm lg:sticky lg:top-24">
                         <h2 class="text-lg font-bold text-slate-900 mb-5">订单摘要</h2>
                         <div class="flex justify-between text-sm mb-3"><span>商品数量</span><span>${App.state.cart.reduce((n,i)=>n+(Number(i.qty)||0),0)} 件</span></div>
-                        <div class="flex justify-between font-bold text-slate-900 text-xl border-t border-gray-100 pt-4 mb-5"><span>合计</span><span>¥${total.toFixed(2)}</span></div>
+                        <div class="flex justify-between font-bold text-slate-900 text-xl border-t border-gray-100 pt-4 mb-5"><span>合计</span><span>$${total.toFixed(2)}</span></div>
                         <button type="button" onclick="location.hash='#/checkout'" ${hasInvalid ? 'disabled' : ''} class="w-full bg-primary text-white font-bold py-3 rounded-xl disabled:opacity-40 disabled:cursor-not-allowed">前往结算</button>
                         ${hasInvalid ? '<p class="text-xs text-red-600 mt-3">请先处理库存不足的商品。</p>' : ''}
                     </div>
@@ -192,8 +192,8 @@ const App = {
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <section class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
                         <h2 class="text-lg font-bold text-slate-900 mb-4">商品清单</h2>
-                        ${App.state.cart.map(i => `<div class="flex justify-between gap-4 text-sm py-2 border-b border-gray-100"><span class="min-w-0">${App.escapeHtml(i.title || '商品')} × ${Number(i.qty)||1}</span><b class="whitespace-nowrap">¥${((Number(i.price)||0)*(Number(i.qty)||1)).toFixed(2)}</b></div>`).join('')}
-                        <div class="flex justify-between font-bold text-slate-900 text-xl mt-5"><span>应付金额</span><span>¥${total.toFixed(2)}</span></div>
+                        ${App.state.cart.map(i => `<div class="flex justify-between gap-4 text-sm py-2 border-b border-gray-100"><span class="min-w-0">${App.escapeHtml(i.title || '商品')} × ${Number(i.qty)||1}</span><b class="whitespace-nowrap">$${((Number(i.price)||0)*(Number(i.qty)||1)).toFixed(2)}</b></div>`).join('')}
+                        <div class="flex justify-between font-bold text-slate-900 text-xl mt-5"><span>应付金额</span><span>$${total.toFixed(2)}</span></div>
                     </section>
                     <section class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
                         <h2 class="text-lg font-bold text-slate-900 mb-4">支付与备注</h2>

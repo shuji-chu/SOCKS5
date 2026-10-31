@@ -95,7 +95,13 @@
         }
 
         function openPasswordModal() { document.getElementById('password-modal').classList.remove('hidden'); document.getElementById('password-modal').classList.add('flex'); }
-        function logout() { localStorage.clear(); window.location.href = './login.html'; }
+        function logout() {
+            ['sosks5_token','tgx_token','socks5_token','sosks5_user','tgx_user','socks5_user'].forEach(key => {
+                localStorage.removeItem(key);
+                sessionStorage.removeItem(key);
+            });
+            window.location.href = './login.html';
+        }
         function sendPwdCode() { alert('邮箱验证码接口尚未接入，未发送验证码。'); }
         function savePassword() {
             alert('密码修改接口尚未接入，密码未更改。');

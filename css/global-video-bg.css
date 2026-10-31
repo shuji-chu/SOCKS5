@@ -452,3 +452,85 @@ select,textarea,.input,.search-input{
 @media(prefers-reduced-motion:reduce){
   button,.button,.btn,.card,.product-card,.business-card{transition:none!important}
 }
+
+
+/* Interaction hardening: reliable taps, alignment and mobile safe areas */
+button,.button,.btn,input[type="button"],input[type="submit"],[role="button"]{
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+  -webkit-appearance:none;
+  appearance:none;
+  vertical-align:middle;
+}
+button,.button,.btn{
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  line-height:1.25;
+  gap:.5em;
+  max-width:100%;
+}
+button svg,button img,.button svg,.button img,.btn svg,.btn img{
+  pointer-events:none;
+  flex:0 0 auto;
+}
+button:focus-visible,.button:focus-visible,.btn:focus-visible,
+a:focus-visible,[role="button"]:focus-visible{
+  outline:3px solid rgba(0,85,255,.28)!important;
+  outline-offset:3px!important;
+}
+button[disabled],button[aria-disabled="true"],.button[aria-disabled="true"],
+.btn[aria-disabled="true"],a[aria-disabled="true"]{
+  cursor:not-allowed!important;
+  opacity:.55!important;
+}
+.bottom-nav a,.home-bottom-nav a,.mobile-tabbar a{
+  min-height:48px;
+  min-width:48px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+}
+.bottom-nav,.home-bottom-nav,.mobile-tabbar{
+  z-index:1000!important;
+  padding-bottom:env(safe-area-inset-bottom,0px)!important;
+}
+body{
+  scroll-padding-bottom:calc(88px + env(safe-area-inset-bottom,0px));
+}
+.modal-overlay,.modal-backdrop,.mtp-modal,[role="dialog"]{
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
+}
+@media(max-width:768px){
+  button,.button,.btn,input[type="button"],input[type="submit"],[role="button"]{
+    touch-action:manipulation;
+  }
+  .bottom-nav,.home-bottom-nav,.mobile-tabbar{
+    padding-left:max(8px,env(safe-area-inset-left,0px))!important;
+    padding-right:max(8px,env(safe-area-inset-right,0px))!important;
+  }
+  .bottom-nav a,.home-bottom-nav a,.mobile-tabbar a{
+    flex:1 1 0;
+    min-width:0;
+    min-height:52px;
+  }
+  .modal-overlay,.modal-backdrop,.mtp-modal,[role="dialog"]{
+    max-height:100dvh;
+  }
+}
+@media(hover:none){
+  button:hover,.button:hover,.btn:hover,
+  .card:hover,.product-card:hover,.business-card:hover{
+    transform:none!important;
+  }
+  button:active,.button:active,.btn:active{
+    filter:brightness(.96);
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto!important}
+}

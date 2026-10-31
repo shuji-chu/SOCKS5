@@ -51,10 +51,10 @@
     <script>
         const email = localStorage.getItem('socks5_email');
         let newAvatarBase64 = "";
-        if (!email) window.location.href = '/login.html';
+        if (!email) window.location.href = './login.html';
 
         document.getElementById('edit-nickname').value = localStorage.getItem('socks5_nickname') || email.split('@')[0];
-        document.getElementById('edit-avatar-preview').src = localStorage.getItem('socks5_avatar') || '/logo.jpg';
+        document.getElementById('edit-avatar-preview').src = localStorage.getItem('socks5_avatar') || '../../assets/logo.png';
 
         function previewImage(input) {
             if (input.files && input.files[0]) {
@@ -95,7 +95,7 @@
         }
 
         function openPasswordModal() { document.getElementById('password-modal').classList.remove('hidden'); document.getElementById('password-modal').classList.add('flex'); }
-        function logout() { localStorage.clear(); window.location.href = '/login.html'; }
+        function logout() { localStorage.clear(); window.location.href = './login.html'; }
         function sendPwdCode() { alert('邮箱验证码接口尚未接入，未发送验证码。'); }
         function savePassword() {
             alert('密码修改接口尚未接入，密码未更改。');

@@ -35,3 +35,65 @@ input::placeholder,textarea::placeholder{color:#64748b!important}
 .hero-stats small,.hero-stats strong,.hero-bottomline,.planet-label{color:#334155!important}
 .planet-glow{background:rgba(0,85,255,.10)!important}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+
+/* S5 FINAL GLOBAL ICE BLUE OVERRIDE */
+
+/* S5 global ice-blue / pure-white visual tokens; no layout rules changed */
+:root{color-scheme:light!important;--bg:#F0F4F8;--panel:rgba(255,255,255,.88);--panel2:#fff;--line:rgba(10,25,47,.10);--text:#0A192F;--muted:#334155;--cyan:#087fbd;--blue:#0055FF;--radius:18px;--s5-bg:#F0F4F8;--s5-bg2:#E0F7FA;--s5-ink:#0A192F;--s5-muted:#334155;--s5-cyan:#087fbd;--s5-blue:#0055FF;--s5-line:rgba(10,25,47,.10);--s5-glass:rgba(255,255,255,.84)}
+html{background:#F0F4F8!important}
+body{background:linear-gradient(145deg,#F0F4F8 0%,#E0F7FA 52%,#fff 100%)!important;color:#334155!important}
+body:before{opacity:.035!important}
+h1,h2,h3,h4,h5,h6,.s5-page-heading h1,.s5-section-head h2,.s5-referral-copy h2{color:#0A192F}
+p,.muted,.s5-page-heading p,.s5-section-head p{color:#334155}
+.site-header,.dp-header,.s5-site-header{background:rgba(255,255,255,.9)!important;border-color:rgba(10,25,47,.08)!important;color:#0A192F!important;box-shadow:0 4px 20px rgba(15,23,42,.045)!important;backdrop-filter:blur(20px)}
+.main-nav{color:#334155!important}.main-nav a:hover,.main-nav a.active{color:#0055FF!important;border-color:#0055FF!important}
+.site-footer,.s5-site-footer{background:rgba(255,255,255,.82)!important;color:#334155!important;border-color:rgba(10,25,47,.08)!important}
+.panel,.dp-glass,.business-card,.product-card,.content-card,.stat-card,.feature-card,.login-card,.auth-card,.s5-panel,.s5-metric-card,.s5-subscription-card,.s5-showcase-card{background:rgba(255,255,255,.88)!important;color:#334155!important;border:1px solid rgba(10,25,47,.09)!important;box-shadow:0 8px 28px rgba(15,23,42,.055)!important;backdrop-filter:blur(18px)}
+input,select,textarea{background:#fff!important;color:#0A192F!important;border:1px solid rgba(10,25,47,.14)!important}
+input::placeholder,textarea::placeholder{color:#64748b!important}
+.s5-cinema-hero,.s5-webgl-hero,.s5-hero,.s5-tutorial-page{background:linear-gradient(135deg,#E0F7FA,#fff 62%,#edf4ff)!important;color:#0A192F!important;border-color:#d5e8f8!important}
+.s5-hero h1,.s5-hero h2,.s5-cinema-hero h1,.s5-cinema-hero h2,.s5-tutorial-page h1,.s5-tutorial-page h2{color:#0A192F!important;text-shadow:none!important}
+.s5-hero p,.s5-cinema-hero p,.s5-tutorial-page p,.s5-tutorial-page li{color:#334155!important}
+.s5-hero:before{opacity:.12!important;filter:saturate(.45)!important}
+.s5-hero:after{opacity:.07!important}
+.s5-hero-tags,.s5-hero-tags span{color:#245b99!important}
+.s5-hero-tags span{background:#fff!important;border-color:#d6e7fa!important}
+.s5-hero-contact,.s5-float-label{background:rgba(255,255,255,.88)!important;border-color:#d6e7fa!important;color:#334155!important;box-shadow:0 8px 25px rgba(15,23,42,.06)!important}
+.s5-hero-contact b{color:#0A192F!important}
+.s5-promo,.s5-affiliate,.s5-home-bottom,.s5-referral-hero,.s5-poster{background:linear-gradient(135deg,#fff,#eaf5ff)!important;border:1px solid #d6e7fa!important;color:#0A192F!important;box-shadow:0 10px 30px rgba(15,23,42,.05)!important}
+.s5-promo h2,.s5-affiliate h2,.s5-home-bottom h2,.s5-poster h3,.s5-poster-brand{color:#0A192F!important}
+.s5-promo p,.s5-affiliate p,.s5-poster p,.s5-home-bottom p{color:#334155!important}
+.s5-promo small,.s5-poster small{color:#475569!important}
+.s5-promo>a,.s5-affiliate a{background:#0055FF!important;color:#fff!important}
+.s5-button-primary,.s5-legal-accept{background:linear-gradient(110deg,#258cf0,#0055FF)!important;color:#fff!important}
+.s5-ghost-btn,.s5-button-ghost{background:#fff!important;color:#155eaa!important;border:1px solid #cfe0f5!important}
+.s5-announcement,.s5-business-card,.s5-glass-card,.s5-help-card,.s5-contact-banner,.s5-profile-card,.s5-panel{background:rgba(255,255,255,.88)!important;border:1px solid rgba(10,25,47,.09)!important;color:#334155!important;box-shadow:0 8px 28px rgba(15,23,42,.055)!important}
+.s5-profile-card h2,.s5-profile-card b,.s5-profile-card strong,.s5-business-card h3,.s5-glass-card h3{color:#0A192F!important}
+.s5-profile-card p,.s5-business-card p,.s5-glass-card p,.s5-help-card p{color:#334155!important}
+.s5-status-pill,.s5-month-chip{background:#eef6ff!important;border-color:#d6e7fa!important;color:#245b99!important}
+.s5-doc-page pre{background:#f1f6fc!important;color:#334155!important;border-color:#d6e7fa!important}
+.s5-legal-dialog,.s5-legal-box{background:rgba(255,255,255,.97)!important;color:#334155!important;border-color:#d6e7fa!important;box-shadow:0 25px 70px rgba(15,23,42,.14)!important}
+.s5-legal-dialog h1,.s5-legal-dialog h2,.s5-legal-dialog h3,.s5-legal-box h2,.s5-legal-box h3{color:#0A192F!important}
+.s5-legal-dialog p,.s5-legal-dialog li,.s5-legal-box p,.s5-legal-box li{color:#334155!important}
+.s5-legal-actions{background:linear-gradient(0deg,#fff 75%,transparent)!important}
+.s5-legal-notice{background:rgba(255,255,255,.96)!important;color:#334155!important;border-color:#d6e7fa!important}
+.s5-copy-field,.s5-referral-stats>div,.s5-rank-medal{background:#f4f8fd!important;border-color:#d6e7fa!important;color:#334155!important}
+.s5-copy-field span,.s5-referral-copy>small,.s5-referral-note,.s5-referral-stats span,.s5-referral-stats small{color:#475569!important}
+.s5-referral-copy h2,.s5-poster h3,.s5-poster-brand{color:#0A192F!important}
+.s5-referral-ring,.s5-poster-orbit{background:radial-gradient(circle,#fff,#e4f2ff)!important;border-color:#bcd8f5!important;color:#0055FF!important;box-shadow:0 5px 18px rgba(0,85,255,.08)!important}
+.s5-poster-code{background:#fff!important;border-color:#bcd8f5!important;color:#0055FF!important}
+.s5-table-wrap,.s5-rank-table{border-color:#d6e7fa!important}
+.s5-rank-table th{background:#eef5fc!important;color:#334155!important}
+.s5-rank-table td{border-color:#e3ebf4!important;color:#334155!important}
+.s5-rank-table td small{color:#64748b!important}
+.s5-rank-table td:nth-child(4),.s5-referral-stats b{color:#0055FF!important}
+.s5-empty-state b{color:#0A192F!important}.s5-empty-state p{color:#475569!important}
+.s5-empty-icon{background:#eef6ff!important;border-color:#d6e7fa!important;color:#0055FF!important}
+.s5-skeleton-block{background:linear-gradient(100deg,#e8f1fb 20%,#f8fbff 50%,#e8f1fb 80%)!important}
+#s5-first-paint{background:linear-gradient(145deg,#F0F4F8,#E0F7FA,#fff)!important}
+#s5-starfield{background:radial-gradient(ellipse at 70% 0%,#fff 0,transparent 43%),radial-gradient(ellipse at 0% 55%,#e0f7fa 0,transparent 38%),#F0F4F8!important;opacity:.12!important}
+#sosks5-ai-panel{background:rgba(255,255,255,.97)!important;color:#334155!important;border-color:#d6e7fa!important;box-shadow:0 20px 60px rgba(15,23,42,.14)!important}
+#sosks5-ai-panel *{color:inherit}
+#sosks5-ai-send{background:#0055FF!important;color:#fff!important}
+

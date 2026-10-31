@@ -25,3 +25,8 @@
 .rank-table td small{color:#64748b!important}
 .poster h2{color:#0A192F!important}
 
+
+/* Ice-blue photo placeholders; preserve image crop and card geometry */
+.product-photo,.business-image{background:#eaf4ff!important}
+.business-image:after{background:linear-gradient(0deg,rgba(10,25,47,.28),transparent 70%)!important}
+.business-image>span{color:#fff!important}

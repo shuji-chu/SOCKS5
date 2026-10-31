@@ -96,7 +96,7 @@ const App = {
               <div class="s5-astronaut" aria-label="漂浮宇航员动画"><div class="s5-orbit"></div><div class="s5-astronaut-body" aria-hidden="true"></div></div>
               <div class="s5-hero-contact"><b>在线业务支持</b><span>客服：晴天社区官方</span><span>在线服务：官方客服入口</span><span>服务时间：每日在线</span></div><div class="s5-slider-dots"><i></i><i></i><i></i></div>
             </section>
-            <section class="s5-announcement"><span class="s5-live-dot"></span><b>平台公告</b><div class="s5-marquee"><span>欢迎来到 晴天社区数字服务空间　·　下单前请仔细阅读商品说明　·　如需帮助可联系在线客服　·　感谢你的支持</span></div><a href="#/notices">查看公告 →</a></section>
+            <section class="s5-announcement"><span class="s5-live-dot"></span><b>平台公告</b><div class="s5-marquee"><span>欢迎来到 晴天社区数字服务空间　·　下单前请仔细阅读商品说明　·　如需帮助可联系在线客服　·　感谢你的支持</span></div><a href="../../blog.html">查看公告 →</a></section>
             <section class="s5-categories s5-business-grid">
               <a href="#/products" class="s5-category"><span><img src="${S5_ICON('shop')}" alt="" aria-hidden="true"></span><b>账号商城</b><small>社交平台 · 邮箱服务 · 数字工具</small><em>探索商品 ↗</em></a>
               <a href="#/nodes" class="s5-category"><span><img src="${S5_ICON('network')}" alt="" aria-hidden="true"></span><b>节点中心</b><small>高速节点 · 订阅服务 · 使用指引</small><em>浏览节点 ↗</em></a>

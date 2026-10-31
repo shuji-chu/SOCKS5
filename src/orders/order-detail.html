@@ -181,7 +181,7 @@
         const created=first(order,['created_at','created_time','create_time','created','add_time']);
         const paidAt=first(order,['paid_at','pay_time','paid_time']);
         const status=String(first(order,['status_text','status_label','status','trade_status','pay_status'])??'未知');
-        const paid= /paid|success|completed|已支付|已完成/i.test(status)||Number(status)===1||Number(first(order,['paid','is_paid','pay_status']))===1;
+        const paidFlag=first(order,['paid','is_paid','isPaid']);const paidValue=String(paidFlag??'').toLowerCase();const statusValue=status.trim().toLowerCase();const unpaidStatus=/unpaid|not[_ -]?paid|pending|wait[_ -]?pay|未支付|待支付|支付中|已取消|已关闭|cancelled|canceled|closed|expired/.test(statusValue);const paidStatus=/^paid$|^success$|^completed$|^complete$|^已支付$|^已完成$|^1$/.test(statusValue);const paid= !unpaidStatus&&(paidStatus||paidFlag===true||paidValue==='true'||paidValue==='1'||paidValue==='yes'||Number(first(order,['paid','is_paid','isPaid']))===1||Number(first(order,['pay_status']))===1);
         const deliveryStatus=String(first(order,['delivery_status','deliver_status','shipping_status','is_delivered'])??'未返回');
         const amountYuan=first(order,['total_amount_yuan','amount_yuan','actual_amount_yuan','pay_amount_yuan']);
         const amount=amountYuan??first(order,['total_amount','amount','total','actual_amount','pay_amount','price']);

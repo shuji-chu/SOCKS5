@@ -67,9 +67,9 @@
     traffic: 'https://api.lynli.me/static/qian/traffic.json'
   };
   const STATIC_DATA_FALLBACKS = {
-    nodes: 'https://raw.githubusercontent.com/shuji-chu/qian/main/nodes.json',
-    accounts: 'https://raw.githubusercontent.com/shuji-chu/qian/main/accounts.json',
-    traffic: 'https://raw.githubusercontent.com/shuji-chu/qian/main/traffic.json'
+    nodes: 'https://raw.githubusercontent.com/shuji-chu/qian/socks5-data/nodes.json',
+    accounts: 'https://raw.githubusercontent.com/shuji-chu/qian/socks5-data/accounts.json',
+    traffic: 'https://raw.githubusercontent.com/shuji-chu/qian/socks5-data/traffic.json'
   };
 
   async function fetchStaticData(type) {

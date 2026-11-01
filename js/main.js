@@ -160,8 +160,8 @@
   }
   
   const HOME_STATIC_URLS = {
-    nodes: ['https://api.lynli.me/static/qian/nodes.json', 'https://raw.githubusercontent.com/shuji-chu/qian/main/nodes.json'],
-    accounts: ['https://api.lynli.me/static/qian/accounts.json', 'https://raw.githubusercontent.com/shuji-chu/qian/main/accounts.json']
+    nodes: ['https://api.lynli.me/static/qian/nodes.json', 'https://raw.githubusercontent.com/shuji-chu/qian/socks5-data/nodes.json'],
+    accounts: ['https://api.lynli.me/static/qian/accounts.json', 'https://raw.githubusercontent.com/shuji-chu/qian/socks5-data/accounts.json']
   };
   async function fetchHomeStatic(kind) {
     const urls = HOME_STATIC_URLS[kind] || [];

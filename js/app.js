@@ -1,13 +1,13 @@
 
-const API_ROOT='https://web.lynli.me';
+const API_ROOT='https://api.lynli.me';
 const assetBase=()=>String(window.SOSKS5_OSS_BASE_URL||'').replace(/\/+$/,'');
 const localIcon=u=>{if(!u)return '';const s=String(u).trim();if(s.startsWith('./assets/icons/'))return s;if(s.startsWith('/assets/icons/'))return '.'+s;const m=s.match(/assets\/icons\/([a-z0-9_.-]+\.svg)/i);return m?'./assets/icons/'+m[1]:'./assets/icons/network.svg'};
-const API_V1='https://web.lynli.me/api/v1';
+const API_V1='https://api.lynli.me/api/v1';
 const requestedCategory=new URLSearchParams(location.search).get('category')||'节点';
-let liveProducts=[],activeKind=['节点','账号','引流'].includes(requestedCategory)?requestedCategory:'节点',searchTerm='',activeFilter='全部',paymentMethods=[];
+let liveProducts=[],activeKind=['节点','服务器'].includes(requestedCategory)?requestedCategory:'节点',searchTerm='',activeFilter='全部',paymentMethods=[];
 let catalogPage=1,catalogTotal=0,catalogTotalPages=1,catalogLoading=false,catalogRequestId=0;
-const catalogAllRowsLoaded={节点:false,账号:false,引流:false};
-const catalogCache={节点:null,账号:null,引流:null};
+const catalogAllRowsLoaded={节点:false,服务器:false};
+const catalogCache={节点:null,服务器:null};
 const catalogPrefetching=new Set();
 const CATALOG_PAGE_SIZE=15;
 
@@ -70,13 +70,11 @@ if(!window.__S5_GLOBAL_ACTION_GUARD__){
 
 const STATIC_CATALOG_URLS={
  '节点':'https://api.lynli.me/static/qian/nodes.json',
- '账号':'https://api.lynli.me/static/qian/accounts.json',
- '引流':'https://api.lynli.me/static/qian/traffic.json'
+ '服务器':'https://api.lynli.me/static/qian/servers.json'
 };
 const STATIC_CATALOG_FALLBACKS={
- '节点':'https://raw.githubusercontent.com/shuji-chu/qian/main/nodes.json',
- '账号':'https://raw.githubusercontent.com/shuji-chu/qian/main/accounts.json',
- '引流':'https://raw.githubusercontent.com/shuji-chu/qian/main/traffic.json'
+ '节点':'https://raw.githubusercontent.com/shuji-chu/qian/socks5-data/nodes.json',
+ '服务器':'https://raw.githubusercontent.com/shuji-chu/qian/socks5-data/servers.json'
 };
 async function fetchStaticCatalog(kind){
  const urls=[STATIC_CATALOG_URLS[kind],STATIC_CATALOG_FALLBACKS[kind]].filter(Boolean);
@@ -100,52 +98,13 @@ async function fetchStaticCatalog(kind){
  throw new Error(lastError&&lastError.name==='AbortError'?'网络请求超时，请重新加载':'网络异常，请点击重试');
 }
 
-const catalogFacetIcon=(p,kind,label)=>{
- if(kind==='节点')return '';
- const name=String(label||'').toLowerCase();
- const brands=[
-  [/telegram|电报/,'telegram','26A5E4'],[/tiktok|抖音/,'tiktok','25F4EE'],[/instagram|ins/,'instagram','E4405F'],
-  [/facebook|脸书/,'facebook','0866FF'],[/threads/,'threads','6C63FF'],[/whatsapp/,'whatsapp','25D366'],
-  [/discord/,'discord','5865F2'],[/steam/,'steam','1688D4'],[/netflix/,'netflix','E50914'],
-  [/gmail|google/,'gmail','EA4335'],[/outlook|hotmail/,'microsoftoutlook','0078D4'],[/yahoo/,'yahoo','6001D2'],
-  [/icloud|apple/,'icloud','3693F3'],[/youtube|油管/,'youtube','FF0033'],[/reddit/,'reddit','FF4500'],
-  [/midjourney/,'midjourney','5865F2'],[/mail\.ru|mailru/,'maildotru','168DE2'],[/spotify/,'spotify','1DB954'],
-  [/x\b|twitter|推特/,'x','1D9BF0'],[/linkedin/,'linkedin','0A66C2']
- ];
- const found=brands.find(([pattern])=>pattern.test(name));
- if(found)return 'https://cdn.simpleicons.org/'+found[1]+'/'+found[2];
- const backend=p.platform_icon_url||p.icon_url||p.brand_icon_url||p.brand_logo||p.platform_icon||p.platform_logo||p.logo_url||p.icon?.url||'';
- return backend?String(backend):'';
-};
 const NODE_PROTOCOLS=['VLESS','Hysteria2','Trojan','VMess','Shadowsocks','TUIC','AnyTLS','SSR','MTProto'];
-const APP_ALIASES=[
- ['Telegram',/telegram/i],['TikTok',/tiktok/i],['Instagram',/instagram/i],['Facebook',/facebook|\bfb\b/i],['Threads',/threads/i],['WhatsApp',/whatsapp/i],['Discord',/discord/i],['Steam',/steam/i],['Netflix',/netflix/i],['Gmail',/gmail|google mail/i],['Outlook',/outlook|hotmail/i],['Yahoo',/yahoo mail/i],['iCloud',/icloud/i],['YouTube',/youtube/i],['X',/(?:^|[^a-z])twitter(?:$|[^a-z])|(?:^|\s)X(?:\s|$)/i],['Reddit',/reddit/i],['Snapchat',/snapchat/i],['Pinterest',/pinterest/i],['LinkedIn',/linkedin/i],['Twitch',/twitch/i],['Spotify',/spotify/i],['Midjourney',/midjourney/i],['Google',/google(?:\s+voice)?/i],['Apple',/apple id/i]
-];
 function catalogFacet(p,kind){
- if(kind==='节点'){
-  const raw=p.protocols||p.supported_protocols||p.protocol||p.node_protocol||p.type||[];
-  const values=Array.isArray(raw)?raw:String(raw).split(/[,，|、;；]+/);
-  const found=new Set(values.map(v=>String(typeof v==='object'?(v.name||v.protocol||v.type||''):v).trim().toLowerCase().replace(/[^a-z0-9]/g,'')));
-  return NODE_PROTOCOLS.filter(name=>found.has(name.toLowerCase().replace(/[^a-z0-9]/g,'')));
- }
- const found=new Map(),add=value=>{
-  if(value==null||value==='')return;
-  if(Array.isArray(value)){value.forEach(add);return}
-  if(typeof value==='object'){add(value.name??value.text??value.platform??value.app_name??value.title??value.label??value.value);return}
-  String(value).split(/[,，|、;；]+/).map(x=>x.trim()).filter(x=>x&&x.length<=40&&!/^(通用|general|generic|all|global|universal|other|others|全部|all platforms)$/i.test(x)).forEach(x=>found.set(x.toLowerCase(),x));
- };
- const fields=['platform','platform_name','app','app_name','appName','account_platform','traffic_platform','target_platform','source_platform','social_platform','product_platform','provider','site','website','media_platform','channel_platform'];
- const objects=[p,p._merchantAttrs||{},p.extra_attrs||{},p.extraAttrs||{},p.extra_attributes||{},p.extraAttributes||{},p.attributes||{}];
- objects.forEach(obj=>{if(obj&&typeof obj==='object'&&!Array.isArray(obj))fields.forEach(key=>add(obj[key]))});
- const title=String(p._title||p.title||p.name||p.product_name||p.sku_name||'');
- APP_ALIASES.forEach(([name,pattern])=>{if(pattern.test(title))found.set(name.toLowerCase(),name)});
- // Titles beginning with an app name (e.g. "Telegram [US] +1 Account") are a reliable fallback.
- const leading=title.match(/^\s*([A-Za-z][A-Za-z0-9.+_-]{1,24})(?=\s|\[|【|：|:)/);
- if(leading&&!/^(high|quality|premium|aged|verified|account|followers|likes|views|traffic|bulk|cheap|highquality)$/i.test(leading[1])){
-  const candidate=leading[1],known=APP_ALIASES.find(([name,pattern])=>pattern.test(candidate));
-  found.set((known?known[0]:candidate).toLowerCase(),known?known[0]:candidate);
- }
- return [...found.values()];
+ if(kind!=='节点')return [];
+ const raw=p.protocols||p.supported_protocols||p.protocol||p.node_protocol||p.type||[];
+ const values=Array.isArray(raw)?raw:String(raw).split(/[,，|、;；]+/);
+ const found=new Set(values.map(v=>String(typeof v==='object'?(v.name||v.protocol||v.type||''):v).trim().toLowerCase().replace(/[^a-z0-9]/g,'')));
+ return NODE_PROTOCOLS.filter(name=>found.has(name.toLowerCase().replace(/[^a-z0-9]/g,'')));
 }
 function renderCatalogFilters(){
  const root=document.getElementById('catalogFilters');if(!root)return;
@@ -190,21 +149,21 @@ function toast(message){
 const token=()=>localStorage.getItem('sosks5_token')||localStorage.getItem('tgx_token')||'';
 function unpack(r){return r&&r.data!==undefined?r.data:r}
 function listify(value){
- const queue=[value],seen=new Set(),keys=['items','list','products','plans','nodes','accounts','rows','records','results','data','result','payload'];
+ const queue=[value],seen=new Set(),keys=['items','list','products','plans','nodes','servers','rows','records','results','data','result','payload'];
  while(queue.length){const d=queue.shift();if(d==null||seen.has(d))continue;if(Array.isArray(d))return d;if(typeof d!=='object')continue;seen.add(d);for(const k of keys){const child=d[k];if(Array.isArray(child))return child;if(child&&typeof child==='object')queue.push(child)}}
  throw Error('商品目录 JSON 结构不正确：未找到商品数组（已检查 data/result/payload/items/list/products/rows）');
 }
 async function api(path,method='GET',body){const headers={Accept:'application/json','Content-Type':'application/json'};if(token())headers.Authorization='Bearer '+token();let r;try{r=await fetch(API_V1+path,{method,headers,signal:AbortSignal.timeout?AbortSignal.timeout(12000):undefined,...(body!==undefined?{body:JSON.stringify(body)}:{})})}catch(e){throw Error(e.name==='TimeoutError'||e.name==='AbortError'?'请求超时，请检查网络后重试':'网络连接失败，请检查网络后重试')}let d;try{d=await r.json()}catch{throw Error('服务端返回的 JSON 格式不正确，请稍后重试')}const hs=d&&d.http_status!==undefined?Number(d.http_status):null;if(!r.ok||hs!==null&&hs!==200||d?.success===false||d?.status==='fail'||d?.error)throw Error(safeUiMessage(d?.message||d?.msg||d?.detail||d?.error||('请求未成功（HTTP '+(hs!==null&&hs!==200?hs:r.status)+'）')));return d}
 function categoryOf(p,source){
- // Endpoint is authoritative; merchant labels vary and must not discard valid rows.
- if(source==='traffic')return '引流';if(source==='account')return '账号';if(source==='node')return '节点';
- const raw=String(p.category||p.product_type||p.product_category||p.type||p.kind||p.tag||'').toLowerCase();
- if(/traffic|flow|引流|流量包|traffic_pack|增长|推广|群发|机器人|growth|接码|短信|验证码|查询|查号|sms|lookup|query/.test(raw))return '引流';
- if(/node|proxy|vpn|节点|线路|订阅|vless|vmess|trojan|hysteria/.test(raw))return '节点';
- if(/account|账号|帐号|chatgpt|telegram|google|gmail|outlook/.test(raw))return '账号';return '其他';
+ const raw=[p.category,p.product_type,p.product_category,p.type,p.kind,p.tag,p.name,p.title,p.product_name,p.description,p.platform,p.brand].filter(Boolean).join(' ').toLowerCase();
+ if(/traffic|flow|引流|流量包|traffic_pack|增长|推广|群发|机器人|growth|接码|短信|验证码|查询|查号|sms|lookup|query/.test(raw))return '其他';
+ if(/account|账号|帐号|chatgpt|telegram|google|gmail|outlook|facebook|instagram|tiktok|whatsapp|discord|reddit/.test(raw))return '其他';
+ if(/server|vps|dedicated|bare.?metal|cloud.?host|服务器|云主机|独立主机|裸金属/.test(raw))return '服务器';
+ if(/node|proxy|vpn|节点|线路|订阅|vless|vmess|trojan|hysteria|shadowsocks|socks5|wireguard|tuic/.test(raw))return '节点';
+ return source==='server'?'服务器':source==='node'?'节点':'其他';
 }
 function catalogDisplayText(value){if(value==null)return '';if(Array.isArray(value))return value.map(catalogDisplayText).filter(Boolean).join(' · ');if(typeof value==='object'){for(const key of ['name','text','label','title','value','display_name'])if(value[key]!=null&&value[key]!=='')return catalogDisplayText(value[key]);return Object.entries(value).filter(([,v])=>v===true).map(([k])=>k).join(' · ')}return String(value)}
-function catalogPriceYuan(p,source){const yuan=p&&p.price_yuan!=null&&p.price_yuan!==''?p.price_yuan:(source==='traffic'?p?.unit_price_yuan:undefined);if(yuan!==undefined&&yuan!==null&&yuan!==''){const n=Number(yuan);return Number.isFinite(n)&&n>=0?n:null}const cents=p&&p.price_cents;if(cents!==undefined&&cents!==null&&cents!==''){const n=Number(cents);return Number.isFinite(n)&&n>=0?n/100:null}return null}
+function catalogPriceYuan(p,source){const yuan=p&&(p.price_yuan??p.premium_yuan);if(yuan!==undefined&&yuan!==null&&yuan!==''){const n=Number(yuan);return Number.isFinite(n)&&n>=0?n:null}const cents=p&&(p.price_cents??p.premium_cents);if(cents!==undefined&&cents!==null&&cents!==''){const n=Number(cents);return Number.isFinite(n)&&n>=0?n/100:null}return null}
 function moneyOf(p){const value=catalogPriceYuan(p,p&&p._source);return value===null?0:value}
 function groupedNodeRows(response){
  const root=unpack(response);
@@ -238,76 +197,14 @@ function groupedNodeRows(response){
  out.forEach((row,index)=>{const id=row.sku_id??row.skuId??row.product_id??row.productId??row.id??row.uuid;const key=id!=null?'id:'+String(id):'row:'+String(row._region)+'|'+String(row.sku_name||row.name||row.title||row.product_name||index)+'|'+String(row.price??row.price_yuan??row.month_price??'');if(!unique.has(key))unique.set(key,row);});
  return Array.from(unique.values());
 }
-function localizeTrafficTitle(value){
- let title=String(value??'');
- const dictionary=[
-  [/\b2FA\s*On\b/gi,'已开2FA'],[/\b2FA\s*Off\b/gi,'无2FA'],[/\bRandom\s+Country\b/gi,'随机国家'],[/\bDevice\s+Lock\b/gi,'设备锁'],
-  [/\bFull\s+Account\b/gi,'全功能号'],[/\bBlind\s+Box\b/gi,'盲盒'],
-  [/\[\s*US\s*\]/gi,'[美国]'],
-  [/\[\s*UK\s*\]/gi,'[英国]'],
-  [/\[\s*GB\s*\]/gi,'[英国]'],
-  [/\[\s*IN\s*\]/gi,'[印度]'],
-  [/\[\s*SG\s*\]/gi,'[新加坡]'],
-  [/\[\s*CA\s*\]/gi,'[加拿大]'],
-  [/\[\s*BR\s*\]/gi,'[巴西]'],
-  [/\[\s*RU\s*\]/gi,'[俄罗斯]'],
-  [/\[\s*CN\s*\]/gi,'[中国]'],
-  [/\[\s*JP\s*\]/gi,'[日本]'],
-  [/\[\s*KR\s*\]/gi,'[韩国]'],
-  [/\[\s*HK\s*\]/gi,'[中国香港]'],
-  [/\[\s*TW\s*\]/gi,'[中国台湾]'],
-  [/\[\s*TH\s*\]/gi,'[泰国]'],
-  [/\[\s*VN\s*\]/gi,'[越南]'],
-  [/\[\s*ID\s*\]/gi,'[印度尼西亚]'],
-  [/\[\s*MY\s*\]/gi,'[马来西亚]'],
-  [/\[\s*PH\s*\]/gi,'[菲律宾]'],
-  [/\[\s*AU\s*\]/gi,'[澳大利亚]'],
-  [/\[\s*NZ\s*\]/gi,'[新西兰]'],
-  [/\[\s*DE\s*\]/gi,'[德国]'],
-  [/\[\s*FR\s*\]/gi,'[法国]'],
-  [/\[\s*IT\s*\]/gi,'[意大利]'],
-  [/\[\s*ES\s*\]/gi,'[西班牙]'],
-  [/\[\s*NL\s*\]/gi,'[荷兰]'],
-  [/\[\s*SE\s*\]/gi,'[瑞典]'],
-  [/\[\s*NO\s*\]/gi,'[挪威]'],
-  [/\[\s*FI\s*\]/gi,'[芬兰]'],
-  [/\[\s*PL\s*\]/gi,'[波兰]'],
-  [/\[\s*TR\s*\]/gi,'[土耳其]'],
-  [/\[\s*MX\s*\]/gi,'[墨西哥]'],
-  [/\[\s*AR\s*\]/gi,'[阿根廷]'],
-  [/\[\s*CL\s*\]/gi,'[智利]'],
-  [/\[\s*CO\s*\]/gi,'[哥伦比亚]'],
-  [/\[\s*ZA\s*\]/gi,'[南非]'],
-  [/\[\s*NG\s*\]/gi,'[尼日利亚]'],
-  [/\[\s*EG\s*\]/gi,'[埃及]'],
-  [/\[\s*AE\s*\]/gi,'[阿联酋]'],
-  [/\[\s*SA\s*\]/gi,'[沙特阿拉伯]'],
-  [/\[\s*IL\s*\]/gi,'[以色列]'],
-  [/\[\s*PK\s*\]/gi,'[巴基斯坦]'],
-  [/\[\s*BD\s*\]/gi,'[孟加拉国]'],
-  [/\[\s*LK\s*\]/gi,'[斯里兰卡]'],
-  [/\[\s*NP\s*\]/gi,'[尼泊尔]'],
-  [/\bAPI\s+Login\b/gi,'API登录'],[/\biOS\s+Real\s+Device\b/gi,'iOS真机'],[/\bBlind\s+Box\b/gi,'盲盒'],
-  [/\bFull\s+Account\b/gi,'全功能号'],[/\bShared\s+Account\b/gi,'共享账号'],[/\bShared\b/gi,'共享号'],
-  [/\bAged\b/gi,'老号'],[/\bBulk\s+Available\b/gi,'大量有货'],[/\bPhone\s+Verified\b/gi,'手机已验证'],
-  [/\bLevel\s+(\d+)\b/gi,'$1级'],[/\b30d\b/gi,'30天'],[/\b1m\b/gi,'1个月'],
-  [/\[\s*US\s*\]/gi,'[美国]'],[/\[\s*UK\s*\]/gi,'[英国]'],[/\[\s*CN\s*\]/gi,'[中国]'],
-  [/\bFull\s+Access\b/gi,'完整权限'],[/\bVerified\b/gi,'已验证'],[/\bUnverified\b/gi,'未验证'],
-  [/\bPrivate\b/gi,'独享'],[/\bPremium\b/gi,'高级版'],[/\bInstant\s+Delivery\b/gi,'即时交付'],
-  [/\bWith\s+Token\b/gi,'含令牌'],[/\bToken\b/gi,'令牌'],[/\bAvailable\b/gi,'有货'],[/\bIn\s+Stock\b/gi,'有库存']
- ];
- dictionary.forEach(([pattern,replacement])=>{title=title.replace(pattern,replacement)});
- return title.replace(/\s{2,}/g,' ').trim();
-}
+function normalizeNodeTitle(value){return String(value??'').trim();}
 function normalize(p,i,source){
  const nested=[p.product,p.goods,p.item,p.sku,p.detail].filter(v=>v&&typeof v==='object'&&!Array.isArray(v));
  p=Object.assign({},...nested,p);
  const picture=p.picture;const pictureUrl=typeof picture==='string'?picture:(picture&&typeof picture==='object'?(picture.url||picture.src||picture.image_url||picture.original_url||''):'');
  let icon=p.icon_url||p.brand_icon_url||p.brand_logo||p.platform_icon||p.platform_logo||p.logo_url||p.protocol_icon_url||p.icon?.url||'';
  let image=(p.image_url!==undefined&&p.image_url!==null&&p.image_url!==''?p.image_url:p.cover_url)||p.original_image_url||p.product_image_url||p.image||p.cover||p.thumbnail||p.thumb||p.picture_url||pictureUrl||p.logo||'';
- if(source==='account'){icon=p.icon_url||p.brand_icon_url||p.brand_logo||p.platform_icon||p.platform_logo||p.logo_url||p.icon?.url||icon;image=p.image_url||pictureUrl||p.picture_url||p.original_image_url||p.product_image_url||p.cover_url||p.image||p.cover||p.thumbnail||p.thumb||image;}
  const resolveAsset=u=>{if(!u)return '';u=String(u);if(u.startsWith('data:'))return u;const cdn=assetBase();if(/^https?:\/\//i.test(u)){if(cdn){try{const parsed=new URL(u),apiHost=new URL(API_ROOT).hostname;if(parsed.hostname===apiHost)return cdn+parsed.pathname+parsed.search+parsed.hash}catch(_){}}return u}const path=u.startsWith('/')?u:'/'+(u.startsWith('./')?u.slice(2):u);return cdn?cdn+path:API_ROOT+path};
- if(!icon&&source==='account'){const brand=String(p.platform||p.brand||p.provider||p.email_domain||p.domain||p.name||p.title||p.product_name||'').toLowerCase();if(/gmail|google mail|@gmail|google workspace/.test(brand))icon='https://cdn.simpleicons.org/gmail/EA4335';else if(/outlook|hotmail|live\.com|microsoft/.test(brand))icon='https://cdn.simpleicons.org/microsoftoutlook/0078D4';else if(/yahoo/.test(brand))icon='https://cdn.simpleicons.org/yahoo/6001D2';else if(/icloud|apple/.test(brand))icon='https://cdn.simpleicons.org/icloud/3693F3';else if(/proton/.test(brand))icon='https://cdn.simpleicons.org/protonmail/6D4AFF';}
  let attrs=p.extra_attrs||p.extraAttrs||p.extra_attributes||p.extraAttributes||p.merchant_attrs||p.merchantAttrs||p.attributes||{};
  if(typeof attrs==='string'){try{attrs=JSON.parse(attrs)}catch(_){attrs={}}}
  const merchant=attrs&&typeof attrs==='object'?attrs:{};
@@ -319,12 +216,9 @@ function normalize(p,i,source){
  const priceYuan=parsedPrice!==null&&Number.isFinite(parsedPrice)&&parsedPrice>=0?parsedPrice:0;
  const priceProvided=parsedPrice!==null&&Number.isFinite(parsedPrice)&&parsedPrice>=0;
  if(!priceProvided)console.warn('[S5 static catalog: price missing]',{source,id:p.id,title:p.name||p.title,price_yuan:p.price_yuan,unit_price_yuan:p.unit_price_yuan,price_cents:p.price_cents});
- const rawTitle=String((source==='traffic'?(p.name||p.title||p.product_title||p.productTitle||p.sku_name||p.skuName||p.product_name||p.productName||p.goods_name||p.goodsName||p.item_name||p.itemName||p.display_name||p.displayName||p.label||merchant.name||merchant.title||merchant.product_title||merchant.sku_name||merchant.product_name||''):(p.title||p.name||p.product_title||p.productTitle||p.display_name||p.displayName||p.sku_title||p.skuTitle||p.sku_name||p.product_name||p.productName||p.goods_name||p.goodsName||p.item_name||p.itemName||p.label||p.en_name||p.name_en||p.english_name||p.description_zh||p.description||''))||'商品 '+String(p.sku_id??p.id??p.product_id??i+1));
- let finalTitle=localizeTrafficTitle(rawTitle).replace(/\bShared\b/gi,'共享').replace(/高级版\s+共享/gi,'高级共享账号').replace(/\s*\(\s*1m\s*\)/gi,' (1个月)').replace(/\bSteamGuard\b/gi,'令牌').replace(/\bSteam\s*Guard\b/gi,'令牌');
- const platformNotes=[[/^\s*Threads\b/i,'Threads（社交平台）'],[/^\s*Steam\b/i,'Steam（游戏平台）'],[/^\s*Telegram\b/i,'Telegram（即时通讯）'],[/^\s*TikTok\b/i,'TikTok（短视频平台）'],[/^\s*Discord\b/i,'Discord（社群平台）'],[/^\s*Reddit\b/i,'Reddit（社区论坛）']];
- for(const [pattern,label] of platformNotes){if(pattern.test(finalTitle)){finalTitle=finalTitle.replace(pattern,label);break}}
- const brandText=(rawTitle+' '+String(p.platform||p.brand||p.provider||p.account_category||'')).toLowerCase();
- const brandIcon=/telegram|电报/.test(brandText)?'telegram':/threads/.test(brandText)?'threads':/tiktok|抖音/.test(brandText)?'tiktok':/instagram|\bins\b/.test(brandText)?'instagram':/facebook|脸书/.test(brandText)?'facebook':/whatsapp/.test(brandText)?'whatsapp':/discord/.test(brandText)?'discord':/steam/.test(brandText)?'steam':/netflix/.test(brandText)?'netflix':/midjourney/.test(brandText)?'midjourney':/mail\.ru|mailru/.test(brandText)?'mailru':/gmail|google mail/.test(brandText)?'gmail':/outlook|hotmail/.test(brandText)?'outlook':/yahoo/.test(brandText)?'yahoo':/icloud|apple/.test(brandText)?'icloud':/youtube|油管/.test(brandText)?'youtube':/reddit/.test(brandText)?'reddit':/\bmail\b/.test(brandText)?'mail':'';
+ const rawTitle=String(p.title||p.name||p.product_title||p.productTitle||p.display_name||p.displayName||p.sku_title||p.skuTitle||p.sku_name||p.product_name||p.productName||p.goods_name||p.goodsName||p.item_name||p.itemName||p.label||p.en_name||p.name_en||p.english_name||p.description_zh||p.description||'商品 '+String(p.sku_id??p.id??p.product_id??i+1));
+ const finalTitle=normalizeNodeTitle(rawTitle);
+ const brandIcon='';
  return {...p,_brandIcon:brandIcon,_key:source+'-'+i+'-'+String(p.sku_id??p.id??p.product_id??p.uuid??'sku'),_source:source,_kind:categoryOf(p,source),_title:finalTitle,_desc:String(p.description_zh||p.chinese_description||p.description_cn||p.description||p.summary||p.content||''),_image:resolveAsset(image),_icon:resolveAsset(icon),_price:Number.isFinite(priceYuan)?priceYuan:0,_priceProvided:priceProvided,_priceCents:Math.round(priceYuan*100),_stock:rawStock,_sales:p.sales??p.sold_count??p.total_sales??p.buy_count,_tutorial:p.tutorial_markdown||p.tutorial_md||p.tutorial||p.guide_markdown||p.guide||p.markdown||p.content_md||'',_delivery:p.delivery_content||p.delivery_description||p.delivery||p.deliverables||p.delivery_type||p.delivery_method||'',_warranty:p.warranty||p.warranty_period||p.after_sales||p.after_sale||p.support_policy||p.guarantee||'',_notice:p.notice||p.notes||p.warning||p.terms||'',_merchantAttrs:merchant,_region:catalogDisplayText(p._region||p.region_name||p.region||p.country||p.area||p.location||''),_premium:premium,_period:p.period_name||p.period_label||p.period||p.billing_cycle||''};
 }
 function markdown(md){const lines=String(md||'暂无教程内容').split(String.fromCharCode(10));let out='',listOpen=false;for(const raw of lines){const line=raw.trim();if(!line){if(listOpen){out+='</ul>';listOpen=false}out+='<p></p>';continue}let level=0;while(level<6&&line[level]==='#')level++;if(level>0&&line[level]===' '){if(listOpen){out+='</ul>';listOpen=false}out+='<h'+level+'>'+inlineMd(line.slice(level+1))+'</h'+level+'>';continue}if(line.startsWith('- ')||line.startsWith('* ')){if(!listOpen){out+='<ul>';listOpen=true}out+='<li>'+inlineMd(line.slice(2))+'</li>';continue}if(listOpen){out+='</ul>';listOpen=false}out+='<p>'+inlineMd(line)+'</p>'}if(listOpen)out+='</ul>';return '<div class="markdown">'+out+'</div>'}
@@ -345,7 +239,7 @@ function productImage(p){
 function stockLabel(p){const single=p._stock??'—';const bulk=p.bulk_available_count??p.wholesale_available_count??p.batch_stock??p.bulk_stock??p.wholesale_stock??p.available_batches??null;return bulk!=null?'可成批数 '+String(bulk):String(single)}
 function renderProducts(){
  const root=document.getElementById('products');
- if(window.ShopRender){window.ShopRender.render({root,products:liveProducts,activeKind,searchTerm,activeFilter,pageInfo:{page:catalogPage,size:CATALOG_PAGE_SIZE,total:catalogTotal,totalPages:catalogTotalPages,serverPaginated:activeKind!=='节点'&&!catalogAllRowsLoaded[activeKind]}});return}
+ if(window.ShopRender){window.ShopRender.render({root,products:liveProducts,activeKind,searchTerm,activeFilter,pageInfo:{page:catalogPage,size:CATALOG_PAGE_SIZE,total:catalogTotal,totalPages:catalogTotalPages,serverPaginated:false}});return}
  root.innerHTML='<div class="error-state">商品渲染模块未加载，请刷新页面。</div>';
 }
 
@@ -372,29 +266,17 @@ async function loadCatalogPage(page=1,kind=activeKind){
  root.innerHTML=Array.from({length:6},()=>'<div class="skeleton-card"><div class="skeleton-cover"></div><div class="skeleton-line" style="width:62%"></div><div class="skeleton-line" style="width:40%"></div></div>').join('');
  const hint=document.getElementById('resultCount');if(hint)hint.textContent='正在加载静态商品数据…';
  try{
-  const source=kind==='节点'?'node':kind==='账号'?'account':'traffic';
+  if(!['节点','服务器'].includes(kind))kind='节点';
+  const source=kind==='服务器'?'server':'node';
   const rawRows=await fetchStaticCatalog(kind);
   if(requestId!==catalogRequestId)return;
-  let blockedInternal=0,blockedPrice=0;
   const products=rawRows
-   .filter(row=>{
-    if(!row||typeof row!=='object'||row.visible===false||row.is_visible===false)return false;
-    if(kind!=='账号')return true;
-    const fields=['title','name','product_title','product_name','display_name','sku_title','sku_name','goods_name','item_name','category','category_zh','category_en','category_slug','product_category','product_type','account_category','tags','tag','labels','platform','brand','provider'];
-    const values=fields.map(key=>row[key]).filter(value=>value!=null).map(value=>typeof value==='string'?value:JSON.stringify(value)).join(' ');
-    if(/lynli[.]me|lynli[.]com|admin/i.test(values)){blockedInternal++;return false;}
-    return true;
-   })
+   .filter(row=>row&&typeof row==='object'&&row.visible!==false&&row.is_visible!==false&&row.enabled!==false&&categoryOf(row,source)===kind)
    .map((row,index)=>{
     const item=normalize(row,index,source);
     item._platformFacets=catalogFacet(item,kind);
     return item;
-   })
-   .filter(item=>{
-    if(kind==='账号'&&Number.isFinite(Number(item._price))&&Number(item._price)>1000){blockedPrice++;return false;}
-    return true;
    });
-  if(kind==='账号'&&(blockedInternal||blockedPrice))console.warn('[S5 account catalog guard] 已拦截异常商品：',{internalDomainOrAdmin:blockedInternal,priceOver1000:blockedPrice,total:blockedInternal+blockedPrice});
   catalogCache[kind]={products,total:products.length,pages:Math.max(1,Math.ceil(products.length/CATALOG_PAGE_SIZE)),complete:true};
   catalogAllRowsLoaded[kind]=true;
   liveProducts=products;

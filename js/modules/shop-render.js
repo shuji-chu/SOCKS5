@@ -81,12 +81,9 @@ function localizeCatalogText(value){
  const countries={"US":"美国","UK":"英国","GB":"英国","IN":"印度","SG":"新加坡","CA":"加拿大","BR":"巴西","RU":"俄罗斯","CN":"中国","JP":"日本","KR":"韩国","HK":"中国香港","TW":"中国台湾","TH":"泰国","VN":"越南","ID":"印度尼西亚","MY":"马来西亚","PH":"菲律宾","AU":"澳大利亚","NZ":"新西兰","DE":"德国","FR":"法国","IT":"意大利","ES":"西班牙","NL":"荷兰","SE":"瑞典","NO":"挪威","FI":"芬兰","PL":"波兰","TR":"土耳其","MX":"墨西哥","AR":"阿根廷","CL":"智利","CO":"哥伦比亚","ZA":"南非","NG":"尼日利亚","EG":"埃及","AE":"阿联酋","SA":"沙特阿拉伯","IL":"以色列","PK":"巴基斯坦","BD":"孟加拉国","LK":"斯里兰卡","NP":"尼泊尔"};
  text=text.replace(/\[\s*([A-Z]{2})\s*\]/gi,(match,code)=>countries[code.toUpperCase()]?'['+countries[code.toUpperCase()]+']':match);
  const rules=[
-  [/\b2FA\s*On\b/gi,'已开2FA'],[/\b2FA\s*Off\b/gi,'无2FA'],[/\bRandom\s+Country\b/gi,'随机国家'],
-  [/\bBlind\s+Box\b/gi,'盲盒'],[/\bFull\s+Account\b/gi,'全功能号'],[/\bDevice\s+Lock\b/gi,'设备锁'],
-  [/\bShared\s+Account\b/gi,'共享账号'],[/\bShared\b/gi,'共享号'],[/\bAged\b/gi,'老号'],
-  [/\bVerified\b/gi,'已验证'],[/\bUnverified\b/gi,'未验证'],[/\bPremium\b/gi,'高级版'],
-  [/\bInstant\s+Delivery\b/gi,'即时交付'],[/\bFull\s+Access\b/gi,'完整权限'],[/\bPhone\s+Verified\b/gi,'手机已验证'],
-  [/\bAvailable\b/gi,'有货'],[/\bIn\s+Stock\b/gi,'有库存'],[/\bWith\s+Token\b/gi,'含令牌'],[/\bToken\b/gi,'令牌']
+  [/\bPremium\b/gi,'高级版'],
+  [/\bInstant\s+Delivery\b/gi,'即时交付'],
+  [/\bAvailable\b/gi,'有货'],[/\bIn\s+Stock\b/gi,'有库存']
  ];
  rules.forEach(([pattern,replacement])=>{text=text.replace(pattern,replacement)});
  return text.replace(/\s{2,}/g,' ').trim();

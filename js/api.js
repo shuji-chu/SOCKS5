@@ -4,6 +4,8 @@
   // API host can be overridden before this file loads:
   // window.SOSKS5_API_BASE = 'https://your-api-host.example';
   const API_BASE = String(window.SOSKS5_API_BASE || 'https://web.lynli.me').replace(/\/+$/, '');
+  // Auth API host is intentionally separate so existing shop endpoints remain unchanged.
+  const AUTH_API_BASE = String(window.LYNLI_AUTH_API_BASE || 'https://lynli.kz.ci').replace(/\/+$/, '');
 
   function debounce(fn, delay) {
     let timer;
@@ -1037,7 +1039,6 @@
   }
 
   // Standalone C-end authentication API. Keep the legacy shop API_BASE untouched.
-  const AUTH_API_BASE = String(window.LYNLI_AUTH_API_BASE || 'https://lynli.kz.ci').replace(/\/+$/, '');
   const AUTH_CONFIG_FALLBACK = { siteName: 'Lynli', registerOpen: true, maintenance: false };
 
   async function authRequest(path, payload, method) {

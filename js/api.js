@@ -105,12 +105,12 @@
   }
 
   function catalogPriceYuan(plan, type) {
-    const yuan = plan && (plan._staticPriceYuan ?? plan.price_yuan ?? (type === 'traffic' ? plan.unit_price_yuan : undefined));
+    const yuan = plan && (plan._staticPriceYuan ?? plan.price_yuan ?? plan.premium_yuan);
     if (yuan !== undefined && yuan !== null && yuan !== '') {
       const value = Number(yuan);
       return Number.isFinite(value) && value >= 0 ? value : null;
     }
-    const cents = plan && plan.price_cents;
+    const cents = plan && (plan.price_cents ?? plan.premium_cents);
     if (cents !== undefined && cents !== null && cents !== '') {
       const value = Number(cents);
       return Number.isFinite(value) && value >= 0 ? value / 100 : null;
@@ -246,7 +246,7 @@
     const serverProduct = /server|vps|dedicated|bare.?metal|cloud.?host|服务器|云主机|独立主机|裸金属/.test(productKind + ' ' + kind);
     p.category = nodeProduct ? '节点服务' : (serverProduct ? '服务器' : '其他');
     const periods = periodOptions(p);
-    const directYuan = catalogPriceYuan(p, p.product_type === 'traffic' ? 'traffic' : 'accounts');
+    const directYuan = catalogPriceYuan(p, 'catalog');
     const prices = periods.map(x => x.price).filter(x => Number.isFinite(x) && x >= 0);
     p.price = directYuan !== null ? directYuan : (prices.length ? Math.min.apply(null, prices) / 100 : Number(p.price || 0));
     p.stock = p.stock === undefined ? (p.available === false ? 0 : 1) : Number(p.stock);
@@ -268,8 +268,8 @@
     const out = keys.filter(([key]) => plan && plan[key] !== null && plan[key] !== undefined && plan[key] !== '' && Number(plan[key]) >= 0)
       .map(([key, label, value]) => ({ key, label, value, price: Number(plan[key]) }));
     if (!out.length && plan) {
-      const yuan = plan._staticPriceYuan ?? plan.price_yuan ?? (plan.product_type === 'traffic' ? plan.unit_price_yuan : undefined) ?? plan.price;
-      const cents = plan.price_cents;
+      const yuan = plan._staticPriceYuan ?? plan.price_yuan ?? plan.premium_yuan ?? plan.price;
+      const cents = plan.price_cents ?? plan.premium_cents;
       if (yuan !== undefined && yuan !== null && yuan !== '' && Number.isFinite(Number(yuan)) && Number(yuan) >= 0) {
         out.push({ key: 'month_price', label: '默认套餐', value: 'month_price', price: Math.round(Number(yuan) * 100) });
       } else if (cents !== undefined && cents !== null && cents !== '' && Number.isFinite(Number(cents)) && Number(cents) >= 0) {
@@ -530,8 +530,7 @@
     TOKEN_KEYS.concat(USER_KEYS).forEach((key) => localStorage.removeItem(key));
   }
   function getPlans() { return fetchStaticData('nodes'); }
-  function getAccounts() { return fetchStaticData('accounts'); }
-  function getClonedProducts() { return fetchStaticData('traffic'); }
+  function getServers() { return fetchStaticData('servers'); }
   function getUserInfo() { return request('/user/info', { method: 'GET' }); }
   function getSubscription() { return request('/user/getSubscribe', { method: 'GET' }); }
   function getInviteStats() { return request('/user/invite/fetch', { method: 'GET' }); }
@@ -546,9 +545,8 @@
     saveToken: saveToken,
     clearSession: clearSession,
     getPlans: getPlans,
-    getAccounts: getAccounts,
+    getServers: getServers,
     fetchStaticData: fetchStaticData,
-    getClonedProducts: getClonedProducts,
     getUserInfo: getUserInfo,
     getSubscription: getSubscription,
     getInviteStats: getInviteStats,

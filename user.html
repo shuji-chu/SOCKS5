@@ -106,7 +106,7 @@ body{padding-bottom:calc(82px + env(safe-area-inset-bottom))!important}
 <script>
 (()=>{'use strict';
 const $=id=>document.getElementById(id);
-const API=()=>String(window.SOSKS5_API_BASE||'https://web.lynli.me').replace(/\/+$/,'')+'/api/v1';
+const API=()=>'https://api.lynli.me'.replace(/\/+$/,'')+'/api/v1';
 const token=()=>localStorage.getItem('sosks5_token')||localStorage.getItem('tgx_token')||sessionStorage.getItem('sosks5_token')||sessionStorage.getItem('tgx_token')||'';
 let toastTimer=0,clashUrl='',profileData={};
 function toast(message){const el=$('profileToast');if(!el)return;el.textContent=String(message||'操作未完成').slice(0,240);el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),3200)}

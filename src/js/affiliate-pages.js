@@ -1,7 +1,7 @@
 /* Shared affiliate/account financial bindings. All displayed money is CNY. */
 (function () {
   'use strict';
-  const API_BASE = String(window.SOSKS5_API_BASE || 'https://web.lynli.me').replace(/\/+$/, '') + '/api/v1';
+  const API_BASE = 'https://api.lynli.me'.replace(/\/+$/, '') + '/api/v1';
   const token = () => localStorage.getItem('sosks5_token') || localStorage.getItem('tgx_token') || sessionStorage.getItem('sosks5_token') || sessionStorage.getItem('tgx_token') || '';
   function unwrap(v) { let x=v; for(let i=0;i<6 && x && typeof x==='object' && x.data!==undefined;i++) x=x.data; return x || {}; }
   async function get(path) {

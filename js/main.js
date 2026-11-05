@@ -59,29 +59,7 @@
   }
   (function injectProductErrorStyles(){if(document.getElementById('s5-product-error-styles'))return;const st=document.createElement('style');st.id='s5-product-error-styles';st.textContent='.s5-product-error{grid-column:1/-1;max-width:620px;width:100%;margin:22px auto;padding:30px 22px;text-align:center;border:1px solid rgba(71,145,220,.2);border-radius:22px;background:linear-gradient(145deg,rgba(255,255,255,.96),rgba(238,247,255,.94));color:#334b66;box-shadow:0 18px 48px rgba(44,117,190,.12),0 0 28px rgba(86,169,255,.1);backdrop-filter:blur(22px)}.s5-product-error-icon{display:grid;place-items:center;width:68px;height:68px;margin:0 auto 15px;border:1px solid rgba(0,85,255,.13);border-radius:20px;background:linear-gradient(145deg,#f5faff,#e6f2ff)}.s5-product-error-icon img{width:36px;height:36px}.s5-product-error strong{display:block;color:#0A192F;font-size:19px;font-weight:900}.s5-product-error p{margin:8px auto 18px;color:#4a6078;font-size:13px}.s5-product-error button{min-width:190px;min-height:48px;border:0;border-radius:13px;background:linear-gradient(110deg,#087bff,#0055d9 58%,#1746c8);color:#fff;font-weight:900;box-shadow:0 10px 24px rgba(0,85,255,.22)}';document.head.appendChild(st);})();
 
-  function productIconPath(item, type) {
-    const name = [item && item.account_category, item && item.platform, item && item.name, item && item.title, item && item.product_name, item && item.product_type].filter(Boolean).join(' ').toLowerCase();
-    const icons = [
-      [/facebook|脸书|fb账号/, 'platform-facebook.svg'],
-      [/instagram|ins账号/, 'platform-instagram.svg'],
-      [/tiktok|抖音海外|tik tok/, 'platform-tiktok.svg'],
-      [/twitter|(^|[^a-z])x账号|推特/, 'platform-x.svg'],
-      [/telegram|电报|tg账号/, 'platform-telegram.svg'],
-      [/google|gmail|谷歌/, 'platform-google.svg'],
-      [/whatsapp|wa账号/, 'platform-whatsapp.svg'],
-      [/discord/, 'platform-discord.svg'],
-      [/youtube|油管/, 'platform-youtube.svg'],
-      [/reddit/, 'platform-reddit.svg']
-    ];
-    const match = icons.find(([pattern]) => pattern.test(name));
-    return match ? './assets/images/' + match[1] : (type === 'node' ? './assets/images/nodes.svg' : './assets/images/accounts.svg');
-  }
-  function accountCategoryName(item) {
-    const name = [item && item.account_category,item && item.platform,item && item.name,item && item.title,item && item.product_name].filter(Boolean).join(' ').toLowerCase();
-    const entries = [[/facebook|脸书|fb账号/,'Facebook'],[/instagram|ins账号/,'Instagram'],[/tiktok|tik tok|抖音海外/,'TikTok'],[/twitter|推特|x账号/,'X / Twitter'],[/telegram|电报|tg账号/,'Telegram'],[/google|gmail|谷歌/,'Google / Gmail'],[/whatsapp|wa账号/,'WhatsApp'],[/discord/,'Discord'],[/youtube|油管/,'YouTube'],[/reddit/,'Reddit']];
-    const found = entries.find(([pattern]) => pattern.test(name));
-    return found ? found[1] : '海外账号资源';
-  }
+  function productIconPath(item,type){return type==='node'?'./assets/images/nodes.svg':'./assets/images/placeholder.svg';}
   function imageUrl(item, fallback) {
     const url = item && (item.image_url || item.image || item.cover_url || item.thumbnail || item.oss_url || item.picture || item.img);
     return url && /^https?:\/\//i.test(String(url)) ? String(url) : (fallback || './assets/images/placeholder.svg');
@@ -96,9 +74,9 @@
     return ['yuan','cny','rmb','元'].includes(String(item.price_unit || item.currency_unit || item.unit || '').trim().toLowerCase());
   }
   function clonePrice(item) {
-    const yuan = item.price_yuan ?? item.unit_price_yuan ?? item.amount_yuan;
+    const yuan = item.price_yuan ?? item.premium_yuan ?? item.unit_price_yuan ?? item.amount_yuan;
     if (yuan !== null && yuan !== undefined && yuan !== '') return money(yuan, true);
-    const raw = item.price_cents ?? item.price_amount ?? item.price ?? item.amount ?? item.sale_price;
+    const raw = item.price_cents ?? item.premium_cents ?? item.price_amount ?? item.price ?? item.amount ?? item.sale_price;
     if (raw === null || raw === undefined || raw === '') return '询价';
     return money(raw, priceUnitIsYuan(item));
   }
@@ -116,15 +94,13 @@
     if (prices.length) return money(Math.min.apply(null, prices), true);
     return clonePrice(item);
   }
-  function card(item, type) {
-    const title = productName(item);
-    const description = productDescription(item);
-    const fallbackImage = productIconPath(item, type);
-    const image = imageUrl(item, fallbackImage);
-    const price = type === 'node' ? planPrice(item) : clonePrice(item);
-    const tag = type === 'node' ? (item.protocol || item.node_protocol || '全球高速节点') : accountCategoryName(item);
-    const detail = item.id != null ? ' data-product-id="' + esc(item.id) + '"' : '';
-    return '<article class="product-card live-product-card"><img class="product-photo" src="' + esc(image) + '" alt="' + esc(title) + '" loading="lazy" onerror="this.onerror=null;this.src=\''+esc(fallbackImage)+'\'"><div class="product-info"><span class="product-tag">' + tag + '</span><h3>' + esc(title) + '</h3><p>' + esc(description) + '</p><div class="product-buy"><strong>' + esc(price) + '</strong>' + (type === 'node' ? '<button class="button button-small" type="button"' + detail + '>查看套餐</button>' : '<a class="button button-small" href="' + esc(item.detail_url || item.url || 'https://t.me/qingtian_Boss') + '" target="_blank" rel="noopener noreferrer">咨询购买</a>') + '</div></div></article>';
+  function card(item,type){
+    const title=productName(item),description=productDescription(item);
+    const fallbackImage=productIconPath(item,type),image=imageUrl(item,fallbackImage);
+    const price=type==='node'?planPrice(item):clonePrice(item);
+    const tag=type==='node'?(item.protocol||item.node_protocol||'全球高速节点'):(item.region_name||item.region||'服务器资源');
+    const action=type==='node'?'<button class="button button-small" type="button" data-product-id="'+esc(item.id)+'">查看套餐</button>':'<a class="button button-small" href="./shop.html?category=服务器">查看服务器</a>';
+    return '<article class="product-card live-product-card"><img class="product-photo" src="'+esc(image)+'" alt="'+esc(title)+'" loading="lazy" onerror="this.onerror=null;this.src=\''+esc(fallbackImage)+'\'"><div class="product-info"><span class="product-tag">'+esc(tag)+'</span><h3>'+esc(title)+'</h3><p>'+esc(description)+'</p><div class="product-buy"><strong>'+esc(price)+'</strong>'+action+'</div></div></article>';
   }
       function groupedNodeRows(response){
    const root=unpack(response);
@@ -159,211 +135,82 @@
    return Array.from(unique.values());
   }
   
-  const HOME_STATIC_URLS = {
-    nodes: ['https://api.lynli.me/static/qian/nodes.json', 'https://raw.githubusercontent.com/shuji-chu/qian/socks5-data/nodes.json'],
-    accounts: ['https://api.lynli.me/static/qian/accounts.json', 'https://raw.githubusercontent.com/shuji-chu/qian/socks5-data/accounts.json']
+  const HOME_STATIC_URLS={
+    nodes:['https://api.lynli.me/static/qian/nodes.json','https://raw.githubusercontent.com/shuji-chu/qian/socks5-data/nodes.json'],
+    servers:['https://api.lynli.me/static/qian/servers.json','https://raw.githubusercontent.com/shuji-chu/qian/socks5-data/servers.json']
   };
-  async function fetchHomeStatic(kind) {
-    const urls = HOME_STATIC_URLS[kind] || [];
-    let lastError = null;
-    for (const url of urls) {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 5000);
-      try {
-        const response = await fetch(url, {method:'GET', mode:'cors', credentials:'omit', cache:'no-store', headers:{Accept:'application/json'}, signal:controller.signal});
-        if (!response.ok) throw new Error('HTTP ' + response.status);
-        const payload = await response.json();
-        const rows = Array.isArray(payload) ? payload : listFrom(unwrap(payload));
-        if (!Array.isArray(rows)) throw new Error('商品数据不是数组');
-        if (!rows.length) throw new Error('静态目录返回空数组');
-        if (rows.length) {
-          console.info('[S5 home catalog] loaded', kind, rows.length, url);
-          return rows;
-        }
-        lastError = new Error('静态目录暂时为空');
-      } catch (error) {
-        lastError = error;
-        console.error('[S5 home catalog] 请求失败，正在尝试备用源', {kind, url, name:error&&error.name, message:error&&error.message, stack:error&&error.stack});
-      } finally {
-        clearTimeout(timeout);
-      }
+  async function fetchHomeStatic(kind){
+    const urls=HOME_STATIC_URLS[kind]||[];let lastError=null;
+    for(const url of urls){
+      const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),5000);
+      try{
+        const response=await fetch(url,{method:'GET',mode:'cors',credentials:'omit',cache:'no-store',headers:{Accept:'application/json'},signal:controller.signal});
+        if(!response.ok)throw new Error('HTTP '+response.status);
+        const payload=await response.json(),rows=Array.isArray(payload)?payload:listFrom(unwrap(payload));
+        if(!Array.isArray(rows)||!rows.length)throw new Error('静态目录为空或格式不正确');
+        return rows;
+      }catch(error){lastError=error}finally{clearTimeout(timeout)}
     }
-    throw lastError || new Error('静态目录不可用');
+    throw lastError||new Error('静态目录不可用');
   }
-
-  async function fetchCatalog() {
-    const staticResults = await Promise.allSettled([fetchHomeStatic('nodes'), fetchHomeStatic('accounts')]);
-    const staticNodes = staticResults[0].status === 'fulfilled' ? staticResults[0].value : null;
-    const staticAccounts = staticResults[1].status === 'fulfilled' ? staticResults[1].value : null;
-    const needLiveNodes = !staticNodes || !staticNodes.length;
-    const needLiveAccounts = !staticAccounts || !staticAccounts.length;
-    const results = await Promise.allSettled([
-      needLiveNodes ? (API && typeof API.getPlans === 'function' ? API.getPlans() : Promise.reject(new Error('API module unavailable'))) : Promise.resolve([]),
-      needLiveAccounts ? (API && typeof API.getAccounts === 'function' ? API.getAccounts() : Promise.reject(new Error('账号目录 API unavailable'))) : Promise.resolve([]),
-      (async()=>{const base=String(window.SOSKS5_PUBLIC_API_BASE||'https://api.lynli.me').replace(/\/+$/,'');const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),1200);let response;try{response=await fetch(base+'/api/v1/public/catalog/account-overrides',{headers:{Accept:'application/json'},signal:controller.signal})}finally{clearTimeout(timer)}if(!response.ok)throw Error('catalog overrides unavailable');return response.json()})()
+  function catalogAllowed(row,kind){
+    if(!row||typeof row!=='object'||row.visible===false||row.is_visible===false||row.enabled===false)return false;
+    const category=[row.category,row.product_type,row.product_category,row.service_type,row.type,row.kind].filter(Boolean).join(' ').toLowerCase();
+    const name=[row.name,row.title,row.product_name,row.sku_name].filter(Boolean).join(' ').toLowerCase();
+    if(/account|accounts|账号|帐号|facebook|instagram|tiktok|telegram|gmail|outlook|whatsapp|discord|reddit/.test(category+' '+name))return false;
+    if(/traffic|引流|接码|短信|验证码|查询|查号|群发|推广|growth|sms|lookup|verification/.test(category))return false;
+    if(kind==='servers')return true;
+    const protocol=[row.protocol,row.node_protocol,row.protocol_name].filter(Boolean).join(' ').toLowerCase();
+    return /node|proxy|vpn|节点|订阅|vless|vmess|hysteria|trojan|shadowsocks|socks5|wireguard|tuic/.test(category+' '+protocol+' '+name)||!!row.protocol||!!row.node_protocol;
+  }
+  async function fetchCatalog(){
+    const results=await Promise.allSettled([
+      fetchHomeStatic('nodes').catch(()=>API&&typeof API.getPlans==='function'?API.getPlans():Promise.reject(new Error('节点目录 API 不可用'))),
+      fetchHomeStatic('servers').catch(()=>API&&typeof API.getServers==='function'?API.getServers():Promise.reject(new Error('服务器目录 API 不可用')))
     ]);
-    const nodesResponse = staticNodes && staticNodes.length ? staticNodes : (results[0].status === 'fulfilled' ? unwrap(results[0].value) : []);
-    const accountResponse = staticAccounts && staticAccounts.length ? staticAccounts : (results[1].status === 'fulfilled' ? unwrap(results[1].value) : []);
-    if (needLiveNodes && results[0].status === 'rejected') toast('节点商品加载失败：' + results[0].reason.message);
-    if (needLiveAccounts && results[1].status === 'rejected') { console.error('[S5 home catalog] 账号目录回退失败', results[1].reason); toast('账号商品加载失败：' + results[1].reason.message); }
-    const plans = groupedNodeRows(nodesResponse);
-    const isSocialAccount = (p) => /facebook|脸书|instagram|tiktok|twitter|推特|telegram|电报|whatsapp|google|gmail|youtube|油管|discord|reddit|snapchat|linkedin|outlook|apple id|meta account|threads|steam|netflix/.test([p.name,p.title,p.content,p.description,p.type,p.product_type,p.product_category,p.platform,p.brand].join(' ').toLowerCase());
-    const isAccountPlan = (p) => {
-      const kind = String(p.product_type || p.product_category || p.service_type || p.type || '').toLowerCase();
-      const words = [p.name,p.title,p.content,p.description,p.protocol,p.node_protocol].join(' ').toLowerCase();
-      if (/node|nodes|proxy|节点|代理|订阅|vless|vmess|hysteria|trojan|shadowsocks|socks5|wireguard|tuic/.test(kind + ' ' + words)) return false;
-      return kind === 'account' || kind === 'accounts' || /账号|account/.test(kind) || isSocialAccount(p);
-    };
-    const nodes = staticNodes && staticNodes.length ? plans : plans.filter((p) => {
-      if (isAccountPlan(p)) return false;
-      const kind = String(p.product_type || p.product_category || p.service_type || '').toLowerCase();
-      const words = [p.name,p.title,p.content,p.description,p.type,p.protocol,p.node_protocol].join(' ').toLowerCase();
-      return kind === 'node' || kind === 'nodes' || kind === 'proxy' || /节点|proxy|vpn|订阅|vless|vmess|hysteria|trojan|shadowsocks|socks5|wireguard|tuic|network/.test(words);
-    });
-    const overridePayload = results[2].status === 'fulfilled' ? results[2].value : [];
-    const overrideRows = listFrom(unwrap(overridePayload));
-    const overrideMap = new Map(overrideRows.filter((item) => item && item.id != null).map((item) => [String(item.id), item]));
-    const allowedAccount = (item) => !/接码|短信|验证码|查询|查号|流量包|流量|引流|traffic|sms|verification|lookup|query/i.test([item.category,item.product_type,item.product_category,item.type,item.name,item.title,item.product_name].filter(Boolean).join(' '));
-    const combined = listFrom(accountResponse).filter(allowedAccount).concat(plans.filter(isAccountPlan).filter(allowedAccount)).map((item) => Object.assign({}, item, overrideMap.get(String(item.id)) || {}));
-    const seen = new Set();
-    const accounts = combined.filter((item) => {
-      const key = item.id != null ? 'id:' + String(item.id) : 'name:' + String(item.name || item.title || item.product_name || '');
-      if (seen.has(key)) return false;
-      seen.add(key); return true;
-    }).map((item) => Object.assign({}, item, {category: '账号服务', product_type: 'account', account_category: item.account_category || item.platform || accountCategoryName(item)}));
-    console.info('[S5 home catalog] ready', {nodes:nodes.length, accounts:accounts.length, source:{nodes:staticNodes&&staticNodes.length?'static':'api',accounts:staticAccounts&&staticAccounts.length?'static':'api'}});
-    return {nodes, accounts};
+    const nodePayload=results[0].status==='fulfilled'?unwrap(results[0].value):[];
+    const serverPayload=results[1].status==='fulfilled'?unwrap(results[1].value):[];
+    const nodes=groupedNodeRows(nodePayload).filter(row=>catalogAllowed(row,'nodes'));
+    const servers=listFrom(serverPayload).filter(row=>catalogAllowed(row,'servers'));
+    if(!nodes.length&&results[0].status==='rejected')toast('节点商品加载失败：'+results[0].reason.message);
+    if(!servers.length&&results[1].status==='rejected')toast('服务器商品加载失败：'+results[1].reason.message);
+    return {nodes,servers};
   }
-  async function loadHome() {
-    const productSection = $$('.content-section').find((section) => /精选数字商品/.test(section.textContent));
-    if (productSection) {
-      const grid = $('.product-grid', productSection);
-      setBusy(grid, '正在加载精选商品…');
-      try {
-        const catalog = await fetchCatalog();
-        const featured = catalog.accounts.map((item) => ({item,type:'account'}))
-          .concat(catalog.nodes.map((item) => ({item,type:'node'})))
-          .map((entry,index) => {
-            const p = entry.item;
-            const weightRaw = p.sort_weight ?? p.sortWeight ?? p.weight;
-            const salesRaw = p.sales ?? p.sold_count ?? p.total_sales ?? p.buy_count ?? p.orders_count ?? p.purchase_count;
-            const stockRaw = p.stock ?? p.available_stock ?? p.inventory ?? p.quantity;
-            const orderRaw = p.sort ?? p.sort_order ?? p.display_order;
-            const weight = weightRaw !== null && weightRaw !== undefined && weightRaw !== '' && Number.isFinite(Number(weightRaw)) ? Number(weightRaw) : null;
-            const sales = salesRaw !== null && salesRaw !== undefined && salesRaw !== '' && Number.isFinite(Number(salesRaw)) ? Number(salesRaw) : 0;
-            const stock = stockRaw !== null && stockRaw !== undefined && stockRaw !== '' && Number.isFinite(Number(stockRaw)) ? Number(stockRaw) : 0;
-            const order = orderRaw !== null && orderRaw !== undefined && orderRaw !== '' && Number.isFinite(Number(orderRaw)) ? Number(orderRaw) : Number.MAX_SAFE_INTEGER;
-            const hot = p.hot === true || p.is_hot === true || p.featured === true ? 1 : 0;
-            return {...entry, _rank:weight === null ? sales : weight, _salesRank:sales, _hotRank:hot, _orderRank:order, _stockRank:stock, _sourceIndex:index};
-          })
-          .sort((a,b) => b._rank-a._rank || b._salesRank-a._salesRank || b._hotRank-a._hotRank || a._orderRank-b._orderRank || b._stockRank-a._stockRank || a._sourceIndex-b._sourceIndex)
-          .slice(0, 50);
-        grid.innerHTML = featured.length ? featured.map((entry) => card(entry.item, entry.type)).join('') : emptyState('当前暂无可展示商品');
-      } catch (error) {
-        grid.innerHTML = productErrorState();
-        toast(error.message || '商品加载失败');
-      }
+  async function loadHome(){
+    const section=$$('.content-section').find(s=>/精选数字商品/.test(s.textContent));
+    if(section){
+      const grid=$('.product-grid',section);setBusy(grid,'正在加载节点与服务器商品…');
+      try{
+        const catalog=await fetchCatalog();
+        const featured=catalog.nodes.map(item=>({item,type:'node'})).concat(catalog.servers.map(item=>({item,type:'server'})))
+          .map((entry,index)=>{
+            const p=entry.item,weightRaw=p.sort_weight??p.sortWeight??p.weight,salesRaw=p.sales??p.sold_count??p.total_sales??p.buy_count;
+            const stockRaw=p.stock??p.available_stock??p.inventory??p.quantity,orderRaw=p.sort??p.sort_order??p.display_order;
+            const weight=weightRaw!=null&&weightRaw!==''&&Number.isFinite(Number(weightRaw))?Number(weightRaw):null;
+            const sales=salesRaw!=null&&salesRaw!==''&&Number.isFinite(Number(salesRaw))?Number(salesRaw):0;
+            const stock=stockRaw!=null&&stockRaw!==''&&Number.isFinite(Number(stockRaw))?Number(stockRaw):0;
+            const order=orderRaw!=null&&orderRaw!==''&&Number.isFinite(Number(orderRaw))?Number(orderRaw):Number.MAX_SAFE_INTEGER;
+            return {...entry,_rank:weight===null?sales:weight,_salesRank:sales,_orderRank:order,_stockRank:stock,_sourceIndex:index};
+          }).sort((x,y)=>y._rank-x._rank||y._salesRank-x._salesRank||x._orderRank-y._orderRank||y._stockRank-x._stockRank||x._sourceIndex-y._sourceIndex).slice(0,50);
+        grid.innerHTML=featured.length?featured.map(entry=>card(entry.item,entry.type)).join(''):emptyState('当前暂无可展示商品');
+      }catch(error){grid.innerHTML=productErrorState();toast(error.message||'商品加载失败')}
     }
-    const announcement = $('.announcement');
-    if (announcement) {
-      try {
-        const notices = listFrom(unwrap(await API.getNotices()));
-        if (!notices.length) { announcement.hidden = true; return; }
-        const track = $('.announcement-track span', announcement);
-        if (track) track.textContent = notices.map((n) => [n.title,n.content].filter(Boolean).join('：')).join('　 ·　 ');
-        announcement.hidden = false;
-      } catch (error) {
-        announcement.hidden = true;
-        toast('公告加载失败：' + error.message);
-      }
+    const announcement=$('.announcement');
+    if(announcement){
+      try{const notices=listFrom(unwrap(await API.getNotices()));if(!notices.length){announcement.hidden=true;return}
+        const track=$('.announcement-track span',announcement);if(track)track.textContent=notices.map(n=>[n.title,n.content].filter(Boolean).join('：')).join('　 ·　 ');announcement.hidden=false;
+      }catch(error){announcement.hidden=true;toast('公告加载失败：'+error.message)}
     }
-    const blindbox = $('.blindbox-wrap');
-    if (blindbox) blindbox.remove();
+    const blindbox=$('.blindbox-wrap');if(blindbox)blindbox.remove();
   }
 
-  async function loadShop() {
-    const main = $('main');
-    if (!main) return;
-    main.innerHTML = '<section class="shop-hero"><span class="eyebrow">LIVE DIGITAL MARKETPLACE</span><h1>海外账号资源与全球节点<br><em>实时商品目录</em></h1><p>商品名称、图片和价格通过服务端接口加载。</p><div class="shop-tabs"><a class="button button-small" href="#accounts">海外账号资源</a><a class="button button-small button-ghost" href="#nodes">全球高速节点</a></div></section><section id="accounts" class="content-section"><div class="section-heading"><div><span class="eyebrow">OVERSEAS ACCOUNTS</span><h2>海外账号资源商城</h2></div></div><div id="live-accounts" class="product-grid shop-product-grid"></div></section><section id="nodes" class="content-section"><div class="section-heading"><div><span class="eyebrow">GLOBAL NETWORK</span><h2>全球高速节点服务</h2></div></div><div id="live-nodes" class="product-grid shop-product-grid"></div></section>';
-    const accounts = $('#live-accounts'), nodes = $('#live-nodes');
-    setBusy(accounts, '正在加载账号商品…'); setBusy(nodes, '正在加载节点套餐…');
-    const catalog = await fetchCatalog();
-    accounts.innerHTML = catalog.accounts.length ? catalog.accounts.map((p) => card(p,'account')).join('') : emptyState('服务端当前没有可展示的账号商品');
-    nodes.innerHTML = catalog.nodes.length ? catalog.nodes.map((p) => card(p,'node')).join('') : emptyState('服务端当前没有可展示的节点套餐');
-  }
-
-  async function loadPromo() {
-    const main = $('main');
-    if (!main) return;
-    main.innerHTML = '<div class="page-title"><div><span class="eyebrow">INVITE · GROW · EARN</span><h1>引流分销中心</h1><p>邀请链接、推广数据与机器人绑定状态来自后端。</p></div></div><section class="profile-card promo-hero"><div class="profile-main"><span class="eyebrow">YOUR INVITATION LINK</span><h2>专属邀请入口</h2><p id="invite-note">正在读取账户信息…</p><div class="invite-field"><span id="invite-url" class="break-all">加载中…</span><button id="copy-invite" class="button button-small" type="button">复制邀请链接</button></div></div><div class="profile-decoration">↗</div></section><section class="metric-grid" id="promo-metrics"><article class="metric-card"><span>本月邀请</span><strong>—</strong></article><article class="metric-card"><span>有效注册用户</span><strong>—</strong></article><article class="metric-card"><span>累计预估奖励</span><strong>—</strong></article></section><section class="panel"><div class="panel-heading"><div><span class="eyebrow">TELEGRAM BOT</span><h2>绑定 TG 机器人</h2><p id="bot-guide">正在读取机器人绑定入口…</p></div></div><div id="bot-entry" class="bot-entry"></div></section><section class="panel"><div class="panel-heading"><div><span class="eyebrow">YOUR INVITED USERS</span><h2>真实邀请客户明细</h2><p>按实际邀请用户的贡献金额排序。后端目前未提供独立的全站排行榜接口。</p></div></div><div class="table-scroll"><table class="rank-table"><thead><tr><th>用户</th><th>注册时间</th><th>已消费</th><th>预估佣金</th></tr></thead><tbody id="invite-customer-rows"></tbody></table></div></section>';
-    if (!API.readToken()) { location.href = './login.html?redirect=promo.html'; return; }
-    const inviteUrlNode = $('#invite-url');
-    try {
-      const [infoResponse, statsResponse, customersResponse, botResponse] = await Promise.all([
-        API.getUserInfo(), API.getInviteStats(), API.getInviteCustomers(), API.getBotStatus()
-      ]);
-      const leaderboardResult = await Promise.allSettled([API.getReferralLeaderboard({period:'month',limit:10})]);
-      const info = unwrap(infoResponse) || {};
-      const user = info.user || info.profile || info.account || info.member || info;
-      const shortId = String(user.short_id || user.shortId || info.short_id || info.shortId || '').trim();
-      if (!/^\d{5}$/.test(shortId)) throw new Error('用户接口未返回 5 位 short_id');
-      const inviteUrl = location.origin + '/login.html?mode=register&short_id=' + encodeURIComponent(shortId);
-      inviteUrlNode.textContent = inviteUrl;
-      $('#invite-note').textContent = '当前账户邀请码：' + shortId;
-      $('#copy-invite').addEventListener('click', () => UI.copy(inviteUrl));
-      const stats = unwrap(statsResponse) || {};
-      const customers = listFrom(unwrap(customersResponse));
-      const monthCustomers = customers.filter((c) => thisMonth(c.created_at || c.createdAt));
-      const activeCustomers = customers;
-      const commissionCents = customers.reduce((sum,c) => sum + Number(c.commission || 0), 0);
-      const metricCards = $$('#promo-metrics .metric-card');
-      metricCards[0].querySelector('strong').textContent = fmtCount(monthCustomers.length);
-      metricCards[1].querySelector('strong').textContent = fmtCount(activeCustomers.length);
-      metricCards[2].querySelector('strong').textContent = money(commissionCents, false);
-      metricCards[0].querySelector('span').textContent = '本月邀请注册';
-      metricCards[1].querySelector('span').textContent = '有效注册用户';
-      metricCards[2].querySelector('span').textContent = '累计预估佣金';
-      const bot = unwrap(botResponse) || {};
-      const botUrl = bot.mivra_url || '';
-      $('#bot-guide').textContent = bot.guide ? String(bot.guide).replaceAll('{short_id}',shortId) : '打开机器人后发送“绑定 ' + shortId + '”完成绑定。';
-      $('#bot-entry').innerHTML = botUrl ? '<p class="bot-status">' + (bot.bound ? '已绑定 Telegram 账号' : '尚未绑定 Telegram 账号') + '</p><a class="button" href="' + esc(botUrl) + '" target="_blank" rel="noopener noreferrer">打开机器人并绑定</a>' : emptyState('后端暂未配置机器人入口，请联系管理员');
-      const tbody = $('#invite-customer-rows');
-      const leaderboardResponse = leaderboardResult[0].status === 'fulfilled' ? unwrap(leaderboardResult[0].value) : null;
-      const leaderboardRows = listFrom(leaderboardResponse);
-      if (leaderboardRows.length) {
-        const panelTitle = $('.panel .panel-heading h2')[1];
-        if (panelTitle) panelTitle.textContent = '本月推广排行榜';
-        const headers = $('.rank-table thead th');
-        if (headers.length === 4) {
-          headers[0].textContent = '排名';
-          headers[1].textContent = '推广用户';
-          headers[2].textContent = '邀请人数';
-          headers[3].textContent = '预估奖励';
-        }
-        tbody.innerHTML = leaderboardRows.slice(0,10).map((row,index) => {
-          const name = row.nickname || row.username || row.name || ('用户 ' + (row.short_id || row.shortId || ''));
-          const count = row.invite_count ?? row.invites ?? row.count ?? row.total_invites ?? row.total ?? 0;
-          const reward = row.reward_yuan != null ? money(row.reward_yuan,true) : money(row.commission ?? row.reward ?? row.amount ?? 0,false);
-          return '<tr><td><span class="rank-medal">' + String(index+1).padStart(2,'0') + '</span></td><td><b>' + esc(name) + '</b><small>' + esc(row.short_id || row.shortId || '') + '</small></td><td>' + esc(fmtCount(count)) + '</td><td>' + esc(reward) + '</td></tr>';
-        }).join('');
-      } else {
-        const sorted = customers.slice().sort((a,b) => Number(b.commission || 0) - Number(a.commission || 0));
-        tbody.innerHTML = sorted.length ? sorted.map((c) => {
-          const date = dateValue(c.created_at || c.createdAt);
-          return '<tr><td>' + esc(c.nickname || ('用户 ' + (c.short_id || ''))) + '<small>' + esc(c.short_id || '') + '</small></td><td>' + (date ? esc(date.toLocaleDateString('zh-CN')) : '—') + '</td><td>' + esc(money(c.charge || 0,false)) + '</td><td>' + esc(money(c.commission || 0,false)) + '</td></tr>';
-        }).join('') : '<tr><td colspan="4">' + esc('暂无邀请客户数据') + '</td></tr>';
-      }
-    } catch (error) {
-      if (/401|unauth|登录|token/i.test(error.message || '')) {
-        API.clearSession();
-        location.href = './login.html?redirect=promo.html';
-        return;
-      }
-      toast('引流数据加载失败：' + error.message);
-      if (inviteUrlNode) inviteUrlNode.textContent = '暂时无法获取邀请链接';
-      $('#bot-entry').innerHTML = emptyState('机器人信息暂时无法获取');
-      $('#invite-customer-rows').innerHTML = '<tr><td colspan="4">邀请数据暂时无法获取</td></tr>';
-    }
+  async function loadShop(){
+    const root=$('main');if(!root)return;
+    root.innerHTML='<section class="shop-hero"><span class="eyebrow">LIVE DIGITAL MARKETPLACE</span><h1>全球节点与服务器<br><em>实时商品目录</em></h1><p>商品名称、图片和价格通过正式服务接口加载。</p><div class="shop-tabs"><a class="button button-small" href="#nodes">全球高速节点</a><a class="button button-small button-ghost" href="#servers">服务器资源</a></div></section><section id="nodes" class="content-section"><div class="section-heading"><div><span class="eyebrow">GLOBAL NETWORK</span><h2>全球高速节点服务</h2></div></div><div id="live-nodes" class="product-grid shop-product-grid"></div></section><section id="servers" class="content-section"><div class="section-heading"><div><span class="eyebrow">SERVER INFRASTRUCTURE</span><h2>服务器资源</h2></div></div><div id="live-servers" class="product-grid shop-product-grid"></div></section>';
+    const nodes=$('#live-nodes'),servers=$('#live-servers');setBusy(nodes,'正在加载节点套餐…');setBusy(servers,'正在加载服务器资源…');
+    const catalog=await fetchCatalog();
+    nodes.innerHTML=catalog.nodes.length?catalog.nodes.map(p=>card(p,'node')).join(''):emptyState('服务端当前没有可展示的节点套餐');
+    servers.innerHTML=catalog.servers.length?catalog.servers.map(p=>card(p,'server')).join(''):emptyState('服务端当前没有可展示的服务器资源');
   }
 
   async function loadUser() {
@@ -443,7 +290,7 @@
     if (!form || !API) return;
     if (API.readToken()) {
       const existingRedirect = new URLSearchParams(location.search).get('redirect');
-      location.replace(existingRedirect === 'promo.html' ? './promo.html' : existingRedirect === 'shop.html' ? './shop.html' : './user.html');
+      location.replace(existingRedirect === 'shop.html' ? './shop.html' : existingRedirect === 'index.html' ? './index.html' : './user.html');
       return;
     }
     form.addEventListener('submit', async (event) => {
@@ -461,7 +308,7 @@
         if (!token) throw new Error(data.message || data.msg || '登录接口未返回 Token');
         API.saveToken(token);
         const redirect = new URLSearchParams(location.search).get('redirect');
-        location.replace(redirect === 'promo.html' ? './promo.html' : redirect === 'shop.html' ? './shop.html' : redirect === 'index.html' ? './index.html' : './user.html');
+        location.replace(redirect === 'shop.html' ? './shop.html' : redirect === 'index.html' ? './index.html' : './user.html');
       } catch (error) {
         toast('登录失败：' + (error.message || '请稍后重试'));
         button.disabled = false;
@@ -476,7 +323,6 @@
     addGlobalNavigation();
     if (currentPath === 'index.html') return loadHome();
     if (currentPath === 'shop.html') return loadShop().catch((error) => toast('商城加载失败：' + error.message));
-    if (currentPath === 'promo.html') return loadPromo();
     if (currentPath === 'user.html') return loadUser();
     if (currentPath === 'login.html') return loadLogin();
   }

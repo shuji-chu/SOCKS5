@@ -137,7 +137,7 @@
   }
 
 
-  const TOKEN_KEYS = ['sosks5_token', 'tgx_token'];
+  const TOKEN_KEYS = ['sosks5_token', 'tgx_token', 'lynli_token'];
   const USER_KEYS = ['sosks5_user', 'tgx_user'];
   let paymentChannels = [];
   const $ = (id) => document.getElementById(id);
@@ -173,7 +173,7 @@
     const nativeConfirm = window.confirm.bind(window);
     window.confirm = (message) => nativeConfirm(safeUiMessage(message));
   }
-  const readToken = () => localStorage.getItem('sosks5_token') || localStorage.getItem('tgx_token') || '';
+  const readToken = () => localStorage.getItem('sosks5_token') || localStorage.getItem('tgx_token') || localStorage.getItem('lynli_token') || '';
   const unwrap = (r) => r && r.data !== undefined ? r.data : r;
   const isSuccess = (r) => !!r && (r.status === 'success' || r.success === true || r.code === 200 || r.code === 0 || r.data !== undefined || r.ok === true);
   const money = (n) => {
@@ -1035,4 +1035,105 @@
   } else {
     setTimeout(install, 0);
   }
+
+  // Standalone C-end authentication API. Keep the legacy shop API_BASE untouched.
+  const AUTH_API_BASE = String(window.LYNLI_AUTH_API_BASE || 'https://lynli.kz.ci').replace(/\/+$/, '');
+  const AUTH_CONFIG_FALLBACK = { siteName: 'Lynli', registerOpen: true, maintenance: false };
+
+  async function authRequest(path, payload, method) {
+    const options = {
+      method: method || (payload ? 'POST' : 'GET'),
+      headers: { Accept: 'application/json' }
+    };
+    if (payload !== undefined && payload !== null) {
+      options.headers['Content-Type'] = 'application/json';
+      options.body = JSON.stringify(payload);
+    }
+    let response;
+    try {
+      response = await fetch(AUTH_API_BASE + '/api/v1' + path, options);
+    } catch (_) {
+      throw new Error('网络连接失败，请检查网络后重试');
+    }
+    let body = {};
+    try { body = await response.json(); } catch (_) {
+      const parseError = new Error('服务端返回格式异常，请稍后重试');
+      parseError.status = response.status;
+      throw parseError;
+    }
+    const message = body && (body.message || body.msg || body.detail || body.error);
+    if (!response.ok || body.success === false || body.status === 'fail' ||
+        (body.http_status !== undefined && Number(body.http_status) !== 200)) {
+      const error = new Error(String(message || ('请求未成功（HTTP ' + response.status + '）')));
+      error.status = response.status || Number(body.http_status) || 0;
+      throw error;
+    }
+    return body && body.data !== undefined ? body.data : body;
+  }
+
+  async function getConfig() {
+    try {
+      const data = await authRequest('/config', null, 'GET');
+      return Object.assign({}, AUTH_CONFIG_FALLBACK, data || {});
+    } catch (_) {
+      return Object.assign({}, AUTH_CONFIG_FALLBACK);
+    }
+  }
+
+  async function sendCode(email) {
+    return authRequest('/passport/auth/send-code', { email: String(email || '').trim() }, 'POST');
+  }
+
+  function persistAuthResult(data, defaultRole) {
+    const result = data || {};
+    const token = result.token || result.auth_data || result.access_token;
+    if (!token) throw new Error('服务端未返回登录凭证');
+
+    // saveToken writes both legacy shop keys plus the new Lynli key.
+    saveToken(token);
+    const user = result.user || null;
+    if (user) saveUser(user);
+
+    const role = String(result.role || (user && user.role) || defaultRole || 'user');
+    const isAdmin = result.isAdmin !== undefined
+      ? Number(result.isAdmin) === 1
+      : (role === 'admin' ? 1 : 0);
+    localStorage.setItem('isAdmin', String(isAdmin));
+    localStorage.setItem('role', role);
+    if (user) {
+      USER_KEYS.forEach((key) => localStorage.setItem(key, JSON.stringify(user)));
+    }
+    return result;
+  }
+
+  async function login(email, password) {
+    const data = await authRequest('/passport/auth/login', {
+      email: String(email || '').trim(),
+      password: String(password || '')
+    }, 'POST');
+    return persistAuthResult(data, 'user');
+  }
+
+  async function register(payload) {
+    const input = payload || {};
+    const inviteCode = String(input.invite_code || '').trim().toUpperCase();
+    const body = {
+      email: String(input.email || '').trim(),
+      code: String(input.code || '').trim(),
+      password: String(input.password || '')
+    };
+    if (inviteCode) body.invite_code = inviteCode;
+    const data = await authRequest('/passport/auth/register', body, 'POST');
+    data.isAdmin = 0;
+    data.role = data.role || 'user';
+    return persistAuthResult(data, 'user');
+  }
+
+  window.LynliAuthAPI = Object.freeze({
+    getConfig: getConfig,
+    sendCode: sendCode,
+    login: login,
+    register: register
+  });
+
 })();

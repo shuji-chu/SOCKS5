@@ -1,7 +1,7 @@
 /* First-party node map and latency tools. Uses only this site's node/server APIs and the node's own health URL. */
 (function(w){
  'use strict';
- const API='https://web.lynli.me/api/v1';
+ const API='https://api.lynli.me/api/v1';
  const token=()=>localStorage.getItem('sosks5_token')||localStorage.getItem('tgx_token')||'';
  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const idOf=n=>n?.node_id??n?.server_id??n?.nodeId??n?.serverId??n?.node?.id??n?.server?.id??((n?._kind==='节点'||n?.category==='节点'||n?.product_type==='node'||n?.type==='node')?(n?.id??n?.uuid):null);

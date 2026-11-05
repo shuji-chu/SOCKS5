@@ -247,6 +247,7 @@ function renderProducts(){
 async function loadCatalogPage(page=1,kind=activeKind){
  const root=document.getElementById('products');if(!root)return;
  const requestId=++catalogRequestId;
+ if(!['节点','服务器'].includes(kind))kind='节点';
  activeKind=kind;
  catalogPage=Math.max(1,Number(page)||1);
  const cached=catalogCache[kind];

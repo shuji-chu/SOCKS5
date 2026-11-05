@@ -1,11 +1,8 @@
 (function () {
   'use strict';
 
-  // API host can be overridden before this file loads:
-  // window.SOSKS5_API_BASE = 'https://your-api-host.example';
-  const API_BASE = String(window.SOSKS5_API_BASE || 'https://web.lynli.me').replace(/\/+$/, '');
-  // Auth API host is intentionally separate so existing shop endpoints remain unchanged.
-  const AUTH_API_BASE = String(window.LYNLI_AUTH_API_BASE || 'https://lynli.kz.ci').replace(/\/+$/, '');
+  const API_BASE = 'https://api.lynli.me';
+  const AUTH_API_BASE = API_BASE;
 
   function debounce(fn, delay) {
     let timer;
@@ -65,13 +62,11 @@
 
   const STATIC_DATA_URLS = {
     nodes: 'https://api.lynli.me/static/qian/nodes.json',
-    accounts: 'https://api.lynli.me/static/qian/accounts.json',
-    traffic: 'https://api.lynli.me/static/qian/traffic.json'
+    servers: 'https://api.lynli.me/static/qian/servers.json'
   };
   const STATIC_DATA_FALLBACKS = {
     nodes: 'https://raw.githubusercontent.com/shuji-chu/qian/socks5-data/nodes.json',
-    accounts: 'https://raw.githubusercontent.com/shuji-chu/qian/socks5-data/accounts.json',
-    traffic: 'https://raw.githubusercontent.com/shuji-chu/qian/socks5-data/traffic.json'
+    servers: 'https://raw.githubusercontent.com/shuji-chu/qian/socks5-data/servers.json'
   };
 
   async function fetchStaticData(type) {
@@ -128,8 +123,8 @@
     const yuan = catalogPriceYuan(p, type);
     p._staticPriceYuan = yuan;
     p.price = yuan === null ? 0 : yuan;
-    p.product_type = type === 'nodes' ? 'node' : type === 'accounts' ? 'account' : 'traffic';
-    p.category = type === 'nodes' ? '节点服务' : type === 'accounts' ? '账号服务' : '引流服务';
+    p.product_type = type === 'nodes' ? 'node' : 'server';
+    p.category = type === 'nodes' ? '节点服务' : '服务器';
     p.image_url = p.image_url || p.cover_url || '';
     p.stock = p.sold_out === true || p.in_stock === false
       ? 0
@@ -248,8 +243,8 @@
     p.protocols = Array.isArray(p.protocols) ? p.protocols : (p.protocol ? [p.protocol] : []);
     const productKind = String(p.product_type || p.product_category || p.service_type || '').toLowerCase();
     const nodeProduct = /node|proxy|节点|代理|订阅|vpn|网络|vless|vmess|hysteria2|trojan|shadowsocks|socks5|wireguard|tuic/.test(productKind + ' ' + kind);
-    const socialAccount = /facebook|脸书|instagram|tiktok|twitter|推特|telegram|电报|whatsapp|google|gmail|youtube|油管|discord|reddit|snapchat|linkedin|outlook|apple id|meta account/.test(kind);
-    p.category = nodeProduct ? '节点服务' : (socialAccount ? '账号服务' : (p.category || (/traffic|引流|增长|推广|群发|机器人|growth/.test(productKind + ' ' + kind) ? '引流服务' : '账号服务')));
+    const serverProduct = /server|vps|dedicated|bare.?metal|cloud.?host|服务器|云主机|独立主机|裸金属/.test(productKind + ' ' + kind);
+    p.category = nodeProduct ? '节点服务' : (serverProduct ? '服务器' : '其他');
     const periods = periodOptions(p);
     const directYuan = catalogPriceYuan(p, p.product_type === 'traffic' ? 'traffic' : 'accounts');
     const prices = periods.map(x => x.price).filter(x => Number.isFinite(x) && x >= 0);
@@ -508,67 +503,6 @@
     });
   }
 
-  function platformIcon(p) {
-    const text = [p && p.account_category,p && p.platform,p && p.name,p && p.title,p && p.product_name,p && p.product_type].filter(Boolean).join(' ').toLowerCase();
-    const entries = [
-      [/facebook|脸书|fb账号/,'platform-facebook.svg'],[/instagram|ins账号/,'platform-instagram.svg'],
-      [/tiktok|tik tok|抖音海外/,'platform-tiktok.svg'],[/twitter|推特|x账号/,'platform-x.svg'],
-      [/telegram|电报|tg账号/,'platform-telegram.svg'],[/google|gmail|谷歌/,'platform-google.svg'],
-      [/whatsapp|wa账号/,'platform-whatsapp.svg'],[/discord/,'platform-discord.svg'],
-      [/youtube|油管/,'platform-youtube.svg'],[/reddit/,'platform-reddit.svg']
-    ];
-    const match=entries.find(([re])=>re.test(text));
-    return match ? './assets/images/'+match[1] : './assets/images/accounts.svg';
-  }
-
-  function cloneMoney(p) {
-    const raw = catalogPriceYuan(p, 'traffic');
-    if (raw === null) return "价格以客服确认为准";
-    return "¥" + raw.toFixed(2);
-  }
-
-  function renderCloneModal(p) {
-    const title = p.name || p.title || p.product_name || "数字商品";
-    const image = p.image_url || p.cover_url || platformIcon(p);
-    const description = p.detail_description || p.details || p.content_zh || p.description_zh || p.chinese_description || p.description_cn || p.content || p.description || p.introduction || "暂未提供详细说明，请联系客服了解商品规格、交付方式与适用范围。";
-    showModal("商品详情", '<div class="s5-clone-detail">' +
-      '<img class="s5-clone-detail-image" src="' + esc(image) + '" alt="' + esc(title) + '" onerror="this.onerror=null;this.src=\'./assets/images/accounts.svg\'">' +
-      '<h3>' + esc(title) + '</h3><p>' + esc(description) + '</p><div class="s5-clone-detail-price">' + esc(cloneMoney(p)) + '</div>' +
-      '<a class="s5-clone-buy" href="https://t.me/qingtian_Boss" target="_blank" rel="noopener noreferrer">立即购买 / 联系客服</a></div>');
-  }
-
-  async function loadClonedProducts() {
-    const box = $("s5-cloned-products");
-    if (!box || box.dataset.loaded === "1") return;
-    box.dataset.loaded = "1";
-    try {
-      box.innerHTML = '<div class="s5-clone-heading"><div><h2>海外精选数字商品</h2><p class="s5-clone-intro">正在同步商品目录，请稍候…</p></div></div><div class="s5-clone-grid"><div class="s5-skeleton">正在加载</div><div class="s5-skeleton">正在加载</div><div class="s5-skeleton">正在加载</div></div>';
-      const products = await fetchStaticData('traffic');
-      box._cloneProducts = products;
-      box.innerHTML = '<div class="s5-clone-heading"><div><span class="s5-section-label">全球精选</span><h2>海外精选数字商品</h2><p class="s5-clone-intro">精选数字商品 · 中文商品说明 · 价格以商品详情为准</p></div><span class="s5-clone-count">' + products.length + ' 件商品</span></div>' +
-        (products.length ? '<div class="s5-clone-grid">' + products.map((p, index) => {
-          const title = p.name || p.title || p.product_name || "数字商品 " + (index + 1);
-          const fallback = platformIcon(p);
-          const image = p.image_url || p.cover_url || fallback;
-          const desc = p.description_zh || p.chinese_description || p.description_cn || p.summary_zh || p.description || p.summary || "查看商品详情，了解规格、交付方式与适用范围。";
-          return '<button type="button" class="s5-clone-card" data-clone-index="' + index + '">' +
-            '<img loading="lazy" src="' + esc(image) + '" alt="' + esc(title) + '" class="s5-clone-image" onerror="this.onerror=null;this.src=\''+esc(fallback)+'\'">' +
-            '<span class="s5-clone-card-body"><span class="s5-clone-name">' + esc(title) + '</span><span class="s5-clone-desc">' + esc(desc) + '</span><span class="s5-clone-card-foot"><strong>' + esc(cloneMoney(p)) + '</strong><span>查看详情 ↗</span></span></span></button>';
-        }).join("") + '</div>' : '<div class="s5-clone-empty">当前暂无已发布商品，请稍后再来查看。</div>');
-      box.querySelectorAll("[data-clone-index]").forEach((card) => card.addEventListener("click", () => {
-        const p = box._cloneProducts[Number(card.getAttribute("data-clone-index"))];
-        if (p) renderCloneModal(p);
-      }));
-    } catch (error) {
-      box.dataset.loaded = "0";
-      box.innerHTML = '<div class="s5-clone-heading"><div><h2>海外精选数字商品</h2><p class="s5-clone-intro">商品目录暂时无法读取，请稍后重试。</p></div></div><button type="button" class="s5-clone-retry">点击重试</button>';
-      box.querySelector(".s5-clone-retry")?.addEventListener("click", loadClonedProducts);
-      // Optional catalog errors are handled by the UI without logging internals.
-    }
-  }
-
-  // Growth APIs: contracts agreed for future backend implementation.
-  // These functions call real endpoints and deliberately do not fabricate fallback data.
   async function validateCoupon(payload) {
     return request('/user/coupon/validate', { method: 'POST', body: JSON.stringify({
       code: String(payload && payload.code || '').trim(),
@@ -638,7 +572,7 @@
     };
     App.loadProducts = async function (type, forceReload) {
       const hash = location.hash || '';
-      const catalogType = type || (hash === '#/nodes' ? 'nodes' : hash === '#/traffic' ? 'traffic' : 'accounts');
+      const catalogType = ['nodes','servers'].includes(type) ? type : (hash === '#/servers' ? 'servers' : 'nodes');
       this.state = this.state || {};
       if (!forceReload && this.state._staticCatalogType === catalogType &&
           (this.state._staticCatalogLoading || this.state._staticCatalogLoaded)) return;
@@ -948,17 +882,17 @@
 
 
   function renderPlanPage(kind) {
+    kind = kind === 'servers' ? 'servers' : 'nodes';
     const all = (App.state.products || []).map(normalizePlan);
     const matches = all.filter((p) => {
       const text = [p.category, p.title, p.name, p.description, p.product_type].join(' ').toLowerCase();
       const productKind = String(p.product_type || p.product_category || '').toLowerCase();
       if (kind === 'nodes') return productKind === 'node' || /node|proxy|节点|代理|订阅|vpn|网络|vless|vmess|hysteria2|trojan/.test(text);
-      if (kind === 'traffic') return productKind === 'traffic' || /traffic|引流|增长|推广|群发|机器人|growth/.test(text);
-      return productKind !== 'node' && productKind !== 'traffic' && !/node|proxy|节点|代理|订阅|vpn|网络|vless|vmess|hysteria2|trojan|traffic|引流|增长|推广|群发|机器人|growth/.test(text);
+      return productKind === 'server' || /server|vps|dedicated|服务器|云主机|独立主机/.test(text);
     });
-    const title = kind === 'nodes' ? '节点中心' : kind === 'traffic' ? '引流系统' : '账号商城';
-    const subtitle = kind === 'nodes' ? '节点套餐与网络服务' : kind === 'traffic' ? '引流与增长服务套餐' : '账号与数字服务套餐';
-    const staticType = kind === 'nodes' ? 'nodes' : kind === 'traffic' ? 'traffic' : 'accounts';
+    const title = kind === 'nodes' ? '节点中心' : '服务器中心';
+    const subtitle = kind === 'nodes' ? '节点套餐与网络服务' : '服务器与主机产品';
+    const staticType = kind;
     const hero = '<section class="s5-subpage-hero"><div class="s5-subpage-copy"><span class="s5-section-label">LIVE SERVICE CATALOG</span><h1>' + title + '</h1><p>' + subtitle + '</p></div></section>';
     if (App.state._staticCatalogLoading) {
       const skeleton = Array.from({ length: 6 }, () => '<article class="s5-glass-card s5-product-card s5-skeleton-card" aria-hidden="true"><div class="s5-skeleton s5-skeleton-cover"></div><div class="s5-skeleton s5-skeleton-line"></div><div class="s5-skeleton s5-skeleton-line short"></div></article>').join('');
@@ -974,22 +908,19 @@
       return '<article class="s5-glass-card s5-product-card"><div class="s5-product-top"><div class="s5-product-symbol">◈</div><span class="s5-product-category">' + esc(p.category || title) + '</span></div><h3>' + esc(p.name || p.title) + '</h3><p class="s5-product-desc">' + esc(p.content || p.description || '套餐规格与有效期以服务端信息为准。') + '</p><div class="s5-product-bottom"><div><small>起售价</small><strong>¥' + price.toFixed(2) + '</strong></div><button type="button" class="s5-small-cta" data-product-id="' + esc(p.id) + '"' + (sold ? ' disabled' : '') + '>' + (sold ? '暂不可购' : '立即购买') + '</button></div></article>';
     }).join('') : '<div class="s5-empty-state">该分类暂无可购买套餐。套餐目录由服务端实时提供，请稍后刷新。</div>';
     const docs = '<footer class="s5-developer-docs"><a href="#" aria-label="开发者文档">开发者文档（即将上线）</a></footer>';
-    const clonePanel = kind === 'traffic' ? '<section id="s5-cloned-products" class="s5-clone-products"></section>' : '';
-    return hero + '<section class="s5-subpage-content"><div class="s5-section-heading"><div><span class="s5-section-label">AVAILABLE PLANS</span><h2>' + title + '套餐</h2><p>下单前请确认套餐周期、价格与支付方式。</p></div></div><div class="s5-product-grid">' + cards + '</div></section>' + clonePanel + docs;
+    return hero + '<section class="s5-subpage-content"><div class="s5-section-heading"><div><span class="s5-section-label">AVAILABLE PLANS</span><h2>' + title + '套餐</h2><p>下单前请确认套餐周期、价格与支付方式。</p></div></div><div class="s5-product-grid">' + cards + '</div></section>' + docs;
   }
 
     const originalRouter = App.router.bind(App);
     App.router = function () {
       originalRouter();
       const hash = location.hash || '#/';
-      if (hash === '#/products' || hash === '#/nodes' || hash === '#/traffic') {
-        const kind = hash === '#/nodes' ? 'nodes' : hash === '#/traffic' ? 'traffic' : 'products';
+      if (hash === '#/products' || hash === '#/nodes' || hash === '#/servers') {
+        const kind = hash === '#/servers' ? 'servers' : 'nodes';
         const view = $('app-view');
         if (view) view.innerHTML = renderPlanPage(kind);
       }
       if (hash === '#/dashboard') setTimeout(addSubscriptionPanel, 0);
-      if (hash === '#/traffic') setTimeout(loadClonedProducts, 0);
-      if (hash === '#/' || hash === '') { const view = $('app-view'); if (view && !view.querySelector('#s5-cloned-products')) { const panel = document.createElement('section'); panel.id = 's5-cloned-products'; panel.className = 's5-clone-products'; const promo = view.querySelector('#s5-promo'); if (promo) promo.insertAdjacentElement('afterend', panel); else view.appendChild(panel); } setTimeout(loadClonedProducts, 0); }
     };
 
     // Purchase buttons from the redesigned product cards take over the legacy cart flow.

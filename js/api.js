@@ -38,7 +38,7 @@ async function request(path,options={}){
  const headers=new Headers(options.headers||{});
  headers.set('Accept','application/json');
  const currentToken=token();
- if(options.auth!==false&&currentToken)headers.set('Authorization','Bearer '+currentToken);
+ if(currentToken)headers.set('Authorization','Bearer '+currentToken);
  let body=options.body;
  if(body!==undefined&&body!==null&&typeof body!=='string'&&!(body instanceof FormData)){
   headers.set('Content-Type','application/json');

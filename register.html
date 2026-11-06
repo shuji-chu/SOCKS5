@@ -1,4 +1,55 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f5f8fc"><title>注册 · 晴天节点</title><link rel="icon" href="./logo.png"><link rel="stylesheet" href="./css/style.css"></head>
-<body data-page="register"><header class="topbar"><a class="brand" href="./index.html"><img src="./logo.png" alt=""><span>晴天节点</span></a><a class="text-link" href="./index.html">返回首页</a></header>
-<main class="auth-shell"><section class="auth-card"><a class="brand auth-brand" href="./index.html"><img src="./logo.png" alt=""><span>晴天节点</span></a><span class="eyebrow">CREATE ACCOUNT</span><h1>创建账户</h1><p class="auth-intro">注册后即可选购高速节点套餐。</p><form id="registerForm"><label>邮箱地址<input id="email" type="email" autocomplete="email" placeholder="name@example.com" required></label><label>邮箱验证码<div class="input-with-action"><input id="code" inputmode="numeric" maxlength="6" placeholder="6 位验证码" required><button class="button button-outline" id="sendCode" type="button">发送验证码</button></div></label><label>设置密码<input id="password" type="password" autocomplete="new-password" minlength="6" placeholder="至少 6 位" required></label><label>邀请码 <span class="optional">选填</span><input id="inviteCode" type="text" placeholder="如有邀请码请填写"></label><p id="formMessage" class="form-message" role="alert"></p><button class="button button-wide" type="submit">创建账户 <span>→</span></button></form><p class="auth-switch">已有账户？ <a href="./login.html">立即登录</a></p></section></main><script src="./js/api.js"></script><script src="./js/main.js"></script></body></html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f5f8fc">
+<title>注册 · 晴天节点</title><link rel="icon" href="./logo.png"><link rel="stylesheet" href="./css/style.css">
+</head>
+<body data-page="register">
+<header class="topbar"><a class="brand" href="./index.html"><img src="./logo.png" alt=""><span>晴天节点</span></a><a class="text-link" href="./index.html">返回首页</a></header>
+<main class="auth-shell"><section class="auth-card">
+<a class="brand auth-brand" href="./index.html"><img src="./logo.png" alt=""><span>晴天节点</span></a>
+<span class="eyebrow">CREATE ACCOUNT</span><h1>创建账户</h1><p class="auth-intro">注册后即可选购高速节点套餐。</p>
+<form id="registerForm" novalidate>
+<label for="email">邮箱地址<input id="email" name="email" type="email" autocomplete="email" placeholder="name@example.com" required></label>
+<label for="code">邮箱验证码<div class="input-with-action"><input id="code" name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="12" placeholder="请输入邮箱验证码" required><button class="button button-outline" id="sendCode" type="button">发送验证码</button></div></label>
+<label for="password">设置密码<input id="password" name="password" type="password" autocomplete="new-password" minlength="6" placeholder="至少 6 位" required></label>
+<label for="confirmPassword">确认密码<input id="confirmPassword" name="confirmPassword" type="password" autocomplete="new-password" minlength="6" placeholder="请再次输入密码" required></label>
+<label for="inviteCode">邀请码 <span class="optional">选填</span><input id="inviteCode" name="inviteCode" type="text" autocomplete="off" placeholder="如有邀请码请填写"></label>
+<p id="formMessage" class="form-message" role="alert" aria-live="polite"></p>
+<button class="button button-wide" id="registerButton" type="submit">创建账户 <span>→</span></button>
+</form>
+<p class="auth-switch">已有账户？ <a href="./login.html">立即登录</a></p>
+</section></main>
+<script src="./js/api.js"></script>
+<script>
+(function(){
+'use strict';
+const form=document.getElementById('registerForm'),email=document.getElementById('email'),code=document.getElementById('code'),password=document.getElementById('password'),confirmPassword=document.getElementById('confirmPassword'),inviteCode=document.getElementById('inviteCode'),send=document.getElementById('sendCode'),button=document.getElementById('registerButton'),message=document.getElementById('formMessage');
+const validEmail=value=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+let cooldownTimer=null,cooldown=0,sending=false;
+function show(text,error=true){message.textContent=text||'';message.classList.toggle('success',!error);message.setAttribute('role',error?'alert':'status')}
+function setSendState(){send.disabled=sending||cooldown>0;send.textContent=sending?'发送中...':cooldown>0?'已发送('+cooldown+'s)':'发送验证码'}
+function startCooldown(){cooldown=60;setSendState();if(cooldownTimer)clearInterval(cooldownTimer);cooldownTimer=setInterval(()=>{cooldown=Math.max(0,cooldown-1);setSendState();if(cooldown===0){clearInterval(cooldownTimer);cooldownTimer=null}},1000)}
+send.addEventListener('click',async()=>{
+ if(sending||cooldown>0)return;show('');
+ const address=email.value.trim();if(!validEmail(address)){show('请先输入有效的邮箱地址（需包含 @ 和有效域名）。');email.focus();return}
+ sending=true;setSendState();
+ try{await window.S5Api.sendCode(address);show('验证码已发送，请查收邮箱。',false);startCooldown()}
+ catch(error){show(error&&error.message?error.message:'验证码发送失败，请稍后重试');cooldown=0}
+ finally{sending=false;setSendState()}
+});
+form.addEventListener('submit',async event=>{
+ event.preventDefault();if(button.disabled)return;show('');
+ const address=email.value.trim(),secret=password.value,confirm=confirmPassword.value,verifyCode=code.value.trim();
+ if(!validEmail(address)){show('请输入有效的邮箱地址。');email.focus();return}
+ if(!verifyCode){show('请填写邮箱验证码。');code.focus();return}
+ if(secret.length<6){show('密码至少需要 6 位。');password.focus();return}
+ if(secret!==confirm){show('两次输入的密码不一致，请重新确认。');confirmPassword.focus();return}
+ button.disabled=true;button.textContent='注册中...';
+ try{await window.S5Api.register({email:address,code:verifyCode,password:secret,invite_code:inviteCode.value.trim()});if(!localStorage.getItem('lynli_token'))throw new Error('注册成功，但服务端未返回有效 token');location.href='./user.html'}
+ catch(error){show(error&&error.message?error.message:'注册失败，请稍后重试');button.disabled=false;button.innerHTML='创建账户 <span>→</span>'}
+});
+window.addEventListener('pagehide',()=>{if(cooldownTimer)clearInterval(cooldownTimer)});
+})();
+</script>
+</body></html>

@@ -31,31 +31,17 @@ function show(text,error=true){message.textContent=text||'';message.classList.to
 function setSendState(){send.disabled=sending||cooldown>0;send.textContent=sending?'发送中...':cooldown>0?'已发送('+cooldown+'s)':'发送验证码'}
 function startCooldown(){cooldown=60;setSendState();if(cooldownTimer)clearInterval(cooldownTimer);cooldownTimer=setInterval(()=>{cooldown=Math.max(0,cooldown-1);setSendState();if(cooldown===0){clearInterval(cooldownTimer);cooldownTimer=null}},1000)}
 send.addEventListener('click',async()=>{
- alert("前端已触发！");
  if(sending||cooldown>0)return;
  show('');
  const emailValue=email.value.trim();
  if(!validEmail(emailValue)){show('请先输入有效的邮箱地址。');email.focus();return}
  sending=true;setSendState();
  try{
-  const response=await fetch('https://api.lynli.me/api/v1/passport/auth/send-code',{
-   method:'POST',
-   headers:{'Content-Type':'application/json'},
-   body:JSON.stringify({email:emailValue})
-  });
-  if(!response.ok){
-   const serverError=await response.text();
-   alert("服务器拒绝: "+serverError);
-   show(serverError||('服务器拒绝请求（HTTP '+response.status+'）'));
-   return;
-  }
-  const result=await response.json().catch(()=>({}));
+  const result=await window.S5Api.sendCode(emailValue);
   const backendMessage=result&&typeof result.message==='string'?result.message:'';
-  if(result&&result.success===false)throw new Error(backendMessage||'验证码发送失败');
   show(backendMessage||'验证码已发送，请查收邮箱。',false);
   startCooldown();
  }catch(err){
-  alert("网络错误: "+err.message);
   show(err&&err.message?err.message:'验证码发送失败，请稍后重试');
   cooldown=0;
  }finally{

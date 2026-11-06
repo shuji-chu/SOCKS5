@@ -25,7 +25,7 @@ function responseMessage(payload){
 function hasFailureFlag(payload){
  if(!payload||typeof payload!=='object')return false;
  const status=String(payload.status??'').toLowerCase(),code=payload.code,message=responseMessage(payload);
- const failureMessage=/(频繁|失败|错误|无效|不正确|不能为空|未通过|已存在|已过期|禁止|拒绝|不足|invalid|incorrect|unauthorized|forbidden|failed)/i.test(message);
+ const failureMessage=/(频繁|失败|错误|无效|不正确|不能为空|未通过|已存在|已注册|已过期|禁止|拒绝|不足|invalid|incorrect|unauthorized|forbidden|failed)/i.test(message);
  return payload.success===false||['fail','failed','error'].includes(status)||failureMessage||
   (typeof code==='number'&&code>=400)||(typeof code==='string'&&/^\d{3,}$/.test(code)&&Number(code)>=400);
 }
@@ -57,8 +57,13 @@ async function request(path,options={}){
   redirectToLogin();
   throw new Error(responseMessage(payload)||'登录状态已失效，请重新登录');
  }
+ const message=responseMessage(payload);
+ if(options.requireCodeOne&&(payload.code!==1||payload.success===false||/(错误|已注册)/.test(message))){
+  const error=new Error(message||'验证码发送失败');
+  error.status=response.status;error.payload=payload;throw error;
+ }
  if(!response.ok||hasFailureFlag(payload)){
-  const error=new Error(responseMessage(payload)||'请求失败（HTTP '+response.status+'）');
+  const error=new Error(message||'请求失败（HTTP '+response.status+'）');
   error.status=response.status;error.payload=payload;throw error;
  }
  return unwrap(payload);
@@ -78,7 +83,7 @@ async function login(email,password){
  const data=await request('/passport/auth/login',{method:'POST',auth:false,body:{email,password}});
  saveToken(credential(data));return data;
 }
-function sendCode(email){return request('/passport/auth/send-code',{method:'POST',auth:false,body:{email}})}
+function sendCode(email){return request('/passport/auth/send-code',{method:'POST',auth:false,body:{email},requireCodeOne:true})}
 async function register(input){
  const body={email:input.email,code:input.code,password:input.password};
  if(input.invite_code&&String(input.invite_code).trim())body.invite_code=String(input.invite_code).trim();

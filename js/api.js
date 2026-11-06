@@ -21,10 +21,11 @@ function login(email,password){return request('/passport/auth/login',{method:'PO
 function sendCode(email){return request('/passport/auth/send-code',{method:'POST',auth:false,body:{email}})}
 function register(input){const body={email:input.email,code:input.code,password:input.password};if(input.invite_code)body.invite_code=input.invite_code;return request('/passport/auth/register',{method:'POST',auth:false,body}).then(data=>{saveToken(data.token||data.auth_data||data.access_token);return data})}
 function getPlans(){return request('/user/plan/fetch',{method:'GET',auth:false})}
+function getConfig(){return request('/config',{method:'GET',auth:false})}
 function getUserInfo(){return request('/user/info')}
 function getSubscription(){return request('/user/getSubscribe')}
 function createOrder(payload){return request('/user/order/save',{method:'POST',body:payload})}
 function checkoutOrder(tradeNo){return request('/user/order/checkout',{method:'POST',body:{trade_no:tradeNo}})}
 window.API_BASE=API_BASE;
-window.S5Api=Object.freeze({request,unwrap,token,saveToken,clearToken,login,sendCode,register,getPlans,getUserInfo,getSubscription,createOrder,checkoutOrder});
+window.S5Api=Object.freeze({request,unwrap,token,saveToken,clearToken,login,sendCode,register,getPlans,getConfig,getUserInfo,getSubscription,createOrder,checkoutOrder});
 })();

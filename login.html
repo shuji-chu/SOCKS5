@@ -1,4 +1,38 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f5f8fc"><title>登录 · 晴天节点</title><link rel="icon" href="./logo.png"><link rel="stylesheet" href="./css/style.css"></head>
-<body data-page="login"><header class="topbar"><a class="brand" href="./index.html"><img src="./logo.png" alt=""><span>晴天节点</span></a><a class="text-link" href="./index.html">返回首页</a></header>
-<main class="auth-shell"><section class="auth-card"><a class="brand auth-brand" href="./index.html"><img src="./logo.png" alt=""><span>晴天节点</span></a><span class="eyebrow">WELCOME BACK</span><h1>登录账户</h1><p class="auth-intro">登录后管理套餐、流量与订阅。</p><form id="loginForm"><label>邮箱地址<input id="email" type="email" autocomplete="username" placeholder="name@example.com" required></label><label>登录密码<input id="password" type="password" autocomplete="current-password" placeholder="请输入密码" required></label><p id="formMessage" class="form-message" role="alert"></p><button class="button button-wide" type="submit">登录账户 <span>→</span></button></form><p class="auth-switch">还没有账户？ <a href="./register.html">立即注册</a></p></section></main><script src="./js/api.js"></script><script src="./js/main.js"></script></body></html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f5f8fc">
+<title>登录 · 晴天节点</title><link rel="icon" href="./logo.png"><link rel="stylesheet" href="./css/style.css">
+</head>
+<body data-page="login">
+<header class="topbar"><a class="brand" href="./index.html"><img src="./logo.png" alt=""><span>晴天节点</span></a><a class="text-link" href="./index.html">返回首页</a></header>
+<main class="auth-shell"><section class="auth-card">
+<a class="brand auth-brand" href="./index.html"><img src="./logo.png" alt=""><span>晴天节点</span></a>
+<span class="eyebrow">WELCOME BACK</span><h1>登录账户</h1><p class="auth-intro">登录后管理套餐、流量与订阅。</p>
+<form id="loginForm" novalidate>
+<label for="email">邮箱地址<input id="email" name="email" type="email" autocomplete="username" placeholder="name@example.com" required></label>
+<label for="password">登录密码<input id="password" name="password" type="password" autocomplete="current-password" placeholder="请输入至少 6 位密码" required minlength="6"></label>
+<p id="formMessage" class="form-message" role="alert" aria-live="polite"></p>
+<button class="button button-wide" id="loginButton" type="submit">登录账户 <span>→</span></button>
+</form>
+<p class="auth-switch">还没有账户？ <a href="./register.html">立即注册</a></p>
+</section></main>
+<script src="./js/api.js"></script>
+<script>
+(function(){
+'use strict';
+const form=document.getElementById('loginForm'),email=document.getElementById('email'),password=document.getElementById('password'),button=document.getElementById('loginButton'),message=document.getElementById('formMessage');
+const validEmail=value=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+function show(text,error=true){message.textContent=text||'';message.classList.toggle('success',!error);message.setAttribute('role',error?'alert':'status')}
+form.addEventListener('submit',async event=>{
+ event.preventDefault();if(button.disabled)return;show('');
+ const address=email.value.trim(),secret=password.value;
+ if(!validEmail(address)){show('请输入有效的邮箱地址（需包含 @ 和有效域名）。');email.focus();return}
+ if(!secret||secret.length<6){show('密码不能为空，且至少需要 6 位。');password.focus();return}
+ button.disabled=true;button.textContent='登录中...';
+ try{await window.S5Api.login(address,secret);const token=localStorage.getItem('lynli_token');if(!token)throw new Error('登录成功，但服务端未返回有效 token');location.href='./user.html'}
+ catch(error){show(error&&error.message?error.message:'登录失败，请稍后重试');button.disabled=false;button.innerHTML='登录账户 <span>→</span>'}
+});
+})();
+</script>
+</body></html>

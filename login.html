@@ -27,11 +27,17 @@ function show(text,error=true){message.textContent=text||'';message.classList.to
 form.addEventListener('submit',async event=>{
  event.preventDefault();if(button.disabled)return;show('');
  const address=email.value.trim(),secret=password.value;
- if(!validEmail(address)){show('请输入有效的邮箱地址（需包含 @ 和有效域名）。');email.focus();return}
- if(!secret||secret.length<6){show('密码不能为空，且至少需要 6 位。');password.focus();return}
- button.disabled=true;button.textContent='登录中...';
- try{await window.S5Api.login(address,secret);const token=localStorage.getItem('lynli_token');if(!token)throw new Error('登录成功，但服务端未返回有效 token');location.href='./user.html'}
- catch(error){show(error&&error.message?error.message:'登录失败，请稍后重试');button.disabled=false;button.innerHTML='登录账户 <span>→</span>'}
+ if(!validEmail(address)){show('请输入有效的邮箱地址。');email.focus();return}
+ if(secret.length<6){show('密码不能为空，且至少需要 6 位。');password.focus();return}
+ button.disabled=true;button.setAttribute('aria-busy','true');button.textContent='登录中...';
+ try{
+  await window.S5Api.login(address,secret);
+  if(!localStorage.getItem('lynli_token'))throw new Error('登录接口未返回有效 Token，请检查后端响应');
+  location.replace('./user.html');
+ }catch(error){
+  show(error&&error.message?error.message:'登录失败，请稍后重试');
+  button.disabled=false;button.removeAttribute('aria-busy');button.innerHTML='登录账户 <span>→</span>';
+ }
 });
 })();
 </script>

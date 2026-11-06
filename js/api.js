@@ -83,7 +83,18 @@ async function login(email,password){
  const data=await request('/passport/auth/login',{method:'POST',auth:false,body:{email,password}});
  saveToken(credential(data));return data;
 }
-function sendCode(email){return request('/passport/auth/send-code',{method:'POST',auth:false,body:{email},requireCodeOne:true})}
+function sendCode(email){
+ const url=API_BASE+API_PREFIX+'/passport/auth/send-code';
+ const body=JSON.stringify({email:email});
+ console.log('[send-code] POST',url,{email});
+ return request('/passport/auth/send-code',{
+  method:'POST',
+  auth:false,
+  headers:{'Content-Type':'application/json'},
+  body,
+  requireCodeOne:true
+ });
+}
 async function register(input){
  const body={email:input.email,code:input.code,password:input.password};
  if(input.invite_code&&String(input.invite_code).trim())body.invite_code=String(input.invite_code).trim();
